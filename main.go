@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/spatial-go/geos/pattern"
+	"github.com/spatial-go/geos/geo"
 )
 
 func main() {
-	wkt := pattern.NewWKT()
+	wkt := geo.NewWKT()
 	fromWKT := wkt.FromWKTStr("POINT(10 10)")
 	fmt.Printf("%p\r\n", &fromWKT)
 

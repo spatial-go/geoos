@@ -1,21 +1,20 @@
-package pattern
+package test
 
 import (
 	"fmt"
+	"github.com/spatial-go/geos/coder"
 	"testing"
 )
 
 func TestFromWkt(t *testing.T){
-	wkt := NewWKT()
-	fromWKT := wkt.FromWKTStr("POINT(10 10)")
+	fromWKT := coder.FromWKTStr("POINT(10 10)")
 	fmt.Printf("%p\r\n", &fromWKT)
 
-	s, e := wkt.ToWKTStr(fromWKT)
+	s, e := coder.ToWKTStr(fromWKT)
 	if e != nil {
 		t.Error( e.Error())
 	} else {
 		t.Log(s)
 	}
-	wkt.Destroy()
 
 }

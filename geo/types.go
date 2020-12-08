@@ -1,4 +1,4 @@
-package geom
+package geo
 
 ///**
 //#include "geos.c"
@@ -17,3 +17,9 @@ package geom
 //	GeometryCollection = C.GEOS_GEOMETRYCOLLECTION
 //)
 
+type CodeType int
+
+const (
+	WKB CodeType = 0
+	WKT CodeType = 1
+)
