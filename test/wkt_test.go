@@ -7,7 +7,7 @@ import (
 )
 
 func TestFromWkt(t *testing.T){
-	fromWKT := coder.FromWKTStr("POINT(10 10)")
+	fromWKT := coder.GeomFromWKTStr("POINT(10 10)")
 	fmt.Printf("%p\r\n", &fromWKT)
 
 	s, e := coder.ToWKTStr(fromWKT)

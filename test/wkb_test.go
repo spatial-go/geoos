@@ -11,7 +11,7 @@ func TestWkb(t *testing.T){
 	var testPoint = "POINT(-117 35)"
 	var testHex = "01010000000000000000405DC00000000000804140"
 
-	geometry, e := coder.FromWKB(testByte)
+	geometry, e := coder.GeomFromWKBStr(testByte)
 	if e != nil {
 		t.Error(e.Error())
 	}
@@ -21,7 +21,7 @@ func TestWkb(t *testing.T){
 	t.Log(testPoint)
 	t.Log(bytes)
 
-	geosGeometry, _ := coder.FromWKBHex(testHex)
+	geosGeometry, _ := coder.GeomFromWKBHexStr(testHex)
 	wkbstr, _ := coder.ToWKB(geosGeometry)
 	t.Log(wkbstr)
 	hex, _ := coder.ToWKBHex(geosGeometry)

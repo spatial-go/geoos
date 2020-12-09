@@ -13,7 +13,7 @@ func ToWKTStr(g geo.GEOSGeometry) (string, error) {
 }
 
 // 根据WKT格式字符串生成集合对象
-func FromWKTStr(wktstr string) geo.GEOSGeometry {
+func GeomFromWKTStr(wktstr string) geo.GEOSGeometry {
 	reader := geo.WKTReaderFactory()
 	defer geo.WKTReaderDestroy(reader)
 	return geo.EncodeWKTToGeom(reader, wktstr)

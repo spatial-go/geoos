@@ -1,44 +1,18 @@
 package test
 
 import (
+	"github.com/spatial-go/geos/algorithm"
+	"github.com/spatial-go/geos/coder"
 	"testing"
 )
+const bufferPoly = `POLYGON ((1.0000000000000000 0.0000000000000000, 0.9807852804032304 -0.1950903220161281, 0.9238795325112870 -0.3826834323650894, 0.8314696123025456 -0.5555702330196017, 0.7071067811865481 -0.7071067811865470, 0.5555702330196032 -0.8314696123025447, 0.3826834323650908 -0.9238795325112863, 0.1950903220161296 -0.9807852804032302, 0.0000000000000016 -1.0000000000000000, -0.1950903220161265 -0.9807852804032308, -0.3826834323650878 -0.9238795325112875, -0.5555702330196004 -0.8314696123025465, -0.7071067811865459 -0.7071067811865492, -0.8314696123025438 -0.5555702330196043, -0.9238795325112857 -0.3826834323650923, -0.9807852804032299 -0.1950903220161312, -1.0000000000000000 -0.0000000000000032, -0.9807852804032311 0.1950903220161249, -0.9238795325112882 0.3826834323650864, -0.8314696123025475 0.5555702330195990, -0.7071067811865505 0.7071067811865446, -0.5555702330196060 0.8314696123025428, -0.3826834323650936 0.9238795325112852, -0.1950903220161322 0.9807852804032297, -0.0000000000000037 1.0000000000000000, 0.1950903220161248 0.9807852804032311, 0.3826834323650867 0.9238795325112881, 0.5555702330195996 0.8314696123025469, 0.7071067811865455 0.7071067811865496, 0.8314696123025438 0.5555702330196044, 0.9238795325112859 0.3826834323650920, 0.9807852804032300 0.1950903220161305, 1.0000000000000000 0.0000000000000000))`
+func TestBuffer(t *testing.T){
+	geometry := coder.GeomFromWKTStr("POINT(0 0)")
+	buffer := algorithm.Buffer(geometry, 1.0, 8)
+	polygon := coder.GeomFromWKTStr(bufferPoly)
 
-func TestInterpolate(t *testing.T) {
-
-	//wkt := coder.NewWKT()
-	//g := wkt.FromWKTStr("LINESTRING(0 0, 1 1)")
-	//defer wkt.Destroy()
-	//
-	//algorithm := NewAlgorithm()
-	//defer algorithm.Destroy()
-	//geometry, e := algorithm.Interpolate(g, 10)
-	//if e != nil {
-	//	t.Error(e.Error())
-	//} else {
-	//	t.Logf("%p", &geometry)
-	//}
-
-	//c:= geo.InitGeosContext()
-	//fmt.Printf("%p",c)
-	//geo.FinishGeosContext(c)
-	//fmt.Printf("%p",c)
-
+	eq:= algorithm.EqualsExact(buffer,polygon,0.0000001)
+	if eq {
+		t.Log("相等")
+	}
 }
-
-//func TestGeometryProject(t *testing.T) {
-//	wkt := geo.NewWKT()
-//	defer wkt.Destroy()
-//	ls := geo.FromWKTStr(wkt.Handler,"LINESTRING(0 0, 1 1)")
-//	pt := geo.FromWKTStr(wkt.Handler,"POINT(0 1)")
-//	fmt.Printf("%p",ls)
-//	fmt.Printf("%p",pt)
-//	a := algorithm.NewAlgorithm()
-//	defer a.Destroy()
-//	project := a.Project(ls, pt)
-//
-//	expected := 0.7071067811865476
-//	if expected != project {
-//		t.Errorf("Geometry.Project(): want %v, got %v", expected, project)
-//	}
-//}

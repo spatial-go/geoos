@@ -6,7 +6,7 @@ import (
 )
 
 // 根据wkb 二进制生成集合对象
-func FromWKB(wkbByte []byte) (geo.GEOSGeometry, error) {
+func GeomFromWKBStr(wkbByte []byte) (geo.GEOSGeometry, error) {
 	cwkb := geo.GoByteArrayToCCharArray(wkbByte)
 	reader := geo.WKBReaderFactory()
 	defer geo.WKBReaderDestroy(reader)
@@ -28,7 +28,7 @@ func ToWKBHex(g geo.GEOSGeometry) (string, error) {
 }
 
 // 根据hex格式字符串生成集合对象
-func FromWKBHex(wkbHex string) (geo.GEOSGeometry, error) {
+func GeomFromWKBHexStr(wkbHex string) (geo.GEOSGeometry, error) {
 	wkbstr, err := hex.DecodeString(wkbHex)
 	if err != nil {
 		return nil, err

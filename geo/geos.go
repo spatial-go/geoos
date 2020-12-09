@@ -27,7 +27,10 @@ type GEOSWKTWriter *C.GEOSWKTWriter
 type GEOSWKBReader *C.GEOSWKBReader
 type GEOSWKBWriter *C.GEOSWKBWriter
 
-type GEOSChar C.char
+type GEOSChar *C.char
+
+
+
 
 var (
 	geosContext = InitGeosContext()
@@ -48,6 +51,7 @@ func Version() string {
 func Error() error {
 	return fmt.Errorf("geo: %s", C.GoString(C.geos_get_last_error()))
 }
+
 //  ====================Reader\Writer 初始化、销毁方法===============================
 /**
 Reader factory
@@ -85,7 +89,6 @@ func WKBWriterFactory() GEOSWKBWriter {
 func WKBWriterDestroy(writer GEOSWKBWriter) {
 	C.GEOSWKBWriter_destroy_r(geosContext, writer)
 }
-
 
 //===========================几何对象、字符串之间编解码方法================================
 // 解码生成wkt格式字符串
@@ -162,7 +165,7 @@ func EncodeHexToGeom(reader GEOSWKBReader, cwkb []C.uchar) (GEOSGeometry, error)
 
 //=========================== Go与C 转换帮助===============================
 // c语言字符转成go 字符串
-func CStrToGo(c *C.char) string {
+func CStrToGo(c GEOSChar) string {
 	return C.GoString(c)
 }
 
@@ -178,4 +181,18 @@ func GoByteArrayToCCharArray(array []byte) []C.uchar {
 		cArray = append(cArray, C.uchar(array[i]))
 	}
 	return cArray
+}
+
+//=========================== buffer 缓冲区===============================
+func Buffer(g GEOSGeometry, width float64, quadsegs int32) GEOSGeometry {
+	return C.GEOSBuffer_r(geosContext, g, C.double(width), C.int(quadsegs))
+}
+
+//=========================== Geometry 比较方法===============================
+func EqualsExact(s GEOSGeometry, d GEOSGeometry, tolerance float64) bool {
+	c := C.GEOSEqualsExact_r(geosContext, s, d, C.double(tolerance))
+	if c==1 {
+		return true
+	}
+	return false
 }
