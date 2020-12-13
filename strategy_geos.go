@@ -23,6 +23,7 @@ func (G GEOSAlgorithm) Boundary(g Geometry) (Geometry, error) {
 	}
 	return geometry, nil
 }
+
 func (G GEOSAlgorithm) Centroid(g Geometry) (Geometry, error) {
 	s := MarshalString(g)
 	centroid, e := geo.Centroid(s)
