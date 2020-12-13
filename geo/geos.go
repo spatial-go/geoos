@@ -42,20 +42,6 @@ func Error() error {
 	return fmt.Errorf("geo: %s", C.GoString(C.geos_get_last_error()))
 }
 
-//=========================== buffer 缓冲区===============================
-func Buffer(g GEOSGeometry, width float64, quadsegs int32) GEOSGeometry {
-	return C.GEOSBuffer_r(geosContext, g, C.double(width), C.int(quadsegs))
-}
-
-//=========================== Geometry 比较方法===============================
-func EqualsExact(s GEOSGeometry, d GEOSGeometry, tolerance float64) bool {
-	c := C.GEOSEqualsExact_r(geosContext, s, d, C.double(tolerance))
-	if c == 1 {
-		return true
-	}
-	return false
-}
-
 // 计算面积
 func Area(wkt string) (float64, error) {
 	geoGeom := GeomFromWKTStr(wkt)
@@ -77,4 +63,26 @@ func Boundary(wkt string) (string, error) {
 	}
 	C.GEOSGeom_destroy_r(geosContext, geoGeom)
 	return s, nil
+}
+
+func Centroid(wkt string) (string, error) {
+	geoGeom := GeomFromWKTStr(wkt)
+	g := C.GEOSGetCentroid_r(geosContext, geoGeom)
+	s, e := ToWKTStr(g)
+	if e != nil {
+		return "", e
+	}
+	C.GEOSGeom_destroy_r(geosContext, geoGeom)
+	return s, nil
+}
+
+func IsSimple(wkt string) (bool, error) {
+	geoGeom := GeomFromWKTStr(wkt)
+	c := C.GEOSisSimple_r(geosContext, geoGeom)
+	b, e := boolFromC(c)
+	if e != nil {
+		return false, e
+	}
+	C.GEOSGeom_destroy_r(geosContext, geoGeom)
+	return b, nil
 }

@@ -1,4 +1,4 @@
-package base
+package geos
 
 
 // MultiLineString is a set of polylines.

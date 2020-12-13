@@ -1,4 +1,4 @@
-package base
+package geos
 
 // Polygon is a closed area. The first LineString is the outer ring.
 // The others are the holes. Each LineString is expected to be closed
@@ -20,7 +20,7 @@ func (p Polygon) Area() (float64, error) {
 	return s.Area(p)
 }
 
-func (p Polygon) Boundary() (*Geometry ,error){
+func (p Polygon) Boundary() (Geometry,error){
 	s := NormalStrategy()
 	return s.Boundary(p)
 }

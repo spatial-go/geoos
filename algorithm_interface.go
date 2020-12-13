@@ -1,16 +1,21 @@
-package base
+package geos
 
 import "C"
 
 type Algorithm interface {
+
+	// 其他功能
+	// 计算几何图形面积
+	Area(g Geometry) (float64, error)
+
 	Buffer(g Geometry, width float64, quadsegs int32) Geometry
 	// 如果两个几何图形相等，则EqualsExact将返回true，因为它们的点在给定公差内。
 	EqualsExact(s Geometry, d Geometry, tolerance float64) bool
 
-	// 其他功能
-	// Area returns the area of the geometry, which must be a areal geometry like
-	// a polygon or multipolygon.
-	Area(g Geometry) (float64, error)
+	//如果此Geometry没有异常的几何点（例如自相交或自相切），则返回true
+	IsSimple(g Geometry) (bool, error)
+
+
 
 	// Length returns the length of the geometry, which must be a lineal geometry
 	// like a linestring or linear ring.
@@ -43,7 +48,7 @@ type Algorithm interface {
 	ConvexHull() (*Geometry, error)
 
 	// 计算几何图形的组合边界的闭合值
-	Boundary(g Geometry) (*Geometry, error)
+	Boundary(g Geometry) (Geometry, error)
 
 	// UnaryUnion computes the union of all the constituent geometries of the
 	// geometry.
@@ -53,8 +58,11 @@ type Algorithm interface {
 	// the geometry.
 	PointOnSurface() (*Geometry, error)
 
-	// Centroid is the center point of the geometry.
-	Centroid() (*Geometry, error)
+	// 计算几何的几何中心，或等效地，将几何的质心计算为POINT
+	//对于[MULTI] POINT，将其计算为输入坐标的算术平均值
+	//对于[ MULTI ] linestring，这个值计算为每个线段的加权长度。
+	//对于[MULTI] POLYGON，“重量”被认为是面积。如果提供了空的几何图形，则返回空的GEOMETRYCOLLECTION
+	Centroid(g Geometry) (Geometry, error)
 
 	// LineMerge will merge together a collection of LineStrings where they touch
 	// only at their start and end points. The LineStrings must be fully noded. The
@@ -63,6 +71,7 @@ type Algorithm interface {
 
 	// Simplify returns a geometry simplified by amount given by tolerance.
 	// May not preserve topology -- see SimplifyP.
+	// 如果此Geometry没有异常的几何点（例如自相交或自相切），则返回true
 	Simplify(tolerance float64) (*Geometry, error)
 
 	// SimplifyP returns a geometry simplified by amount given by tolerance.
@@ -149,8 +158,7 @@ type Algorithm interface {
 	// the empty geometry).
 	IsEmpty() (bool, error)
 
-	// IsSimple returns true iff the only self-intersections are at boundary points.
-	IsSimple() (bool, error)
+
 	// IsRing returns true if the lineal geometry has the ring property.
 	IsRing() (bool, error)
 

@@ -1,4 +1,4 @@
-package base
+package geos
 
 // A MultiPoint represents a set of points in the 2D Eucledian or Cartesian plane.
 type MultiPoint []Point

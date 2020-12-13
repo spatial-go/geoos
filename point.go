@@ -1,4 +1,4 @@
-package base
+package geos
 
 type Point struct {
 	X float64

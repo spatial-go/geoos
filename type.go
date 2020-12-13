@@ -1,4 +1,4 @@
-package base
+package geos
 
 const (
 	TypePoint           = "Point"

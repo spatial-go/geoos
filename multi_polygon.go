@@ -1,4 +1,4 @@
-package base
+package geos
 
 // MultiPolygon is a set of polygons.
 type MultiPolygon []Polygon
