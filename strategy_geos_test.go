@@ -365,3 +365,119 @@ func TestGEOSAlgorithm_Contains(t *testing.T) {
 		})
 	}
 }
+
+func TestGEOSAlgorithm_UniquePoints(t *testing.T) {
+	const polygon = `POLYGON((0 0, 6 0, 6 6, 0 6, 0 0))`
+	const multipoint = `MULTIPOINT((0 0),(6 0),(6 6),(0 6))`
+
+	poly, _ := UnmarshalString(polygon)
+
+	type args struct {
+		g Geometry
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    string
+		wantErr bool
+	}{
+		{name: "uniquepoints", args: args{g: poly}, want: multipoint, wantErr: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			G := GEOSAlgorithm{}
+			got, err := G.UniquePoints(tt.args.g)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("UniquePoints() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			res := MarshalString(got)
+			t.Log(res)
+			if !reflect.DeepEqual(res, tt.want) {
+				t.Errorf("UniquePoints() got = %v, want %v", res, tt.want)
+			}
+		})
+	}
+}
+
+func TestGEOSAlgorithm_SharedPaths(t *testing.T) {
+	const mullinestring = `MULTILINESTRING((26 125,26 200,126 200,126 125,26 125),
+	   (51 150,101 150,76 175,51 150))`
+	const linestring = `LINESTRING(151 100,126 156.25,126 125,90 161, 76 175)`
+	const res = `GEOMETRYCOLLECTION (MULTILINESTRING ((126.0000000000000000 156.2500000000000000, 126.0000000000000000 125.0000000000000000), (101.0000000000000000 150.0000000000000000, 90.0000000000000000 161.0000000000000000), (90.0000000000000000 161.0000000000000000, 76.0000000000000000 175.0000000000000000)), MULTILINESTRING EMPTY)`
+
+	mulline, _ := UnmarshalString(mullinestring)
+	line, _ := UnmarshalString(linestring)
+
+	type args struct {
+		g1 Geometry
+		g2 Geometry
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    string
+		wantErr bool
+	}{
+		{name: "sharepath", args: args{
+			g1: line,
+			g2: mulline,
+		}, want: res, wantErr: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			G := GEOSAlgorithm{}
+			got, err := G.SharedPaths(tt.args.g1, tt.args.g2)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("SharedPaths() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("SharedPaths() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestGEOSAlgorithm_Snap(t *testing.T) {
+	const input = `POINT(0.05 0.05)`
+	const refernce = `POINT(0 0)`
+	const expect = `POINT(0 0)`
+
+	inputGeom, _ := UnmarshalString(input)
+	referenceGeom, _ := UnmarshalString(refernce)
+
+	type args struct {
+		input     Geometry
+		reference Geometry
+		tolerance float64
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    string
+		wantErr bool
+	}{
+		{name: "snap", args: args{
+			input:     inputGeom,
+			reference: referenceGeom,
+			tolerance: 0.1,
+		}, want: expect, wantErr: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			G := GEOSAlgorithm{}
+			got, err := G.Snap(tt.args.input, tt.args.reference, tt.args.tolerance)
+
+			s := MarshalString(got)
+			t.Log(s)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Snap() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(s, tt.want) {
+				t.Errorf("Snap() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

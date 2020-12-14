@@ -10,6 +10,7 @@ package geo
 import "C"
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -163,7 +164,7 @@ func Within(g1 string, g2 string) (bool, error) {
 	return b, nil
 
 }
-func Contains(g1 string,g2 string)(bool,error){
+func Contains(g1 string, g2 string) (bool, error) {
 	geom1 := GeomFromWKTStr(g1)
 	geom2 := GeomFromWKTStr(g2)
 	c := C.GEOSContains_r(geosContext, geom1, geom2)
@@ -174,4 +175,42 @@ func Contains(g1 string,g2 string)(bool,error){
 	C.GEOSGeom_destroy_r(geosContext, geom1)
 	C.GEOSGeom_destroy_r(geosContext, geom2)
 	return b, nil
+}
+
+func UniquePoints(g string) (string, error) {
+	geom := GeomFromWKTStr(g)
+	c := C.GEOSGeom_extractUniquePoints_r(geosContext, geom)
+	if c == nil {
+		return "", errors.New("UniquePoints return null")
+	}
+	wkt, e := ToWKTStr(c)
+	if e != nil {
+		return "", e
+	}
+	return wkt, nil
+
+}
+
+func SharedPaths(g1 string, g2 string) (string, error) {
+	geom1 := GeomFromWKTStr(g1)
+	geom2 := GeomFromWKTStr(g2)
+	g := C.GEOSSharedPaths_r(geosContext, geom1, geom2)
+	wkt, e := ToWKTStr(g)
+	if e != nil {
+		return "", e
+	}
+	C.GEOSGeom_destroy_r(geosContext, geom1)
+	C.GEOSGeom_destroy_r(geosContext, geom2)
+	return wkt, nil
+}
+
+func Snap(input string, reference string, tolerance float64) (string, error) {
+	inputGeom := GeomFromWKTStr(input)
+	referenceGeom := GeomFromWKTStr(reference)
+	g := C.GEOSSnap_r(geosContext, inputGeom, referenceGeom, C.double(tolerance))
+	s, e := ToWKTStr(g)
+	if e != nil {
+		return "", e
+	}
+	return s, nil
 }

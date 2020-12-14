@@ -50,13 +50,13 @@ func (G GEOSAlgorithm) Length(g Geometry) (float64, error) {
 func (G GEOSAlgorithm) Distance(g1 Geometry, g2 Geometry) (float64, error) {
 	geom1 := MarshalString(g1)
 	geom2 := MarshalString(g2)
-	return geo.Distance(geom1,geom2)
+	return geo.Distance(geom1, geom2)
 }
 
 func (G GEOSAlgorithm) HausdorffDistance(g1 Geometry, g2 Geometry) (float64, error) {
 	geom1 := MarshalString(g1)
 	geom2 := MarshalString(g2)
-	return geo.HausdorffDistance(geom1,geom2)
+	return geo.HausdorffDistance(geom1, geom2)
 }
 
 func (G GEOSAlgorithm) IsEmpty(g Geometry) (bool, error) {
@@ -160,10 +160,10 @@ func (G GEOSAlgorithm) NGeometry() (int, error) {
 	panic("implement me")
 }
 
-
 func (G GEOSAlgorithm) Buffer(g Geometry, width float64, quadsegs int32) Geometry {
 	panic("implement me")
 }
+
 // 如果两个几何图形相等，则EqualsExact将返回true，因为它们的点在给定公差内。
 func (G GEOSAlgorithm) EqualsExact(g1 Geometry, g2 Geometry, tolerance float64) bool {
 	panic("implement me")
@@ -180,29 +180,55 @@ func (G GEOSAlgorithm) Relate(s Geometry, d Geometry, ) {
 func (G GEOSAlgorithm) Crosses(g1 Geometry, g2 Geometry) (bool, error) {
 	geom1 := MarshalString(g1)
 	geom2 := MarshalString(g2)
-	return geo.Crosses(geom1,geom2)
+	return geo.Crosses(geom1, geom2)
 }
 
 func (G GEOSAlgorithm) Within(g1 Geometry, g2 Geometry) (bool, error) {
 	geom1 := MarshalString(g1)
 	geom2 := MarshalString(g2)
-	return geo.Within(geom1,geom2)
+	return geo.Within(geom1, geom2)
 }
 
 func (G GEOSAlgorithm) Contains(g1 Geometry, g2 Geometry) (bool, error) {
 	geom1 := MarshalString(g1)
 	geom2 := MarshalString(g2)
-	return geo.Contains(geom1,geom2)
+	return geo.Contains(geom1, geom2)
 }
 
-func (G GEOSAlgorithm) UniquePoints() (*Geometry, error) {
-	panic("implement me")
+func (G GEOSAlgorithm) UniquePoints(g Geometry) (Geometry, error) {
+	geom := MarshalString(g)
+	wkt, e := geo.UniquePoints(geom)
+	if e != nil {
+		return nil, e
+	}
+	geometry, e := UnmarshalString(wkt)
+	if e != nil {
+		return nil, e
+	}
+	return geometry, nil
+
 }
 
-func (G GEOSAlgorithm) SharedPaths(other *Geometry) (*Geometry, error) {
-	panic("implement me")
+func (G GEOSAlgorithm) SharedPaths(g1 Geometry, g2 Geometry) (string, error) {
+	geom1 := MarshalString(g1)
+	geom2 := MarshalString(g2)
+	s, e := geo.SharedPaths(geom1, geom2)
+	if e != nil {
+		return "", e
+	}
+	return s, nil
 }
 
-func (G GEOSAlgorithm) Snap(other *Geometry, tolerance float64) (*Geometry, error) {
-	panic("implement me")
+func (G GEOSAlgorithm) Snap(input Geometry, reference Geometry, tolerance float64) (Geometry, error) {
+	inGeom := MarshalString(input)
+	refGeom := MarshalString(reference)
+	s, e := geo.Snap(inGeom, refGeom, tolerance)
+	if e != nil {
+		return nil, e
+	}
+	geometry, e := UnmarshalString(s)
+	if e != nil {
+		return nil, e
+	}
+	return geometry, nil
 }

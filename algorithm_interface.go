@@ -73,17 +73,17 @@ type Algorithm interface {
 	SimplifyP(tolerance float64) (*Geometry, error)
 
 	// UniquePoints return all distinct vertices of input geometry as a MultiPoint.
-	UniquePoints() (*Geometry, error)
+	UniquePoints(g Geometry) (Geometry, error)
 
 	// SharedPaths finds paths shared between the two given lineal geometries.
 	// Returns a GeometryCollection having two elements:
 	//	- first element is a MultiLineString containing shared paths having the _same_ direction on both inputs
 	//	- second element is a MultiLineString containing shared paths having the _opposite_ direction on the two inputs
-	SharedPaths(other *Geometry) (*Geometry, error)
+	SharedPaths(g1 Geometry, g2 Geometry) (string, error)
 
 	// Snap returns a new geometry where the geometry is snapped to the given
 	// geometry by given tolerance.
-	Snap(other *Geometry, tolerance float64) (*Geometry, error)
+	Snap(input Geometry, reference Geometry, tolerance float64) (Geometry, error)
 
 	// Binary topology functions
 
