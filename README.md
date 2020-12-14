@@ -1,7 +1,7 @@
 
-# Geos
+# Geos:-: ![](https://assets-dev.dituwuyou.com/changjing/static/images/logo_blue.png)
 
-我们的组织`spatial-go`正式成立，这是我们的第一个开源项目`geos`,`geos`是`Go`的库,提供有关空间数据和几何算法的操作。
+我们的组织`spatial-go`正式成立，这是我们的第一个开源项目`geos`,`geos`提供有关空间数据和几何算法,使用`Go`语言包装实现。
 欢迎大家使用并提出宝贵意见！
 
 ## 内容列表
@@ -16,12 +16,12 @@
 
 ## 背景
 
-为提高公司在Gis圈内知名度，建立自己的品牌护城河，拥有一定的技术壁垒，同时也旨在提升个人技术能力和个人业界影响力，特启动开源项目。
+    `Geos`是面向空间定义和空间计算的基础类库，基于`Go`语言实现。目前已实际用于商业项目中。
 
 
 ## 安装
 
-这个项目依赖 [geos](https://github.com/libgeos/geos)（geos 是 JTS 的C++版本实现) 请先确保本地已经安装。
+项目依赖 [geos](https://github.com/libgeos/geos)（geos 是 JTS 的C++版本实现) 请先确保本地已经安装。
 
 1、OS X系统安装(brew 方式)
 ```sh
@@ -48,7 +48,7 @@ func AlgorithmStrategy(name string) Algorithm {
    }
 }
 ```
-默认算法底层实现使用`Geos 的 C库`，后续可自实现或其他算法实现空间运算接口屏蔽算法具体实现。
+默认算法底层实现使用`Geos 的 C库`，后续可自行实现或使用其他算法实现空间运算接口，屏蔽算法具体实现。
     
 ## 使用说明
 以计算面积`area`为例。
@@ -87,8 +87,9 @@ func main() {
 
 ## 如何贡献
 
-非常欢迎你的加入！[提一个 Issue](https://github.com/spatial-go/geos/issues/new) 或者提交一个 Pull Request。
-
+非常欢迎你的加入！[提一个 Issue](https://github.com/spatial-go/geos/issues/new) 在GIS领域贡献自己的一份力量。
+联系邮箱： [RDC@changjing.ai](RDC@changjing.ai)
+公众号：亿景智联
 
 
 ## 使用许可
