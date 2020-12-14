@@ -1,6 +1,5 @@
 package geos
 
-import "C"
 
 type Algorithm interface {
 
@@ -10,24 +9,20 @@ type Algorithm interface {
 
 	Buffer(g Geometry, width float64, quadsegs int32) Geometry
 	// 如果两个几何图形相等，则EqualsExact将返回true，因为它们的点在给定公差内。
-	EqualsExact(s Geometry, d Geometry, tolerance float64) bool
+	EqualsExact(g1 Geometry, g2 Geometry, tolerance float64) bool
 
 	//如果此Geometry没有异常的几何点（例如自相交或自相切），则返回true
 	IsSimple(g Geometry) (bool, error)
 
-
-
 	// Length returns the length of the geometry, which must be a lineal geometry
 	// like a linestring or linear ring.
-	Length() (float64, error)
+	Length(g Geometry) (float64, error)
 
 	// Distance returns the Cartesian distance between the two geometries.
-	Distance(s Geometry, d Geometry) (float64, error)
+	Distance(g1 Geometry, g2 Geometry) (float64, error)
 
-	// HausdorffDistance computes the maximum distance of the geometry to the nearest
-	// point in the other geometry (i.e., considers the whole shape and position of
-	// the geometries).
-	HausdorffDistance(s Geometry, d Geometry) (float64, error)
+	// Returns the Hausdorff distance between two geometries, a measure of how similar or dissimilar 2 geometries are.
+	HausdorffDistance(g1 Geometry, g2 Geometry) (float64, error)
 
 	// HausdorffDistanceDensify computes the Hausdorff distance (see
 	// HausdorffDistance) with an additional densification fraction amount.
@@ -37,7 +32,6 @@ type Algorithm interface {
 	// Nine-Intersection Model (DE-9IM) matrix) for the spatial relationship between
 	// the two geometries.
 	Relate(s Geometry, d Geometry)
-
 	// Unary topology functions
 
 	// Envelope is the bounding box of a geometry, as a polygon.
@@ -125,15 +119,15 @@ type Algorithm interface {
 
 	// Crosses returns true if the two geometries have some but not all interior
 	// points in common.
-	Crosses(other *Geometry) (bool, error)
+	Crosses(g1 Geometry, g2 Geometry) (bool, error)
 
 	// Within returns true if every point of this geometry is a point of the other,
 	// and the interiors of the two geometries have at least one point in common.
-	Within(other *Geometry) (bool, error)
+	Within(g1 Geometry, g2 Geometry) (bool, error)
 
 	// Contains returns true if every point of the other is a point of this geometry,
 	// and the interiors of the two geometries have at least one point in common.
-	Contains(other *Geometry) (bool, error)
+	Contains(g1 Geometry, g2 Geometry) (bool, error)
 
 	// Overlaps returns true if the geometries have some but not all points in
 	// common, they have the same dimension, and the intersection of the interiors
@@ -156,7 +150,7 @@ type Algorithm interface {
 
 	// IsEmpty returns true if the set of points of this geometry is empty (i.e.,
 	// the empty geometry).
-	IsEmpty() (bool, error)
+	IsEmpty(g Geometry) (bool, error)
 
 
 	// IsRing returns true if the lineal geometry has the ring property.

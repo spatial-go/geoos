@@ -284,7 +284,6 @@ fabric.properties
 *.pdb
 
 # Kernel Module Compile Results
-*.mod*
 *.cmd
 .tmp_versions/
 modules.order
@@ -355,7 +354,6 @@ $RECYCLE.BIN/
 *.dll
 
 # Fortran module files
-*.mod
 *.smod
 
 # Compiled Static libraries
@@ -422,3 +420,4 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+go.mod

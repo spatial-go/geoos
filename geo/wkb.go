@@ -5,6 +5,7 @@ package geo
 #include "geos.h"
 */
 import "C"
+
 import (
 	"encoding/hex"
 	"errors"

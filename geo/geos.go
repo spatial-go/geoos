@@ -42,7 +42,6 @@ func Error() error {
 	return fmt.Errorf("geo: %s", C.GoString(C.geos_get_last_error()))
 }
 
-// 计算面积
 func Area(wkt string) (float64, error) {
 	geoGeom := GeomFromWKTStr(wkt)
 	var d C.double
@@ -84,5 +83,95 @@ func IsSimple(wkt string) (bool, error) {
 		return false, e
 	}
 	C.GEOSGeom_destroy_r(geosContext, geoGeom)
+	return b, nil
+}
+
+func Length(wkt string) (float64, error) {
+	geoGeom := GeomFromWKTStr(wkt)
+	var d C.double
+	i := C.GEOSLength_r(geosContext, geoGeom, &d)
+	if i == 0 {
+		return 0.0, Error()
+	}
+	C.GEOSGeom_destroy_r(geosContext, geoGeom)
+	return float64(d), nil
+
+}
+
+func Distance(g1 string, g2 string) (float64, error) {
+	geom1 := GeomFromWKTStr(g1)
+	geom2 := GeomFromWKTStr(g2)
+	var distance C.double
+	i := C.GEOSDistance_r(geosContext, geom1, geom2, &distance)
+	if i == 0 {
+		return 0.0, Error()
+	}
+	C.GEOSGeom_destroy_r(geosContext, geom1)
+	C.GEOSGeom_destroy_r(geosContext, geom2)
+	return float64(distance), nil
+
+}
+
+func HausdorffDistance(g1 string, g2 string) (float64, error) {
+	geom1 := GeomFromWKTStr(g1)
+	geom2 := GeomFromWKTStr(g2)
+
+	var distance C.double
+	i := C.GEOSHausdorffDistance_r(geosContext, geom1, geom2, &distance)
+	if i == 0 {
+		return 0.0, Error()
+	}
+	return float64(distance), nil
+}
+
+func IsEmpty(g string) (bool, error) {
+	geoGeom := GeomFromWKTStr(g)
+	c := C.GEOSisEmpty_r(geosContext, geoGeom)
+	b, e := boolFromC(c)
+	if e != nil {
+		return false, e
+	}
+	C.GEOSGeom_destroy_r(geosContext, geoGeom)
+	return b, nil
+}
+
+func Crosses(g1 string, g2 string) (bool, error) {
+	geom1 := GeomFromWKTStr(g1)
+	geom2 := GeomFromWKTStr(g2)
+	c := C.GEOSCrosses_r(geosContext, geom1, geom2)
+	b, e := boolFromC(c)
+	if e != nil {
+		return false, e
+	}
+	C.GEOSGeom_destroy_r(geosContext, geom1)
+	C.GEOSGeom_destroy_r(geosContext, geom2)
+	return b, nil
+
+}
+
+func Within(g1 string, g2 string) (bool, error) {
+
+	geom1 := GeomFromWKTStr(g1)
+	geom2 := GeomFromWKTStr(g2)
+	c := C.GEOSWithin_r(geosContext, geom1, geom2)
+	b, e := boolFromC(c)
+	if e != nil {
+		return false, e
+	}
+	C.GEOSGeom_destroy_r(geosContext, geom1)
+	C.GEOSGeom_destroy_r(geosContext, geom2)
+	return b, nil
+
+}
+func Contains(g1 string,g2 string)(bool,error){
+	geom1 := GeomFromWKTStr(g1)
+	geom2 := GeomFromWKTStr(g2)
+	c := C.GEOSContains_r(geosContext, geom1, geom2)
+	b, e := boolFromC(c)
+	if e != nil {
+		return false, e
+	}
+	C.GEOSGeom_destroy_r(geosContext, geom1)
+	C.GEOSGeom_destroy_r(geosContext, geom2)
 	return b, nil
 }
