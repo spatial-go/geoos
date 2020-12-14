@@ -1,6 +1,6 @@
+![](https://assets-dev.dituwuyou.com/changjing/static/images/logo_blue.png)
 
-# Geos:-: ![](https://assets-dev.dituwuyou.com/changjing/static/images/logo_blue.png)
-
+# Geos
 我们的组织`spatial-go`正式成立，这是我们的第一个开源项目`geos`,`geos`提供有关空间数据和几何算法,使用`Go`语言包装实现。
 欢迎大家使用并提出宝贵意见！
 
@@ -16,7 +16,7 @@
 
 ## 背景
 
-    `Geos`是面向空间定义和空间计算的基础类库，基于`Go`语言实现。目前已实际用于商业项目中。
+`Geos`是面向空间定义和空间计算的基础类库，基于`Go`语言实现。目前已实际用于商业项目中。
 
 
 ## 安装
