@@ -43,6 +43,7 @@ func Error() error {
 	return fmt.Errorf("geo: %s", C.GoString(C.geos_get_last_error()))
 }
 
+// Returns the area of a polygonal geometry
 func Area(wkt string) (float64, error) {
 	geoGeom := GeomFromWKTStr(wkt)
 	var d C.double
@@ -54,6 +55,7 @@ func Area(wkt string) (float64, error) {
 	return float64(d), nil
 }
 
+// Returns the closure of the combinatorial boundary of this Geometry
 func Boundary(wkt string) (string, error) {
 	geoGeom := GeomFromWKTStr(wkt)
 	g := C.GEOSBoundary_r(geosContext, geoGeom)
@@ -65,6 +67,13 @@ func Boundary(wkt string) (string, error) {
 	return s, nil
 }
 
+// Computes the geometric center of a geometry, or equivalently, the center of mass of the geometry as a POINT.
+// For [MULTI]POINTs, this is computed as the arithmetic mean of the input coordinates.
+// For [MULTI]LINESTRINGs, this is computed as the weighted length of each line segment.
+// For [MULTI]POLYGONs, "weight" is thought in terms of area.
+// If an empty geometry is supplied, an empty GEOMETRYCOLLECTION is returned.
+// If NULL is supplied, NULL is returned.
+// If CIRCULARSTRING or COMPOUNDCURVE are supplied, they are converted to linestring wtih CurveToLine first, then same than for LINESTRING
 func Centroid(wkt string) (string, error) {
 	geoGeom := GeomFromWKTStr(wkt)
 	g := C.GEOSGetCentroid_r(geosContext, geoGeom)
@@ -76,6 +85,7 @@ func Centroid(wkt string) (string, error) {
 	return s, nil
 }
 
+// Returns true if this Geometry has no anomalous geometric points, such as self intersection or self tangency
 func IsSimple(wkt string) (bool, error) {
 	geoGeom := GeomFromWKTStr(wkt)
 	c := C.GEOSisSimple_r(geosContext, geoGeom)
@@ -87,6 +97,7 @@ func IsSimple(wkt string) (bool, error) {
 	return b, nil
 }
 
+// returns the 2D Cartesian length of the geometry if it is a LineString, MultiLineString
 func Length(wkt string) (float64, error) {
 	geoGeom := GeomFromWKTStr(wkt)
 	var d C.double
@@ -98,7 +109,7 @@ func Length(wkt string) (float64, error) {
 	return float64(d), nil
 
 }
-
+// returns the minimum 2D Cartesian (planar) distance between two geometries, in projected units (spatial ref units).
 func Distance(g1 string, g2 string) (float64, error) {
 	geom1 := GeomFromWKTStr(g1)
 	geom2 := GeomFromWKTStr(g2)
@@ -113,6 +124,9 @@ func Distance(g1 string, g2 string) (float64, error) {
 
 }
 
+// Returns the Hausdorff distance between two geometries, a measure of how similar or dissimilar 2 geometries are.
+// Implements algorithm for computing a distance metric which can be thought of as the "Discrete Hausdorff Distance".
+// This is the Hausdorff distance restricted to discrete points for one of the geometries
 func HausdorffDistance(g1 string, g2 string) (float64, error) {
 	geom1 := GeomFromWKTStr(g1)
 	geom2 := GeomFromWKTStr(g2)
@@ -124,7 +138,8 @@ func HausdorffDistance(g1 string, g2 string) (float64, error) {
 	}
 	return float64(distance), nil
 }
-
+// Returns true if this Geometry is an empty geometry.
+// If true, then this Geometry represents an empty geometry collection, polygon, point etc.
 func IsEmpty(g string) (bool, error) {
 	geoGeom := GeomFromWKTStr(g)
 	c := C.GEOSisEmpty_r(geosContext, geoGeom)
@@ -136,6 +151,10 @@ func IsEmpty(g string) (bool, error) {
 	return b, nil
 }
 
+// Crosses takes two geometry objects and returns TRUE if their intersection "spatially cross",
+// that is, the geometries have some, but not all interior points in common.
+// The intersection of the interiors of the geometries must not be the empty set and must have a dimensionality less than the maximum dimension of the two input geometries.
+// Additionally, the intersection of the two geometries must not equal either of the source geometries. Otherwise, it returns FALSE.
 func Crosses(g1 string, g2 string) (bool, error) {
 	geom1 := GeomFromWKTStr(g1)
 	geom2 := GeomFromWKTStr(g2)
@@ -149,7 +168,9 @@ func Crosses(g1 string, g2 string) (bool, error) {
 	return b, nil
 
 }
-
+//Returns TRUE if geometry A is completely inside geometry B.
+// For this function to make sense, the source geometries must both be of the same coordinate projection,
+// having the same SRID.
 func Within(g1 string, g2 string) (bool, error) {
 
 	geom1 := GeomFromWKTStr(g1)
@@ -164,6 +185,12 @@ func Within(g1 string, g2 string) (bool, error) {
 	return b, nil
 
 }
+
+// Geometry A contains Geometry B if and only if no points of B lie in the exterior of A,
+// and at least one point of the interior of B lies in the interior of A.
+// An important subtlety of this definition is that A does not contain its boundary, but A does contain itself.
+//Returns TRUE if geometry B is completely inside geometry A.
+// For this function to make sense, the source geometries must both be of the same coordinate projection, having the same SRID.
 func Contains(g1 string, g2 string) (bool, error) {
 	geom1 := GeomFromWKTStr(g1)
 	geom2 := GeomFromWKTStr(g2)
@@ -177,6 +204,7 @@ func Contains(g1 string, g2 string) (bool, error) {
 	return b, nil
 }
 
+// UniquePoints return all distinct vertices of input geometry as a MultiPoint.
 func UniquePoints(g string) (string, error) {
 	geom := GeomFromWKTStr(g)
 	c := C.GEOSGeom_extractUniquePoints_r(geosContext, geom)
@@ -191,6 +219,10 @@ func UniquePoints(g string) (string, error) {
 
 }
 
+
+// Returns a collection containing paths shared by the two input geometries.
+// Those going in the same direction are in the first element of the collection, those going in the opposite direction are in the second element.
+// The paths themselves are given in the direction of the first geometry.
 func SharedPaths(g1 string, g2 string) (string, error) {
 	geom1 := GeomFromWKTStr(g1)
 	geom2 := GeomFromWKTStr(g2)
@@ -204,6 +236,10 @@ func SharedPaths(g1 string, g2 string) (string, error) {
 	return wkt, nil
 }
 
+// Snaps the vertices and segments of a geometry to another Geometry's vertices.
+// A snap distance tolerance is used to control where snapping is performed.
+// The result geometry is the input geometry with the vertices snapped.
+// If no snapping occurs then the input geometry is returned unchanged.
 func Snap(input string, reference string, tolerance float64) (string, error) {
 	inputGeom := GeomFromWKTStr(input)
 	referenceGeom := GeomFromWKTStr(reference)
