@@ -7,7 +7,13 @@ type Ring LineString
 func (r Ring) GeoJSONType() string {
 	return TypePolygon
 }
+
 // Dimensions returns 2 because a Ring is a 2d object.
 func (r Ring) Dimensions() int {
 	return 2
+}
+
+// Nums num of linstrings
+func (r Ring) Nums() int {
+	return 1
 }

@@ -261,3 +261,40 @@ func Snap(input string, reference string, tolerance float64) (string, error) {
 	}
 	return s, nil
 }
+
+// Buffer returns a geometry that represents all points whose distance from
+// this Geometry is less than or equal to distance.
+func Buffer(g string, width float64, quadsegs int32) (wkt string, err error) {
+	geom := GeomFromWKTStr(g)
+	defer C.GEOSGeom_destroy_r(geosContext, geom)
+	bufferGeom := C.GEOSBuffer_r(geosContext, geom, C.double(width), C.int(quadsegs))
+	if wkt, err = ToWKTStr(bufferGeom); err != nil {
+		wkt = ""
+	}
+	return
+}
+
+// EqualsExact returns true if both geometries are Equal, as evaluated by their
+// points being within the given tolerance.
+func EqualsExact(g1 string, g2 string, tolerance float64) (bool, error) {
+	geom1 := GeomFromWKTStr(g1)
+	geom2 := GeomFromWKTStr(g2)
+	defer func() {
+		C.GEOSGeom_destroy_r(geosContext, geom1)
+		C.GEOSGeom_destroy_r(geosContext, geom2)
+	}()
+	c := C.GEOSEqualsExact_r(geosContext, geom1, geom2, C.double(tolerance))
+	b, e := boolFromC(c)
+	if e != nil {
+		return false, e
+	}
+	return b, nil
+}
+
+// NGeometry returns the number of component geometries.
+func NGeometry(g string) (int, error) {
+	geom := GeomFromWKTStr(g)
+	defer C.GEOSGeom_destroy_r(geosContext, geom)
+	c := C.GEOSGetNumGeometries_r(geosContext, geom)
+	return intFromC(c, -1)
+}

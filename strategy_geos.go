@@ -202,25 +202,34 @@ func (G GEOSAlgorithm) IsClosed() (bool, error) {
 	panic("implement me")
 }
 
-func (G GEOSAlgorithm) SRID() (int, error) {
-	panic("implement me")
+// NGeometry returns the number of component geometries.
+func (G GEOSAlgorithm) NGeometry(g Geometry) (int, error) {
+	wkt := MarshalString(g)
+	return geo.NGeometry(wkt)
 }
 
-func (G GEOSAlgorithm) SetSRID(srid int) {
-	panic("implement me")
+// Buffer sReturns a geometry that represents all points whose distance from this Geometry is less than or equal to distance.
+func (G GEOSAlgorithm) Buffer(g Geometry, width float64, quadsegs int32) (geometry Geometry) {
+	var (
+		wkt string
+		err error
+	)
+	wkt = MarshalString(g)
+	if wkt, err = geo.Buffer(wkt, width, quadsegs); err != nil {
+		return
+	}
+	geometry, _ = UnmarshalString(wkt)
+	return
 }
 
-func (G GEOSAlgorithm) NGeometry() (int, error) {
-	panic("implement me")
-}
-
-// Returns a geometry that represents all points whose distance from this Geometry is less than or equal to distance.
-func (G GEOSAlgorithm) Buffer(g Geometry, width float64, quadsegs int32) Geometry {
-	panic("implement me")
-}
-
-func (G GEOSAlgorithm) EqualsExact(g1 Geometry, g2 Geometry, tolerance float64) bool {
-	panic("implement me")
+// EqualsExact returns true if both geometries are Equal, as evaluated by their
+// points being within the given tolerance.
+func (G GEOSAlgorithm) EqualsExact(g1 Geometry, g2 Geometry, tolerance float64) (bool, error) {
+	var (
+		wkt1 = MarshalString(g1)
+		wkt2 = MarshalString(g2)
+	)
+	return geo.EqualsExact(wkt1, wkt2, tolerance)
 }
 
 func (G GEOSAlgorithm) HausdorffDistanceDensify(s Geometry, d Geometry, densifyFrac float64) (float64, error) {

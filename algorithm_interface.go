@@ -5,7 +5,7 @@ type Algorithm interface {
 
 	Buffer(g Geometry, width float64, quadsegs int32) Geometry
 
-	EqualsExact(g1 Geometry, g2 Geometry, tolerance float64) bool
+	EqualsExact(g1 Geometry, g2 Geometry, tolerance float64) (bool, error)
 
 	IsSimple(g Geometry) (bool, error)
 
@@ -79,9 +79,5 @@ type Algorithm interface {
 
 	IsClosed() (bool, error)
 
-	SRID() (int, error)
-
-	SetSRID(srid int)
-
-	NGeometry() (int, error)
+	NGeometry(g Geometry) (int, error)
 }
