@@ -79,9 +79,5 @@ type Algorithm interface {
 
 	IsClosed() (bool, error)
 
-	SRID() (int, error)
-
-	SetSRID(srid int)
-
 	NGeometry() (int, error)
 }

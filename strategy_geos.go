@@ -196,14 +196,6 @@ func (G GEOSAlgorithm) IsClosed() (bool, error) {
 	panic("implement me")
 }
 
-func (G GEOSAlgorithm) SRID() (int, error) {
-	panic("implement me")
-}
-
-func (G GEOSAlgorithm) SetSRID(srid int) {
-	panic("implement me")
-}
-
 func (G GEOSAlgorithm) NGeometry() (int, error) {
 	panic("implement me")
 }
