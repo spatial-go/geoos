@@ -27,6 +27,19 @@
 ```sh
 $ brew install geos
 ```
+2、Ubuntu
+```sh
+$ apt-get install libgeos-dev
+```
+3、源码安装
+```sh
+$ wget http://download.osgeo.org/geos/geos-3.3.8.tar.bz2
+$ tar xvfj geos-3.3.8.tar.bz2
+$ cd geos-3.3.8
+$ ./configure
+$ make
+$ sudo make install
+```
 
 ## 目录结构
 ![](http://ww1.sinaimg.cn/large/007CUp1qly1glmh76nm95j30jc0tq77g.jpg)
