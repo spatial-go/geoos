@@ -481,3 +481,24 @@ func TestGEOSAlgorithm_Snap(t *testing.T) {
 		})
 	}
 }
+
+func TestGEOSAlgorithm_Envelope(t *testing.T) {
+	point := `POINT(1 3)`
+	expectPoint := `POINT(1 3)`
+
+	pointGeom, _ := UnmarshalString(point)
+
+	t.Run(`Envelope`, func(t *testing.T) {
+		G := GEOSAlgorithm{}
+		gotPointGeom, err := G.Envelope(pointGeom)
+		gotPoint := MarshalString(gotPointGeom)
+
+		if err != nil {
+			t.Errorf("Envelope() error = %v", err)
+			return
+		}
+		if gotPoint != expectPoint {
+			t.Errorf("Envelope() got = %v, want %v", gotPoint, expectPoint)
+		}
+	})
+}

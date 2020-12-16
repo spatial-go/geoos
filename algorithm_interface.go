@@ -1,8 +1,6 @@
 package geos
 
-
 type Algorithm interface {
-
 	Area(g Geometry) (float64, error)
 
 	Buffer(g Geometry, width float64, quadsegs int32) Geometry
@@ -19,10 +17,9 @@ type Algorithm interface {
 
 	HausdorffDistanceDensify(s Geometry, d Geometry, densifyFrac float64) (float64, error)
 
-
 	Relate(s Geometry, d Geometry)
 
-	Envelope() (*Geometry, error)
+	Envelope(s Geometry) (Geometry, error)
 
 	ConvexHull() (*Geometry, error)
 

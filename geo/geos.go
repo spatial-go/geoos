@@ -109,6 +109,7 @@ func Length(wkt string) (float64, error) {
 	return float64(d), nil
 
 }
+
 // returns the minimum 2D Cartesian (planar) distance between two geometries, in projected units (spatial ref units).
 func Distance(g1 string, g2 string) (float64, error) {
 	geom1 := GeomFromWKTStr(g1)
@@ -138,6 +139,7 @@ func HausdorffDistance(g1 string, g2 string) (float64, error) {
 	}
 	return float64(distance), nil
 }
+
 // Returns true if this Geometry is an empty geometry.
 // If true, then this Geometry represents an empty geometry collection, polygon, point etc.
 func IsEmpty(g string) (bool, error) {
@@ -149,6 +151,15 @@ func IsEmpty(g string) (bool, error) {
 	}
 	C.GEOSGeom_destroy_r(geosContext, geoGeom)
 	return b, nil
+}
+
+// Envelope ...
+func Envelope(wkt string) (string, error) {
+	geoGeom := GeomFromWKTStr(wkt)
+	g := C.GEOSEnvelope_r(geosContext, geoGeom)
+	s, e := ToWKTStr(g)
+	C.GEOSGeom_destroy_r(geosContext, geoGeom)
+	return s, e
 }
 
 // Crosses takes two geometry objects and returns TRUE if their intersection "spatially cross",
@@ -168,6 +179,7 @@ func Crosses(g1 string, g2 string) (bool, error) {
 	return b, nil
 
 }
+
 //Returns TRUE if geometry A is completely inside geometry B.
 // For this function to make sense, the source geometries must both be of the same coordinate projection,
 // having the same SRID.
@@ -218,7 +230,6 @@ func UniquePoints(g string) (string, error) {
 	return wkt, nil
 
 }
-
 
 // Returns a collection containing paths shared by the two input geometries.
 // Those going in the same direction are in the first element of the collection, those going in the opposite direction are in the second element.
