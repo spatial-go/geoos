@@ -7,7 +7,13 @@ type MultiPoint []Point
 func (mp MultiPoint) GeoJSONType() string {
 	return TypeMultiPoint
 }
+
 // Dimensions returns 0 because a MultiPoint is a 0d object.
 func (mp MultiPoint) Dimensions() int {
 	return 0
+}
+
+// Nums num of points
+func (mp MultiPoint) Nums() int {
+	return len(mp)
 }

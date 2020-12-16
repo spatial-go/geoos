@@ -196,8 +196,10 @@ func (G GEOSAlgorithm) IsClosed() (bool, error) {
 	panic("implement me")
 }
 
-func (G GEOSAlgorithm) NGeometry() (int, error) {
-	panic("implement me")
+// NGeometry returns the number of component geometries.
+func (G GEOSAlgorithm) NGeometry(g Geometry) (int, error) {
+	wkt := MarshalString(g)
+	return geo.NGeometry(wkt)
 }
 
 // Buffer sReturns a geometry that represents all points whose distance from this Geometry is less than or equal to distance.

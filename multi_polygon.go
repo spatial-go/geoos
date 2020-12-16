@@ -7,12 +7,18 @@ type MultiPolygon []Polygon
 func (mp MultiPolygon) GeoJSONType() string {
 	return TypeMultiPolygon
 }
+
 // Dimensions returns 0 because a MultiPoint is a 0d object.
 func (mp MultiPolygon) Dimensions() int {
 	return 2
 }
 
-func (mp MultiPolygon)Area() (float64, error){
+// Nums num of polygons
+func (mp MultiPolygon) Nums() int {
+	return len(mp)
+}
+
+func (mp MultiPolygon) Area() (float64, error) {
 	s := NormalStrategy()
 	return s.Area(mp)
 }

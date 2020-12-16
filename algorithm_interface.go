@@ -79,5 +79,5 @@ type Algorithm interface {
 
 	IsClosed() (bool, error)
 
-	NGeometry() (int, error)
+	NGeometry(g Geometry) (int, error)
 }

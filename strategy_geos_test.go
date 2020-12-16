@@ -511,9 +511,9 @@ func TestGEOSAlgorithm_Buffer(t *testing.T) {
 }
 
 func TestGEOSAlgorithm_EqualsExact(t *testing.T) {
-	geometry1, _ := UnmarshalString("POINT(146.193976625564 70.8658283817455)")
-	geometry2, _ := UnmarshalString("POINT(146.193976725564 70.8658283827455)")
-	geometry3, _ := UnmarshalString("POINT(146.193977625564 70.8658283827455)")
+	geometry1, _ := UnmarshalString("POINT(116.309878625564 40.0427783817455)")
+	geometry2, _ := UnmarshalString("POINT(116.309878725564 40.0427783827455)")
+	geometry3, _ := UnmarshalString("POINT(116.309877625564 40.0427783827455)")
 	type args struct {
 		g1        Geometry
 		g2        Geometry
@@ -539,6 +539,42 @@ func TestGEOSAlgorithm_EqualsExact(t *testing.T) {
 			}
 			if got != tt.want {
 				t.Errorf("GEOSAlgorithm.EqualsExact() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestGEOSAlgorithm_NGeometry(t *testing.T) {
+	multiPoint, _ := UnmarshalString(`MULTIPOINT ( -1 0, -1 2, -1 3, -1 4, -1 7, 0 1, 0 3, 1 1, 2 0, 6 0, 7 8, 9 8, 10 6 )`)
+	multiLineString, _ := UnmarshalString(`MULTILINESTRING((10 130,50 190,110 190,140 150,150 80,100 10,20 40,10 130),
+	(70 40,100 50,120 80,80 110,50 90,70 40))`)
+	multiPolygon, _ := UnmarshalString(`MULTIPOLYGON (((40 40, 20 45, 45 30, 40 40)),
+	((20 35, 10 30, 10 10, 30 5, 45 20, 20 35)),
+	((30 20, 20 15, 20 25, 30 20)))`)
+	type args struct {
+		g Geometry
+	}
+	tests := []struct {
+		name    string
+		G       GEOSAlgorithm
+		args    args
+		want    int
+		wantErr bool
+	}{
+		{name: "ngeometry multiPoint", args: args{g: multiPoint}, want: 13, wantErr: false},
+		{name: "ngeometry multiLineString", args: args{g: multiLineString}, want: 2, wantErr: false},
+		{name: "ngeometry multiPolygon", args: args{g: multiPolygon}, want: 3, wantErr: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			G := GEOSAlgorithm{}
+			got, err := G.NGeometry(tt.args.g)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GEOSAlgorithm.NGeometry() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("GEOSAlgorithm.NGeometry() = %v, want %v", got, tt.want)
 			}
 		})
 	}
