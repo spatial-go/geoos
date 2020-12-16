@@ -25,6 +25,7 @@ func (G GEOSAlgorithm) Boundary(g Geometry) (Geometry, error) {
 	}
 	return geometry, nil
 }
+
 // Computes the geometric center of a geometry, or equivalently, the center of mass of the geometry as a POINT.
 // For [MULTI]POINTs, this is computed as the arithmetic mean of the input coordinates.
 // For [MULTI]LINESTRINGs, this is computed as the weighted length of each line segment.
@@ -44,16 +45,19 @@ func (G GEOSAlgorithm) Centroid(g Geometry) (Geometry, error) {
 	}
 	return geometry, nil
 }
+
 // Returns true if this Geometry has no anomalous geometric points, such as self intersection or self tangency.
 func (G GEOSAlgorithm) IsSimple(g Geometry) (bool, error) {
 	s := MarshalString(g)
 	return geo.IsSimple(s)
 }
+
 // returns the 2D Cartesian length of the geometry if it is a LineString, MultiLineString
 func (G GEOSAlgorithm) Length(g Geometry) (float64, error) {
 	s := MarshalString(g)
 	return geo.Length(s)
 }
+
 // returns the minimum 2D Cartesian (planar) distance between two geometries, in projected units (spatial ref units).
 func (G GEOSAlgorithm) Distance(g1 Geometry, g2 Geometry) (float64, error) {
 	geom1 := MarshalString(g1)
@@ -161,18 +165,22 @@ func (G GEOSAlgorithm) Intersects(other *Geometry) (bool, error) {
 func (G GEOSAlgorithm) Overlaps(other *Geometry) (bool, error) {
 	panic("implement me")
 }
+
 // Returns TRUE if the given Geometries are "spatially equal".
 func (G GEOSAlgorithm) Equals(other *Geometry) (bool, error) {
 	panic("implement me")
 }
+
 // Returns TRUE if no point in Geometry B is outside Geometry A
 func (G GEOSAlgorithm) Covers(other *Geometry) (bool, error) {
 	panic("implement me")
 }
+
 // Returns TRUE if no point in Geometry A is outside Geometry B
 func (G GEOSAlgorithm) CoveredBy(other *Geometry) (bool, error) {
 	panic("implement me")
 }
+
 // IsRing returns true if the lineal geometry has the ring property.
 func (G GEOSAlgorithm) IsRing() (bool, error) {
 	panic("implement me")
@@ -181,43 +189,53 @@ func (G GEOSAlgorithm) IsRing() (bool, error) {
 func (G GEOSAlgorithm) HasZ() (bool, error) {
 	panic("implement me")
 }
+
 // Returns TRUE if the LINESTRING's start and end points are coincident.
 // For Polyhedral Surfaces, reports if the surface is areal (open) or volumetric (closed).
 func (G GEOSAlgorithm) IsClosed() (bool, error) {
 	panic("implement me")
 }
 
-func (G GEOSAlgorithm) SRID() (int, error) {
-	panic("implement me")
+// NGeometry returns the number of component geometries.
+func (G GEOSAlgorithm) NGeometry(g Geometry) (int, error) {
+	wkt := MarshalString(g)
+	return geo.NGeometry(wkt)
 }
 
-func (G GEOSAlgorithm) SetSRID(srid int) {
-	panic("implement me")
+// Buffer sReturns a geometry that represents all points whose distance from this Geometry is less than or equal to distance.
+func (G GEOSAlgorithm) Buffer(g Geometry, width float64, quadsegs int32) (geometry Geometry) {
+	var (
+		wkt string
+		err error
+	)
+	wkt = MarshalString(g)
+	if wkt, err = geo.Buffer(wkt, width, quadsegs); err != nil {
+		return
+	}
+	geometry, _ = UnmarshalString(wkt)
+	return
 }
 
-func (G GEOSAlgorithm) NGeometry() (int, error) {
-	panic("implement me")
-}
-
-// Returns a geometry that represents all points whose distance from this Geometry is less than or equal to distance.
-func (G GEOSAlgorithm) Buffer(g Geometry, width float64, quadsegs int32) Geometry {
-	panic("implement me")
-}
-
-func (G GEOSAlgorithm) EqualsExact(g1 Geometry, g2 Geometry, tolerance float64) bool {
-	panic("implement me")
+// EqualsExact returns true if both geometries are Equal, as evaluated by their
+// points being within the given tolerance.
+func (G GEOSAlgorithm) EqualsExact(g1 Geometry, g2 Geometry, tolerance float64) (bool, error) {
+	var (
+		wkt1 = MarshalString(g1)
+		wkt2 = MarshalString(g2)
+	)
+	return geo.EqualsExact(wkt1, wkt2, tolerance)
 }
 
 func (G GEOSAlgorithm) HausdorffDistanceDensify(s Geometry, d Geometry, densifyFrac float64) (float64, error) {
 	panic("implement me")
 }
+
 // Relate computes the intersection matrix (Dimensionally Extended
 // Nine-Intersection Model (DE-9IM) matrix) for the spatial relationship between
 // the two geometries.
-func (G GEOSAlgorithm) Relate(s Geometry, d Geometry, ) {
+func (G GEOSAlgorithm) Relate(s Geometry, d Geometry) {
 	panic("implement me")
 }
-
 
 // Crosses takes two geometry objects and returns TRUE if their intersection "spatially cross",
 // that is, the geometries have some, but not all interior points in common.
