@@ -1,7 +1,6 @@
 package geos
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
 )
@@ -321,11 +320,11 @@ func (p *Parser) parseCoord() (point Point, err error) {
 
 	c1, err := strconv.ParseFloat(t1.lexeme, 64)
 	if err != nil {
-		return point, errors.New(fmt.Sprintf("invalid lexeme %s for token on pos %d", t1.lexeme, t1.pos))
+		return point, fmt.Errorf("invalid lexeme %s for token on pos %d", t1.lexeme, t1.pos)
 	}
 	c2, err := strconv.ParseFloat(t2.lexeme, 64)
 	if err != nil {
-		return point, errors.New( fmt.Sprintf("invalid lexeme %s for token on pos %d", t2.lexeme, t2.pos))
+		return point, fmt.Errorf("invalid lexeme %s for token on pos %d", t2.lexeme, t2.pos)
 	}
 
 	return Point{c1, c2}, nil

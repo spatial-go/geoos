@@ -481,3 +481,65 @@ func TestGEOSAlgorithm_Snap(t *testing.T) {
 		})
 	}
 }
+
+func TestGEOSAlgorithm_Buffer(t *testing.T) {
+	geometry, _ := UnmarshalString("POINT(100 90)")
+	expectGeometry, _ := UnmarshalString("POLYGON((150 90,146.193976625564 70.8658283817455,135.355339059327 54.6446609406727,119.134171618255 43.8060233744357,100 40,80.8658283817456 43.8060233744356,64.6446609406727 54.6446609406725,53.8060233744357 70.8658283817454,50 89.9999999999998,53.8060233744356 109.134171618254,64.6446609406725 125.355339059327,80.8658283817453 136.193976625564,99.9999999999998 140,119.134171618254 136.193976625564,135.355339059327 125.355339059328,146.193976625564 109.134171618255,150 90))")
+	type args struct {
+		g        Geometry
+		width    float64
+		quadsegs int32
+	}
+	tests := []struct {
+		name string
+		G    GEOSAlgorithm
+		args args
+		want Geometry
+	}{
+		{name: "buffer", args: args{g: geometry, width: 50, quadsegs: 4}, want: expectGeometry},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			G := GEOSAlgorithm{}
+			gotGeometry := G.Buffer(tt.args.g, tt.args.width, tt.args.quadsegs)
+			isEqual, _ := G.EqualsExact(gotGeometry, tt.want, 0.000001)
+			if !isEqual {
+				t.Errorf("GEOSAlgorithm.Buffer() = %v, want %v", MarshalString(gotGeometry), MarshalString(tt.want))
+			}
+		})
+	}
+}
+
+func TestGEOSAlgorithm_EqualsExact(t *testing.T) {
+	geometry1, _ := UnmarshalString("POINT(146.193976625564 70.8658283817455)")
+	geometry2, _ := UnmarshalString("POINT(146.193976725564 70.8658283827455)")
+	geometry3, _ := UnmarshalString("POINT(146.193977625564 70.8658283827455)")
+	type args struct {
+		g1        Geometry
+		g2        Geometry
+		tolerance float64
+	}
+	tests := []struct {
+		name    string
+		G       GEOSAlgorithm
+		args    args
+		want    bool
+		wantErr bool
+	}{
+		{name: "equals exact", args: args{g1: geometry1, g2: geometry2, tolerance: 0.000001}, want: true, wantErr: false},
+		{name: "not equals exact", args: args{g1: geometry1, g2: geometry3, tolerance: 0.000001}, want: false, wantErr: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			G := GEOSAlgorithm{}
+			got, err := G.EqualsExact(tt.args.g1, tt.args.g2, tt.args.tolerance)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GEOSAlgorithm.EqualsExact() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("GEOSAlgorithm.EqualsExact() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

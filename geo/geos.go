@@ -109,6 +109,7 @@ func Length(wkt string) (float64, error) {
 	return float64(d), nil
 
 }
+
 // returns the minimum 2D Cartesian (planar) distance between two geometries, in projected units (spatial ref units).
 func Distance(g1 string, g2 string) (float64, error) {
 	geom1 := GeomFromWKTStr(g1)
@@ -138,6 +139,7 @@ func HausdorffDistance(g1 string, g2 string) (float64, error) {
 	}
 	return float64(distance), nil
 }
+
 // Returns true if this Geometry is an empty geometry.
 // If true, then this Geometry represents an empty geometry collection, polygon, point etc.
 func IsEmpty(g string) (bool, error) {
@@ -168,6 +170,7 @@ func Crosses(g1 string, g2 string) (bool, error) {
 	return b, nil
 
 }
+
 //Returns TRUE if geometry A is completely inside geometry B.
 // For this function to make sense, the source geometries must both be of the same coordinate projection,
 // having the same SRID.
@@ -219,7 +222,6 @@ func UniquePoints(g string) (string, error) {
 
 }
 
-
 // Returns a collection containing paths shared by the two input geometries.
 // Those going in the same direction are in the first element of the collection, those going in the opposite direction are in the second element.
 // The paths themselves are given in the direction of the first geometry.
@@ -249,4 +251,31 @@ func Snap(input string, reference string, tolerance float64) (string, error) {
 		return "", e
 	}
 	return s, nil
+}
+
+// Buffer returns a geometry that represents all points whose distance from
+// this Geometry is less than or equal to distance.
+func Buffer(g string, width float64, quadsegs int32) (wkt string, err error) {
+	geom := GeomFromWKTStr(g)
+	bufferGeom := C.GEOSBuffer_r(geosContext, geom, C.double(width), C.int(quadsegs))
+	if wkt, err = ToWKTStr(bufferGeom); err != nil {
+		wkt = ""
+	}
+	C.GEOSGeom_destroy_r(geosContext, geom)
+	return
+}
+
+// EqualsExact returns true if both geometries are Equal, as evaluated by their
+// points being within the given tolerance.
+func EqualsExact(g1 string, g2 string, tolerance float64) (bool, error) {
+	geom1 := GeomFromWKTStr(g1)
+	geom2 := GeomFromWKTStr(g2)
+	c := C.GEOSEqualsExact_r(geosContext, geom1, geom2, C.double(tolerance))
+	b, e := boolFromC(c)
+	if e != nil {
+		return false, e
+	}
+	C.GEOSGeom_destroy_r(geosContext, geom1)
+	C.GEOSGeom_destroy_r(geosContext, geom2)
+	return b, nil
 }
