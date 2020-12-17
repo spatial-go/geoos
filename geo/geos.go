@@ -175,6 +175,60 @@ func Envelope(wkt string) (string, error) {
 	return s, e
 }
 
+// ConvexHull ...
+func ConvexHull(wkt string) (string, error) {
+	geoGeom := GeomFromWKTStr(wkt)
+	g := C.GEOSConvexHull_r(geosContext, geoGeom)
+	s, e := ToWKTStr(g)
+	C.GEOSGeom_destroy_r(geosContext, geoGeom)
+	return s, e
+}
+
+// UnaryUnion ...
+func UnaryUnion(wkt string) (string, error) {
+	geoGeom := GeomFromWKTStr(wkt)
+	g := C.GEOSUnaryUnion_r(geosContext, geoGeom)
+	s, e := ToWKTStr(g)
+	C.GEOSGeom_destroy_r(geosContext, geoGeom)
+	return s, e
+}
+
+// PointOnSurface ...
+func PointOnSurface(wkt string) (string, error) {
+	geoGeom := GeomFromWKTStr(wkt)
+	g := C.GEOSPointOnSurface_r(geosContext, geoGeom)
+	s, e := ToWKTStr(g)
+	C.GEOSGeom_destroy_r(geosContext, geoGeom)
+	return s, e
+}
+
+// LineMerge ...
+func LineMerge(wkt string) (string, error) {
+	geoGeom := GeomFromWKTStr(wkt)
+	g := C.GEOSLineMerge_r(geosContext, geoGeom)
+	s, e := ToWKTStr(g)
+	C.GEOSGeom_destroy_r(geosContext, geoGeom)
+	return s, e
+}
+
+// Simplify ...
+func Simplify(wkt string, tolerance float64) (string, error) {
+	geoGeom := GeomFromWKTStr(wkt)
+	g := C.GEOSSimplify_r(geosContext, geoGeom, C.double(tolerance))
+	s, e := ToWKTStr(g)
+	C.GEOSGeom_destroy_r(geosContext, geoGeom)
+	return s, e
+}
+
+// SimplifyP ...
+func SimplifyP(wkt string, tolerance float64) (string, error) {
+	geoGeom := GeomFromWKTStr(wkt)
+	g := C.GEOSTopologyPreserveSimplify_r(geosContext, geoGeom, C.double(tolerance))
+	s, e := ToWKTStr(g)
+	C.GEOSGeom_destroy_r(geosContext, geoGeom)
+	return s, e
+}
+
 // Crosses takes two geometry objects and returns TRUE if their intersection "spatially cross",
 // that is, the geometries have some, but not all interior points in common.
 // The intersection of the interiors of the geometries must not be the empty set and must have a dimensionality less than the maximum dimension of the two input geometries.

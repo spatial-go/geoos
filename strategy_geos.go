@@ -93,36 +93,72 @@ func (G GEOSAlgorithm) Envelope(g Geometry) (Geometry, error) {
 	return UnmarshalString(envelope)
 }
 
+// ConvexHull ...
+// TODO 测试
 //Computes the convex hull of a geometry. The convex hull is the smallest convex geometry that encloses all geometries in the input.
 //In the general case the convex hull is a Polygon. The convex hull of two or more collinear points is a two-point LineString. The convex hull of one or more identical points is a Point.
-func (G GEOSAlgorithm) ConvexHull() (*Geometry, error) {
-	panic("implement me")
+func (G GEOSAlgorithm) ConvexHull(g Geometry) (Geometry, error) {
+	wkt := MarshalString(g)
+	envelope, e := geo.ConvexHull(wkt)
+	if e != nil {
+		return nil, e
+	}
+	return UnmarshalString(envelope)
 }
 
 //UnaryUnion does dissolve boundaries between components of a multipolygon (invalid) and does perform union between the components of a geometrycollection
-func (G GEOSAlgorithm) UnaryUnion() (*Geometry, error) {
-	panic("implement me")
+func (G GEOSAlgorithm) UnaryUnion(g Geometry) (Geometry, error) {
+	wkt := MarshalString(g)
+	envelope, e := geo.UnaryUnion(wkt)
+	if e != nil {
+		return nil, e
+	}
+	return UnmarshalString(envelope)
 }
 
+// PointOnSurface ...
 // Returns a POINT guaranteed to intersect a surface.
-func (G GEOSAlgorithm) PointOnSurface() (*Geometry, error) {
-	panic("implement me")
+func (G GEOSAlgorithm) PointOnSurface(g Geometry) (Geometry, error) {
+	wkt := MarshalString(g)
+	envelope, e := geo.PointOnSurface(wkt)
+	if e != nil {
+		return nil, e
+	}
+	return UnmarshalString(envelope)
 }
 
+// LineMerge ...
 // Returns a (set of) LineString(s) formed by sewing together the constituent line work of a MULTILINESTRING.
-func (G GEOSAlgorithm) LineMerge() (*Geometry, error) {
-	panic("implement me")
+func (G GEOSAlgorithm) LineMerge(g Geometry) (Geometry, error) {
+	wkt := MarshalString(g)
+	envelope, e := geo.LineMerge(wkt)
+	if e != nil {
+		return nil, e
+	}
+	return UnmarshalString(envelope)
 }
 
+// Simplify ...
 // Returns a "simplified" version of the given geometry using the Douglas-Peucker algorithm,May not preserve topology
-func (G GEOSAlgorithm) Simplify(tolerance float64) (*Geometry, error) {
-	panic("implement me")
+func (G GEOSAlgorithm) Simplify(g Geometry, tolerance float64) (Geometry, error) {
+	wkt := MarshalString(g)
+	envelope, e := geo.Simplify(wkt, tolerance)
+	if e != nil {
+		return nil, e
+	}
+	return UnmarshalString(envelope)
 }
 
+// SimplifyP ...
 // SimplifyP returns a geometry simplified by amount given by tolerance.
 // Unlike Simplify, SimplifyP guarantees it will preserve topology.
-func (G GEOSAlgorithm) SimplifyP(tolerance float64) (*Geometry, error) {
-	panic("implement me")
+func (G GEOSAlgorithm) SimplifyP(g Geometry, tolerance float64) (Geometry, error) {
+	wkt := MarshalString(g)
+	envelope, e := geo.SimplifyP(wkt, tolerance)
+	if e != nil {
+		return nil, e
+	}
+	return UnmarshalString(envelope)
 }
 
 // Returns a geometry that represents the point set intersection of the Geometries.
