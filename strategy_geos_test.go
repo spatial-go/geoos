@@ -482,6 +482,51 @@ func TestGEOSAlgorithm_Snap(t *testing.T) {
 	}
 }
 
+func TestGEOSAlgorithm_Envelope(t *testing.T) {
+	point, _ := UnmarshalString(`POINT(1 3)`)
+	expectPoint, _ := UnmarshalString(`POINT(1 3)`)
+
+	line, _ := UnmarshalString(`LINESTRING(0 0, 1 3)`)
+	expectPolygon0, _ := UnmarshalString(`POLYGON((0 0,1 0,1 3,0 3,0 0))`)
+
+	polygon1, _ := UnmarshalString(`POLYGON((0 0, 0 1, 1.0000001 1, 1.0000001 0, 0 0))`)
+	expectPolygon1, _ := UnmarshalString(`POLYGON((0 0,1.0000001 0,1.0000001 1,0 1,0 0))`)
+
+	polygon2, _ := UnmarshalString(`POLYGON((0 0, 0 1, 1.0000000001 1, 1.0000000001 0, 0 0))`)
+	expectPolygon2, _ := UnmarshalString(`POLYGON((0 0,1.0000000001 0,1.0000000001 1,0 1,0 0))`)
+
+	type args struct {
+		g Geometry
+	}
+
+	tests := []struct {
+		name    string
+		G       GEOSAlgorithm
+		args    args
+		want    Geometry
+		wantErr bool
+	}{
+		{name: "envelope Point", args: args{g: point}, want: expectPoint, wantErr: false},
+		{name: "envelope LineString", args: args{g: line}, want: expectPolygon0, wantErr: false},
+		{name: "envelope Polygon", args: args{g: polygon1}, want: expectPolygon1, wantErr: false},
+		{name: "envelope Polygon", args: args{g: polygon2}, want: expectPolygon2, wantErr: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			G := GEOSAlgorithm{}
+			gotGeometry, err := G.Envelope(tt.args.g)
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GEOSAlgorithm.EqualsExact() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			isEqual, _ := G.EqualsExact(gotGeometry, tt.want, 0.000001)
+			if !isEqual {
+				t.Errorf("GEOSAlgorithm.Envelope() = %v, want %v", MarshalString(gotGeometry), MarshalString(tt.want))
+			}
+		})
+	}
+}
 func TestGEOSAlgorithm_Buffer(t *testing.T) {
 	geometry, _ := UnmarshalString("POINT(100 90)")
 	expectGeometry, _ := UnmarshalString("POLYGON((150 90,146.193976625564 70.8658283817455,135.355339059327 54.6446609406727,119.134171618255 43.8060233744357,100 40,80.8658283817456 43.8060233744356,64.6446609406727 54.6446609406725,53.8060233744357 70.8658283817454,50 89.9999999999998,53.8060233744356 109.134171618254,64.6446609406725 125.355339059327,80.8658283817453 136.193976625564,99.9999999999998 140,119.134171618254 136.193976625564,135.355339059327 125.355339059328,146.193976625564 109.134171618255,150 90))")
@@ -511,9 +556,9 @@ func TestGEOSAlgorithm_Buffer(t *testing.T) {
 }
 
 func TestGEOSAlgorithm_EqualsExact(t *testing.T) {
-	geometry1, _ := UnmarshalString("POINT(146.193976625564 70.8658283817455)")
-	geometry2, _ := UnmarshalString("POINT(146.193976725564 70.8658283827455)")
-	geometry3, _ := UnmarshalString("POINT(146.193977625564 70.8658283827455)")
+	geometry1, _ := UnmarshalString("POINT(116.309878625564 40.0427783817455)")
+	geometry2, _ := UnmarshalString("POINT(116.309878725564 40.0427783827455)")
+	geometry3, _ := UnmarshalString("POINT(116.309877625564 40.0427783827455)")
 	type args struct {
 		g1        Geometry
 		g2        Geometry
@@ -539,6 +584,42 @@ func TestGEOSAlgorithm_EqualsExact(t *testing.T) {
 			}
 			if got != tt.want {
 				t.Errorf("GEOSAlgorithm.EqualsExact() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestGEOSAlgorithm_NGeometry(t *testing.T) {
+	multiPoint, _ := UnmarshalString(`MULTIPOINT ( -1 0, -1 2, -1 3, -1 4, -1 7, 0 1, 0 3, 1 1, 2 0, 6 0, 7 8, 9 8, 10 6 )`)
+	multiLineString, _ := UnmarshalString(`MULTILINESTRING((10 130,50 190,110 190,140 150,150 80,100 10,20 40,10 130),
+	(70 40,100 50,120 80,80 110,50 90,70 40))`)
+	multiPolygon, _ := UnmarshalString(`MULTIPOLYGON (((40 40, 20 45, 45 30, 40 40)),
+	((20 35, 10 30, 10 10, 30 5, 45 20, 20 35)),
+	((30 20, 20 15, 20 25, 30 20)))`)
+	type args struct {
+		g Geometry
+	}
+	tests := []struct {
+		name    string
+		G       GEOSAlgorithm
+		args    args
+		want    int
+		wantErr bool
+	}{
+		{name: "ngeometry multiPoint", args: args{g: multiPoint}, want: 13, wantErr: false},
+		{name: "ngeometry multiLineString", args: args{g: multiLineString}, want: 2, wantErr: false},
+		{name: "ngeometry multiPolygon", args: args{g: multiPolygon}, want: 3, wantErr: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			G := GEOSAlgorithm{}
+			got, err := G.NGeometry(tt.args.g)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GEOSAlgorithm.NGeometry() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("GEOSAlgorithm.NGeometry() = %v, want %v", got, tt.want)
 			}
 		})
 	}

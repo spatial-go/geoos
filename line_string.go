@@ -7,12 +7,18 @@ type LineString []Point
 func (ls LineString) GeoJSONType() string {
 	return TypeLineString
 }
+
 // Dimensions returns 1 because a LineString is a 1d object.
 func (ls LineString) Dimensions() int {
 	return 1
 }
 
-func (ls LineString) Boundary() (Geometry,error){
+// Nums num of linestrings
+func (ls LineString) Nums() int {
+	return 1
+}
+
+func (ls LineString) Boundary() (Geometry, error) {
 	s := NormalStrategy()
 	return s.Boundary(ls)
 }

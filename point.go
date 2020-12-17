@@ -14,6 +14,11 @@ func (p Point) Dimensions() int {
 	return 0
 }
 
+// Nums num of points
+func (p Point) Nums() int {
+	return 1
+}
+
 // Y returns the vertical coordinate of the point.
 func (p Point) GetY() float64 {
 	return p.Y

@@ -153,6 +153,15 @@ func IsEmpty(g string) (bool, error) {
 	return b, nil
 }
 
+// Envelope ...
+func Envelope(wkt string) (string, error) {
+	geoGeom := GeomFromWKTStr(wkt)
+	g := C.GEOSEnvelope_r(geosContext, geoGeom)
+	s, e := ToWKTStr(g)
+	C.GEOSGeom_destroy_r(geosContext, geoGeom)
+	return s, e
+}
+
 // Crosses takes two geometry objects and returns TRUE if their intersection "spatially cross",
 // that is, the geometries have some, but not all interior points in common.
 // The intersection of the interiors of the geometries must not be the empty set and must have a dimensionality less than the maximum dimension of the two input geometries.
@@ -257,11 +266,11 @@ func Snap(input string, reference string, tolerance float64) (string, error) {
 // this Geometry is less than or equal to distance.
 func Buffer(g string, width float64, quadsegs int32) (wkt string, err error) {
 	geom := GeomFromWKTStr(g)
+	defer C.GEOSGeom_destroy_r(geosContext, geom)
 	bufferGeom := C.GEOSBuffer_r(geosContext, geom, C.double(width), C.int(quadsegs))
 	if wkt, err = ToWKTStr(bufferGeom); err != nil {
 		wkt = ""
 	}
-	C.GEOSGeom_destroy_r(geosContext, geom)
 	return
 }
 
@@ -270,12 +279,22 @@ func Buffer(g string, width float64, quadsegs int32) (wkt string, err error) {
 func EqualsExact(g1 string, g2 string, tolerance float64) (bool, error) {
 	geom1 := GeomFromWKTStr(g1)
 	geom2 := GeomFromWKTStr(g2)
+	defer func() {
+		C.GEOSGeom_destroy_r(geosContext, geom1)
+		C.GEOSGeom_destroy_r(geosContext, geom2)
+	}()
 	c := C.GEOSEqualsExact_r(geosContext, geom1, geom2, C.double(tolerance))
 	b, e := boolFromC(c)
 	if e != nil {
 		return false, e
 	}
-	C.GEOSGeom_destroy_r(geosContext, geom1)
-	C.GEOSGeom_destroy_r(geosContext, geom2)
 	return b, nil
+}
+
+// NGeometry returns the number of component geometries.
+func NGeometry(g string) (int, error) {
+	geom := GeomFromWKTStr(g)
+	defer C.GEOSGeom_destroy_r(geosContext, geom)
+	c := C.GEOSGetNumGeometries_r(geosContext, geom)
+	return intFromC(c, -1)
 }

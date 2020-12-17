@@ -19,7 +19,7 @@ type Algorithm interface {
 
 	Relate(s Geometry, d Geometry)
 
-	Envelope() (*Geometry, error)
+	Envelope(s Geometry) (Geometry, error)
 
 	ConvexHull() (*Geometry, error)
 
@@ -79,5 +79,5 @@ type Algorithm interface {
 
 	IsClosed() (bool, error)
 
-	NGeometry() (int, error)
+	NGeometry(g Geometry) (int, error)
 }

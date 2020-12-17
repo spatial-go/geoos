@@ -15,12 +15,17 @@ func (p Polygon) Dimensions() int {
 	return 2
 }
 
+// Nums num of polygons
+func (p Polygon) Nums() int {
+	return 1
+}
+
 func (p Polygon) Area() (float64, error) {
 	s := NormalStrategy()
 	return s.Area(p)
 }
 
-func (p Polygon) Boundary() (Geometry,error){
+func (p Polygon) Boundary() (Geometry, error) {
 	s := NormalStrategy()
 	return s.Boundary(p)
 }
