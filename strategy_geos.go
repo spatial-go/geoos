@@ -263,16 +263,28 @@ func (G GEOSAlgorithm) EqualsExact(g1 Geometry, g2 Geometry, tolerance float64) 
 	return geo.EqualsExact(wkt1, wkt2, tolerance)
 }
 
+<<<<<<< HEAD
 // HausdorffDistanceDensify ...
+=======
+// HausdorffDistanceDensify computes the Hausdorff distance with an additional densification fraction amount
+>>>>>>> a1310ea0c8d9c74dab601390b4f91981dc57f2c9
 func (G GEOSAlgorithm) HausdorffDistanceDensify(s Geometry, d Geometry, densifyFrac float64) (float64, error) {
-	panic("implement me")
+	var (
+		wkt1 = MarshalString(s)
+		wkt2 = MarshalString(d)
+	)
+	return geo.HausdorffDistanceDensify(wkt1, wkt2, densifyFrac)
 }
 
 // Relate computes the intersection matrix (Dimensionally Extended
 // Nine-Intersection Model (DE-9IM) matrix) for the spatial relationship between
 // the two geometries.
-func (G GEOSAlgorithm) Relate(s Geometry, d Geometry) {
-	panic("implement me")
+func (G GEOSAlgorithm) Relate(s Geometry, d Geometry) (string, error) {
+	var (
+		wkt1 = MarshalString(s)
+		wkt2 = MarshalString(d)
+	)
+	return geo.Relate(wkt1, wkt2)
 }
 
 // Crosses takes two geometry objects and returns TRUE if their intersection "spatially cross",
