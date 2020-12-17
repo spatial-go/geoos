@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 )
+
 func UnmarshalString(s string) (Geometry, error) {
 	p := Parser{NewLexer(strings.NewReader(s))}
 	return p.Parse()
@@ -20,7 +21,7 @@ func MarshalString(g Geometry) string {
 func wkt(buf *bytes.Buffer, geom Geometry) {
 	switch g := geom.(type) {
 	case Point:
-		_, _ = fmt.Fprintf(buf, "POINT(%g %g)", g.GetX(), g.GetY())
+		_, _ = fmt.Fprintf(buf, "POINT(%g %g)", g.Lat(), g.Lon())
 	case MultiPoint:
 		{
 			if len(g) == 0 {
@@ -33,7 +34,7 @@ func wkt(buf *bytes.Buffer, geom Geometry) {
 				if i != 0 {
 					buf.WriteByte(',')
 				}
-				_, _ = fmt.Fprintf(buf, "(%g %g)", p.GetX(), p.GetY())
+				_, _ = fmt.Fprintf(buf, "(%g %g)", p.Lat(), p.Lon())
 			}
 			buf.WriteByte(')')
 		}
@@ -131,7 +132,7 @@ func writeLineString(buf *bytes.Buffer, ls LineString) {
 			buf.WriteByte(',')
 		}
 
-		_, _ = fmt.Fprintf(buf, "%g %g", p.GetX(), p.GetY())
+		_, _ = fmt.Fprintf(buf, "%g %g", p.Lat(), p.Lon())
 	}
 	buf.WriteByte(')')
 }
