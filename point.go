@@ -8,11 +8,11 @@ type Point struct {
 func (p Point) GeoJSONType() string {
 	return TypePoint
 }
+
 // Dimensions returns 0 because a point is a 0d object.
 func (p Point) Dimensions() int {
 	return 0
 }
-
 
 // Y returns the vertical coordinate of the point.
 func (p Point) GetY() float64 {
@@ -33,5 +33,3 @@ func (p Point) GetLat() float64 {
 func (p Point) GetLon() float64 {
 	return p.Y
 }
-
-
