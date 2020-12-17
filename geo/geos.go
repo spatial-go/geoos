@@ -140,6 +140,19 @@ func HausdorffDistance(g1 string, g2 string) (float64, error) {
 	return float64(distance), nil
 }
 
+// HausdorffDistanceDensify computes the Hausdorff distance with an additional densification fraction amount
+func HausdorffDistanceDensify(g1 string, g2 string, densifyFrac float64) (float64, error) {
+	geom1 := GeomFromWKTStr(g1)
+	geom2 := GeomFromWKTStr(g2)
+	defer func() {
+		C.GEOSGeom_destroy_r(geosContext, geom1)
+		C.GEOSGeom_destroy_r(geosContext, geom2)
+	}()
+	var distance C.double
+	c := C.GEOSHausdorffDistanceDensify_r(geosContext, geom1, geom2, C.double(densifyFrac), &distance)
+	return float64FromC(c, distance)
+}
+
 // Returns true if this Geometry is an empty geometry.
 // If true, then this Geometry represents an empty geometry collection, polygon, point etc.
 func IsEmpty(g string) (bool, error) {

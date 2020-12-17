@@ -232,8 +232,13 @@ func (G GEOSAlgorithm) EqualsExact(g1 Geometry, g2 Geometry, tolerance float64) 
 	return geo.EqualsExact(wkt1, wkt2, tolerance)
 }
 
+// HausdorffDistanceDensify computes the Hausdorff distance with an additional densification fraction amount
 func (G GEOSAlgorithm) HausdorffDistanceDensify(s Geometry, d Geometry, densifyFrac float64) (float64, error) {
-	panic("implement me")
+	var (
+		wkt1 = MarshalString(s)
+		wkt2 = MarshalString(d)
+	)
+	return geo.HausdorffDistanceDensify(wkt1, wkt2, densifyFrac)
 }
 
 // Relate computes the intersection matrix (Dimensionally Extended
