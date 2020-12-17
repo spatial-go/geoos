@@ -624,3 +624,37 @@ func TestGEOSAlgorithm_NGeometry(t *testing.T) {
 		})
 	}
 }
+
+func TestGEOSAlgorithm_IsClosed(t *testing.T) {
+	const linestring = `LINESTRING(1 1,2 3,3 2,1 2)`
+	const closedLinestring = `LINESTRING(1 1,2 3,3 2,1 2,1 1)`
+	line, _ := UnmarshalString(linestring)
+	closedLine, _ := UnmarshalString(closedLinestring)
+
+	type args struct {
+		g Geometry
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    bool
+		wantErr bool
+	}{
+		{name: "line", args: args{g: line}, want: false, wantErr: false},
+		{name: "closedLine", args: args{g: closedLine}, want: true, wantErr: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			G := GEOSAlgorithm{}
+			got, err := G.IsClosed(&tt.args.g)
+			t.Log(got)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("geometry: %s IsClose() error = %v, wantErr %v", tt.name, err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("geometry: %s IsSimple() got = %v, want %v", tt.name, got, tt.want)
+			}
+		})
+	}
+}
