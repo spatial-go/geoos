@@ -18,7 +18,7 @@ type Algorithm interface {
 
 	HausdorffDistanceDensify(s Geometry, d Geometry, densifyFrac float64) (float64, error)
 
-	Relate(s Geometry, d Geometry) (string, error)
+	Relate(s Geometry, d Geometry)
 
 	Envelope(g Geometry) (Geometry, error)
 
