@@ -1,5 +1,6 @@
 package geos
 
+// const ...
 const (
 	TypePoint           = "Point"
 	TypeMultiPoint      = "MultiPoint"

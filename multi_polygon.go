@@ -18,6 +18,11 @@ func (mp MultiPolygon) Nums() int {
 	return len(mp)
 }
 
+<<<<<<< HEAD
+// Area Returns the area of this polygonal geometry
+=======
+// Area ...
+>>>>>>> a1310ea0c8d9c74dab601390b4f91981dc57f2c9
 func (mp MultiPolygon) Area() (float64, error) {
 	s := NormalStrategy()
 	return s.Area(mp)
