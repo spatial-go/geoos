@@ -19,23 +19,23 @@ type Algorithm interface {
 
 	Relate(s Geometry, d Geometry)
 
-	Envelope(s Geometry) (Geometry, error)
+	Envelope(g Geometry) (Geometry, error)
 
-	ConvexHull() (*Geometry, error)
+	ConvexHull(g Geometry) (Geometry, error)
 
 	Boundary(g Geometry) (Geometry, error)
 
-	UnaryUnion() (*Geometry, error)
+	UnaryUnion(g Geometry) (Geometry, error)
 
-	PointOnSurface() (*Geometry, error)
+	PointOnSurface(g Geometry) (Geometry, error)
 
 	Centroid(g Geometry) (Geometry, error)
 
-	LineMerge() (*Geometry, error)
+	LineMerge(g Geometry) (Geometry, error)
 
-	Simplify(tolerance float64) (*Geometry, error)
+	Simplify(g Geometry, tolerance float64) (Geometry, error)
 
-	SimplifyP(tolerance float64) (*Geometry, error)
+	SimplifyP(g Geometry, tolerance float64) (Geometry, error)
 
 	UniquePoints(g Geometry) (Geometry, error)
 
