@@ -10,6 +10,7 @@ import (
 
 type tokenType int
 
+// const ...
 const (
 	// Separator
 	LeftParen tokenType = iota
@@ -33,25 +34,28 @@ const (
 	// Values
 	Float
 
-	// Eof
+	// Eof ...
 	Eof
 )
 
 // eof is used to simplify treatment of file end
 const eof = rune(0)
 
+// Token ...
 type Token struct {
 	ttype  tokenType
 	lexeme string
 	pos    int
 }
 
+// Lexer ...
 type Lexer struct {
 	reader *bufio.Reader
 
 	pos int
 }
 
+// NewLexer ...
 func NewLexer(reader io.Reader) *Lexer {
 	return &Lexer{
 		reader: bufio.NewReader(reader),

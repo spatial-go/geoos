@@ -137,6 +137,19 @@ func HausdorffDistance(g1 string, g2 string) (float64, error) {
 	return float64(distance), nil
 }
 
+// HausdorffDistanceDensify computes the Hausdorff distance with an additional densification fraction amount
+func HausdorffDistanceDensify(g1 string, g2 string, densifyFrac float64) (float64, error) {
+	geom1 := GeomFromWKTStr(g1)
+	geom2 := GeomFromWKTStr(g2)
+	defer func() {
+		C.GEOSGeom_destroy_r(geosContext, geom1)
+		C.GEOSGeom_destroy_r(geosContext, geom2)
+	}()
+	var distance C.double
+	c := C.GEOSHausdorffDistanceDensify_r(geosContext, geom1, geom2, C.double(densifyFrac), &distance)
+	return float64FromC(c, distance)
+}
+
 // Returns true if this Geometry is an empty geometry.
 // If true, then this Geometry represents an empty geometry collection, polygon, point etc.
 func IsEmpty(g string) (bool, error) {
@@ -150,6 +163,60 @@ func IsEmpty(g string) (bool, error) {
 func Envelope(wkt string) (string, error) {
 	geoGeom := GeomFromWKTStr(wkt)
 	g := C.GEOSEnvelope_r(geosContext, geoGeom)
+	s, e := ToWKTStr(g)
+	C.GEOSGeom_destroy_r(geosContext, geoGeom)
+	return s, e
+}
+
+// ConvexHull ...
+func ConvexHull(wkt string) (string, error) {
+	geoGeom := GeomFromWKTStr(wkt)
+	g := C.GEOSConvexHull_r(geosContext, geoGeom)
+	s, e := ToWKTStr(g)
+	C.GEOSGeom_destroy_r(geosContext, geoGeom)
+	return s, e
+}
+
+// UnaryUnion ...
+func UnaryUnion(wkt string) (string, error) {
+	geoGeom := GeomFromWKTStr(wkt)
+	g := C.GEOSUnaryUnion_r(geosContext, geoGeom)
+	s, e := ToWKTStr(g)
+	C.GEOSGeom_destroy_r(geosContext, geoGeom)
+	return s, e
+}
+
+// PointOnSurface ...
+func PointOnSurface(wkt string) (string, error) {
+	geoGeom := GeomFromWKTStr(wkt)
+	g := C.GEOSPointOnSurface_r(geosContext, geoGeom)
+	s, e := ToWKTStr(g)
+	C.GEOSGeom_destroy_r(geosContext, geoGeom)
+	return s, e
+}
+
+// LineMerge ...
+func LineMerge(wkt string) (string, error) {
+	geoGeom := GeomFromWKTStr(wkt)
+	g := C.GEOSLineMerge_r(geosContext, geoGeom)
+	s, e := ToWKTStr(g)
+	C.GEOSGeom_destroy_r(geosContext, geoGeom)
+	return s, e
+}
+
+// Simplify ...
+func Simplify(wkt string, tolerance float64) (string, error) {
+	geoGeom := GeomFromWKTStr(wkt)
+	g := C.GEOSSimplify_r(geosContext, geoGeom, C.double(tolerance))
+	s, e := ToWKTStr(g)
+	C.GEOSGeom_destroy_r(geosContext, geoGeom)
+	return s, e
+}
+
+// SimplifyP ...
+func SimplifyP(wkt string, tolerance float64) (string, error) {
+	geoGeom := GeomFromWKTStr(wkt)
+	g := C.GEOSTopologyPreserveSimplify_r(geosContext, geoGeom, C.double(tolerance))
 	s, e := ToWKTStr(g)
 	C.GEOSGeom_destroy_r(geosContext, geoGeom)
 	return s, e
@@ -348,4 +415,21 @@ func IsClosed(g string) (bool, error) {
 	defer C.GEOSGeom_destroy_r(geosContext, geoGeom)
 	c := C.GEOSisClosed_r(geosContext, geoGeom)
 	return boolFromC(c)
+}
+
+// Relate computes the intersection matrix (Dimensionally Extended
+// Nine-Intersection Model (DE-9IM) matrix) for the spatial relationship between
+// the two geometries.
+func Relate(g1 string, g2 string) (string, error) {
+	geom1 := GeomFromWKTStr(g1)
+	geom2 := GeomFromWKTStr(g2)
+	defer func() {
+		C.GEOSGeom_destroy_r(geosContext, geom1)
+		C.GEOSGeom_destroy_r(geosContext, geom2)
+	}()
+	c := C.GEOSRelate_r(geosContext, geom1, geom2)
+	if c == nil {
+		return "", Error()
+	}
+	return C.GoString(c), nil
 }

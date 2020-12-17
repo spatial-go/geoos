@@ -3,7 +3,7 @@ package geos
 // LineString represents a set of points to be thought of as a polyline.
 type LineString []Point
 
-// GeoJSONType returns the GeoJSON type for the object.
+// GeoJSONType returns the GeoJSON type for the linestring.
 func (ls LineString) GeoJSONType() string {
 	return TypeLineString
 }
@@ -18,6 +18,7 @@ func (ls LineString) Nums() int {
 	return 1
 }
 
+// Boundary Returns the closure of the combinatorial boundary of this linestring.
 func (ls LineString) Boundary() (Geometry, error) {
 	s := NormalStrategy()
 	return s.Boundary(ls)
