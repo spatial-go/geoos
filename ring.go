@@ -3,7 +3,7 @@ package geos
 // Ring represents a set of ring on the earth.
 type Ring LineString
 
-// GeoJSONType returns the GeoJSON type for the object.
+// GeoJSONType returns the GeoJSON type for the ring.
 func (r Ring) GeoJSONType() string {
 	return TypePolygon
 }

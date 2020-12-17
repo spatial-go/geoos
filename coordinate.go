@@ -1,9 +1,10 @@
 package geos
+
 import (
 	"fmt"
 )
 
-// 3维坐标点
+// Coordinate 3维坐标点
 type Coordinate struct {
 	X float64
 	Y float64
@@ -14,4 +15,3 @@ type Coordinate struct {
 func (c Coordinate) String() string {
 	return fmt.Sprintf("%f %f", c.X, c.Y)
 }
-

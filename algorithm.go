@@ -1,5 +1,7 @@
 package geos
 
+// Algorithm is the interface implemented by an object that can implementation
+// spatial algorithm.
 type Algorithm interface {
 	Area(g Geometry) (float64, error)
 
@@ -17,25 +19,25 @@ type Algorithm interface {
 
 	HausdorffDistanceDensify(s Geometry, d Geometry, densifyFrac float64) (float64, error)
 
-	Relate(s Geometry, d Geometry)
+	Relate(s Geometry, d Geometry) (string, error)
 
-	Envelope() (*Geometry, error)
+	Envelope(g Geometry) (Geometry, error)
 
-	ConvexHull() (*Geometry, error)
+	ConvexHull(g Geometry) (Geometry, error)
 
 	Boundary(g Geometry) (Geometry, error)
 
-	UnaryUnion() (*Geometry, error)
+	UnaryUnion(g Geometry) (Geometry, error)
 
-	PointOnSurface() (*Geometry, error)
+	PointOnSurface(g Geometry) (Geometry, error)
 
 	Centroid(g Geometry) (Geometry, error)
 
-	LineMerge() (*Geometry, error)
+	LineMerge(g Geometry) (Geometry, error)
 
-	Simplify(tolerance float64) (*Geometry, error)
+	Simplify(g Geometry, tolerance float64) (Geometry, error)
 
-	SimplifyP(tolerance float64) (*Geometry, error)
+	SimplifyP(g Geometry, tolerance float64) (Geometry, error)
 
 	UniquePoints(g Geometry) (Geometry, error)
 

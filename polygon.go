@@ -5,7 +5,7 @@ package geos
 // ie. the first point matches the last.
 type Polygon []Ring
 
-// GeoJSONType returns the GeoJSON type for the object.
+// GeoJSONType returns the GeoJSON type for the polygon.
 func (p Polygon) GeoJSONType() string {
 	return TypePolygon
 }
@@ -20,11 +20,13 @@ func (p Polygon) Nums() int {
 	return 1
 }
 
+// Area Returns the area of this polygonal geometry
 func (p Polygon) Area() (float64, error) {
 	s := NormalStrategy()
 	return s.Area(p)
 }
 
+// Boundary Returns the closure of the combinatorial boundary of this Geometry
 func (p Polygon) Boundary() (Geometry, error) {
 	s := NormalStrategy()
 	return s.Boundary(p)
