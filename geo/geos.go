@@ -417,6 +417,14 @@ func IsClosed(g string) (bool, error) {
 	return boolFromC(c)
 }
 
+// HasZ returns true if the geometry is 3D
+func HasZ(g string) (bool, error) {
+	geoGeom := GeomFromWKTStr(g)
+	defer C.GEOSGeom_destroy_r(geosContext, geoGeom)
+	c := C.GEOSHasZ_r(geosContext, geoGeom)
+	return boolFromC(c)
+}
+
 // Relate computes the intersection matrix (Dimensionally Extended
 // Nine-Intersection Model (DE-9IM) matrix) for the spatial relationship between
 // the two geometries.
