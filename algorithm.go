@@ -1,5 +1,7 @@
 package geos
 
+// Algorithm is the interface implemented by an object that can implementation
+// spatial algorithm.
 type Algorithm interface {
 	Area(g Geometry) (float64, error)
 
