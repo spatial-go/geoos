@@ -280,8 +280,12 @@ func (G GEOSAlgorithm) HausdorffDistanceDensify(s Geometry, d Geometry, densifyF
 // Relate computes the intersection matrix (Dimensionally Extended
 // Nine-Intersection Model (DE-9IM) matrix) for the spatial relationship between
 // the two geometries.
-func (G GEOSAlgorithm) Relate(s Geometry, d Geometry) {
-	panic("implement me")
+func (G GEOSAlgorithm) Relate(s Geometry, d Geometry) (string, error) {
+	var (
+		wkt1 = MarshalString(s)
+		wkt2 = MarshalString(d)
+	)
+	return geo.Relate(wkt1, wkt2)
 }
 
 // Crosses takes two geometry objects and returns TRUE if their intersection "spatially cross",

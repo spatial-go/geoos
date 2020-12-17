@@ -365,3 +365,20 @@ func NGeometry(g string) (int, error) {
 	c := C.GEOSGetNumGeometries_r(geosContext, geom)
 	return intFromC(c, -1)
 }
+
+// Relate computes the intersection matrix (Dimensionally Extended
+// Nine-Intersection Model (DE-9IM) matrix) for the spatial relationship between
+// the two geometries.
+func Relate(g1 string, g2 string) (string, error) {
+	geom1 := GeomFromWKTStr(g1)
+	geom2 := GeomFromWKTStr(g2)
+	defer func() {
+		C.GEOSGeom_destroy_r(geosContext, geom1)
+		C.GEOSGeom_destroy_r(geosContext, geom2)
+	}()
+	c := C.GEOSRelate_r(geosContext, geom1, geom2)
+	if c == nil {
+		return "", Error()
+	}
+	return C.GoString(c), nil
+}
