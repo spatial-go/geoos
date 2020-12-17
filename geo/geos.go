@@ -17,6 +17,7 @@ import (
 type GEOSContext C.GEOSContextHandle_t
 
 type GEOSGeometry *C.GEOSGeometry
+type GEOSPreparedGeometry *C.GEOSPreparedGeometry
 type GEOSCoordSequence C.GEOSCoordSequence
 type GEOSBufferParams C.GEOSBufferParams
 type GEOSSTRtree C.GEOSSTRtree
@@ -88,13 +89,9 @@ func Centroid(wkt string) (string, error) {
 // Returns true if this Geometry has no anomalous geometric points, such as self intersection or self tangency
 func IsSimple(wkt string) (bool, error) {
 	geoGeom := GeomFromWKTStr(wkt)
+	defer C.GEOSGeom_destroy_r(geosContext, geoGeom)
 	c := C.GEOSisSimple_r(geosContext, geoGeom)
-	b, e := boolFromC(c)
-	if e != nil {
-		return false, e
-	}
-	C.GEOSGeom_destroy_r(geosContext, geoGeom)
-	return b, nil
+	return boolFromC(c)
 }
 
 // returns the 2D Cartesian length of the geometry if it is a LineString, MultiLineString
@@ -157,13 +154,9 @@ func HausdorffDistanceDensify(g1 string, g2 string, densifyFrac float64) (float6
 // If true, then this Geometry represents an empty geometry collection, polygon, point etc.
 func IsEmpty(g string) (bool, error) {
 	geoGeom := GeomFromWKTStr(g)
+	defer C.GEOSGeom_destroy_r(geosContext, geoGeom)
 	c := C.GEOSisEmpty_r(geosContext, geoGeom)
-	b, e := boolFromC(c)
-	if e != nil {
-		return false, e
-	}
-	C.GEOSGeom_destroy_r(geosContext, geoGeom)
-	return b, nil
+	return boolFromC(c)
 }
 
 // Envelope ...
@@ -236,15 +229,12 @@ func SimplifyP(wkt string, tolerance float64) (string, error) {
 func Crosses(g1 string, g2 string) (bool, error) {
 	geom1 := GeomFromWKTStr(g1)
 	geom2 := GeomFromWKTStr(g2)
+	defer func() {
+		C.GEOSGeom_destroy_r(geosContext, geom1)
+		C.GEOSGeom_destroy_r(geosContext, geom2)
+	}()
 	c := C.GEOSCrosses_r(geosContext, geom1, geom2)
-	b, e := boolFromC(c)
-	if e != nil {
-		return false, e
-	}
-	C.GEOSGeom_destroy_r(geosContext, geom1)
-	C.GEOSGeom_destroy_r(geosContext, geom2)
-	return b, nil
-
+	return boolFromC(c)
 }
 
 //Returns TRUE if geometry A is completely inside geometry B.
@@ -254,15 +244,12 @@ func Within(g1 string, g2 string) (bool, error) {
 
 	geom1 := GeomFromWKTStr(g1)
 	geom2 := GeomFromWKTStr(g2)
+	defer func() {
+		C.GEOSGeom_destroy_r(geosContext, geom1)
+		C.GEOSGeom_destroy_r(geosContext, geom2)
+	}()
 	c := C.GEOSWithin_r(geosContext, geom1, geom2)
-	b, e := boolFromC(c)
-	if e != nil {
-		return false, e
-	}
-	C.GEOSGeom_destroy_r(geosContext, geom1)
-	C.GEOSGeom_destroy_r(geosContext, geom2)
-	return b, nil
-
+	return boolFromC(c)
 }
 
 // Geometry A contains Geometry B if and only if no points of B lie in the exterior of A,
@@ -273,14 +260,12 @@ func Within(g1 string, g2 string) (bool, error) {
 func Contains(g1 string, g2 string) (bool, error) {
 	geom1 := GeomFromWKTStr(g1)
 	geom2 := GeomFromWKTStr(g2)
+	defer func() {
+		C.GEOSGeom_destroy_r(geosContext, geom1)
+		C.GEOSGeom_destroy_r(geosContext, geom2)
+	}()
 	c := C.GEOSContains_r(geosContext, geom1, geom2)
-	b, e := boolFromC(c)
-	if e != nil {
-		return false, e
-	}
-	C.GEOSGeom_destroy_r(geosContext, geom1)
-	C.GEOSGeom_destroy_r(geosContext, geom2)
-	return b, nil
+	return boolFromC(c)
 }
 
 // UniquePoints return all distinct vertices of input geometry as a MultiPoint.
@@ -351,11 +336,7 @@ func EqualsExact(g1 string, g2 string, tolerance float64) (bool, error) {
 		C.GEOSGeom_destroy_r(geosContext, geom2)
 	}()
 	c := C.GEOSEqualsExact_r(geosContext, geom1, geom2, C.double(tolerance))
-	b, e := boolFromC(c)
-	if e != nil {
-		return false, e
-	}
-	return b, nil
+	return boolFromC(c)
 }
 
 // NGeometry returns the number of component geometries.
@@ -364,6 +345,76 @@ func NGeometry(g string) (int, error) {
 	defer C.GEOSGeom_destroy_r(geosContext, geom)
 	c := C.GEOSGetNumGeometries_r(geosContext, geom)
 	return intFromC(c, -1)
+}
+
+// Overlaps returns true if one geometry overlaps the other.
+func Overlaps(g1 string, g2 string) (bool, error) {
+	geom1 := GeomFromWKTStr(g1)
+	geom2 := GeomFromWKTStr(g2)
+	pGeom := C.GEOSPrepare_r(geosContext, geom1)
+	defer func() {
+		C.GEOSGeom_destroy_r(geosContext, geom1)
+		C.GEOSGeom_destroy_r(geosContext, geom2)
+		C.GEOSPreparedGeom_destroy_r(geosContext, pGeom)
+	}()
+	c := C.GEOSPreparedOverlaps_r(geosContext, pGeom, geom2)
+	return boolFromC(c)
+}
+
+// Equals returns true if the two geometries have at least one point in common.
+func Equals(g1 string, g2 string) (bool, error) {
+	geom1 := GeomFromWKTStr(g1)
+	geom2 := GeomFromWKTStr(g2)
+	defer func() {
+		C.GEOSGeom_destroy_r(geosContext, geom1)
+		C.GEOSGeom_destroy_r(geosContext, geom2)
+	}()
+	c := C.GEOSEquals_r(geosContext, geom1, geom2)
+	return boolFromC(c)
+}
+
+// Covers computes whether the prepared geometry covers the other.
+func Covers(g1 string, g2 string) (bool, error) {
+	geom1 := GeomFromWKTStr(g1)
+	geom2 := GeomFromWKTStr(g2)
+	pGeom := C.GEOSPrepare_r(geosContext, geom1)
+	defer func() {
+		C.GEOSGeom_destroy_r(geosContext, geom1)
+		C.GEOSGeom_destroy_r(geosContext, geom2)
+		C.GEOSPreparedGeom_destroy_r(geosContext, pGeom)
+	}()
+	c := C.GEOSPreparedCovers_r(geosContext, pGeom, geom2)
+	return boolFromC(c)
+}
+
+// CoveredBy computes whether the prepared geometry is covered by the other.
+func CoversBy(g1 string, g2 string) (bool, error) {
+	geom1 := GeomFromWKTStr(g1)
+	geom2 := GeomFromWKTStr(g2)
+	pGeom := C.GEOSPrepare_r(geosContext, geom1)
+	defer func() {
+		C.GEOSGeom_destroy_r(geosContext, geom1)
+		C.GEOSGeom_destroy_r(geosContext, geom2)
+		C.GEOSPreparedGeom_destroy_r(geosContext, pGeom)
+	}()
+	c := C.GEOSPreparedCoveredBy_r(geosContext, pGeom, geom2)
+	return boolFromC(c)
+}
+
+// IsRing returns true if the lineal geometry has the ring property.
+func IsRing(g string) (bool, error) {
+	geoGeom := GeomFromWKTStr(g)
+	defer C.GEOSGeom_destroy_r(geosContext, geoGeom)
+	c := C.GEOSisRing_r(geosContext, geoGeom)
+	return boolFromC(c)
+}
+
+// IsClosed returns true if the geometry is closed
+func IsClosed(g string) (bool, error) {
+	geoGeom := GeomFromWKTStr(g)
+	defer C.GEOSGeom_destroy_r(geosContext, geoGeom)
+	c := C.GEOSisClosed_r(geosContext, geoGeom)
+	return boolFromC(c)
 }
 
 // Relate computes the intersection matrix (Dimensionally Extended

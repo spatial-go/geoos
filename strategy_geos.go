@@ -197,40 +197,50 @@ func (G GEOSAlgorithm) Intersects(other *Geometry) (bool, error) {
 	panic("implement me")
 }
 
-// Overlaps returns TRUE if the Geometries "spatially overlap". By that we mean they intersect, but one does not completely contain another.
-func (G GEOSAlgorithm) Overlaps(other *Geometry) (bool, error) {
-	panic("implement me")
+// Returns TRUE if the Geometries "spatially overlap". By that we mean they intersect, but one does not completely contain another.
+func (G GEOSAlgorithm) Overlaps(g *Geometry, other *Geometry) (bool, error) {
+	geom1 := MarshalString(*g)
+	geom2 := MarshalString(*other)
+	return geo.Overlaps(geom1, geom2)
 }
 
-// Equals returns TRUE if the given Geometries are "spatially equal".
-func (G GEOSAlgorithm) Equals(other *Geometry) (bool, error) {
-	panic("implement me")
+// Returns TRUE if the given Geometries are "spatially equal".
+func (G GEOSAlgorithm) Equals(g *Geometry, other *Geometry) (bool, error) {
+	geom1 := MarshalString(*g)
+	geom2 := MarshalString(*other)
+	return geo.Equals(geom1, geom2)
 }
 
-// Covers returns TRUE if no point in Geometry B is outside Geometry A
-func (G GEOSAlgorithm) Covers(other *Geometry) (bool, error) {
-	panic("implement me")
+// Returns TRUE if no point in Geometry B is outside Geometry A
+func (G GEOSAlgorithm) Covers(g *Geometry, other *Geometry) (bool, error) {
+	geom1 := MarshalString(*g)
+	geom2 := MarshalString(*other)
+	return geo.Covers(geom1, geom2)
 }
 
-// CoveredBy returns TRUE if no point in Geometry A is outside Geometry B
-func (G GEOSAlgorithm) CoveredBy(other *Geometry) (bool, error) {
-	panic("implement me")
+// Returns TRUE if no point in Geometry A is outside Geometry B
+func (G GEOSAlgorithm) CoveredBy(g *Geometry, other *Geometry) (bool, error) {
+	geom1 := MarshalString(*g)
+	geom2 := MarshalString(*other)
+	return geo.CoversBy(geom1, geom2)
 }
 
 // IsRing returns true if the lineal geometry has the ring property.
-func (G GEOSAlgorithm) IsRing() (bool, error) {
-	panic("implement me")
+func (G GEOSAlgorithm) IsRing(g *Geometry) (bool, error) {
+	geom1 := MarshalString(*g)
+	return geo.IsRing(geom1)
 }
 
-// HasZ ...
-func (G GEOSAlgorithm) HasZ() (bool, error) {
-	panic("implement me")
+func (G GEOSAlgorithm) HasZ(g *Geometry) (bool, error) {
+	geom1 := MarshalString(*g)
+	return geo.IsRing(geom1)
 }
 
-// IsClosed returns TRUE if the LINESTRING's start and end points are coincident.
+// Returns TRUE if the LINESTRING's start and end points are coincident.
 // For Polyhedral Surfaces, reports if the surface is areal (open) or volumetric (closed).
-func (G GEOSAlgorithm) IsClosed() (bool, error) {
-	panic("implement me")
+func (G GEOSAlgorithm) IsClosed(g *Geometry) (bool, error) {
+	geom1 := MarshalString(*g)
+	return geo.IsClosed(geom1)
 }
 
 // NGeometry returns the number of component geometries.
