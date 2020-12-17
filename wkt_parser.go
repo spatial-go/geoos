@@ -5,10 +5,12 @@ import (
 	"strconv"
 )
 
+// Parser ...
 type Parser struct {
 	*Lexer
 }
 
+// Parse ...
 func (p *Parser) Parse() (Geometry, error) {
 	t, err := p.scanToken()
 	if err != nil {

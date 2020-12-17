@@ -6,11 +6,13 @@ import (
 	"strings"
 )
 
+// UnmarshalString ...
 func UnmarshalString(s string) (Geometry, error) {
 	p := Parser{NewLexer(strings.NewReader(s))}
 	return p.Parse()
 }
 
+// MarshalString ...
 // 集合对象生成wkt字符串
 func MarshalString(g Geometry) string {
 	buf := bytes.NewBuffer(nil)
