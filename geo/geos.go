@@ -441,3 +441,122 @@ func Relate(g1 string, g2 string) (string, error) {
 	}
 	return C.GoString(c), nil
 }
+
+// Intersection Returns a geometry that represents the point set intersection of the Geometries.
+func Intersection(g1 string, g2 string) (string, error) {
+	geom1 := GeomFromWKTStr(g1)
+	geom2 := GeomFromWKTStr(g2)
+	defer func() {
+		C.GEOSGeom_destroy_r(geosContext, geom1)
+		C.GEOSGeom_destroy_r(geosContext, geom2)
+	}()
+	g := C.GEOSIntersection_r(geosContext, geom1, geom2)
+	wkt, e := ToWKTStr(g)
+	if e != nil {
+		return "", e
+	}
+	return wkt, nil
+}
+
+// Difference Returns a geometry that represents that part of geometry A that does not intersect with geometry B.
+// One can think of this as GeometryA - Intersection(A,B).
+// If A is completely contained in B then an empty geometry collection is returned.
+func Difference(g1 string, g2 string) (string, error) {
+	geom1 := GeomFromWKTStr(g1)
+	geom2 := GeomFromWKTStr(g2)
+	defer func() {
+		C.GEOSGeom_destroy_r(geosContext, geom1)
+		C.GEOSGeom_destroy_r(geosContext, geom2)
+	}()
+	g := C.GEOSDifference_r(geosContext, geom1, geom2)
+	wkt, e := ToWKTStr(g)
+	if e != nil {
+		return "", e
+	}
+	return wkt, nil
+}
+
+// SymDifference Returns a geometry that represents the portions of A and B that do not intersect.
+// It is called a symmetric difference because SymDifference(A,B) = SymDifference(B,A).
+// One can think of this as Union(geomA,geomB) - Intersection(A,B).
+func SymDifference(g1 string, g2 string) (string, error) {
+	geom1 := GeomFromWKTStr(g1)
+	geom2 := GeomFromWKTStr(g2)
+	defer func() {
+		C.GEOSGeom_destroy_r(geosContext, geom1)
+		C.GEOSGeom_destroy_r(geosContext, geom2)
+	}()
+	g := C.GEOSSymDifference_r(geosContext, geom1, geom2)
+	wkt, e := ToWKTStr(g)
+	if e != nil {
+		return "", e
+	}
+	return wkt, nil
+}
+
+// Union returns a new geometry representing all points in this geometry and the other.
+func Union(g1 string, g2 string) (string, error) {
+	geom1 := GeomFromWKTStr(g1)
+	geom2 := GeomFromWKTStr(g2)
+	defer func() {
+		C.GEOSGeom_destroy_r(geosContext, geom1)
+		C.GEOSGeom_destroy_r(geosContext, geom2)
+	}()
+	g := C.GEOSUnion_r(geosContext, geom1, geom2)
+	wkt, e := ToWKTStr(g)
+	if e != nil {
+		return "", e
+	}
+	return wkt, nil
+}
+
+// Disjoint Overlaps, Touches, Within all imply geometries are not spatially disjoint.
+// If any of the aforementioned returns true, then the geometries are not spatially disjoint.
+// Disjoint implies false for spatial intersection.
+func Disjoint(g1 string, g2 string) (bool, error) {
+	geom1 := GeomFromWKTStr(g1)
+	geom2 := GeomFromWKTStr(g2)
+	defer func() {
+		C.GEOSGeom_destroy_r(geosContext, geom1)
+		C.GEOSGeom_destroy_r(geosContext, geom2)
+	}()
+	c := C.GEOSDisjoint_r(geosContext, geom1, geom2)
+	b, e := boolFromC(c)
+	if e != nil {
+		return false, e
+	}
+	return b, nil
+}
+
+// Touches Returns TRUE if the only points in common between g1 and g2 lie in the union of the boundaries of g1 and g2.
+// The touches relation applies to all Area/Area, Line/Line, Line/Area, Point/Area and Point/Line pairs of relationships, but not to the Point/Point pair.
+func Touches(g1 string, g2 string) (bool, error) {
+	geom1 := GeomFromWKTStr(g1)
+	geom2 := GeomFromWKTStr(g2)
+	defer func() {
+		C.GEOSGeom_destroy_r(geosContext, geom1)
+		C.GEOSGeom_destroy_r(geosContext, geom2)
+	}()
+	c := C.GEOSTouches_r(geosContext, geom1, geom2)
+	b, e := boolFromC(c)
+	if e != nil {
+		return false, e
+	}
+	return b, nil
+}
+
+//Intersects If a geometry  shares any portion of space then they intersect
+func Intersects(g1 string, g2 string) (bool, error) {
+	geom1 := GeomFromWKTStr(g1)
+	geom2 := GeomFromWKTStr(g2)
+	defer func() {
+		C.GEOSGeom_destroy_r(geosContext, geom1)
+		C.GEOSGeom_destroy_r(geosContext, geom2)
+	}()
+	c := C.GEOSIntersects_r(geosContext, geom1, geom2)
+	b, e := boolFromC(c)
+	if e != nil {
+		return false, e
+	}
+	return b, nil
+}

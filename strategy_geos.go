@@ -155,48 +155,6 @@ func (G GEOSAlgorithm) SimplifyP(g Geometry, tolerance float64) (Geometry, error
 	return UnmarshalString(envelope)
 }
 
-// Intersection returns a geometry that represents the point set intersection of the Geometries.
-func (G GEOSAlgorithm) Intersection(other *Geometry) (*Geometry, error) {
-	panic("implement me")
-}
-
-// Difference returns a geometry that represents that part of geometry A that does not intersect with geometry B.
-// One can think of this as GeometryA - Intersection(A,B).
-// If A is completely contained in B then an empty geometry collection is returned.
-func (G GEOSAlgorithm) Difference(other *Geometry) (*Geometry, error) {
-	panic("implement me")
-}
-
-// SymDifference returns a geometry that represents the portions of A and B that do not intersect.
-// It is called a symmetric difference because SymDifference(A,B) = SymDifference(B,A).
-// One can think of this as Union(geomA,geomB) - Intersection(A,B).
-func (G GEOSAlgorithm) SymDifference(other *Geometry) (*Geometry, error) {
-	panic("implement me")
-}
-
-// Union returns a new geometry representing all points in this geometry and the other.
-func (G GEOSAlgorithm) Union(other *Geometry) (*Geometry, error) {
-	panic("implement me")
-}
-
-//Disjoint  Overlaps, Touches, Within all imply geometries are not spatially disjoint.
-// If any of the aforementioned returns true, then the geometries are not spatially disjoint.
-// Disjoint implies false for spatial intersection.
-func (G GEOSAlgorithm) Disjoint(other *Geometry) (bool, error) {
-	panic("implement me")
-}
-
-// Touches returns TRUE if the only points in common between g1 and g2 lie in the union of the boundaries of g1 and g2.
-// The ouches relation applies to all Area/Area, Line/Line, Line/Area, Point/Area and Point/Line pairs of relationships, but not to the Point/Point pair.
-func (G GEOSAlgorithm) Touches(other *Geometry) (bool, error) {
-	panic("implement me")
-}
-
-// Intersects If a geometry  shares any portion of space then they intersect
-func (G GEOSAlgorithm) Intersects(other *Geometry) (bool, error) {
-	panic("implement me")
-}
-
 // Returns TRUE if the Geometries "spatially overlap". By that we mean they intersect, but one does not completely contain another.
 func (G GEOSAlgorithm) Overlaps(g *Geometry, other *Geometry) (bool, error) {
 	geom1 := MarshalString(*g)
@@ -368,4 +326,92 @@ func (G GEOSAlgorithm) Snap(input Geometry, reference Geometry, tolerance float6
 		return nil, e
 	}
 	return geometry, nil
+}
+
+// Intersection returns a geometry that represents the point set intersection of the Geometries.
+func (G GEOSAlgorithm) Intersection(g1 Geometry, g2 Geometry) (Geometry, error) {
+	geom1 := MarshalString(g1)
+	geom2 := MarshalString(g2)
+	s, e := geo.Intersection(geom1, geom2)
+	if e != nil {
+		return nil, e
+	}
+	geometry, e := UnmarshalString(s)
+	if e != nil {
+		return nil, e
+	}
+	return geometry, nil
+}
+
+// Difference returns a geometry that represents that part of geometry A that does not intersect with geometry B.
+// One can think of this as GeometryA - Intersection(A,B).
+// If A is completely contained in B then an empty geometry collection is returned.
+func (G GEOSAlgorithm) Difference(g1 Geometry, g2 Geometry) (Geometry, error) {
+	geom1 := MarshalString(g1)
+	geom2 := MarshalString(g2)
+	s, e := geo.Difference(geom1, geom2)
+	if e != nil {
+		return nil, e
+	}
+	geometry, e := UnmarshalString(s)
+	if e != nil {
+		return nil, e
+	}
+	return geometry, nil
+}
+
+// SymDifference returns a geometry that represents the portions of A and B that do not intersect.
+// It is called a symmetric difference because SymDifference(A,B) = SymDifference(B,A).
+// One can think of this as Union(geomA,geomB) - Intersection(A,B).
+func (G GEOSAlgorithm) SymDifference(g1 Geometry, g2 Geometry) (Geometry, error) {
+	geom1 := MarshalString(g1)
+	geom2 := MarshalString(g2)
+	s, e := geo.SymDifference(geom1, geom2)
+	if e != nil {
+		return nil, e
+	}
+	geometry, e := UnmarshalString(s)
+	if e != nil {
+		return nil, e
+	}
+	return geometry, nil
+}
+
+// Union returns a new geometry representing all points in this geometry and the other.
+func (G GEOSAlgorithm) Union(g1 Geometry, g2 Geometry) (Geometry, error) {
+	geom1 := MarshalString(g1)
+	geom2 := MarshalString(g2)
+	s, e := geo.Union(geom1, geom2)
+	if e != nil {
+		return nil, e
+	}
+	geometry, e := UnmarshalString(s)
+	if e != nil {
+		return nil, e
+	}
+	return geometry, nil
+}
+
+// Disjoint Overlaps, Touches, Within all imply geometries are not spatially disjoint.
+// If any of the aforementioned returns true, then the geometries are not spatially disjoint.
+// Disjoint implies false for spatial intersection.
+func (G GEOSAlgorithm) Disjoint(g1 Geometry, g2 Geometry) (bool, error) {
+	geom1 := MarshalString(g1)
+	geom2 := MarshalString(g2)
+	return geo.Disjoint(geom1, geom2)
+}
+
+// Touches returns TRUE if the only points in common between g1 and g2 lie in the union of the boundaries of g1 and g2.
+// The ouches relation applies to all Area/Area, Line/Line, Line/Area, Point/Area and Point/Line pairs of relationships, but not to the Point/Point pair.
+func (G GEOSAlgorithm) Touches(g1 Geometry, g2 Geometry) (bool, error) {
+	geom1 := MarshalString(g1)
+	geom2 := MarshalString(g2)
+	return geo.Touches(geom1, geom2)
+}
+
+// Intersects If a geometry  shares any portion of space then they intersect
+func (G GEOSAlgorithm) Intersects(g1 Geometry, g2 Geometry) (bool, error) {
+	geom1 := MarshalString(g1)
+	geom2 := MarshalString(g2)
+	return geo.Intersects(geom1, geom2)
 }

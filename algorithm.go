@@ -45,19 +45,19 @@ type Algorithm interface {
 
 	Snap(input Geometry, reference Geometry, tolerance float64) (Geometry, error)
 
-	Intersection(other *Geometry) (*Geometry, error)
+	Intersection(g1 Geometry, g2 Geometry) (Geometry, error)
 
-	Difference(other *Geometry) (*Geometry, error)
+	Difference(g1 Geometry, g2 Geometry) (Geometry, error)
 
-	SymDifference(other *Geometry) (*Geometry, error)
+	SymDifference(g1 Geometry, g2 Geometry) (Geometry, error)
 
-	Union(other *Geometry) (*Geometry, error)
+	Union(g1 Geometry, g2 Geometry) (Geometry, error)
 
-	Disjoint(other *Geometry) (bool, error)
+	Disjoint(g1 Geometry, g2 Geometry) (bool, error)
 
-	Touches(other *Geometry) (bool, error)
+	Touches(g1 Geometry, g2 Geometry) (bool, error)
 
-	Intersects(other *Geometry) (bool, error)
+	Intersects(g1 Geometry, g2 Geometry) (bool, error)
 
 	Crosses(g1 Geometry, g2 Geometry) (bool, error)
 
