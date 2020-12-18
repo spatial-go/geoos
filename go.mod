@@ -1,3 +1,3 @@
-module github.com/spatial-go/geos
+module github.com/spatial-go/geoos
 
-go 1.14
+go 1.15

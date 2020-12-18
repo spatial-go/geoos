@@ -1,4 +1,4 @@
-package geos
+package geoos
 
 // LineString represents a set of points to be thought of as a polyline.
 type LineString []Point
@@ -18,7 +18,7 @@ func (ls LineString) Nums() int {
 	return 1
 }
 
-// Boundary Returns the closure of the combinatorial boundary of this linestring.
+// Boundary returns the closure of the combinatorial boundary of this linestring.
 func (ls LineString) Boundary() (Geometry, error) {
 	s := NormalStrategy()
 	return s.Boundary(ls)

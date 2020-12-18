@@ -1,4 +1,4 @@
-package geos
+package geoos
 
 // Geometry is the interface implemented by other spatial objects
 type Geometry interface {

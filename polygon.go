@@ -1,4 +1,4 @@
-package geos
+package geoos
 
 // Polygon is a closed area. The first LineString is the outer ring.
 // The others are the holes. Each LineString is expected to be closed
@@ -20,13 +20,13 @@ func (p Polygon) Nums() int {
 	return 1
 }
 
-// Area Returns the area of this polygonal geometry
+// Area returns the area of this polygonal geometry
 func (p Polygon) Area() (float64, error) {
 	s := NormalStrategy()
 	return s.Area(p)
 }
 
-// Boundary Returns the closure of the combinatorial boundary of this Geometry
+// Boundary returns the closure of the combinatorial boundary of this Geometry
 func (p Polygon) Boundary() (Geometry, error) {
 	s := NormalStrategy()
 	return s.Boundary(p)

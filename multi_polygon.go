@@ -1,4 +1,4 @@
-package geos
+package geoos
 
 // MultiPolygon is a set of polygons.
 type MultiPolygon []Polygon
@@ -13,7 +13,7 @@ func (mp MultiPolygon) Dimensions() int {
 	return 2
 }
 
-// Nums num of polygons
+// Nums num of multiPolygons
 func (mp MultiPolygon) Nums() int {
 	return len(mp)
 }

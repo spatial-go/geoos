@@ -1,5 +1,5 @@
 
-# Geos
+# Geoos
 
 我们的组织`spatial-go`正式成立，这是我们的第一个开源项目`geos`,`geos`是`Go`的库,提供有关空间数据和几何算法的操作。
 欢迎大家使用并提出宝贵意见！
@@ -58,7 +58,7 @@ package main
 
 import (
    "fmt"
-   "github.com/spatial-go/geos"
+   "github.com/spatial-go/geoos"
 )
 
 func main() {

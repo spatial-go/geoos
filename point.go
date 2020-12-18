@@ -1,6 +1,6 @@
-package geos
+package geoos
 
-// Point Describes a geographic point
+// Point describes a geographic point
 type Point struct {
 	X float64
 	Y float64

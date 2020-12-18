@@ -1,4 +1,4 @@
-package geos
+package geoos
 
 // MultiLineString is a set of polylines.
 type MultiLineString []LineString
@@ -13,7 +13,7 @@ func (mls MultiLineString) Dimensions() int {
 	return 1
 }
 
-// Nums num of linstrings
+// Nums num of multiLinstrings
 func (mls MultiLineString) Nums() int {
 	return len(mls)
 }

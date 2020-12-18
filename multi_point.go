@@ -1,4 +1,4 @@
-package geos
+package geoos
 
 // A MultiPoint represents a set of points in the 2D Eucledian or Cartesian plane.
 type MultiPoint []Point
@@ -13,7 +13,7 @@ func (mp MultiPoint) Dimensions() int {
 	return 0
 }
 
-// Nums num of points
+// Nums num of multiPoint.
 func (mp MultiPoint) Nums() int {
 	return len(mp)
 }

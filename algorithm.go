@@ -1,4 +1,5 @@
-package geos
+// Package geoos provides support for the implementation of spatial operations and geometric algorithms.
+package geoos
 
 // Algorithm is the interface implemented by an object that can implementation
 // spatial algorithm.

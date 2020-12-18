@@ -1,4 +1,4 @@
-package geos
+package geoos
 
 // Ring represents a set of ring on the earth.
 type Ring LineString

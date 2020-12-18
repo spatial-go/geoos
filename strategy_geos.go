@@ -1,4 +1,4 @@
-package geos
+package geoos
 
 import (
 	"github.com/spatial-go/geos/geo"
