@@ -1,4 +1,9 @@
 package geo
+/*
+#cgo LDFLAGS: -lgeos_c
+#include "geos.h"
+*/
+import "C"
 import (
 	"fmt"
 )
@@ -13,5 +18,10 @@ type Coordinate struct {
 // 2维点的字符串表达
 func (c Coordinate) String() string {
 	return fmt.Sprintf("%f %f", c.X, c.Y)
+}
+
+func PrepareGeometry(g GEOSGeometry) GEOSPreparedGeometry {
+	ptr := C.GEOSPrepare_r(geosContext, g)
+	return ptr
 }
 

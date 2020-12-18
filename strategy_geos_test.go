@@ -527,6 +527,7 @@ func TestGEOSAlgorithm_Envelope(t *testing.T) {
 		})
 	}
 }
+
 func TestGEOSAlgorithm_ConvexHull(t *testing.T) {
 	polygon, _ := UnmarshalString(`POLYGON((1 1, 3 1, 2 2, 3 3, 1 3, 1 1))`)
 	expectPolygon, _ := UnmarshalString(`POLYGON ((1 1, 1 3, 3 3, 3 1, 1 1))`)
@@ -733,6 +734,7 @@ func TestGEOSAlgorithm_SimplifyP(t *testing.T) {
 		})
 	}
 }
+
 func TestGEOSAlgorithm_Buffer(t *testing.T) {
 	geometry, _ := UnmarshalString("POINT(100 90)")
 	expectGeometry, _ := UnmarshalString("POLYGON((150 90,146.193976625564 70.8658283817455,135.355339059327 54.6446609406727,119.134171618255 43.8060233744357,100 40,80.8658283817456 43.8060233744356,64.6446609406727 54.6446609406725,53.8060233744357 70.8658283817454,50 89.9999999999998,53.8060233744356 109.134171618254,64.6446609406725 125.355339059327,80.8658283817453 136.193976625564,99.9999999999998 140,119.134171618254 136.193976625564,135.355339059327 125.355339059328,146.193976625564 109.134171618255,150 90))")
@@ -831,66 +833,35 @@ func TestGEOSAlgorithm_NGeometry(t *testing.T) {
 	}
 }
 
-func TestGEOSAlgorithm_HausdorffDistanceDensify(t *testing.T) {
-	const g1 = `LINESTRING (0 0, 2 0)`
-	const g2 = `MULTIPOINT (0 1, 1 0, 2 1)`
-	geom1, _ := UnmarshalString(g1)
-	geom2, _ := UnmarshalString(g2)
-	type args struct {
-		s           Geometry
-		d           Geometry
-		densifyFrac float64
-	}
-	tests := []struct {
-		name    string
-		G       GEOSAlgorithm
-		args    args
-		want    float64
-		wantErr bool
-	}{
-		{name: "hausdorff_distance_densify", args: args{s: geom1, d: geom2, densifyFrac: 1}, want: 1, wantErr: false},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			G := GEOSAlgorithm{}
-			got, err := G.HausdorffDistanceDensify(tt.args.s, tt.args.d, tt.args.densifyFrac)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GEOSAlgorithm.HausdorffDistanceDensify() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if got != tt.want {
-				t.Errorf("GEOSAlgorithm.HausdorffDistanceDensify() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
+func TestGEOSAlgorithm_IsClosed(t *testing.T) {
+	const linestring = `LINESTRING(1 1,2 3,3 2,1 2)`
+	const closedLinestring = `LINESTRING(1 1,2 3,3 2,1 2,1 1)`
+	line, _ := UnmarshalString(linestring)
+	closedLine, _ := UnmarshalString(closedLinestring)
 
-func TestGEOSAlgorithm_Relate(t *testing.T) {
-	geom1, _ := UnmarshalString("LINESTRING(1 2, 3 4)")
-	geom2, _ := UnmarshalString("LINESTRING(5 6, 7 8)")
 	type args struct {
-		s Geometry
-		d Geometry
+		g Geometry
 	}
 	tests := []struct {
 		name    string
-		G       GEOSAlgorithm
 		args    args
-		want    string
+		want    bool
 		wantErr bool
 	}{
-		{name: "relate", args: args{s: geom1, d: geom2}, want: "FF1FF0102", wantErr: false},
+		{name: "line", args: args{g: line}, want: false, wantErr: false},
+		{name: "closedLine", args: args{g: closedLine}, want: true, wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			G := GEOSAlgorithm{}
-			got, err := G.Relate(tt.args.s, tt.args.d)
+			got, err := G.IsClosed(&tt.args.g)
+			t.Log(got)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("GEOSAlgorithm.Relate() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("geometry: %s IsClose() error = %v, wantErr %v", tt.name, err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("GEOSAlgorithm.Relate() = %v, want %v", got, tt.want)
+				t.Errorf("geometry: %s IsSimple() got = %v, want %v", tt.name, got, tt.want)
 			}
 		})
 	}
