@@ -231,9 +231,10 @@ func (G GEOSAlgorithm) IsRing(g *Geometry) (bool, error) {
 	return geo.IsRing(geom1)
 }
 
+// HasZ returns true if the geometry is 3D
 func (G GEOSAlgorithm) HasZ(g *Geometry) (bool, error) {
 	geom1 := MarshalString(*g)
-	return geo.IsRing(geom1)
+	return geo.HasZ(geom1)
 }
 
 // Returns TRUE if the LINESTRING's start and end points are coincident.
