@@ -866,3 +866,238 @@ func TestGEOSAlgorithm_IsClosed(t *testing.T) {
 		})
 	}
 }
+
+func TestGEOSAlgorithm_SymDifference(t *testing.T) {
+	line01, _ := UnmarshalString(`LINESTRING(50 100, 50 200)`)
+	line02, _ := UnmarshalString(`LINESTRING(50 50, 50 150)`)
+	expectMultiLines, _ := UnmarshalString(`MULTILINESTRING((50 150,50 200),(50 50,50 100))`)
+
+	type args struct {
+		g1 Geometry
+		g2 Geometry
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    Geometry
+		wantErr bool
+	}{
+		{name: "symDifference", args: args{g1: line01, g2: line02}, want: expectMultiLines},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			G := GEOSAlgorithm{}
+			got, err := G.SymDifference(tt.args.g1, tt.args.g2)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("SymDifference() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("SymDifference() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestGEOSAlgorithm_Difference(t *testing.T) {
+	line01, _ := UnmarshalString(`LINESTRING(50 100, 50 200)`)
+	line02, _ := UnmarshalString(`LINESTRING(50 50, 50 150)`)
+	expectLine, _ := UnmarshalString(`LINESTRING(50 150,50 200)`)
+
+	type args struct {
+		g1 Geometry
+		g2 Geometry
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    Geometry
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+		{name: "difference", args: args{g1: line01, g2: line02}, want: expectLine},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			G := GEOSAlgorithm{}
+			got, err := G.Difference(tt.args.g1, tt.args.g2)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Difference() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Difference() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestGEOSAlgorithm_Intersects(t *testing.T) {
+	point01, _ := UnmarshalString(`POINT(0 0)`)
+	line01, _ := UnmarshalString(`LINESTRING ( 0 0, 0 2 )`)
+
+	point02, _ := UnmarshalString(`POINT(0 0)`)
+	line02, _ := UnmarshalString(`LINESTRING ( 2 0, 0 2 )`)
+
+	type args struct {
+		g1 Geometry
+		g2 Geometry
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    bool
+		wantErr bool
+	}{
+		{name: "intersects", args: args{g1: point01, g2: line01}, want: true},
+		{name: "not intersects", args: args{g1: point02, g2: line02}, want: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			G := GEOSAlgorithm{}
+			got, err := G.Intersects(tt.args.g1, tt.args.g2)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Intersects() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("Intersects() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestGEOSAlgorithm_Disjoint(t *testing.T) {
+	point01, _ := UnmarshalString(`POINT(0 0)`)
+	line01, _ := UnmarshalString(`LINESTRING ( 2 0, 0 2 )`)
+
+	point02, _ := UnmarshalString(`POINT(0 0)`)
+	line02, _ := UnmarshalString(`LINESTRING ( 0 0, 0 2 )`)
+
+	type args struct {
+		g1 Geometry
+		g2 Geometry
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    bool
+		wantErr bool
+	}{
+		{name: "disjoint", args: args{g1: point01, g2: line01}, want: true},
+		{name: "not disjoint", args: args{g1: point02, g2: line02}, want: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			G := GEOSAlgorithm{}
+			got, err := G.Disjoint(tt.args.g1, tt.args.g2)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Disjoint() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("Disjoint() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestGEOSAlgorithm_Touches(t *testing.T) {
+	line01, _ := UnmarshalString(`LINESTRING(0 0, 1 1, 0 2)`)
+	point01, _ := UnmarshalString(`POINT(0 2)`)
+
+	line02, _ := UnmarshalString(`LINESTRING(0 0, 1 1, 0 2)`)
+	point02, _ := UnmarshalString(`POINT(1 1)`)
+
+	type args struct {
+		g1 Geometry
+		g2 Geometry
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    bool
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+		{name: "touches", args: args{g1: line01, g2: point01}, want: true},
+		{name: "not touches", args: args{g1: line02, g2: point02}, want: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			G := GEOSAlgorithm{}
+			got, err := G.Touches(tt.args.g1, tt.args.g2)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Touches() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("Touches() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestGEOSAlgorithm_Union(t *testing.T) {
+	point01, _ := UnmarshalString(`POINT(1 2)`)
+	point02, _ := UnmarshalString(`POINT(-2 3)`)
+	expectMultiPoint, _ := UnmarshalString(`MULTIPOINT(1 2,-2 3)`)
+
+	type args struct {
+		g1 Geometry
+		g2 Geometry
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    Geometry
+		wantErr bool
+	}{
+		{name: "union", args: args{g1: point01, g2: point02}, want: expectMultiPoint},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			G := GEOSAlgorithm{}
+			got, err := G.Union(tt.args.g1, tt.args.g2)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Union() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Union() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestGEOSAlgorithm_Intersection(t *testing.T) {
+	point02, _ := UnmarshalString(`POINT(0 0)`)
+	line02, _ := UnmarshalString(`LINESTRING ( 0 0, 0 2 )`)
+	expectPoint, _ := UnmarshalString(`POINT(0 0)`)
+
+	type args struct {
+		g1 Geometry
+		g2 Geometry
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    Geometry
+		wantErr bool
+	}{
+		{name: "intersection", args: args{g1: point02, g2: line02}, want: expectPoint, wantErr: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			G := GEOSAlgorithm{}
+			got, err := G.Intersection(tt.args.g1, tt.args.g2)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Intersection() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Intersection() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
