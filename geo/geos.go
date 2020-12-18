@@ -14,37 +14,53 @@ import (
 	"fmt"
 )
 
+// GEOSContext ...
 type GEOSContext C.GEOSContextHandle_t
 
+// GEOSGeometry ...
 type GEOSGeometry *C.GEOSGeometry
+
+// GEOSPreparedGeometry ...
 type GEOSPreparedGeometry *C.GEOSPreparedGeometry
+
+// GEOSCoordSequence ...
 type GEOSCoordSequence C.GEOSCoordSequence
+
+// GEOSBufferParams ...
 type GEOSBufferParams C.GEOSBufferParams
+
+// GEOSSTRtree ...
 type GEOSSTRtree C.GEOSSTRtree
 
+// GEOSChar ...
 type GEOSChar *C.char
 
 var (
 	geosContext = InitGeosContext()
 )
 
+// InitGeosContext  init context
 func InitGeosContext() GEOSContext {
 	c := C.geos_initGEOS()
 	return GEOSContext(c)
 }
+
+// FinishGeosContext release context
 func FinishGeosContext(c GEOSContext) {
 	C.finishGEOS_r(c)
 }
 
+// Version ...
 func Version() string {
 	return C.GoString(C.GEOSversion())
 }
 
+// Error ...
 func Error() error {
 	return fmt.Errorf("geo: %s", C.GoString(C.geos_get_last_error()))
 }
 
-// Returns the area of a polygonal geometry
+// Area returns the area of a polygonal geometry
 func Area(wkt string) (float64, error) {
 	geoGeom := GeomFromWKTStr(wkt)
 	var d C.double
@@ -56,7 +72,7 @@ func Area(wkt string) (float64, error) {
 	return float64(d), nil
 }
 
-// Returns the closure of the combinatorial boundary of this Geometry
+// Boundary returns the closure of the combinatorial boundary of this Geometry
 func Boundary(wkt string) (string, error) {
 	geoGeom := GeomFromWKTStr(wkt)
 	g := C.GEOSBoundary_r(geosContext, geoGeom)
@@ -68,13 +84,14 @@ func Boundary(wkt string) (string, error) {
 	return s, nil
 }
 
-// Computes the geometric center of a geometry, or equivalently, the center of mass of the geometry as a POINT.
+// Centroid Computes the geometric center of a geometry, or equivalently, the center of mass of the geometry as a POINT.
 // For [MULTI]POINTs, this is computed as the arithmetic mean of the input coordinates.
 // For [MULTI]LINESTRINGs, this is computed as the weighted length of each line segment.
 // For [MULTI]POLYGONs, "weight" is thought in terms of area.
 // If an empty geometry is supplied, an empty GEOMETRYCOLLECTION is returned.
 // If NULL is supplied, NULL is returned.
-// If CIRCULARSTRING or COMPOUNDCURVE are supplied, they are converted to linestring wtih CurveToLine first, then same than for LINESTRING
+// If CIRCULARSTRING or COMPOUNDCURVE are supplied, they are converted to linestring wtih CurveToLine first,
+// then same than for LINESTRING
 func Centroid(wkt string) (string, error) {
 	geoGeom := GeomFromWKTStr(wkt)
 	g := C.GEOSGetCentroid_r(geosContext, geoGeom)
@@ -86,7 +103,7 @@ func Centroid(wkt string) (string, error) {
 	return s, nil
 }
 
-// Returns true if this Geometry has no anomalous geometric points, such as self intersection or self tangency
+// IsSimple returns true if this Geometry has no anomalous geometric points, such as self intersection or self tangency
 func IsSimple(wkt string) (bool, error) {
 	geoGeom := GeomFromWKTStr(wkt)
 	defer C.GEOSGeom_destroy_r(geosContext, geoGeom)
@@ -94,7 +111,7 @@ func IsSimple(wkt string) (bool, error) {
 	return boolFromC(c)
 }
 
-// returns the 2D Cartesian length of the geometry if it is a LineString, MultiLineString
+// Length returns the 2D Cartesian length of the geometry if it is a LineString, MultiLineString
 func Length(wkt string) (float64, error) {
 	geoGeom := GeomFromWKTStr(wkt)
 	var d C.double
@@ -107,7 +124,8 @@ func Length(wkt string) (float64, error) {
 
 }
 
-// returns the minimum 2D Cartesian (planar) distance between two geometries, in projected units (spatial ref units).
+// Distance returns the minimum 2D Cartesian (planar) distance between two geometries,
+// in projected units (spatial ref units).
 func Distance(g1 string, g2 string) (float64, error) {
 	geom1 := GeomFromWKTStr(g1)
 	geom2 := GeomFromWKTStr(g2)
@@ -122,9 +140,10 @@ func Distance(g1 string, g2 string) (float64, error) {
 
 }
 
-// Returns the Hausdorff distance between two geometries, a measure of how similar or dissimilar 2 geometries are.
-// Implements algorithm for computing a distance metric which can be thought of as the "Discrete Hausdorff Distance".
-// This is the Hausdorff distance restricted to discrete points for one of the geometries
+// HausdorffDistance returns the Hausdorff distance between two geometries, a measure of how similar or
+// dissimilar 2 geometries are. Implements algorithm for computing a distance metric which can be
+// thought of as the "Discrete Hausdorff Distance". This is the Hausdorff distance restricted to discrete points
+// for one of the geometries
 func HausdorffDistance(g1 string, g2 string) (float64, error) {
 	geom1 := GeomFromWKTStr(g1)
 	geom2 := GeomFromWKTStr(g2)
@@ -150,7 +169,7 @@ func HausdorffDistanceDensify(g1 string, g2 string, densifyFrac float64) (float6
 	return float64FromC(c, distance)
 }
 
-// Returns true if this Geometry is an empty geometry.
+// IsEmpty returns true if this Geometry is an empty geometry.
 // If true, then this Geometry represents an empty geometry collection, polygon, point etc.
 func IsEmpty(g string) (bool, error) {
 	geoGeom := GeomFromWKTStr(g)
@@ -159,7 +178,9 @@ func IsEmpty(g string) (bool, error) {
 	return boolFromC(c)
 }
 
-// Envelope ...
+// Envelope returns the  minimum bounding box for the supplied geometry, as a geometry.
+// The polygon is defined by the corner points of the bounding box
+// ((MINX, MINY), (MINX, MAXY), (MAXX, MAXY), (MAXX, MINY), (MINX, MINY)).
 func Envelope(wkt string) (string, error) {
 	geoGeom := GeomFromWKTStr(wkt)
 	g := C.GEOSEnvelope_r(geosContext, geoGeom)
@@ -168,7 +189,11 @@ func Envelope(wkt string) (string, error) {
 	return s, e
 }
 
-// ConvexHull ...
+// ConvexHull computes the convex hull of a geometry. The convex hull is the smallest convex geometry
+// that encloses all geometries in the input.
+// In the general case the convex hull is a Polygon.
+// The convex hull of two or more collinear points is a two-point LineString.
+// The convex hull of one or more identical points is a Point.
 func ConvexHull(wkt string) (string, error) {
 	geoGeom := GeomFromWKTStr(wkt)
 	g := C.GEOSConvexHull_r(geosContext, geoGeom)
@@ -177,7 +202,8 @@ func ConvexHull(wkt string) (string, error) {
 	return s, e
 }
 
-// UnaryUnion ...
+// UnaryUnion does dissolve boundaries between components of a multipolygon (invalid) and does perform union
+// between the components of a geometrycollection
 func UnaryUnion(wkt string) (string, error) {
 	geoGeom := GeomFromWKTStr(wkt)
 	g := C.GEOSUnaryUnion_r(geosContext, geoGeom)
@@ -186,7 +212,7 @@ func UnaryUnion(wkt string) (string, error) {
 	return s, e
 }
 
-// PointOnSurface ...
+// PointOnSurface Returns a POINT guaranteed to intersect a surface.
 func PointOnSurface(wkt string) (string, error) {
 	geoGeom := GeomFromWKTStr(wkt)
 	g := C.GEOSPointOnSurface_r(geosContext, geoGeom)
@@ -195,7 +221,7 @@ func PointOnSurface(wkt string) (string, error) {
 	return s, e
 }
 
-// LineMerge ...
+// LineMerge returns a (set of) LineString(s) formed by sewing together the constituent line work of a MULTILINESTRING.
 func LineMerge(wkt string) (string, error) {
 	geoGeom := GeomFromWKTStr(wkt)
 	g := C.GEOSLineMerge_r(geosContext, geoGeom)
@@ -204,7 +230,8 @@ func LineMerge(wkt string) (string, error) {
 	return s, e
 }
 
-// Simplify ...
+// Simplify returns a "simplified" version of the given geometry using the Douglas-Peucker algorithm,
+// May not preserve topology
 func Simplify(wkt string, tolerance float64) (string, error) {
 	geoGeom := GeomFromWKTStr(wkt)
 	g := C.GEOSSimplify_r(geosContext, geoGeom, C.double(tolerance))
@@ -213,7 +240,8 @@ func Simplify(wkt string, tolerance float64) (string, error) {
 	return s, e
 }
 
-// SimplifyP ...
+// SimplifyP returns a geometry simplified by amount given by tolerance.
+// Unlike Simplify, SimplifyP guarantees it will preserve topology.
 func SimplifyP(wkt string, tolerance float64) (string, error) {
 	geoGeom := GeomFromWKTStr(wkt)
 	g := C.GEOSTopologyPreserveSimplify_r(geosContext, geoGeom, C.double(tolerance))
@@ -224,8 +252,9 @@ func SimplifyP(wkt string, tolerance float64) (string, error) {
 
 // Crosses takes two geometry objects and returns TRUE if their intersection "spatially cross",
 // that is, the geometries have some, but not all interior points in common.
-// The intersection of the interiors of the geometries must not be the empty set and must have a dimensionality less than the maximum dimension of the two input geometries.
-// Additionally, the intersection of the two geometries must not equal either of the source geometries. Otherwise, it returns FALSE.
+// The intersection of the interiors of the geometries must not be the empty set and must have a dimensionality
+// less than the maximum dimension of the two input geometries. Additionally, the intersection of the two geometries
+// must not equal either of the source geometries. Otherwise, it returns FALSE.
 func Crosses(g1 string, g2 string) (bool, error) {
 	geom1 := GeomFromWKTStr(g1)
 	geom2 := GeomFromWKTStr(g2)
@@ -237,7 +266,7 @@ func Crosses(g1 string, g2 string) (bool, error) {
 	return boolFromC(c)
 }
 
-//Returns TRUE if geometry A is completely inside geometry B.
+// Within returns TRUE if geometry A is completely inside geometry B.
 // For this function to make sense, the source geometries must both be of the same coordinate projection,
 // having the same SRID.
 func Within(g1 string, g2 string) (bool, error) {
@@ -252,7 +281,7 @@ func Within(g1 string, g2 string) (bool, error) {
 	return boolFromC(c)
 }
 
-// Geometry A contains Geometry B if and only if no points of B lie in the exterior of A,
+// Contains Geometry A contains Geometry B if and only if no points of B lie in the exterior of A,
 // and at least one point of the interior of B lies in the interior of A.
 // An important subtlety of this definition is that A does not contain its boundary, but A does contain itself.
 //Returns TRUE if geometry B is completely inside geometry A.
@@ -283,9 +312,9 @@ func UniquePoints(g string) (string, error) {
 
 }
 
-// Returns a collection containing paths shared by the two input geometries.
-// Those going in the same direction are in the first element of the collection, those going in the opposite direction are in the second element.
-// The paths themselves are given in the direction of the first geometry.
+// SharedPaths returns a collection containing paths shared by the two input geometries.
+// Those going in the same direction are in the first element of the collection, those going in the opposite
+// direction are in the second element. The paths themselves are given in the direction of the first geometry.
 func SharedPaths(g1 string, g2 string) (string, error) {
 	geom1 := GeomFromWKTStr(g1)
 	geom2 := GeomFromWKTStr(g2)
@@ -299,7 +328,7 @@ func SharedPaths(g1 string, g2 string) (string, error) {
 	return wkt, nil
 }
 
-// Snaps the vertices and segments of a geometry to another Geometry's vertices.
+// Snap Snaps the vertices and segments of a geometry to another Geometry's vertices.
 // A snap distance tolerance is used to control where snapping is performed.
 // The result geometry is the input geometry with the vertices snapped.
 // If no snapping occurs then the input geometry is returned unchanged.
@@ -387,7 +416,7 @@ func Covers(g1 string, g2 string) (bool, error) {
 	return boolFromC(c)
 }
 
-// CoveredBy computes whether the prepared geometry is covered by the other.
+// CoversBy computes whether the prepared geometry is covered by the other.
 func CoversBy(g1 string, g2 string) (bool, error) {
 	geom1 := GeomFromWKTStr(g1)
 	geom2 := GeomFromWKTStr(g2)
@@ -442,7 +471,7 @@ func Relate(g1 string, g2 string) (string, error) {
 	return C.GoString(c), nil
 }
 
-// Intersection Returns a geometry that represents the point set intersection of the Geometries.
+// Intersection returns a geometry that represents the point set intersection of the Geometries.
 func Intersection(g1 string, g2 string) (string, error) {
 	geom1 := GeomFromWKTStr(g1)
 	geom2 := GeomFromWKTStr(g2)
@@ -458,7 +487,7 @@ func Intersection(g1 string, g2 string) (string, error) {
 	return wkt, nil
 }
 
-// Difference Returns a geometry that represents that part of geometry A that does not intersect with geometry B.
+// Difference returns a geometry that represents that part of geometry A that does not intersect with geometry B.
 // One can think of this as GeometryA - Intersection(A,B).
 // If A is completely contained in B then an empty geometry collection is returned.
 func Difference(g1 string, g2 string) (string, error) {
@@ -476,7 +505,7 @@ func Difference(g1 string, g2 string) (string, error) {
 	return wkt, nil
 }
 
-// SymDifference Returns a geometry that represents the portions of A and B that do not intersect.
+// SymDifference returns a geometry that represents the portions of A and B that do not intersect.
 // It is called a symmetric difference because SymDifference(A,B) = SymDifference(B,A).
 // One can think of this as Union(geomA,geomB) - Intersection(A,B).
 func SymDifference(g1 string, g2 string) (string, error) {
@@ -528,8 +557,9 @@ func Disjoint(g1 string, g2 string) (bool, error) {
 	return b, nil
 }
 
-// Touches Returns TRUE if the only points in common between g1 and g2 lie in the union of the boundaries of g1 and g2.
-// The touches relation applies to all Area/Area, Line/Line, Line/Area, Point/Area and Point/Line pairs of relationships, but not to the Point/Point pair.
+// Touches returns TRUE if the only points in common between g1 and g2 lie in the union of the boundaries of g1 and g2.
+// The touches relation applies to all Area/Area, Line/Line, Line/Area, Point/Area and Point/Line pairs of relationships,
+// but not to the Point/Point pair.
 func Touches(g1 string, g2 string) (bool, error) {
 	geom1 := GeomFromWKTStr(g1)
 	geom2 := GeomFromWKTStr(g2)

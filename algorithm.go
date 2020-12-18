@@ -65,21 +65,21 @@ type Algorithm interface {
 
 	Contains(g1 Geometry, g2 Geometry) (bool, error)
 
-	Overlaps(g *Geometry, other *Geometry) (bool, error)
+	Overlaps(g1 Geometry, g2 Geometry) (bool, error)
 
-	Equals(g *Geometry, other *Geometry) (bool, error)
+	Equals(g1 Geometry, g2 Geometry) (bool, error)
 
-	Covers(g *Geometry, other *Geometry) (bool, error)
+	Covers(g1 Geometry, g2 Geometry) (bool, error)
 
-	CoveredBy(g *Geometry, other *Geometry) (bool, error)
+	CoveredBy(g1 Geometry, g2 Geometry) (bool, error)
 
 	IsEmpty(g Geometry) (bool, error)
 
-	IsRing(g *Geometry) (bool, error)
+	IsRing(g Geometry) (bool, error)
 
-	HasZ(g *Geometry) (bool, error)
+	HasZ(g Geometry) (bool, error)
 
-	IsClosed(g *Geometry) (bool, error)
+	IsClosed(g Geometry) (bool, error)
 
 	NGeometry(g Geometry) (int, error)
 }

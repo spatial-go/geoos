@@ -5,20 +5,7 @@ package geo
 */
 import "C"
 
-// various wrappers around C API
-
-//=========================== Go与C 转换帮助===============================
-// c语言字符转成go 字符串
-func CStrToGo(c GEOSChar) string {
-	return C.GoString(c)
-}
-
-// go字符串转成C字符
-func GoStrTOC(str string) *C.char {
-	return C.CString(str)
-}
-
-// go字节数组转换成C数组
+// GoByteArrayToCCharArray convert go byte array to C char array
 func GoByteArrayToCCharArray(array []byte) []C.uchar {
 	var cArray []C.uchar
 	for i := range array {

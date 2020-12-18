@@ -1,9 +1,10 @@
 package geos
 
-// Geometry is the interface implemented by an object that can ...
+// Geometry is the interface implemented by other spatial objects
 type Geometry interface {
 	GeoJSONType() string
-	Dimensions() int // e.g. 0d, 1d, 2d
+	// e.g. 0d, 1d, 2d
+	Dimensions() int
 	// Num of geometries
 	Nums() int
 }

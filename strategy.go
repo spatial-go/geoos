@@ -12,8 +12,8 @@ func NormalStrategy() Algorithm {
 func AlgorithmStrategy(name string) Algorithm {
 	switch name {
 	case GEOS:
-		return new(GEOSAlgorithm)
+		return new(GEOAlgorithm)
 	default:
-		return new(GEOSAlgorithm)
+		return new(GEOAlgorithm)
 	}
 }

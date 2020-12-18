@@ -90,7 +90,7 @@ func (p *Parser) parsePoint() (point Point, err error) {
 	if err != nil {
 		return point, err
 	}
-	if t.ttype != Eof {
+	if t.ttype != EOF {
 		return point, fmt.Errorf("parse point unexpected token %s on pos %d", t.lexeme, t.pos)
 	}
 
@@ -130,8 +130,8 @@ func (p *Parser) parseLineString() (line LineString, err error) {
 	if err != nil {
 		return line, err
 	}
-	if t.ttype != Eof {
-		return line, fmt.Errorf("unexpected token %s on pos %d, expected Eof", t.lexeme, t.pos)
+	if t.ttype != EOF {
+		return line, fmt.Errorf("unexpected token %s on pos %d, expected EOF", t.lexeme, t.pos)
 	}
 
 	return line, nil
@@ -199,8 +199,8 @@ func (p *Parser) parsePolygon() (poly Polygon, err error) {
 	if err != nil {
 		return poly, err
 	}
-	if t.ttype != Eof {
-		return poly, fmt.Errorf("unexpected token %s on pos %d, expected Eof", t.lexeme, t.pos)
+	if t.ttype != EOF {
+		return poly, fmt.Errorf("unexpected token %s on pos %d, expected EOF", t.lexeme, t.pos)
 	}
 
 	return poly, nil
@@ -268,8 +268,8 @@ func (p *Parser) parseMultiPolygon() (multi MultiPolygon, err error) {
 	if err != nil {
 		return multi, err
 	}
-	if t.ttype != Eof {
-		return multi, fmt.Errorf("unexpected token %s on pos %d, expected Eof", t.lexeme, t.pos)
+	if t.ttype != EOF {
+		return multi, fmt.Errorf("unexpected token %s on pos %d, expected EOF", t.lexeme, t.pos)
 	}
 
 	return multi, nil

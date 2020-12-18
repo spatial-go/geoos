@@ -5,7 +5,7 @@ package geo
 */
 import "C"
 
-
+// GeometryType ...
 type GeometryType C.int
 
 const (
@@ -58,7 +58,6 @@ var geometryTypes = map[GeometryType]string{
 func  Type(g GEOSGeometry) (GeometryType, error) {
 	i := C.GEOSGeomTypeId_r(geosContext,g)
 	if i == -1 {
-		// XXX: error
 		return -1, Error()
 	}
 	return cGeomTypeIds[i], nil

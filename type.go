@@ -1,6 +1,6 @@
 package geos
 
-// const ...
+// const geomtype
 const (
 	TypePoint           = "Point"
 	TypeMultiPoint      = "MultiPoint"

@@ -34,8 +34,7 @@ const (
 	// Values
 	Float
 
-	// Eof ...
-	Eof
+	EOF
 )
 
 // eof is used to simplify treatment of file end
@@ -161,7 +160,7 @@ func (l *Lexer) scanToken() (Token, error) {
 		w := l.scanFloat(r)
 		return l.getToken(Float, w), nil
 	case r == eof:
-		return l.getToken(Eof, ""), nil
+		return l.getToken(EOF, ""), nil
 	default:
 		return Token{}, fmt.Errorf("Unexpected rune %s on character %d", string(r), l.pos)
 	}

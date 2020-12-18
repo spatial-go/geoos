@@ -19,13 +19,11 @@ func TestGEOSAlgorithm_Centroid(t *testing.T) {
 		want    string
 		wantErr bool
 	}{
-		// TODO: Add test cases.
-
 		{name: "point", args: args{g: geometry}, want: pointresult, wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			G := GEOSAlgorithm{}
+			G := GEOAlgorithm{}
 			got, err := G.Centroid(tt.args.g)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Centroid() error = %v, wantErr %v", err, tt.wantErr)
@@ -59,7 +57,7 @@ func TestGEOSAlgorithm_IsSimple(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			G := GEOSAlgorithm{}
+			G := GEOAlgorithm{}
 			got, err := G.IsSimple(tt.args.g)
 			t.Log(got)
 			if (err != nil) != tt.wantErr {
@@ -89,7 +87,7 @@ func TestGEOSAlgorithm_Area(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			G := GEOSAlgorithm{}
+			G := GEOAlgorithm{}
 			got, err := G.Area(tt.args.g)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Area() error = %v, wantErr %v", err, tt.wantErr)
@@ -136,7 +134,7 @@ func TestGEOSAlgorithm_Boundary(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			G := GEOSAlgorithm{}
+			G := GEOAlgorithm{}
 			got, err := G.Boundary(tt.args.g)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Boundary() error = %v, wantErr %v", err, tt.wantErr)
@@ -167,7 +165,7 @@ func TestGEOSAlgorithm_Length(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			G := GEOSAlgorithm{}
+			G := GEOAlgorithm{}
 			got, err := G.Length(tt.args.g)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Length() error = %v, wantErr %v", err, tt.wantErr)
@@ -203,7 +201,7 @@ func TestGEOSAlgorithm_HausdorffDistance(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			G := GEOSAlgorithm{}
+			G := GEOAlgorithm{}
 			got, err := G.HausdorffDistance(tt.args.g1, tt.args.g2)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("HausdorffDistance() error = %v, wantErr %v", err, tt.wantErr)
@@ -232,7 +230,7 @@ func TestGEOSAlgorithm_IsEmpty(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			G := GEOSAlgorithm{}
+			G := GEOAlgorithm{}
 			got, err := G.IsEmpty(tt.args.g)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("IsEmpty() error = %v, wantErr %v", err, tt.wantErr)
@@ -268,7 +266,7 @@ func TestGEOSAlgorithm_Crosses(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			G := GEOSAlgorithm{}
+			G := GEOAlgorithm{}
 			got, err := G.Crosses(tt.args.g1, tt.args.g2)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Crosses() error = %v, wantErr %v", err, tt.wantErr)
@@ -311,7 +309,7 @@ func TestGEOSAlgorithm_Within(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			G := GEOSAlgorithm{}
+			G := GEOAlgorithm{}
 			got, err := G.Within(tt.args.g1, tt.args.g2)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Within() error = %v, wantErr %v", err, tt.wantErr)
@@ -353,7 +351,7 @@ func TestGEOSAlgorithm_Contains(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			G := GEOSAlgorithm{}
+			G := GEOAlgorithm{}
 			got, err := G.Contains(tt.args.g1, tt.args.g2)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Contains() error = %v, wantErr %v", err, tt.wantErr)
@@ -385,7 +383,7 @@ func TestGEOSAlgorithm_UniquePoints(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			G := GEOSAlgorithm{}
+			G := GEOAlgorithm{}
 			got, err := G.UniquePoints(tt.args.g)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("UniquePoints() error = %v, wantErr %v", err, tt.wantErr)
@@ -426,7 +424,7 @@ func TestGEOSAlgorithm_SharedPaths(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			G := GEOSAlgorithm{}
+			G := GEOAlgorithm{}
 			got, err := G.SharedPaths(tt.args.g1, tt.args.g2)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("SharedPaths() error = %v, wantErr %v", err, tt.wantErr)
@@ -466,7 +464,7 @@ func TestGEOSAlgorithm_Snap(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			G := GEOSAlgorithm{}
+			G := GEOAlgorithm{}
 			got, err := G.Snap(tt.args.input, tt.args.reference, tt.args.tolerance)
 
 			s := MarshalString(got)
@@ -501,7 +499,7 @@ func TestGEOSAlgorithm_Envelope(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		G       GEOSAlgorithm
+		G       GEOAlgorithm
 		args    args
 		want    Geometry
 		wantErr bool
@@ -513,16 +511,16 @@ func TestGEOSAlgorithm_Envelope(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			G := GEOSAlgorithm{}
+			G := GEOAlgorithm{}
 			gotGeometry, err := G.Envelope(tt.args.g)
 
 			if (err != nil) != tt.wantErr {
-				t.Errorf("GEOSAlgorithm.EqualsExact() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("GEOAlgorithm.EqualsExact() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			isEqual, _ := G.EqualsExact(gotGeometry, tt.want, 0.000001)
 			if !isEqual {
-				t.Errorf("GEOSAlgorithm.Envelope() = %v, want %v", MarshalString(gotGeometry), MarshalString(tt.want))
+				t.Errorf("GEOAlgorithm.Envelope() = %v, want %v", MarshalString(gotGeometry), MarshalString(tt.want))
 			}
 		})
 	}
@@ -537,7 +535,7 @@ func TestGEOSAlgorithm_ConvexHull(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		G       GEOSAlgorithm
+		G       GEOAlgorithm
 		args    args
 		want    Geometry
 		wantErr bool
@@ -546,16 +544,16 @@ func TestGEOSAlgorithm_ConvexHull(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			G := GEOSAlgorithm{}
+			G := GEOAlgorithm{}
 			gotGeometry, err := G.ConvexHull(tt.args.g)
 
 			if (err != nil) != tt.wantErr {
-				t.Errorf("GEOSAlgorithm.EqualsExact() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("GEOAlgorithm.EqualsExact() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			isEqual, _ := G.EqualsExact(gotGeometry, tt.want, 0.000001)
 			if !isEqual {
-				t.Errorf("GEOSAlgorithm.Envelope() = %v, want %v", MarshalString(gotGeometry), MarshalString(tt.want))
+				t.Errorf("GEOAlgorithm.Envelope() = %v, want %v", MarshalString(gotGeometry), MarshalString(tt.want))
 			}
 		})
 	}
@@ -569,7 +567,7 @@ func TestGEOSAlgorithm_UnaryUnion(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		G       GEOSAlgorithm
+		G       GEOAlgorithm
 		args    args
 		want    Geometry
 		wantErr bool
@@ -578,16 +576,16 @@ func TestGEOSAlgorithm_UnaryUnion(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			G := GEOSAlgorithm{}
+			G := GEOAlgorithm{}
 			gotGeometry, err := G.UnaryUnion(tt.args.g)
 
 			if (err != nil) != tt.wantErr {
-				t.Errorf("GEOSAlgorithm.EqualsExact() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("GEOAlgorithm.EqualsExact() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			isEqual, _ := G.EqualsExact(gotGeometry, tt.want, 0.000001)
 			if !isEqual {
-				t.Errorf("GEOSAlgorithm.Envelope() = %v, want %v", MarshalString(gotGeometry), MarshalString(tt.want))
+				t.Errorf("GEOAlgorithm.Envelope() = %v, want %v", MarshalString(gotGeometry), MarshalString(tt.want))
 			}
 		})
 	}
@@ -607,7 +605,7 @@ func TestGEOSAlgorithm_PointOnSurface(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		G       GEOSAlgorithm
+		G       GEOAlgorithm
 		args    args
 		want    Geometry
 		wantErr bool
@@ -618,16 +616,16 @@ func TestGEOSAlgorithm_PointOnSurface(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			G := GEOSAlgorithm{}
+			G := GEOAlgorithm{}
 			gotGeometry, err := G.PointOnSurface(tt.args.g)
 
 			if (err != nil) != tt.wantErr {
-				t.Errorf("GEOSAlgorithm.EqualsExact() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("GEOAlgorithm.EqualsExact() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			isEqual, _ := G.EqualsExact(gotGeometry, tt.want, 0.000001)
 			if !isEqual {
-				t.Errorf("GEOSAlgorithm.Envelope() = %v, want %v", MarshalString(gotGeometry), MarshalString(tt.want))
+				t.Errorf("GEOAlgorithm.Envelope() = %v, want %v", MarshalString(gotGeometry), MarshalString(tt.want))
 			}
 		})
 	}
@@ -644,7 +642,7 @@ func TestGEOSAlgorithm_LineMerge(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		G       GEOSAlgorithm
+		G       GEOAlgorithm
 		args    args
 		want    Geometry
 		wantErr bool
@@ -654,16 +652,16 @@ func TestGEOSAlgorithm_LineMerge(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			G := GEOSAlgorithm{}
+			G := GEOAlgorithm{}
 			gotGeometry, err := G.LineMerge(tt.args.g)
 
 			if (err != nil) != tt.wantErr {
-				t.Errorf("GEOSAlgorithm.EqualsExact() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("GEOAlgorithm.EqualsExact() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			isEqual, _ := G.EqualsExact(gotGeometry, tt.want, 0.000001)
 			if !isEqual {
-				t.Errorf("GEOSAlgorithm.Envelope() = %v, want %v", MarshalString(gotGeometry), MarshalString(tt.want))
+				t.Errorf("GEOAlgorithm.Envelope() = %v, want %v", MarshalString(gotGeometry), MarshalString(tt.want))
 			}
 		})
 	}
@@ -678,7 +676,7 @@ func TestGEOSAlgorithm_Simplify(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		G       GEOSAlgorithm
+		G       GEOAlgorithm
 		args    args
 		want    Geometry
 		wantErr bool
@@ -687,16 +685,16 @@ func TestGEOSAlgorithm_Simplify(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			G := GEOSAlgorithm{}
+			G := GEOAlgorithm{}
 			gotGeometry, err := G.Simplify(tt.args.g, tt.args.tolerance)
 
 			if (err != nil) != tt.wantErr {
-				t.Errorf("GEOSAlgorithm.EqualsExact() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("GEOAlgorithm.EqualsExact() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			isEqual, _ := G.EqualsExact(gotGeometry, tt.want, 0.000001)
 			if !isEqual {
-				t.Errorf("GEOSAlgorithm.Envelope() = %v, want %v", MarshalString(gotGeometry), MarshalString(tt.want))
+				t.Errorf("GEOAlgorithm.Envelope() = %v, want %v", MarshalString(gotGeometry), MarshalString(tt.want))
 			}
 		})
 	}
@@ -711,7 +709,7 @@ func TestGEOSAlgorithm_SimplifyP(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		G       GEOSAlgorithm
+		G       GEOAlgorithm
 		args    args
 		want    Geometry
 		wantErr bool
@@ -720,16 +718,16 @@ func TestGEOSAlgorithm_SimplifyP(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			G := GEOSAlgorithm{}
+			G := GEOAlgorithm{}
 			gotGeometry, err := G.SimplifyP(tt.args.g, tt.args.tolerance)
 
 			if (err != nil) != tt.wantErr {
-				t.Errorf("GEOSAlgorithm.EqualsExact() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("GEOAlgorithm.EqualsExact() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			isEqual, _ := G.EqualsExact(gotGeometry, tt.want, 0.000001)
 			if !isEqual {
-				t.Errorf("GEOSAlgorithm.Envelope() = %v, want %v", MarshalString(gotGeometry), MarshalString(tt.want))
+				t.Errorf("GEOAlgorithm.Envelope() = %v, want %v", MarshalString(gotGeometry), MarshalString(tt.want))
 			}
 		})
 	}
@@ -745,7 +743,7 @@ func TestGEOSAlgorithm_Buffer(t *testing.T) {
 	}
 	tests := []struct {
 		name string
-		G    GEOSAlgorithm
+		G    GEOAlgorithm
 		args args
 		want Geometry
 	}{
@@ -753,11 +751,11 @@ func TestGEOSAlgorithm_Buffer(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			G := GEOSAlgorithm{}
+			G := GEOAlgorithm{}
 			gotGeometry := G.Buffer(tt.args.g, tt.args.width, tt.args.quadsegs)
 			isEqual, _ := G.EqualsExact(gotGeometry, tt.want, 0.000001)
 			if !isEqual {
-				t.Errorf("GEOSAlgorithm.Buffer() = %v, want %v", MarshalString(gotGeometry), MarshalString(tt.want))
+				t.Errorf("GEOAlgorithm.Buffer() = %v, want %v", MarshalString(gotGeometry), MarshalString(tt.want))
 			}
 		})
 	}
@@ -774,7 +772,7 @@ func TestGEOSAlgorithm_EqualsExact(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		G       GEOSAlgorithm
+		G       GEOAlgorithm
 		args    args
 		want    bool
 		wantErr bool
@@ -784,14 +782,14 @@ func TestGEOSAlgorithm_EqualsExact(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			G := GEOSAlgorithm{}
+			G := GEOAlgorithm{}
 			got, err := G.EqualsExact(tt.args.g1, tt.args.g2, tt.args.tolerance)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("GEOSAlgorithm.EqualsExact() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("GEOAlgorithm.EqualsExact() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("GEOSAlgorithm.EqualsExact() = %v, want %v", got, tt.want)
+				t.Errorf("GEOAlgorithm.EqualsExact() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -809,7 +807,7 @@ func TestGEOSAlgorithm_NGeometry(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		G       GEOSAlgorithm
+		G       GEOAlgorithm
 		args    args
 		want    int
 		wantErr bool
@@ -820,14 +818,14 @@ func TestGEOSAlgorithm_NGeometry(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			G := GEOSAlgorithm{}
+			G := GEOAlgorithm{}
 			got, err := G.NGeometry(tt.args.g)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("GEOSAlgorithm.NGeometry() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("GEOAlgorithm.NGeometry() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("GEOSAlgorithm.NGeometry() = %v, want %v", got, tt.want)
+				t.Errorf("GEOAlgorithm.NGeometry() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -853,7 +851,7 @@ func TestGEOSAlgorithm_IsClosed(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			G := GEOSAlgorithm{}
+			G := GEOAlgorithm{}
 			got, err := G.IsClosed(&tt.args.g)
 			t.Log(got)
 			if (err != nil) != tt.wantErr {
@@ -886,7 +884,7 @@ func TestGEOSAlgorithm_SymDifference(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			G := GEOSAlgorithm{}
+			G := GEOAlgorithm{}
 			got, err := G.SymDifference(tt.args.g1, tt.args.g2)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("SymDifference() error = %v, wantErr %v", err, tt.wantErr)
@@ -914,12 +912,11 @@ func TestGEOSAlgorithm_Difference(t *testing.T) {
 		want    Geometry
 		wantErr bool
 	}{
-		// TODO: Add test cases.
 		{name: "difference", args: args{g1: line01, g2: line02}, want: expectLine},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			G := GEOSAlgorithm{}
+			G := GEOAlgorithm{}
 			got, err := G.Difference(tt.args.g1, tt.args.g2)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Difference() error = %v, wantErr %v", err, tt.wantErr)
@@ -954,7 +951,7 @@ func TestGEOSAlgorithm_Intersects(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			G := GEOSAlgorithm{}
+			G := GEOAlgorithm{}
 			got, err := G.Intersects(tt.args.g1, tt.args.g2)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Intersects() error = %v, wantErr %v", err, tt.wantErr)
@@ -989,7 +986,7 @@ func TestGEOSAlgorithm_Disjoint(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			G := GEOSAlgorithm{}
+			G := GEOAlgorithm{}
 			got, err := G.Disjoint(tt.args.g1, tt.args.g2)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Disjoint() error = %v, wantErr %v", err, tt.wantErr)
@@ -1019,13 +1016,12 @@ func TestGEOSAlgorithm_Touches(t *testing.T) {
 		want    bool
 		wantErr bool
 	}{
-		// TODO: Add test cases.
 		{name: "touches", args: args{g1: line01, g2: point01}, want: true},
 		{name: "not touches", args: args{g1: line02, g2: point02}, want: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			G := GEOSAlgorithm{}
+			G := GEOAlgorithm{}
 			got, err := G.Touches(tt.args.g1, tt.args.g2)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Touches() error = %v, wantErr %v", err, tt.wantErr)
@@ -1057,7 +1053,7 @@ func TestGEOSAlgorithm_Union(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			G := GEOSAlgorithm{}
+			G := GEOAlgorithm{}
 			got, err := G.Union(tt.args.g1, tt.args.g2)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Union() error = %v, wantErr %v", err, tt.wantErr)
@@ -1089,7 +1085,7 @@ func TestGEOSAlgorithm_Intersection(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			G := GEOSAlgorithm{}
+			G := GEOAlgorithm{}
 			got, err := G.Intersection(tt.args.g1, tt.args.g2)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Intersection() error = %v, wantErr %v", err, tt.wantErr)
