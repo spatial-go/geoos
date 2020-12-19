@@ -1,13 +1,21 @@
 package main
 
-import "github.com/spatial-go/geos"
+import (
+	"fmt"
+	"github.com/spatial-go/geoos"
+)
 
 func main() {
-	const wkt = `POLYGON((1 2, 3 4, 5 6, 1 2))`
-	geometry, _ := geos.UnmarshalString(wkt)
-	strategy := geos.NormalStrategy()
-	b, _ := strategy.IsSimple(geometry)
-	if b {
-		println(b)
+	// First, choose the default algorithm.
+	strategy := geoos.NormalStrategy()
+	// Secondly, manufacturing test data and convert it to geometry
+	const wkt = `POLYGON((-1 -1, 1 -1, 1 1, -1 1, -1 -1))`
+	geometry, _ := geoos.UnmarshalString(wkt)
+	// Last， call the Area () method and get result.
+	area, e := strategy.Area(geometry)
+	if e != nil {
+		fmt.Printf(e.Error())
 	}
+	fmt.Printf("%f", area)
+	// get result 4.0
 }
