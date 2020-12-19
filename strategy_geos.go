@@ -1,7 +1,7 @@
 package geoos
 
 import (
-	"github.com/spatial-go/geos/geo"
+	"github.com/spatial-go/geoos/geo"
 )
 
 // GEOAlgorithm algorithm implement by geos
@@ -62,8 +62,7 @@ func (G GEOAlgorithm) Length(g Geometry) (float64, error) {
 
 // Distance returns the minimum 2D Cartesian (planar) distance between two geometries, in projected units (spatial ref units).
 func (G GEOAlgorithm) Distance(g1 Geometry, g2 Geometry) (float64, error) {
-	geom1 := MarshalString(g1)
-	geom2 := MarshalString(g2)
+	geom1, geom2 := convertGeomToWKT(g1, g2)
 	return geo.Distance(geom1, geom2)
 }
 
@@ -72,8 +71,7 @@ func (G GEOAlgorithm) Distance(g1 Geometry, g2 Geometry) (float64, error) {
 // thought of as the "Discrete Hausdorff Distance". This is the Hausdorff distance restricted
 // to discrete points for one of the geometries
 func (G GEOAlgorithm) HausdorffDistance(g1 Geometry, g2 Geometry) (float64, error) {
-	geom1 := MarshalString(g1)
-	geom2 := MarshalString(g2)
+	geom1, geom2 := convertGeomToWKT(g1, g2)
 	return geo.HausdorffDistance(geom1, geom2)
 }
 
@@ -166,30 +164,25 @@ func (G GEOAlgorithm) SimplifyP(g Geometry, tolerance float64) (Geometry, error)
 // Overlaps returns TRUE if the Geometries "spatially overlap".
 // By that we mean they intersect, but one does not completely contain another.
 func (G GEOAlgorithm) Overlaps(g1 Geometry, g2 Geometry) (bool, error) {
-
-	geom1 := MarshalString(g1)
-	geom2 := MarshalString(g2)
+	geom1, geom2 := convertGeomToWKT(g1, g2)
 	return geo.Overlaps(geom1, geom2)
 }
 
 // Equals returns TRUE if the given Geometries are "spatially equal".
 func (G GEOAlgorithm) Equals(g1 Geometry, g2 Geometry) (bool, error) {
-	geom1 := MarshalString(g1)
-	geom2 := MarshalString(g2)
+	geom1, geom2 := convertGeomToWKT(g1, g2)
 	return geo.Equals(geom1, geom2)
 }
 
 // Covers returns TRUE if no point in Geometry B is outside Geometry A
 func (G GEOAlgorithm) Covers(g1 Geometry, g2 Geometry) (bool, error) {
-	geom1 := MarshalString(g1)
-	geom2 := MarshalString(g2)
+	geom1, geom2 := convertGeomToWKT(g1, g2)
 	return geo.Covers(geom1, geom2)
 }
 
 // CoveredBy returns TRUE if no point in Geometry A is outside Geometry B
 func (G GEOAlgorithm) CoveredBy(g1 Geometry, g2 Geometry) (bool, error) {
-	geom1 := MarshalString(g1)
-	geom2 := MarshalString(g2)
+	geom1, geom2 := convertGeomToWKT(g1, g2)
 	return geo.CoversBy(geom1, geom2)
 }
 
@@ -236,31 +229,22 @@ func (G GEOAlgorithm) Buffer(g Geometry, width float64, quadsegs int32) (geometr
 // EqualsExact returns true if both geometries are Equal, as evaluated by their
 // points being within the given tolerance.
 func (G GEOAlgorithm) EqualsExact(g1 Geometry, g2 Geometry, tolerance float64) (bool, error) {
-	var (
-		wkt1 = MarshalString(g1)
-		wkt2 = MarshalString(g2)
-	)
-	return geo.EqualsExact(wkt1, wkt2, tolerance)
+	geom1, geom2 := convertGeomToWKT(g1, g2)
+	return geo.EqualsExact(geom1, geom2, tolerance)
 }
 
 // HausdorffDistanceDensify computes the Hausdorff distance with an additional densification fraction amount
 func (G GEOAlgorithm) HausdorffDistanceDensify(s Geometry, d Geometry, densifyFrac float64) (float64, error) {
-	var (
-		wkt1 = MarshalString(s)
-		wkt2 = MarshalString(d)
-	)
-	return geo.HausdorffDistanceDensify(wkt1, wkt2, densifyFrac)
+	geom1, geom2 := convertGeomToWKT(s, d)
+	return geo.HausdorffDistanceDensify(geom1, geom2, densifyFrac)
 }
 
 // Relate computes the intersection matrix (Dimensionally Extended
 // Nine-Intersection Model (DE-9IM) matrix) for the spatial relationship between
 // the two geometries.
 func (G GEOAlgorithm) Relate(s Geometry, d Geometry) (string, error) {
-	var (
-		wkt1 = MarshalString(s)
-		wkt2 = MarshalString(d)
-	)
-	return geo.Relate(wkt1, wkt2)
+	geom1, geom2 := convertGeomToWKT(s, d)
+	return geo.Relate(geom1, geom2)
 }
 
 // Crosses takes two geometry objects and returns TRUE if their intersection "spatially cross",
@@ -270,8 +254,7 @@ func (G GEOAlgorithm) Relate(s Geometry, d Geometry) (string, error) {
 // Additionally, the intersection of the two geometries must not equal either of the source geometries.
 // Otherwise, it returns FALSE.
 func (G GEOAlgorithm) Crosses(g1 Geometry, g2 Geometry) (bool, error) {
-	geom1 := MarshalString(g1)
-	geom2 := MarshalString(g2)
+	geom1, geom2 := convertGeomToWKT(g1, g2)
 	return geo.Crosses(geom1, geom2)
 }
 
@@ -279,8 +262,7 @@ func (G GEOAlgorithm) Crosses(g1 Geometry, g2 Geometry) (bool, error) {
 // For this function to make sense, the source geometries must both be of the same coordinate projection,
 // having the same SRID.
 func (G GEOAlgorithm) Within(g1 Geometry, g2 Geometry) (bool, error) {
-	geom1 := MarshalString(g1)
-	geom2 := MarshalString(g2)
+	geom1, geom2 := convertGeomToWKT(g1, g2)
 	return geo.Within(geom1, geom2)
 }
 
@@ -291,8 +273,7 @@ func (G GEOAlgorithm) Within(g1 Geometry, g2 Geometry) (bool, error) {
 // For this function to make sense, the source geometries must both be of the same coordinate projection,
 // having the same SRID.
 func (G GEOAlgorithm) Contains(g1 Geometry, g2 Geometry) (bool, error) {
-	geom1 := MarshalString(g1)
-	geom2 := MarshalString(g2)
+	geom1, geom2 := convertGeomToWKT(g1, g2)
 	return geo.Contains(geom1, geom2)
 }
 
@@ -316,8 +297,7 @@ func (G GEOAlgorithm) UniquePoints(g Geometry) (Geometry, error) {
 // those going in the opposite direction are in the second element.
 // The paths themselves are given in the direction of the first geometry.
 func (G GEOAlgorithm) SharedPaths(g1 Geometry, g2 Geometry) (string, error) {
-	geom1 := MarshalString(g1)
-	geom2 := MarshalString(g2)
+	geom1, geom2 := convertGeomToWKT(g1, g2)
 	s, e := geo.SharedPaths(geom1, geom2)
 	if e != nil {
 		return "", e
@@ -345,8 +325,7 @@ func (G GEOAlgorithm) Snap(input Geometry, reference Geometry, tolerance float64
 
 // Intersection returns a geometry that represents the point set intersection of the Geometries.
 func (G GEOAlgorithm) Intersection(g1 Geometry, g2 Geometry) (Geometry, error) {
-	geom1 := MarshalString(g1)
-	geom2 := MarshalString(g2)
+	geom1, geom2 := convertGeomToWKT(g1, g2)
 	s, e := geo.Intersection(geom1, geom2)
 	if e != nil {
 		return nil, e
@@ -362,8 +341,7 @@ func (G GEOAlgorithm) Intersection(g1 Geometry, g2 Geometry) (Geometry, error) {
 // One can think of this as GeometryA - Intersection(A,B).
 // If A is completely contained in B then an empty geometry collection is returned.
 func (G GEOAlgorithm) Difference(g1 Geometry, g2 Geometry) (Geometry, error) {
-	geom1 := MarshalString(g1)
-	geom2 := MarshalString(g2)
+	geom1, geom2 := convertGeomToWKT(g1, g2)
 	s, e := geo.Difference(geom1, geom2)
 	if e != nil {
 		return nil, e
@@ -379,8 +357,7 @@ func (G GEOAlgorithm) Difference(g1 Geometry, g2 Geometry) (Geometry, error) {
 // It is called a symmetric difference because SymDifference(A,B) = SymDifference(B,A).
 // One can think of this as Union(geomA,geomB) - Intersection(A,B).
 func (G GEOAlgorithm) SymDifference(g1 Geometry, g2 Geometry) (Geometry, error) {
-	geom1 := MarshalString(g1)
-	geom2 := MarshalString(g2)
+	geom1, geom2 := convertGeomToWKT(g1, g2)
 	s, e := geo.SymDifference(geom1, geom2)
 	if e != nil {
 		return nil, e
@@ -394,8 +371,7 @@ func (G GEOAlgorithm) SymDifference(g1 Geometry, g2 Geometry) (Geometry, error) 
 
 // Union returns a new geometry representing all points in this geometry and the other.
 func (G GEOAlgorithm) Union(g1 Geometry, g2 Geometry) (Geometry, error) {
-	geom1 := MarshalString(g1)
-	geom2 := MarshalString(g2)
+	geom1, geom2 := convertGeomToWKT(g1, g2)
 	s, e := geo.Union(geom1, geom2)
 	if e != nil {
 		return nil, e
@@ -411,8 +387,7 @@ func (G GEOAlgorithm) Union(g1 Geometry, g2 Geometry) (Geometry, error) {
 // If any of the aforementioned returns true, then the geometries are not spatially disjoint.
 // Disjoint implies false for spatial intersection.
 func (G GEOAlgorithm) Disjoint(g1 Geometry, g2 Geometry) (bool, error) {
-	geom1 := MarshalString(g1)
-	geom2 := MarshalString(g2)
+	geom1, geom2 := convertGeomToWKT(g1, g2)
 	return geo.Disjoint(geom1, geom2)
 }
 
@@ -420,14 +395,19 @@ func (G GEOAlgorithm) Disjoint(g1 Geometry, g2 Geometry) (bool, error) {
 // The ouches relation applies to all Area/Area, Line/Line, Line/Area, Point/Area and Point/Line pairs of relationships,
 // but not to the Point/Point pair.
 func (G GEOAlgorithm) Touches(g1 Geometry, g2 Geometry) (bool, error) {
-	geom1 := MarshalString(g1)
-	geom2 := MarshalString(g2)
+	geom1, geom2 := convertGeomToWKT(g1, g2)
 	return geo.Touches(geom1, geom2)
 }
 
 // Intersects If a geometry  shares any portion of space then they intersect
 func (G GEOAlgorithm) Intersects(g1 Geometry, g2 Geometry) (bool, error) {
+	geom1, geom2 := convertGeomToWKT(g1, g2)
+	return geo.Intersects(geom1, geom2)
+}
+
+// convertGeomToWKT help to convert Geometry to WKT string
+func convertGeomToWKT(g1 Geometry, g2 Geometry) (string, string) {
 	geom1 := MarshalString(g1)
 	geom2 := MarshalString(g2)
-	return geo.Intersects(geom1, geom2)
+	return geom1, geom2
 }

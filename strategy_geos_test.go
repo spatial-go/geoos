@@ -558,6 +558,7 @@ func TestGEOSAlgorithm_ConvexHull(t *testing.T) {
 		})
 	}
 }
+
 func TestGEOSAlgorithm_UnaryUnion(t *testing.T) {
 	multiPolygon, _ := UnmarshalString(`MULTIPOLYGON(((0 0, 10 0, 10 10, 0 10, 0 0)), ((5 5, 15 5, 15 15, 5 15, 5 5)))`)
 	expectPolygon, _ := UnmarshalString(`POLYGON ((10 5, 10 0, 0 0, 0 10, 5 10, 5 15, 15 15, 15 5, 10 5))`)
@@ -590,6 +591,7 @@ func TestGEOSAlgorithm_UnaryUnion(t *testing.T) {
 		})
 	}
 }
+
 func TestGEOSAlgorithm_PointOnSurface(t *testing.T) {
 	point, _ := UnmarshalString(`POINT(0 5)`)
 	expectPoint0, _ := UnmarshalString(`POINT(0 5)`)
@@ -630,6 +632,7 @@ func TestGEOSAlgorithm_PointOnSurface(t *testing.T) {
 		})
 	}
 }
+
 func TestGEOSAlgorithm_LineMerge(t *testing.T) {
 	multiLineString0, _ := UnmarshalString(`MULTILINESTRING((-29 -27,-30 -29.7,-36 -31,-45 -33),(-45 -33,-46 -32))`)
 	expectLine0, _ := UnmarshalString(`LINESTRING(-29 -27,-30 -29.7,-36 -31,-45 -33,-46 -32)`)
@@ -666,6 +669,7 @@ func TestGEOSAlgorithm_LineMerge(t *testing.T) {
 		})
 	}
 }
+
 func TestGEOSAlgorithm_Simplify(t *testing.T) {
 	lineString, _ := UnmarshalString(`LINESTRING(0 0, 1 1, 0 2, 1 3, 0 4, 1 5)`)
 	expectLine, _ := UnmarshalString(`LINESTRING (0 0, 1 5)`)
@@ -699,6 +703,7 @@ func TestGEOSAlgorithm_Simplify(t *testing.T) {
 		})
 	}
 }
+
 func TestGEOSAlgorithm_SimplifyP(t *testing.T) {
 	lineString, _ := UnmarshalString(`LINESTRING(0 0, 1 1, 0 2, 1 3, 0 4, 1 5)`)
 	expectLine, _ := UnmarshalString(`LINESTRING (0 0, 1 5)`)
@@ -852,7 +857,7 @@ func TestGEOSAlgorithm_IsClosed(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			G := GEOAlgorithm{}
-			got, err := G.IsClosed(&tt.args.g)
+			got, err := G.IsClosed(tt.args.g)
 			t.Log(got)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("geometry: %s IsClose() error = %v, wantErr %v", tt.name, err, tt.wantErr)

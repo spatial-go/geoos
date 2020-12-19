@@ -127,8 +127,7 @@ func Length(wkt string) (float64, error) {
 // Distance returns the minimum 2D Cartesian (planar) distance between two geometries,
 // in projected units (spatial ref units).
 func Distance(g1 string, g2 string) (float64, error) {
-	geom1 := GeomFromWKTStr(g1)
-	geom2 := GeomFromWKTStr(g2)
+	geom1, geom2 := convertWKTtoGEOSGeometry(g1, g2)
 	var distance C.double
 	i := C.GEOSDistance_r(geosContext, geom1, geom2, &distance)
 	if i == 0 {
@@ -145,9 +144,7 @@ func Distance(g1 string, g2 string) (float64, error) {
 // thought of as the "Discrete Hausdorff Distance". This is the Hausdorff distance restricted to discrete points
 // for one of the geometries
 func HausdorffDistance(g1 string, g2 string) (float64, error) {
-	geom1 := GeomFromWKTStr(g1)
-	geom2 := GeomFromWKTStr(g2)
-
+	geom1, geom2 := convertWKTtoGEOSGeometry(g1, g2)
 	var distance C.double
 	i := C.GEOSHausdorffDistance_r(geosContext, geom1, geom2, &distance)
 	if i == 0 {
@@ -158,8 +155,7 @@ func HausdorffDistance(g1 string, g2 string) (float64, error) {
 
 // HausdorffDistanceDensify computes the Hausdorff distance with an additional densification fraction amount
 func HausdorffDistanceDensify(g1 string, g2 string, densifyFrac float64) (float64, error) {
-	geom1 := GeomFromWKTStr(g1)
-	geom2 := GeomFromWKTStr(g2)
+	geom1, geom2 := convertWKTtoGEOSGeometry(g1, g2)
 	defer func() {
 		C.GEOSGeom_destroy_r(geosContext, geom1)
 		C.GEOSGeom_destroy_r(geosContext, geom2)
@@ -256,8 +252,7 @@ func SimplifyP(wkt string, tolerance float64) (string, error) {
 // less than the maximum dimension of the two input geometries. Additionally, the intersection of the two geometries
 // must not equal either of the source geometries. Otherwise, it returns FALSE.
 func Crosses(g1 string, g2 string) (bool, error) {
-	geom1 := GeomFromWKTStr(g1)
-	geom2 := GeomFromWKTStr(g2)
+	geom1, geom2 := convertWKTtoGEOSGeometry(g1, g2)
 	defer func() {
 		C.GEOSGeom_destroy_r(geosContext, geom1)
 		C.GEOSGeom_destroy_r(geosContext, geom2)
@@ -270,9 +265,7 @@ func Crosses(g1 string, g2 string) (bool, error) {
 // For this function to make sense, the source geometries must both be of the same coordinate projection,
 // having the same SRID.
 func Within(g1 string, g2 string) (bool, error) {
-
-	geom1 := GeomFromWKTStr(g1)
-	geom2 := GeomFromWKTStr(g2)
+	geom1, geom2 := convertWKTtoGEOSGeometry(g1, g2)
 	defer func() {
 		C.GEOSGeom_destroy_r(geosContext, geom1)
 		C.GEOSGeom_destroy_r(geosContext, geom2)
@@ -285,10 +278,10 @@ func Within(g1 string, g2 string) (bool, error) {
 // and at least one point of the interior of B lies in the interior of A.
 // An important subtlety of this definition is that A does not contain its boundary, but A does contain itself.
 //Returns TRUE if geometry B is completely inside geometry A.
-// For this function to make sense, the source geometries must both be of the same coordinate projection, having the same SRID.
+// For this function to make sense, the source geometries must both be of the same coordinate projection,
+// having the same SRID.
 func Contains(g1 string, g2 string) (bool, error) {
-	geom1 := GeomFromWKTStr(g1)
-	geom2 := GeomFromWKTStr(g2)
+	geom1, geom2 := convertWKTtoGEOSGeometry(g1, g2)
 	defer func() {
 		C.GEOSGeom_destroy_r(geosContext, geom1)
 		C.GEOSGeom_destroy_r(geosContext, geom2)
@@ -316,8 +309,7 @@ func UniquePoints(g string) (string, error) {
 // Those going in the same direction are in the first element of the collection, those going in the opposite
 // direction are in the second element. The paths themselves are given in the direction of the first geometry.
 func SharedPaths(g1 string, g2 string) (string, error) {
-	geom1 := GeomFromWKTStr(g1)
-	geom2 := GeomFromWKTStr(g2)
+	geom1, geom2 := convertWKTtoGEOSGeometry(g1, g2)
 	g := C.GEOSSharedPaths_r(geosContext, geom1, geom2)
 	wkt, e := ToWKTStr(g)
 	if e != nil {
@@ -358,8 +350,7 @@ func Buffer(g string, width float64, quadsegs int32) (wkt string, err error) {
 // EqualsExact returns true if both geometries are Equal, as evaluated by their
 // points being within the given tolerance.
 func EqualsExact(g1 string, g2 string, tolerance float64) (bool, error) {
-	geom1 := GeomFromWKTStr(g1)
-	geom2 := GeomFromWKTStr(g2)
+	geom1, geom2 := convertWKTtoGEOSGeometry(g1, g2)
 	defer func() {
 		C.GEOSGeom_destroy_r(geosContext, geom1)
 		C.GEOSGeom_destroy_r(geosContext, geom2)
@@ -378,8 +369,7 @@ func NGeometry(g string) (int, error) {
 
 // Overlaps returns true if one geometry overlaps the other.
 func Overlaps(g1 string, g2 string) (bool, error) {
-	geom1 := GeomFromWKTStr(g1)
-	geom2 := GeomFromWKTStr(g2)
+	geom1, geom2 := convertWKTtoGEOSGeometry(g1, g2)
 	pGeom := C.GEOSPrepare_r(geosContext, geom1)
 	defer func() {
 		C.GEOSGeom_destroy_r(geosContext, geom1)
@@ -392,8 +382,7 @@ func Overlaps(g1 string, g2 string) (bool, error) {
 
 // Equals returns true if the two geometries have at least one point in common.
 func Equals(g1 string, g2 string) (bool, error) {
-	geom1 := GeomFromWKTStr(g1)
-	geom2 := GeomFromWKTStr(g2)
+	geom1, geom2 := convertWKTtoGEOSGeometry(g1, g2)
 	defer func() {
 		C.GEOSGeom_destroy_r(geosContext, geom1)
 		C.GEOSGeom_destroy_r(geosContext, geom2)
@@ -404,8 +393,7 @@ func Equals(g1 string, g2 string) (bool, error) {
 
 // Covers computes whether the prepared geometry covers the other.
 func Covers(g1 string, g2 string) (bool, error) {
-	geom1 := GeomFromWKTStr(g1)
-	geom2 := GeomFromWKTStr(g2)
+	geom1, geom2 := convertWKTtoGEOSGeometry(g1, g2)
 	pGeom := C.GEOSPrepare_r(geosContext, geom1)
 	defer func() {
 		C.GEOSGeom_destroy_r(geosContext, geom1)
@@ -418,8 +406,7 @@ func Covers(g1 string, g2 string) (bool, error) {
 
 // CoversBy computes whether the prepared geometry is covered by the other.
 func CoversBy(g1 string, g2 string) (bool, error) {
-	geom1 := GeomFromWKTStr(g1)
-	geom2 := GeomFromWKTStr(g2)
+	geom1, geom2 := convertWKTtoGEOSGeometry(g1, g2)
 	pGeom := C.GEOSPrepare_r(geosContext, geom1)
 	defer func() {
 		C.GEOSGeom_destroy_r(geosContext, geom1)
@@ -458,8 +445,7 @@ func HasZ(g string) (bool, error) {
 // Nine-Intersection Model (DE-9IM) matrix) for the spatial relationship between
 // the two geometries.
 func Relate(g1 string, g2 string) (string, error) {
-	geom1 := GeomFromWKTStr(g1)
-	geom2 := GeomFromWKTStr(g2)
+	geom1, geom2 := convertWKTtoGEOSGeometry(g1, g2)
 	defer func() {
 		C.GEOSGeom_destroy_r(geosContext, geom1)
 		C.GEOSGeom_destroy_r(geosContext, geom2)
@@ -473,8 +459,7 @@ func Relate(g1 string, g2 string) (string, error) {
 
 // Intersection returns a geometry that represents the point set intersection of the Geometries.
 func Intersection(g1 string, g2 string) (string, error) {
-	geom1 := GeomFromWKTStr(g1)
-	geom2 := GeomFromWKTStr(g2)
+	geom1, geom2 := convertWKTtoGEOSGeometry(g1, g2)
 	defer func() {
 		C.GEOSGeom_destroy_r(geosContext, geom1)
 		C.GEOSGeom_destroy_r(geosContext, geom2)
@@ -491,8 +476,7 @@ func Intersection(g1 string, g2 string) (string, error) {
 // One can think of this as GeometryA - Intersection(A,B).
 // If A is completely contained in B then an empty geometry collection is returned.
 func Difference(g1 string, g2 string) (string, error) {
-	geom1 := GeomFromWKTStr(g1)
-	geom2 := GeomFromWKTStr(g2)
+	geom1, geom2 := convertWKTtoGEOSGeometry(g1, g2)
 	defer func() {
 		C.GEOSGeom_destroy_r(geosContext, geom1)
 		C.GEOSGeom_destroy_r(geosContext, geom2)
@@ -509,8 +493,7 @@ func Difference(g1 string, g2 string) (string, error) {
 // It is called a symmetric difference because SymDifference(A,B) = SymDifference(B,A).
 // One can think of this as Union(geomA,geomB) - Intersection(A,B).
 func SymDifference(g1 string, g2 string) (string, error) {
-	geom1 := GeomFromWKTStr(g1)
-	geom2 := GeomFromWKTStr(g2)
+	geom1, geom2 := convertWKTtoGEOSGeometry(g1, g2)
 	defer func() {
 		C.GEOSGeom_destroy_r(geosContext, geom1)
 		C.GEOSGeom_destroy_r(geosContext, geom2)
@@ -525,8 +508,7 @@ func SymDifference(g1 string, g2 string) (string, error) {
 
 // Union returns a new geometry representing all points in this geometry and the other.
 func Union(g1 string, g2 string) (string, error) {
-	geom1 := GeomFromWKTStr(g1)
-	geom2 := GeomFromWKTStr(g2)
+	geom1, geom2 := convertWKTtoGEOSGeometry(g1, g2)
 	defer func() {
 		C.GEOSGeom_destroy_r(geosContext, geom1)
 		C.GEOSGeom_destroy_r(geosContext, geom2)
@@ -543,8 +525,7 @@ func Union(g1 string, g2 string) (string, error) {
 // If any of the aforementioned returns true, then the geometries are not spatially disjoint.
 // Disjoint implies false for spatial intersection.
 func Disjoint(g1 string, g2 string) (bool, error) {
-	geom1 := GeomFromWKTStr(g1)
-	geom2 := GeomFromWKTStr(g2)
+	geom1, geom2 := convertWKTtoGEOSGeometry(g1, g2)
 	defer func() {
 		C.GEOSGeom_destroy_r(geosContext, geom1)
 		C.GEOSGeom_destroy_r(geosContext, geom2)
@@ -561,8 +542,7 @@ func Disjoint(g1 string, g2 string) (bool, error) {
 // The touches relation applies to all Area/Area, Line/Line, Line/Area, Point/Area and Point/Line pairs of relationships,
 // but not to the Point/Point pair.
 func Touches(g1 string, g2 string) (bool, error) {
-	geom1 := GeomFromWKTStr(g1)
-	geom2 := GeomFromWKTStr(g2)
+	geom1, geom2 := convertWKTtoGEOSGeometry(g1, g2)
 	defer func() {
 		C.GEOSGeom_destroy_r(geosContext, geom1)
 		C.GEOSGeom_destroy_r(geosContext, geom2)
@@ -577,8 +557,7 @@ func Touches(g1 string, g2 string) (bool, error) {
 
 //Intersects If a geometry  shares any portion of space then they intersect
 func Intersects(g1 string, g2 string) (bool, error) {
-	geom1 := GeomFromWKTStr(g1)
-	geom2 := GeomFromWKTStr(g2)
+	geom1, geom2 := convertWKTtoGEOSGeometry(g1, g2)
 	defer func() {
 		C.GEOSGeom_destroy_r(geosContext, geom1)
 		C.GEOSGeom_destroy_r(geosContext, geom2)
@@ -589,4 +568,11 @@ func Intersects(g1 string, g2 string) (bool, error) {
 		return false, e
 	}
 	return b, nil
+}
+
+// convertWKTtoGEOSGeometry help to convert WKT string to GEOSGeometry
+func convertWKTtoGEOSGeometry(g1 string, g2 string) (GEOSGeometry, GEOSGeometry) {
+	geom1 := GeomFromWKTStr(g1)
+	geom2 := GeomFromWKTStr(g2)
+	return geom1, geom2
 }

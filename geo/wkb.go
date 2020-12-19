@@ -12,10 +12,13 @@ import (
 	"unsafe"
 )
 
+// GEOSWKBReader ...
 type GEOSWKBReader *C.GEOSWKBReader
+
+// GEOSWKBWriter ...
 type GEOSWKBWriter *C.GEOSWKBWriter
 
-// 根据wkb 二进制生成集合对象
+// GeomFromWKBStr convert wkb byte array to GEOSGeometry
 func GeomFromWKBStr(wkbByte []byte) (GEOSGeometry, error) {
 	cwkb := GoByteArrayToCCharArray(wkbByte)
 	reader := WKBReaderFactory()
@@ -23,21 +26,21 @@ func GeomFromWKBStr(wkbByte []byte) (GEOSGeometry, error) {
 	return EncodeWKBToGeom(reader, cwkb)
 }
 
-// 生成WKB格式字符串表示
+// ToWKB convert GEOSGeometry to wkb byte array
 func ToWKB(g GEOSGeometry) ([]byte, error) {
 	writer := WKBWriterFactory()
 	defer WKBWriterDestroy(writer)
 	return DecodeWKBToArray(writer, g)
 }
 
-// 生成WKB Hex格式字符串表达
+// ToWKBHex convert GEOSGeometry to hex string
 func ToWKBHex(g GEOSGeometry) (string, error) {
 	w := WKBWriterFactory()
 	defer WKBWriterDestroy(w)
 	return DecodeWKBToHexStr(w, g)
 }
 
-// 根据hex格式字符串生成集合对象
+// GeomFromWKBHexStr convert hex string to GEOSGeometry
 func GeomFromWKBHexStr(wkbHex string) (GEOSGeometry, error) {
 	wkbstr, err := hex.DecodeString(wkbHex)
 	if err != nil {
@@ -50,35 +53,32 @@ func GeomFromWKBHexStr(wkbHex string) (GEOSGeometry, error) {
 
 }
 
-// 编码WKB字节数组生成几何对象
+// EncodeWKBToGeom ...
 func EncodeWKBToGeom(reader GEOSWKBReader, cwkb []C.uchar) (GEOSGeometry, error) {
 
 	g := C.GEOSWKBReader_read_r(geosContext, reader, &cwkb[0], C.size_t(len(cwkb)))
 	if g == nil {
 		return nil, errors.New("C.GEOSGeometry is null")
 	}
-	//defer C.GEOSGeom_destroy_r(geosContext, g)
 	return GEOSGeometry(g), nil
 }
 
-// 编码hex字符串生成几何图形
+// EncodeHexToGeom ...
 func EncodeHexToGeom(reader GEOSWKBReader, cwkb []C.uchar) (GEOSGeometry, error) {
 	g := C.GEOSWKBReader_read_r(geosContext, reader, &cwkb[0], C.size_t(len(cwkb)))
 	if g == nil {
 		return nil, errors.New("C.GEOSGeometry is null")
 	}
-	//defer C.GEOSGeom_destroy_r(geosContext, g)
 	return g, nil
 }
 
-// 解码生成wkt格式字符串
+// DecodeWKBToArray ...
 func DecodeWKBToArray(writer GEOSWKBWriter, g GEOSGeometry) ([]byte, error) {
 	var size C.size_t
 	bytes := C.GEOSWKBWriter_write_r(geosContext, writer, g, &size)
 	if bytes == nil {
 		return nil, errors.New("toWKBHex bytes is null")
 	}
-	// TODO: 指针类型之间进行转换?
 	ptr := unsafe.Pointer(bytes)
 	defer C.free(ptr)
 	l := int(size)
@@ -90,33 +90,36 @@ func DecodeWKBToArray(writer GEOSWKBWriter, g GEOSGeometry) ([]byte, error) {
 	return out, nil
 }
 
-// 解码生成wkt格式hex字符串
+// DecodeWKBToHexStr ...
 func DecodeWKBToHexStr(writer GEOSWKBWriter, g GEOSGeometry) (string, error) {
 	var size C.size_t
 	bytes := C.GEOSWKBWriter_writeHEX_r(geosContext, writer, g, &size)
 	if bytes == nil {
 		return "", errors.New("toWKBHex bytes is null")
 	}
-	// 指针类型之间进行转换
 	ca := (*C.char)(unsafe.Pointer(bytes))
 	s := C.GoString(ca)
 	return s, nil
 }
 
-//  ====================Reader\Writer 初始化、销毁方法===============================
-
+// WKBReaderFactory ...
 func WKBReaderFactory() GEOSWKBReader {
 	reader := C.GEOSWKBReader_create_r(geosContext)
 	return GEOSWKBReader(reader)
 }
+
+// WKBReaderDestroy ...
 func WKBReaderDestroy(reader GEOSWKBReader) {
 	C.GEOSWKBReader_destroy_r(geosContext, reader)
 }
 
+// WKBWriterFactory ...
 func WKBWriterFactory() GEOSWKBWriter {
 	writer := C.GEOSWKBWriter_create_r(geosContext)
 	return GEOSWKBWriter(writer)
 }
+
+// WKBWriterDestroy ...
 func WKBWriterDestroy(writer GEOSWKBWriter) {
 	C.GEOSWKBWriter_destroy_r(geosContext, writer)
 }

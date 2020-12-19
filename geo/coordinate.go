@@ -1,4 +1,5 @@
 package geo
+
 /*
 #cgo LDFLAGS: -lgeos_c
 #include "geos.h"
@@ -18,9 +19,9 @@ type Coordinate struct {
 func (c Coordinate) String() string {
 	return fmt.Sprintf("%f %f", c.X, c.Y)
 }
+
 // PrepareGeometry ...
 func PrepareGeometry(g GEOSGeometry) GEOSPreparedGeometry {
 	ptr := C.GEOSPrepare_r(geosContext, g)
 	return ptr
 }
-
