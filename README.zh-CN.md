@@ -7,7 +7,6 @@
 - [安装](#安装)
 - [使用说明](#使用说明)
 - [维护者](#维护者)
-- [相关仓库](#相关仓库)
 - [如何贡献](#如何贡献)
 - [使用许可](#使用许可)
 
@@ -70,9 +69,6 @@ func main() {
 
 [@spatial-go](https://github.com/spatial-go)。
 
-## 相关仓库
-
-- [GEOS](https://github.com/libgeos/geos) — 一个C++实现 JTS 标准的空间操作类库。
 
 ## 如何贡献
 
@@ -81,7 +77,7 @@ func main() {
 非常欢迎你的加入！[提一个 Issue](https://github.com/spatial-go/geos/issues/new) 
 
 
-联系邮箱： [RDC@changjing.ai](RDC@changjing.ai)
+联系邮箱： [os@changjing.ai](os@changjing.ai)
 
 
 ## 使用许可
