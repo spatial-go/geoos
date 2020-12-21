@@ -58,7 +58,7 @@ func main() {
 	}
 
 	fmt.Printf("%f",area)
-	// 输出4.0
+	// output 4.0
 }
 ```
 
