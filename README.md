@@ -1,29 +1,30 @@
 # Geoos
-我们的组织`spatial-go`正式成立，这是我们的第一个开源项目`Geoos`,`Geoos`提供有关空间数据和几何算法,使用`Go`语言包装实现。
-欢迎大家使用并提出宝贵意见！
+Our organization `spatial-go` is officially established! The first open source project `Geoos`(Using `Golang`) provides spatial data and geometric algorithms.
+All comments and suggestions are welcome!
 
-## 内容列表
+## Contents
 
-- [安装](#安装)
-- [使用说明](#使用说明)
-- [维护者](#维护者)
-- [如何贡献](#如何贡献)
-- [使用许可](#使用许可)
+- [Installation](#Installation)
+- [Structure](#Structure)
+- [Documentation](#Documentation)
+- [Maintainer](#Maintainer)
+- [Contributing](#Contributing)
+- [Copying](#Copying)
 
 
-## 安装
+## Installation
 
-项目依赖 [GEOS](https://github.com/libgeos/geos)（GEOS 是 JTS 的C++版本实现) ,需要首先完成`GEOS`的安装。`GEOS`安装方法如下：
+The project depends on [geos](https://github.com/libgeos/geos) (GEOS is a C++ port of the ​JTS Topology Suite), you need to complete the installation of `geos` first. The installation of `geos`:
 
-1、OS X系统安装(brew 方式)
+1. Mac OS X(via brew)
 ```sh
 $ brew install geos
 ```
-2、Ubuntu
+2. Ubuntu or Debian
 ```sh
 $ apt-get install libgeos-dev
 ```
-3、源码安装
+3. Build from source code
 ```sh
 $ wget http://download.osgeo.org/geos/geos-3.9.0.tar.bz2
 $ tar xvfj geos-3.9.0.tar.bz2
@@ -33,51 +34,47 @@ $ make
 $ sudo make install
 ```
 
-## 目录结构
-1. `geo` 包下是对`GEOS C`库的引用和调用，以此来实现空间运算。
-2. `algorithm` 是对外暴露的空间运算方法定义。
-3. `strategy.go` 定义了空间运算底层算法的选择实现。
+## Structure
+1. `Geo` package contains references and calls to the `GEOS C` library to implement spatial operations.
+2. `Algorithm` is the definition of spatial operation, which is outside exposing.
+3. `strategy.go` defines the implementation of the spatial computing based algorithm.
 
-## 使用说明
-以计算面积`Area`为例。
+## Documentation
+How to use `Geoos`:
+Example: Calculating `area` via `Geoos`
 ```
 package main
-
 import (
 	"fmt"
 	"github.com/spatial-go/geoos"
 )
-
 func main() {
-	// First, choose the default algorithm.
 	strategy := geoos.NormalStrategy()
-	// Secondly, manufacturing test data and convert it to geometry
 	const wkt = `POLYGON((-1 -1, 1 -1, 1 1, -1 1, -1 -1))`
 	geometry, _ := geoos.UnmarshalString(wkt)
-	// Last， call the Area () method and get result.
 	area, e := strategy.Area(geometry)
-	if e != nil {
+	if e!=nil{
 		fmt.Printf(e.Error())
 	}
-	fmt.Printf("%f", area)
-	// get result 4.0
-}
 
+	fmt.Printf("%f",area)
+	// 输出4.0
+}
 ```
 
-## 维护者
+## Maintainer
 
 [@spatial-go](https://github.com/spatial-go)。
 
-## 如何贡献
+## Contributing
 
-非常欢迎你的加入！[提一个 Issue](https://github.com/spatial-go/geos/issues/new) 在空间计算领域贡献自己的一份力量。
-
-
-联系邮箱： [RDC@changjing.ai](RDC@changjing.ai)
+We use GitHub issues, but that is not a requirement. Contact us via email is also fine. Please use the GitHub issues only for actual issues. If you are not 100% sure that your problem is an issue, please first discuss this via email. If you report an issue, please describe exactly how to reproduce it.
 
 
-## 使用许可
+Email Address： [RDC@changjing.ai](RDC@changjing.ai)
 
+
+## Copying
+`Geoos` is licensed under the:
 [LGPL-2.1 ](LICENSE)
 
