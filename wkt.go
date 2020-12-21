@@ -13,9 +13,9 @@ func UnmarshalString(s string) (Geometry, error) {
 }
 
 // MarshalString decode to string
-func MarshalString(g Geometry) string {
+func MarshalString(geom Geometry) string {
 	buf := bytes.NewBuffer(nil)
-	wkt(buf, g)
+	wkt(buf, geom)
 	return buf.String()
 }
 
@@ -96,21 +96,6 @@ func wkt(buf *bytes.Buffer, geom Geometry) {
 			buf.WriteByte(')')
 		}
 		buf.WriteByte(')')
-	//case Collection:
-	//	if len(g) == 0 {
-	//		buf.Write([]byte(`GEOMETRYCOLLECTION EMPTY`))
-	//		return
-	//	}
-	//	buf.Write([]byte(`GEOMETRYCOLLECTION(`))
-	//	for i, c := range g {
-	//		if i != 0 {
-	//			buf.WriteByte(',')
-	//		}
-	//		wkt(buf, c)
-	//	}
-	//	buf.WriteByte(')')
-	//case Bound:
-	//	wkt(buf, g.ToPolygon())
 	default:
 		panic("unsupported type")
 	}
