@@ -76,7 +76,6 @@ func main() {
 
 非常欢迎你的加入！[提一个 Issue](https://github.com/spatial-go/geos/issues/new) 
 
-
 联系邮箱： [os@changjing.ai](os@changjing.ai)
 
 

@@ -68,8 +68,9 @@ func main() {
 
 ## Contributing
 
-We use GitHub issues, but that is not a requirement. Contact us via email is also fine. Please use the GitHub issues only for actual issues. If you are not 100% sure that your problem is an issue, please first discuss this via email. If you report an issue, please describe exactly how to reproduce it.
+Thanks to [OSGeo](https://www.osgeo.org/), we will also uphold the concept of "openness, co-creation, and win-win" to contribute in the field of space computing.
 
+We use GitHub issues, but that is not a requirement. Contact us via email is also fine. Please use the GitHub issues only for actual issues. If you are not 100% sure that your problem is an issue, please first discuss this via email. If you report an issue, please describe exactly how to reproduce it.
 
 Email Address： [os@changjing.ai](os@changjing.ai)
 
