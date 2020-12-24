@@ -78,7 +78,6 @@ func main() {
 
 联系邮箱： [geoos@changjing.ai](geoos@changjing.ai)
 
-
 ## 使用许可
 
 [LGPL-2.1 ](LICENSE)

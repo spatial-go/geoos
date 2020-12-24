@@ -74,7 +74,6 @@ We use GitHub issues, but that is not a requirement. Contact us via email is als
 
 Email Address： [geoos@changjing.ai](geoos@changjing.ai)
 
-
 ## Copying
 `Geoos` is licensed under the:
 [LGPL-2.1 ](LICENSE)
