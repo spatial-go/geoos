@@ -72,7 +72,7 @@ Thanks to [OSGeo](https://www.osgeo.org/), we will also uphold the concept of "o
 
 We use GitHub issues, but that is not a requirement. Contact us via email is also fine. Please use the GitHub issues only for actual issues. If you are not 100% sure that your problem is an issue, please first discuss this via email. If you report an issue, please describe exactly how to reproduce it.
 
-Email Address： [os@changjing.ai](os@changjing.ai)
+Email Address： [geoos@changjing.ai](geoos@changjing.ai)
 
 
 ## Copying
