@@ -17,3 +17,18 @@ func (mls MultiLineString) Dimensions() int {
 func (mls MultiLineString) Nums() int {
 	return len(mls)
 }
+
+// Equal compares two multi line strings. Returns true if lengths are the same
+// and all points are Equal.
+func (mls MultiLineString) Equal(multiLineString MultiLineString) bool {
+	if len(mls) != len(multiLineString) {
+		return false
+	}
+	for i, ls := range mls {
+		if !ls.Equal(multiLineString[i]) {
+			return false
+		}
+	}
+
+	return true
+}

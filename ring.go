@@ -17,3 +17,9 @@ func (r Ring) Dimensions() int {
 func (r Ring) Nums() int {
 	return 1
 }
+
+// Equal compares two rings. Returns true if lengths are the same
+// and all points are Equal.
+func (r Ring) Equal(ring Ring) bool {
+	return MultiPoint(r).Equal(MultiPoint(ring))
+}

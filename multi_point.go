@@ -17,3 +17,17 @@ func (mp MultiPoint) Dimensions() int {
 func (mp MultiPoint) Nums() int {
 	return len(mp)
 }
+
+// Equal compares two MultiPoint objects. Returns true if lengths are the same
+// and all points are Equal, and in the same order.
+func (mp MultiPoint) Equal(multiPoint MultiPoint) bool {
+	if len(mp) != len(multiPoint) {
+		return false
+	}
+	for i := range mp {
+		if !mp[i].Equal(multiPoint[i]) {
+			return false
+		}
+	}
+	return true
+}

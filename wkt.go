@@ -96,6 +96,20 @@ func wkt(buf *bytes.Buffer, geom Geometry) {
 			buf.WriteByte(')')
 		}
 		buf.WriteByte(')')
+
+	case Collection:
+		if len(g) == 0 {
+			buf.Write([]byte(`GEOMETRYCOLLECTION EMPTY`))
+			return
+		}
+		buf.Write([]byte(`GEOMETRYCOLLECTION(`))
+		for i, c := range g {
+			if i != 0 {
+				buf.WriteByte(',')
+			}
+			wkt(buf, c)
+		}
+		buf.WriteByte(')')
 	default:
 		panic("unsupported type")
 	}

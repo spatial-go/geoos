@@ -23,3 +23,9 @@ func (ls LineString) Boundary() (Geometry, error) {
 	s := NormalStrategy()
 	return s.Boundary(ls)
 }
+
+// Equal compares two line strings. Returns true if lengths are the same
+// and all points are Equal.
+func (ls LineString) Equal(lineString LineString) bool {
+	return MultiPoint(ls).Equal(MultiPoint(lineString))
+}

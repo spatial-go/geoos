@@ -23,3 +23,18 @@ func (mp MultiPolygon) Area() (float64, error) {
 	s := NormalStrategy()
 	return s.Area(mp)
 }
+
+// Equal compares two multi-polygons.
+func (mp MultiPolygon) Equal(multiPolygon MultiPolygon) bool {
+	if len(mp) != len(multiPolygon) {
+		return false
+	}
+
+	for i, p := range mp {
+		if !p.Equal(multiPolygon[i]) {
+			return false
+		}
+	}
+
+	return true
+}

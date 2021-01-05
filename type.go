@@ -8,4 +8,5 @@ const (
 	TypeMultiLineString = "MultiLineString"
 	TypePolygon         = "Polygon"
 	TypeMultiPolygon    = "MultiPolygon"
+	TypeCollection      = "GeometryCollection"
 )

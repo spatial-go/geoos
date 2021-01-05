@@ -30,3 +30,8 @@ func (p Point) Lat() float64 {
 func (p Point) Lon() float64 {
 	return p.Y
 }
+
+// Equal checks if the point represents the same point or vector.
+func (p Point) Equal(point Point) bool {
+	return p.X == point.X && p.Y == point.Y
+}
