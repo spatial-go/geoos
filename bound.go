@@ -19,6 +19,7 @@ func (b Bound) Dimensions() int {
 	return 2
 }
 
+// Nums ...
 func (b Bound) Nums() int {
 	return 2
 }
@@ -33,9 +34,9 @@ func (b Bound) ToPolygon() Polygon {
 func (b Bound) ToRing() Ring {
 	return Ring{
 		b.Min,
-		Point{b.Max.X, b.Min.Y},
+		Point{b.Max.X(), b.Min.Y()},
 		b.Max,
-		Point{b.Min.X, b.Max.Y},
+		Point{b.Min.X(), b.Max.Y()},
 		b.Min,
 	}
 }

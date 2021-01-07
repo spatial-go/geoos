@@ -1,10 +1,7 @@
 package geoos
 
 // Point describes a geographic point
-type Point struct {
-	X float64
-	Y float64
-}
+type Point [2]float64
 
 // GeoJSONType returns GeoJSON type for the point
 func (p Point) GeoJSONType() string {
@@ -23,15 +20,25 @@ func (p Point) Nums() int {
 
 // Lat returns the vertical, latitude coordinate of the point.
 func (p Point) Lat() float64 {
-	return p.X
+	return p[1]
 }
 
 // Lon returns the horizontal, longitude coordinate of the point.
 func (p Point) Lon() float64 {
-	return p.Y
+	return p[0]
+}
+
+// Y returns the vertical coordinate of the point.
+func (p Point) Y() float64 {
+	return p[1]
+}
+
+// X returns the horizontal coordinate of the point.
+func (p Point) X() float64 {
+	return p[0]
 }
 
 // Equal checks if the point represents the same point or vector.
 func (p Point) Equal(point Point) bool {
-	return p.X == point.X && p.Y == point.Y
+	return p[0] == point[0] && p[1] == point[1]
 }
