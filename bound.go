@@ -1,5 +1,9 @@
 package geoos
 
+import (
+	"math"
+)
+
 var emptyBound = Bound{Min: Point{1, 1}, Max: Point{-1, -1}}
 
 // A Bound represents a closed box or rectangle.
@@ -39,6 +43,44 @@ func (b Bound) ToRing() Ring {
 		Point{b.Min.X(), b.Max.Y()},
 		b.Min,
 	}
+}
+
+// Extend grows the bound to include the new point.
+func (b Bound) Extend(point Point) Bound {
+	// already included, no big deal
+	if b.Contains(point) {
+		return b
+	}
+
+	return Bound{
+		Min: Point{
+			math.Min(b.Min[0], point[0]),
+			math.Min(b.Min[1], point[1]),
+		},
+		Max: Point{
+			math.Max(b.Max[0], point[0]),
+			math.Max(b.Max[1], point[1]),
+		},
+	}
+}
+
+// Contains determines if the point is within the bound.
+// Points on the boundary are considered within.
+func (b Bound) Contains(point Point) bool {
+	if point[1] < b.Min[1] || b.Max[1] < point[1] {
+		return false
+	}
+
+	if point[0] < b.Min[0] || b.Max[0] < point[0] {
+		return false
+	}
+
+	return true
+}
+
+// Bound returns the the same bound.
+func (b Bound) Bound() Bound {
+	return b
 }
 
 // Equal returns if two bounds are equal.

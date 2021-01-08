@@ -32,6 +32,14 @@ func (p Polygon) Boundary() (Geometry, error) {
 	return s.Boundary(p)
 }
 
+// Bound returns a bound around the polygon.
+func (p Polygon) Bound() Bound {
+	if len(p) == 0 {
+		return emptyBound
+	}
+	return p[0].Bound()
+}
+
 // Equal compares two polygons. Returns true if lengths are the same
 // and all points are Equal.
 func (p Polygon) Equal(polygon Polygon) bool {

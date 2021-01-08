@@ -13,6 +13,11 @@ func (p Point) Dimensions() int {
 	return 0
 }
 
+// Bound returns a single point bound of the point.
+func (p Point) Bound() Bound {
+	return Bound{p, p}
+}
+
 // Nums num of points
 func (p Point) Nums() int {
 	return 1

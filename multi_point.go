@@ -18,6 +18,20 @@ func (mp MultiPoint) Nums() int {
 	return len(mp)
 }
 
+// Bound returns a bound around the points. Uses rectangular coordinates.
+func (mp MultiPoint) Bound() Bound {
+	if len(mp) == 0 {
+		return emptyBound
+	}
+
+	b := Bound{mp[0], mp[0]}
+	for _, p := range mp {
+		b = b.Extend(p)
+	}
+
+	return b
+}
+
 // Equal compares two MultiPoint objects. Returns true if lengths are the same
 // and all points are Equal, and in the same order.
 func (mp MultiPoint) Equal(multiPoint MultiPoint) bool {

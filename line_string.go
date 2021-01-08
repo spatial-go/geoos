@@ -24,6 +24,11 @@ func (ls LineString) Boundary() (Geometry, error) {
 	return s.Boundary(ls)
 }
 
+// Bound returns a rect around the line string. Uses rectangular coordinates.
+func (ls LineString) Bound() Bound {
+	return MultiPoint(ls).Bound()
+}
+
 // Equal compares two line strings. Returns true if lengths are the same
 // and all points are Equal.
 func (ls LineString) Equal(lineString LineString) bool {
