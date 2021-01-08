@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+
 	"github.com/spatial-go/geoos"
 	"github.com/spatial-go/geoos/geojson"
 )
