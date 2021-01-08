@@ -2,10 +2,11 @@ package geojson
 
 import (
 	"encoding/json"
-	"github.com/spatial-go/geoos"
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/spatial-go/geoos"
 )
 
 func TestGeometryMarshal(t *testing.T) {

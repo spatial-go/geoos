@@ -14,7 +14,8 @@ func (g *GEOAlgorithm) Area(geom Geometry) (float64, error) {
 
 // Boundary returns the closure of the combinatorial boundary of this Geometry.
 func (g *GEOAlgorithm) Boundary(geom Geometry) (Geometry, error) {
-	boundary, err := geo.Boundary(MarshalString(geom))
+	aa := MarshalString(geom)
+	boundary, err := geo.Boundary(aa)
 	if err != nil {
 		return nil, err
 	}

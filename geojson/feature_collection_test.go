@@ -3,10 +3,11 @@ package geojson
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/spatial-go/geoos"
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/spatial-go/geoos"
 )
 
 func TestNewFeatureCollection(t *testing.T) {

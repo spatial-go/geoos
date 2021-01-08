@@ -38,7 +38,7 @@ func TestGEOSAlgorithm_Centroid(t *testing.T) {
 }
 
 func TestGEOSAlgorithm_IsSimple(t *testing.T) {
-	const polygon = `POLYGON((1 2, 3 4, 5 6, 1 2))`
+	const polygon = `POLYGON((1 2, 3 4, 5 6, 5 3, 1 2))`
 	const linestring = `LINESTRING(1 1,2 2,2 3.5,1 3,1 2,2 1)`
 	poly, _ := UnmarshalString(polygon)
 	line, _ := UnmarshalString(linestring)
@@ -59,7 +59,6 @@ func TestGEOSAlgorithm_IsSimple(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			G := GEOAlgorithm{}
 			got, err := G.IsSimple(tt.args.g)
-			t.Log(got)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("IsSimple() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -561,7 +560,7 @@ func TestGEOSAlgorithm_ConvexHull(t *testing.T) {
 
 func TestGEOSAlgorithm_UnaryUnion(t *testing.T) {
 	multiPolygon, _ := UnmarshalString(`MULTIPOLYGON(((0 0, 10 0, 10 10, 0 10, 0 0)), ((5 5, 15 5, 15 15, 5 15, 5 5)))`)
-	expectPolygon, _ := UnmarshalString(`POLYGON ((10 5, 10 0, 0 0, 0 10, 5 10, 5 15, 15 15, 15 5, 10 5))`)
+	expectPolygon, _ := UnmarshalString(`POLYGON ((0 10,5 10,5 15,15 15,15 5,10 5,10 0,0 0,0 10))`)
 
 	type args struct {
 		g Geometry
@@ -873,7 +872,7 @@ func TestGEOSAlgorithm_IsClosed(t *testing.T) {
 func TestGEOSAlgorithm_SymDifference(t *testing.T) {
 	line01, _ := UnmarshalString(`LINESTRING(50 100, 50 200)`)
 	line02, _ := UnmarshalString(`LINESTRING(50 50, 50 150)`)
-	expectMultiLines, _ := UnmarshalString(`MULTILINESTRING((50 150,50 200),(50 50,50 100))`)
+	expectMultiLines, _ := UnmarshalString(`MULTILINESTRING((50 50,50 100),(50 150,50 200))`)
 
 	type args struct {
 		g1 Geometry

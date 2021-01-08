@@ -3,6 +3,7 @@ package geojson
 import (
 	"encoding/json"
 	"errors"
+
 	"github.com/spatial-go/geoos"
 )
 
@@ -110,9 +111,8 @@ func (g *Geometry) UnmarshalJSON(data []byte) error {
 
 	switch jg.Type {
 	case "Point":
-		var coords []float64
-		err = json.Unmarshal(jg.Coordinates, &coords)
-		p := geoos.Point{X: coords[0], Y: coords[1]}
+		p := geoos.Point{}
+		err = json.Unmarshal(jg.Coordinates, &p)
 		g.Coordinates = p
 	case "MultiPoint":
 		mp := geoos.MultiPoint{}
@@ -207,6 +207,33 @@ func (mp *MultiPoint) UnmarshalJSON(data []byte) error {
 
 // A LineString is a helper type that will marshal to/from a GeoJSON LineString geometry.
 type LineString geoos.LineString
+
+// Geometry will return the orb.Geometry version of the data.
+func (ls LineString) Geometry() geoos.Geometry {
+	return geoos.LineString(ls)
+}
+
+// MarshalJSON will convert the LineString into a GeoJSON LineString geometry.
+func (ls LineString) MarshalJSON() ([]byte, error) {
+	return json.Marshal(Geometry{Coordinates: geoos.LineString(ls)})
+}
+
+// UnmarshalJSON will unmarshal the GeoJSON MultiPoint geometry.
+func (ls *LineString) UnmarshalJSON(data []byte) error {
+	g := &Geometry{}
+	err := json.Unmarshal(data, &g)
+	if err != nil {
+		return err
+	}
+
+	lineString, ok := g.Coordinates.(geoos.LineString)
+	if !ok {
+		return errors.New("geojson: not a LineString type")
+	}
+
+	*ls = LineString(lineString)
+	return nil
+}
 
 // A MultiLineString is a helper type that will marshal to/from a GeoJSON MultiLineString geometry.
 type MultiLineString geoos.MultiLineString

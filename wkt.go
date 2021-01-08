@@ -22,7 +22,7 @@ func MarshalString(geom Geometry) string {
 func wkt(buf *bytes.Buffer, geom Geometry) {
 	switch g := geom.(type) {
 	case Point:
-		_, _ = fmt.Fprintf(buf, "POINT(%g %g)", g.Lat(), g.Lon())
+		_, _ = fmt.Fprintf(buf, "POINT(%g %g)", g.Lon(), g.Lat())
 	case MultiPoint:
 		if len(g) == 0 {
 			buf.Write([]byte(`MULTIPOINT EMPTY`))
@@ -34,7 +34,7 @@ func wkt(buf *bytes.Buffer, geom Geometry) {
 			if i != 0 {
 				buf.WriteByte(',')
 			}
-			_, _ = fmt.Fprintf(buf, "(%g %g)", p.Lat(), p.Lon())
+			_, _ = fmt.Fprintf(buf, "(%g %g)", p.Lon(), p.Lat())
 		}
 		buf.WriteByte(')')
 	case LineString:
@@ -122,7 +122,7 @@ func writeLineString(buf *bytes.Buffer, ls LineString) {
 			buf.WriteByte(',')
 		}
 
-		_, _ = fmt.Fprintf(buf, "%g %g", p.Lat(), p.Lon())
+		_, _ = fmt.Fprintf(buf, "%g %g", p.Lon(), p.Lat())
 	}
 	buf.WriteByte(')')
 }

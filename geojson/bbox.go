@@ -11,8 +11,8 @@ type BBox []float64
 // NewBBox creates a bbox from a a bound.
 func NewBBox(b geoos.Bound) BBox {
 	return []float64{
-		b.Min.X, b.Min.Y,
-		b.Max.X, b.Max.Y,
+		b.Min.X(), b.Min.Y(),
+		b.Max.X(), b.Max.Y(),
 	}
 }
 
