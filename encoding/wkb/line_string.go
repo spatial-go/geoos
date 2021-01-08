@@ -13,7 +13,6 @@ func unmarshalLineString(order byteOrder, data []byte) (geoos.LineString, error)
 	if err != nil {
 		return nil, err
 	}
-
 	return geoos.LineString(ps), nil
 }
 

@@ -25,10 +25,8 @@ func readCollection(r io.Reader, order byteOrder, buf []byte) (geoos.Collection,
 		if err != nil {
 			return nil, err
 		}
-
 		result = append(result, geom)
 	}
-
 	return result, nil
 }
 
@@ -46,6 +44,5 @@ func (e *Encoder) writeCollection(c geoos.Collection) error {
 			return err
 		}
 	}
-
 	return nil
 }
