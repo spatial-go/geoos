@@ -1,29 +1,31 @@
-package geoos
+package wkt
 
 import (
 	"bytes"
 	"fmt"
 	"strings"
+
+	"github.com/spatial-go/geoos"
 )
 
 // UnmarshalString encode to geom
-func UnmarshalString(s string) (Geometry, error) {
+func UnmarshalString(s string) (geoos.Geometry, error) {
 	p := Parser{NewLexer(strings.NewReader(s))}
 	return p.Parse()
 }
 
 // MarshalString decode to string
-func MarshalString(geom Geometry) string {
+func MarshalString(geom geoos.Geometry) string {
 	buf := bytes.NewBuffer(nil)
 	wkt(buf, geom)
 	return buf.String()
 }
 
-func wkt(buf *bytes.Buffer, geom Geometry) {
+func wkt(buf *bytes.Buffer, geom geoos.Geometry) {
 	switch g := geom.(type) {
-	case Point:
+	case geoos.Point:
 		_, _ = fmt.Fprintf(buf, "POINT(%g %g)", g.Lon(), g.Lat())
-	case MultiPoint:
+	case geoos.MultiPoint:
 		if len(g) == 0 {
 			buf.Write([]byte(`MULTIPOINT EMPTY`))
 			return
@@ -37,7 +39,7 @@ func wkt(buf *bytes.Buffer, geom Geometry) {
 			_, _ = fmt.Fprintf(buf, "(%g %g)", p.Lon(), p.Lat())
 		}
 		buf.WriteByte(')')
-	case LineString:
+	case geoos.LineString:
 		if len(g) == 0 {
 			buf.Write([]byte(`LINESTRING EMPTY`))
 			return
@@ -45,7 +47,7 @@ func wkt(buf *bytes.Buffer, geom Geometry) {
 
 		buf.Write([]byte(`LINESTRING`))
 		writeLineString(buf, g)
-	case MultiLineString:
+	case geoos.MultiLineString:
 		if len(g) == 0 {
 			buf.Write([]byte(`MULTILINESTRING EMPTY`))
 			return
@@ -59,9 +61,9 @@ func wkt(buf *bytes.Buffer, geom Geometry) {
 			writeLineString(buf, ls)
 		}
 		buf.WriteByte(')')
-	case Ring:
-		wkt(buf, Polygon{g})
-	case Polygon:
+	case geoos.Ring:
+		wkt(buf, geoos.Polygon{g})
+	case geoos.Polygon:
 		if len(g) == 0 {
 			buf.Write([]byte(`POLYGON EMPTY`))
 			return
@@ -72,10 +74,10 @@ func wkt(buf *bytes.Buffer, geom Geometry) {
 			if i != 0 {
 				buf.WriteByte(',')
 			}
-			writeLineString(buf, LineString(r))
+			writeLineString(buf, geoos.LineString(r))
 		}
 		buf.WriteByte(')')
-	case MultiPolygon:
+	case geoos.MultiPolygon:
 		if len(g) == 0 {
 			buf.Write([]byte(`MULTIPOLYGON EMPTY`))
 			return
@@ -91,13 +93,13 @@ func wkt(buf *bytes.Buffer, geom Geometry) {
 				if j != 0 {
 					buf.WriteByte(',')
 				}
-				writeLineString(buf, LineString(r))
+				writeLineString(buf, geoos.LineString(r))
 			}
 			buf.WriteByte(')')
 		}
 		buf.WriteByte(')')
 
-	case Collection:
+	case geoos.Collection:
 		if len(g) == 0 {
 			buf.Write([]byte(`GEOMETRYCOLLECTION EMPTY`))
 			return
@@ -115,7 +117,7 @@ func wkt(buf *bytes.Buffer, geom Geometry) {
 	}
 }
 
-func writeLineString(buf *bytes.Buffer, ls LineString) {
+func writeLineString(buf *bytes.Buffer, ls geoos.LineString) {
 	buf.WriteByte('(')
 	for i, p := range ls {
 		if i != 0 {

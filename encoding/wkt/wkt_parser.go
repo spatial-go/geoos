@@ -1,8 +1,10 @@
-package geoos
+package wkt
 
 import (
 	"fmt"
 	"strconv"
+
+	"github.com/spatial-go/geoos"
 )
 
 // Parser ...
@@ -11,7 +13,7 @@ type Parser struct {
 }
 
 // Parse ...
-func (p *Parser) Parse() (Geometry, error) {
+func (p *Parser) Parse() (geoos.Geometry, error) {
 	t, err := p.scanToken()
 	if err != nil {
 		return nil, err
@@ -25,12 +27,12 @@ func (p *Parser) Parse() (Geometry, error) {
 		return p.parsePolygon()
 	case Multipoint:
 		line, err := p.parseLineString()
-		return MultiPoint(line), err
+		return geoos.MultiPoint(line), err
 	case MultilineString:
 		poly, err := p.parsePolygon()
-		multiline := make(MultiLineString, 0, len(poly))
+		multiline := make(geoos.MultiLineString, 0, len(poly))
 		for _, ring := range poly {
-			multiline = append(multiline, LineString(ring))
+			multiline = append(multiline, geoos.LineString(ring))
 		}
 		return multiline, err
 	case MultiPolygonEnum:
@@ -40,21 +42,21 @@ func (p *Parser) Parse() (Geometry, error) {
 	}
 }
 
-func (p *Parser) parsePoint() (point Point, err error) {
+func (p *Parser) parsePoint() (point geoos.Point, err error) {
 	t, err := p.scanToken()
 	if err != nil {
 		return point, err
 	}
 	switch t.ttype {
 	case Empty:
-		point = Point{0, 0}
+		point = geoos.Point{0, 0}
 	case Z, M, ZM:
 		t1, err := p.scanToken()
 		if err != nil {
 			return point, err
 		}
 		if t1.ttype == Empty {
-			point = Point{0, 0}
+			point = geoos.Point{0, 0}
 			break
 		}
 		if t1.ttype != LeftParen {
@@ -97,8 +99,8 @@ func (p *Parser) parsePoint() (point Point, err error) {
 	return point, nil
 }
 
-func (p *Parser) parseLineString() (line LineString, err error) {
-	line = make([]Point, 0)
+func (p *Parser) parseLineString() (line geoos.LineString, err error) {
+	line = make([]geoos.Point, 0)
 	t, err := p.scanToken()
 	if err != nil {
 		return nil, err
@@ -137,10 +139,10 @@ func (p *Parser) parseLineString() (line LineString, err error) {
 	return line, nil
 }
 
-func (p *Parser) parseLineStringText(ttype tokenType) (line LineString, err error) {
-	line = make([]Point, 0)
+func (p *Parser) parseLineStringText(ttype tokenType) (line geoos.LineString, err error) {
+	line = make([]geoos.Point, 0)
 	for {
-		var point Point
+		var point geoos.Point
 		switch ttype {
 		case Z, M:
 			point, err = p.parseCoordDrop1()
@@ -166,8 +168,8 @@ func (p *Parser) parseLineStringText(ttype tokenType) (line LineString, err erro
 	return line, nil
 }
 
-func (p *Parser) parsePolygon() (poly Polygon, err error) {
-	poly = make([]Ring, 0)
+func (p *Parser) parsePolygon() (poly geoos.Polygon, err error) {
+	poly = make([]geoos.Ring, 0)
 	t, err := p.scanToken()
 	if err != nil {
 		return poly, err
@@ -206,10 +208,10 @@ func (p *Parser) parsePolygon() (poly Polygon, err error) {
 	return poly, nil
 }
 
-func (p *Parser) parsePolygonText(ttype tokenType) (poly Polygon, err error) {
-	poly = make([]Ring, 0)
+func (p *Parser) parsePolygonText(ttype tokenType) (poly geoos.Polygon, err error) {
+	poly = make([]geoos.Ring, 0)
 	for {
-		var line LineString
+		var line geoos.LineString
 		t, err := p.scanToken()
 		if err != nil {
 			return poly, err
@@ -221,7 +223,7 @@ func (p *Parser) parsePolygonText(ttype tokenType) (poly Polygon, err error) {
 		if err != nil {
 			return poly, err
 		}
-		poly = append(poly, Ring(line))
+		poly = append(poly, geoos.Ring(line))
 		t, err = p.scanToken()
 		if err != nil {
 			return poly, err
@@ -235,8 +237,8 @@ func (p *Parser) parsePolygonText(ttype tokenType) (poly Polygon, err error) {
 	return poly, nil
 }
 
-func (p *Parser) parseMultiPolygon() (multi MultiPolygon, err error) {
-	multi = make([]Polygon, 0)
+func (p *Parser) parseMultiPolygon() (multi geoos.MultiPolygon, err error) {
+	multi = make([]geoos.Polygon, 0)
 	t, err := p.scanToken()
 	if err != nil {
 		return multi, err
@@ -275,10 +277,10 @@ func (p *Parser) parseMultiPolygon() (multi MultiPolygon, err error) {
 	return multi, nil
 }
 
-func (p *Parser) parseMultiPolygonText(ttype tokenType) (multi MultiPolygon, err error) {
-	multi = make([]Polygon, 0)
+func (p *Parser) parseMultiPolygonText(ttype tokenType) (multi geoos.MultiPolygon, err error) {
+	multi = make([]geoos.Polygon, 0)
 	for {
-		var poly Polygon
+		var poly geoos.Polygon
 		t, err := p.scanToken()
 		if err != nil {
 			return multi, err
@@ -304,7 +306,7 @@ func (p *Parser) parseMultiPolygonText(ttype tokenType) (multi MultiPolygon, err
 	return multi, nil
 }
 
-func (p *Parser) parseCoord() (point Point, err error) {
+func (p *Parser) parseCoord() (point geoos.Point, err error) {
 	t1, err := p.scanToken()
 	if err != nil {
 		return point, err
@@ -329,10 +331,10 @@ func (p *Parser) parseCoord() (point Point, err error) {
 		return point, fmt.Errorf("invalid lexeme %s for token on pos %d", t2.lexeme, t2.pos)
 	}
 
-	return Point{c1, c2}, nil
+	return geoos.Point{c1, c2}, nil
 }
 
-func (p *Parser) parseCoordDrop1() (point Point, err error) {
+func (p *Parser) parseCoordDrop1() (point geoos.Point, err error) {
 	point, err = p.parseCoord()
 	if err != nil {
 		return point, err
@@ -350,7 +352,7 @@ func (p *Parser) parseCoordDrop1() (point Point, err error) {
 	return point, nil
 }
 
-func (p *Parser) parseCoordDrop2() (point Point, err error) {
+func (p *Parser) parseCoordDrop2() (point geoos.Point, err error) {
 	point, err = p.parseCoord()
 	if err != nil {
 		return point, err

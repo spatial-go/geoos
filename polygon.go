@@ -20,17 +20,17 @@ func (p Polygon) Nums() int {
 	return 1
 }
 
-// Area returns the area of this polygonal geometry
-func (p Polygon) Area() (float64, error) {
-	s := NormalStrategy()
-	return s.Area(p)
-}
+// // Area returns the area of this polygonal geometry
+// func (p Polygon) Area() (float64, error) {
+// 	s := NormalStrategy()
+// 	return s.Area(p)
+// }
 
-// Boundary returns the closure of the combinatorial boundary of this Geometry
-func (p Polygon) Boundary() (Geometry, error) {
-	s := NormalStrategy()
-	return s.Boundary(p)
-}
+// // Boundary returns the closure of the combinatorial boundary of this Geometry
+// func (p Polygon) Boundary() (Geometry, error) {
+// 	s := NormalStrategy()
+// 	return s.Boundary(p)
+// }
 
 // Bound returns a bound around the polygon.
 func (p Polygon) Bound() Bound {

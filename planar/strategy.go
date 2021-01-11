@@ -1,4 +1,4 @@
-package geoos
+package planar
 
 // GEOS geos algorithm name.
 const GEOS string = "GEOS"

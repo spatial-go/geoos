@@ -18,11 +18,11 @@ func (ls LineString) Nums() int {
 	return 1
 }
 
-// Boundary returns the closure of the combinatorial boundary of this linestring.
-func (ls LineString) Boundary() (Geometry, error) {
-	s := NormalStrategy()
-	return s.Boundary(ls)
-}
+// // Boundary returns the closure of the combinatorial boundary of this linestring.
+// func (ls LineString) Boundary() (Geometry, error) {
+// 	s := NormalStrategy()
+// 	return s.Boundary(ls)
+// }
 
 // Bound returns a rect around the line string. Uses rectangular coordinates.
 func (ls LineString) Bound() Bound {
