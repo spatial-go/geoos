@@ -1,4 +1,4 @@
-package clusters
+package kmeans
 
 import (
 	"fmt"
@@ -6,11 +6,6 @@ import (
 
 	"github.com/spatial-go/geoos/clusters"
 )
-
-// ClustersKmeans ...
-// func ClustersKmeans(points []geoos.Point, number int64) {
-
-// }
 
 // Kmeans configuration/option struct
 type Kmeans struct {
@@ -97,7 +92,6 @@ func (m Kmeans) Partition(dataset clusters.Points, k int) (clusters.Clusters, er
 		}
 		if i == m.iterationThreshold ||
 			changes < int(float64(len(dataset))*m.deltaThreshold) {
-			// fmt.Println("Aborting:", changes, int(float64(len(dataset))*m.TerminationThreshold))
 			break
 		}
 	}
