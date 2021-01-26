@@ -1,8 +1,8 @@
 # 更新日志
 
-## [0.1.1] - 2020-07-10
+## [0.1.1] - 2021-01-15
 ### Added
-— 新增`geojson`数据解析方法`geoos/geojson`
+- 新增`geojson`数据解析方法`geoos/geojson`
 - 新增`wkb`解析
 - 新增`GeometryCollection`解析处理
 ### Changed
