@@ -7,10 +7,6 @@ import (
 	"github.com/spatial-go/geoos/planar"
 )
 
-// coordinates
-// Observation
-// geoos.Point
-
 // Points is a slice of observations
 // Observations is a slice of observations
 type Points []geoos.Point
