@@ -9,14 +9,6 @@ import (
 	"github.com/spatial-go/geoos/planar"
 )
 
-// coordinates
-// Observation
-// geoos.Point
-
-// Points is a slice of observations
-// Observations is a slice of observations
-// type Points []geoos.Point
-
 // A Cluster which data points gravitate around
 type Cluster struct {
 	Center geoos.Point
@@ -114,7 +106,6 @@ func (c Clusters) Reset() {
 }
 
 // PointsInDimension returns all coordinates in a given dimension
-// TODO ?
 func (c Cluster) PointsInDimension(n int) (v []float64) {
 	for _, p := range c.Points {
 		v = append(v, p[n])
@@ -124,7 +115,6 @@ func (c Cluster) PointsInDimension(n int) (v []float64) {
 
 // CentersInDimension returns all cluster centroids' coordinates in a given
 // dimension
-// TODO ?
 func (c Clusters) CentersInDimension(n int) (v []float64) {
 	for _, cl := range c {
 		v = append(v, cl.Center[n])
