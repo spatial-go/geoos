@@ -1006,6 +1006,37 @@ func TestGEOSAlgorithm_Disjoint(t *testing.T) {
 	}
 }
 
+func TestGEOSAlgorithm_Distance(t *testing.T) {
+	point01, _ := wkt.UnmarshalString(`POINT(1 3)`)
+	point02, _ := wkt.UnmarshalString(`POINT(4 7)`)
+
+	type args struct {
+		g1 geoos.Geometry
+		g2 geoos.Geometry
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    float64
+		wantErr bool
+	}{
+		{name: "distance", args: args{g1: point01, g2: point02}, want: 5, wantErr: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			G := GEOAlgorithm{}
+			got, err := G.Distance(tt.args.g1, tt.args.g2)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Distance() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("Distance() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestGEOSAlgorithm_Touches(t *testing.T) {
 	line01, _ := wkt.UnmarshalString(`LINESTRING(0 0, 1 1, 0 2)`)
 	point01, _ := wkt.UnmarshalString(`POINT(0 2)`)
