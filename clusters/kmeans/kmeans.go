@@ -68,7 +68,6 @@ func (m Kmeans) Partition(dataset clusters.Points, k int) (clusters.Clusters, er
 				// During the iterations, if any of the cluster centers has no
 				// data points associated with it, assign a random data point
 				// to it.
-				// Also see: http://user.ceng.metu.edu.tr/~tcan/ceng465_f1314/Schedule/KMeansEmpty.html
 				var ri int
 				for {
 					// find a cluster with at least two data points, otherwise
