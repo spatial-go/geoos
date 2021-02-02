@@ -3,20 +3,19 @@ package geojson
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/spatial-go/geoos"
 )
 
 // A Feature corresponds to GeoJSON feature object
 type Feature struct {
-	ID         interface{}    `json:"id,omitempty"`
-	Type       string         `json:"type"`
-	BBox       BBox           `json:"bbox,omitempty"`
-	Geometry   geoos.Geometry `json:"geometry"`
-	Properties Properties     `json:"properties"`
+	ID         interface{} `json:"id,omitempty"`
+	Type       string      `json:"type"`
+	BBox       BBox        `json:"bbox,omitempty"`
+	Geometry   Geometry    `json:"geometry"`
+	Properties Properties  `json:"properties"`
 }
 
 // NewFeature creates and initializes a GeoJSON feature given the required attributes.
-func NewFeature(geometry geoos.Geometry) *Feature {
+func NewFeature(geometry Geometry) *Feature {
 	return &Feature{
 		Type:       "Feature",
 		Geometry:   geometry,
@@ -33,7 +32,7 @@ func (f Feature) MarshalJSON() ([]byte, error) {
 		Type:       "Feature",
 		Properties: f.Properties,
 		BBox:       f.BBox,
-		Geometry:   NewGeometry(f.Geometry),
+		Geometry:   NewGeometry(f.Geometry.Geometry()),
 	}
 
 	if len(jf.Properties) == 0 {
@@ -77,7 +76,7 @@ func (f *Feature) UnmarshalJSON(data []byte) error {
 		Type:       jf.Type,
 		Properties: jf.Properties,
 		BBox:       jf.BBox,
-		Geometry:   jf.Geometry.Geometry(),
+		Geometry:   *jf.Geometry,
 	}
 
 	return nil

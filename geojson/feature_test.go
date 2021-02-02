@@ -3,13 +3,14 @@ package geojson
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/spatial-go/geoos"
 	"strings"
 	"testing"
+
+	"github.com/spatial-go/geoos"
 )
 
 func TestNewFeature(t *testing.T) {
-	f := NewFeature(geoos.Point{1, 2})
+	f := NewFeature(*NewGeometry(geoos.Point{1, 2}))
 
 	if f.Type != "Feature" {
 		t.Errorf("incorrect feature: %v != Feature", f.Type)
@@ -17,7 +18,7 @@ func TestNewFeature(t *testing.T) {
 }
 
 func TestFeatureMarshalJSON(t *testing.T) {
-	f := NewFeature(geoos.Point{1, 2})
+	f := NewFeature(*NewGeometry(geoos.Point{1, 2}))
 	blob, err := f.MarshalJSON()
 
 	if err != nil {
@@ -30,7 +31,8 @@ func TestFeatureMarshalJSON(t *testing.T) {
 }
 
 func TestFeatureMarshalJSON_BBox(t *testing.T) {
-	f := NewFeature(geoos.Bound{Min: geoos.Point{1, 1}, Max: geoos.Point{2, 2}})
+	bound := geoos.Bound{Min: geoos.Point{1, 1}, Max: geoos.Point{2, 2}}
+	f := NewFeature(*NewGeometry(bound.ToPolygon()))
 
 	// bbox empty
 	f.BBox = nil
@@ -56,7 +58,9 @@ func TestFeatureMarshalJSON_BBox(t *testing.T) {
 }
 
 func TestFeatureMarshalJSON_Bound(t *testing.T) {
-	f := NewFeature(geoos.Bound{Min: geoos.Point{1, 1}, Max: geoos.Point{2, 2}})
+	bound := geoos.Bound{Min: geoos.Point{1, 1}, Max: geoos.Point{2, 2}}
+	f := NewFeature(*NewGeometry(bound.ToPolygon()))
+
 	blob, err := f.MarshalJSON()
 
 	if err != nil {
@@ -73,7 +77,7 @@ func TestFeatureMarshalJSON_Bound(t *testing.T) {
 }
 
 func TestFeatureMarshal(t *testing.T) {
-	f := NewFeature(geoos.Point{1, 2})
+	f := NewFeature(*NewGeometry(geoos.Point{1, 2}))
 	blob, err := json.Marshal(f)
 
 	if err != nil {
@@ -89,7 +93,7 @@ func TestFeatureMarshal(t *testing.T) {
 }
 
 func TestFeatureMarshalValue(t *testing.T) {
-	f := NewFeature(geoos.Point{1, 2})
+	f := NewFeature(*NewGeometry(geoos.Point{1, 2}))
 	blob, err := json.Marshal(*f)
 
 	if err != nil {
@@ -157,8 +161,8 @@ func TestUnmarshalFeature_GeometryCollection(t *testing.T) {
 	}
 
 	wantType := geoos.Collection{}.GeoJSONType()
-	if f.Geometry.GeoJSONType() != wantType {
-		t.Fatalf("invalid GeoJSONType: %v", f.Geometry.GeoJSONType())
+	if f.Geometry.Type != wantType {
+		t.Fatalf("invalid GeoJSONType: %v", f.Geometry.Coordinates.GeoJSONType())
 	}
 }
 
@@ -263,7 +267,7 @@ func TestUnmarshalFeatureID(t *testing.T) {
 func TestMarshalRing(t *testing.T) {
 	ring := geoos.Ring{{0, 0}, {1, 1}, {2, 1}, {0, 0}}
 
-	f := NewFeature(ring)
+	f := NewFeature(*NewGeometry(ring))
 	data, err := f.MarshalJSON()
 	if err != nil {
 		t.Fatalf("should marshal, %v", err)
