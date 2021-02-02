@@ -68,17 +68,17 @@ func TestUnmarshalFeatureCollection(t *testing.T) {
 	}
 
 	f := fc.Features[0]
-	if gt := f.Geometry.GeoJSONType(); gt != "Point" {
+	if gt := f.Geometry.Coordinates.GeoJSONType(); gt != "Point" {
 		t.Errorf("incorrect feature type: %v != %v", gt, "Point")
 	}
 
 	f = fc.Features[1]
-	if gt := f.Geometry.GeoJSONType(); gt != "LineString" {
+	if gt := f.Geometry.Coordinates.GeoJSONType(); gt != "LineString" {
 		t.Errorf("incorrect feature type: %v != %v", gt, "LineString")
 	}
 
 	f = fc.Features[2]
-	if gt := f.Geometry.GeoJSONType(); gt != "Polygon" {
+	if gt := f.Geometry.Coordinates.GeoJSONType(); gt != "Polygon" {
 		t.Errorf("incorrect feature type: %v != %v", gt, "Polygon")
 	}
 
@@ -105,7 +105,7 @@ func TestUnmarshalFeatureCollection(t *testing.T) {
 	}
 
 	// not a feature collection
-	data, _ = NewFeature(geoos.Point{}).MarshalJSON()
+	data, _ = NewFeature(*NewGeometry(geoos.Point{})).MarshalJSON()
 	_, err = UnmarshalFeatureCollection(data)
 	if err == nil {
 		t.Error("should return error if not a feature collection")
