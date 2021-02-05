@@ -1,5 +1,10 @@
 package geoos
 
+import (
+	"math/rand"
+	"reflect"
+)
+
 // Point describes a geographic point
 type Point [2]float64
 
@@ -46,4 +51,12 @@ func (p Point) X() float64 {
 // Equal checks if the point represents the same point or vector.
 func (p Point) Equal(point Point) bool {
 	return p[0] == point[0] && p[1] == point[1]
+}
+
+// Generate implements the Generator interface for Points
+func (p Point) Generate(r *rand.Rand, _ int) reflect.Value {
+	for i := range p {
+		p[i] = r.Float64()
+	}
+	return reflect.ValueOf(p)
 }

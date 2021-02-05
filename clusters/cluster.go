@@ -11,15 +11,18 @@ import (
 
 // A Cluster which data points gravitate around
 type Cluster struct {
-	Center geoos.Point
-	Points Points
+	C      int   //dbscan 用到
+	Points []int //dbscan 用到
+
+	Center    geoos.Point
+	PointList PointList
 }
 
 // Clusters is a slice of clusters
 type Clusters []Cluster
 
 // New sets up a new set of clusters and randomly seeds their initial positions
-func New(k int, dataset Points) (Clusters, error) {
+func New(k int, dataset PointList) (Clusters, error) {
 	var c Clusters
 	if len(dataset) == 0 || len(dataset[0]) == 0 {
 		return c, fmt.Errorf("there must be at least one dimension in the data set")
@@ -43,7 +46,7 @@ func New(k int, dataset Points) (Clusters, error) {
 
 // Append adds an observation to the Cluster
 func (c *Cluster) Append(point geoos.Point) {
-	c.Points = append(c.Points, point)
+	c.PointList = append(c.PointList, point)
 }
 
 // Nearest returns the index of the cluster nearest to point
@@ -73,7 +76,7 @@ func (c Clusters) Neighbour(point geoos.Point, fromCluster int) (int, float64) {
 			continue
 		}
 
-		cd := AverageDistance(point, cluster.Points)
+		cd := AverageDistance(point, cluster.PointList)
 		if nc < 0 || cd < d {
 			nc = i
 			d = cd
@@ -84,7 +87,7 @@ func (c Clusters) Neighbour(point geoos.Point, fromCluster int) (int, float64) {
 
 // Recenter recenters a cluster
 func (c *Cluster) Recenter() {
-	center, err := c.Points.Center()
+	center, err := c.PointList.Center()
 	if err != nil {
 		return
 	}
@@ -101,13 +104,13 @@ func (c Clusters) Recenter() {
 // Reset clears all point assignments
 func (c Clusters) Reset() {
 	for i := 0; i < len(c); i++ {
-		c[i].Points = Points{}
+		c[i].PointList = PointList{}
 	}
 }
 
 // PointsInDimension returns all coordinates in a given dimension
 func (c Cluster) PointsInDimension(n int) (v []float64) {
-	for _, p := range c.Points {
+	for _, p := range c.PointList {
 		v = append(v, p[n])
 	}
 	return v
