@@ -2,11 +2,14 @@ package geoos
 
 // const geomtype
 const (
-	TypePoint           = "Point"
-	TypeMultiPoint      = "MultiPoint"
+	TypePoint      = "Point"
+	TypeMultiPoint = "MultiPoint"
+
 	TypeLineString      = "LineString"
 	TypeMultiLineString = "MultiLineString"
-	TypePolygon         = "Polygon"
-	TypeMultiPolygon    = "MultiPolygon"
-	TypeCollection      = "GeometryCollection"
+
+	TypePolygon      = "Polygon"
+	TypeMultiPolygon = "MultiPolygon"
+
+	TypeCollection = "GeometryCollection"
 )

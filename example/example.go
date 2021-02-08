@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/spatial-go/geoos"
 	"github.com/spatial-go/geoos/encoding/wkt"
 	"github.com/spatial-go/geoos/geojson"
@@ -38,7 +39,7 @@ func main() {
 	println("%p", fc)
 
 	// Geometry will be unmarshalled into the correct geo.Geometry type.
-	point := fc.Features[0].Geometry.(geoos.Point)
+	point := fc.Features[0].Geometry.Coordinates.(geoos.Point)
 	println("%p", &point)
 
 }

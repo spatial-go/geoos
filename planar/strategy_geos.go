@@ -1,7 +1,10 @@
 package planar
 
 import (
+	"math"
+
 	"github.com/spatial-go/geoos"
+	"github.com/spatial-go/geoos/common"
 	"github.com/spatial-go/geoos/encoding/wkt"
 	"github.com/spatial-go/geoos/geo"
 )
@@ -134,6 +137,21 @@ func (g *GEOAlgorithm) Disjoint(geom1, geom2 geoos.Geometry) (bool, error) {
 func (g *GEOAlgorithm) Distance(geom1, geom2 geoos.Geometry) (float64, error) {
 	ms1, ms2 := convertGeomToWKT(geom1, geom2)
 	return geo.Distance(ms1, ms2)
+}
+
+// SphericalDistance calculates spherical distance
+//
+// To get real distance in km
+func (g *GEOAlgorithm) SphericalDistance(point1, point2 geoos.Point) float64 {
+	radius := common.EarthR
+	rad := common.DegreeRad
+	lat0 := point1[1] * rad
+	lng0 := point1[0] * rad
+	lat1 := point2[1] * rad
+	lng1 := point2[0] * rad
+	theta := lng1 - lng0
+	dist := math.Acos(math.Sin(lat0)*math.Sin(lat1) + math.Cos(lat0)*math.Cos(lat1)*math.Cos(theta))
+	return dist * radius
 }
 
 // Envelope returns the  minimum bounding box for the supplied geometry, as a geometry.
