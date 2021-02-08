@@ -11,8 +11,8 @@ import (
 
 // A Cluster which data points gravitate around
 type Cluster struct {
-	C      int   //dbscan 用到
-	Points []int //dbscan 用到
+	C      int   //dbscan
+	Points []int //dbscan
 
 	Center    geoos.Point
 	PointList PointList
