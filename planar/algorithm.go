@@ -32,6 +32,8 @@ type Algorithm interface {
 
 	Distance(geom1, geom2 geoos.Geometry) (float64, error)
 
+	SphericalDistance(point1, point2 geoos.Point) float64
+
 	Envelope(geom geoos.Geometry) (geoos.Geometry, error)
 
 	Equals(geom1, geom2 geoos.Geometry) (bool, error)

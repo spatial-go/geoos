@@ -37,7 +37,7 @@ func New() Kmeans {
 
 // Partition executes the k-means algorithm on the given dataset and
 // partitions it into k clusters
-func (m Kmeans) Partition(dataset clusters.Points, k int) (clusters.Clusters, error) {
+func (m Kmeans) Partition(dataset clusters.PointList, k int) (clusters.Clusters, error) {
 	if k > len(dataset) {
 		return clusters.Clusters{}, fmt.Errorf("the size of the data set must at least equal k")
 	}
@@ -64,7 +64,7 @@ func (m Kmeans) Partition(dataset clusters.Points, k int) (clusters.Clusters, er
 		}
 
 		for ci := 0; ci < len(cc); ci++ {
-			if len(cc[ci].Points) == 0 {
+			if len(cc[ci].PointList) == 0 {
 				// During the iterations, if any of the cluster centers has no
 				// data points associated with it, assign a random data point
 				// to it.
@@ -73,7 +73,7 @@ func (m Kmeans) Partition(dataset clusters.Points, k int) (clusters.Clusters, er
 					// find a cluster with at least two data points, otherwise
 					// we're just emptying one cluster to fill another
 					ri = rand.Intn(len(dataset))
-					if len(cc[points[ri]].Points) > 1 {
+					if len(cc[points[ri]].PointList) > 1 {
 						break
 					}
 				}

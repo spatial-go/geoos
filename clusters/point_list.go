@@ -7,11 +7,12 @@ import (
 	"github.com/spatial-go/geoos/planar"
 )
 
-// Points is a slice of Point
-type Points []geoos.Point
+// PointList is a slice of Point
+type PointList []geoos.Point
 
 // Center returns the center coordinates of a set of Points
-func (points Points) Center() (p geoos.Point, err error) {
+func (points PointList) Center() (p geoos.Point, err error) {
+
 	var l = len(points)
 	if l == 0 {
 		return p, fmt.Errorf("there is no mean for an empty set of points")
@@ -29,8 +30,8 @@ func (points Points) Center() (p geoos.Point, err error) {
 	return p, nil
 }
 
-// AverageDistance returns the average distance between o and all Points
-func AverageDistance(point geoos.Point, points Points) float64 {
+// AverageDistance returns the average distance between o and all PointList
+func AverageDistance(point geoos.Point, points PointList) float64 {
 	var d float64
 	var l int
 	G := planar.GEOAlgorithm{}

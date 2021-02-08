@@ -26,13 +26,13 @@ func TestNewErrors(t *testing.T) {
 
 func TestPartitioningError(t *testing.T) {
 	km := New()
-	d := clusters.Points{}
+	d := clusters.PointList{}
 	if _, err := km.Partition(d, 1); err == nil {
 		t.Errorf("Expected error partitioning with empty data set, got nil")
 		return
 	}
 
-	d = clusters.Points{
+	d = clusters.PointList{
 		geoos.Point{
 			0.1,
 			0.1,
@@ -50,7 +50,7 @@ func TestPartitioningError(t *testing.T) {
 }
 
 func TestDimensions(t *testing.T) {
-	var d clusters.Points
+	var d clusters.PointList
 	for x := 0; x < 255; x += 32 {
 		for y := 0; y < 255; y += 32 {
 			d = append(d, geoos.Point{
@@ -75,7 +75,7 @@ func TestDimensions(t *testing.T) {
 
 func benchmarkPartition(size, partitions int, b *testing.B) {
 	rand.Seed(randomSeed)
-	var d clusters.Points
+	var d clusters.PointList
 
 	for i := 0; i < size; i++ {
 		d = append(d, geoos.Point{

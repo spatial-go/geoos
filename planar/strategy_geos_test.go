@@ -1037,6 +1037,35 @@ func TestGEOSAlgorithm_Distance(t *testing.T) {
 	}
 }
 
+func TestGEOSAlgorithm_SphericalDistance(t *testing.T) {
+	point01 := geoos.Point{116.397439, 39.909177}
+	point02 := geoos.Point{116.397725, 39.903079}
+	point03 := geoos.Point{118.1487, 39.586671}
+
+	type args struct {
+		p1 geoos.Point
+		p2 geoos.Point
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    float64
+		wantErr bool
+	}{
+		{name: "SphericalDistance", args: args{p1: point01, p2: point02}, want: 0.6785053586786567, wantErr: false},
+		{name: "SphericalDistance", args: args{p1: point01, p2: point03}, want: 153.95398145619757, wantErr: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			G := GEOAlgorithm{}
+			got := G.SphericalDistance(tt.args.p1, tt.args.p2)
+			if got != tt.want {
+				t.Errorf("SphericalDistance() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestGEOSAlgorithm_Touches(t *testing.T) {
 	line01, _ := wkt.UnmarshalString(`LINESTRING(0 0, 1 1, 0 2)`)
 	point01, _ := wkt.UnmarshalString(`POINT(0 2)`)

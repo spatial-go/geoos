@@ -7,7 +7,7 @@ import (
 )
 
 func TestCenter(t *testing.T) {
-	var o Points
+	var o PointList
 	o = append(o, geoos.Point{1, 1})
 	o = append(o, geoos.Point{3, 2})
 	o = append(o, geoos.Point{5, 3})
@@ -24,7 +24,7 @@ func TestCenter(t *testing.T) {
 }
 
 func TestAverageDistance(t *testing.T) {
-	var o Points
+	var o PointList
 	o = append(o, geoos.Point{1, 1})
 	o = append(o, geoos.Point{4, 5})
 	o = append(o, geoos.Point{6, 13})
@@ -34,14 +34,14 @@ func TestAverageDistance(t *testing.T) {
 		t.Errorf("Expected average distance of 12.5, got %v", d)
 	}
 
-	d = AverageDistance(o[1], Points{o[1]})
+	d = AverageDistance(o[1], PointList{o[1]})
 	if d != 0 {
 		t.Errorf("Expected average distance of 0, got %v", d)
 	}
 }
 
 func TestClusters(t *testing.T) {
-	var o Points
+	var o PointList
 	o = append(o, geoos.Point{1, 1})
 	o = append(o, geoos.Point{4, 5})
 	o = append(o, geoos.Point{6, 13})
@@ -82,7 +82,7 @@ func TestClusters(t *testing.T) {
 	}
 
 	c.Reset()
-	if len(c[0].Points) > 0 {
-		t.Errorf("Expected empty cluster 1, found %d observations", len(c[0].Points))
+	if len(c[0].PointList) > 0 {
+		t.Errorf("Expected empty cluster 1, found %d observations", len(c[0].PointList))
 	}
 }
