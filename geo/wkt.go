@@ -55,6 +55,7 @@ func WKTReaderDestroy(reader GEOSWKTReader) {
 // DecodeWKTToStr decode GEOSGeometry to WKT string
 func DecodeWKTToStr(writer GEOSWKTWriter, g GEOSGeometry) (string, error) {
 	cstr := C.GEOSWKTWriter_write_r(geosContext, writer, g)
+	defer C.free(unsafe.Pointer(cstr))
 	if cstr == nil {
 		return "", errors.New("writer to wkt is null")
 	}
@@ -64,7 +65,7 @@ func DecodeWKTToStr(writer GEOSWKTWriter, g GEOSGeometry) (string, error) {
 // EncodeWKTToGeom encode WKT string to GEOSGeometry
 func EncodeWKTToGeom(reader GEOSWKTReader, wktStr string) GEOSGeometry {
 	cs := C.CString(wktStr)
+	defer C.free(unsafe.Pointer(cs))
 	g := C.GEOSWKTReader_read_r(geosContext, reader, cs)
-	C.free(unsafe.Pointer(cs))
 	return GEOSGeometry(g)
 }
