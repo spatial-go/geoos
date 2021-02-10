@@ -563,7 +563,7 @@ func TestGEOSAlgorithm_ConvexHull(t *testing.T) {
 
 func TestGEOSAlgorithm_UnaryUnion(t *testing.T) {
 	multiPolygon, _ := wkt.UnmarshalString(`MULTIPOLYGON(((0 0, 10 0, 10 10, 0 10, 0 0)), ((5 5, 15 5, 15 15, 5 15, 5 5)))`)
-	expectPolygon, _ := wkt.UnmarshalString(`POLYGON ((0 10,5 10,5 15,15 15,15 5,10 5,10 0,0 0,0 10))`)
+	expectPolygon, _ := wkt.UnmarshalString(`POLYGON ((10 5,10 0,0 0,0 10,5 10,5 15,15 15,15 5,10 5))`)
 
 	type args struct {
 		g geoos.Geometry
@@ -875,7 +875,7 @@ func TestGEOSAlgorithm_IsClosed(t *testing.T) {
 func TestGEOSAlgorithm_SymDifference(t *testing.T) {
 	line01, _ := wkt.UnmarshalString(`LINESTRING(50 100, 50 200)`)
 	line02, _ := wkt.UnmarshalString(`LINESTRING(50 50, 50 150)`)
-	expectMultiLines, _ := wkt.UnmarshalString(`MULTILINESTRING((50 50,50 100),(50 150,50 200))`)
+	expectMultiLines, _ := wkt.UnmarshalString(`MULTILINESTRING((50 150,50 200),(50 50,50 100))`)
 
 	type args struct {
 		g1 geoos.Geometry

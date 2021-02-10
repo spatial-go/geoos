@@ -42,12 +42,12 @@ var (
 // Area returns the area of a polygonal geometry
 func Area(wkt string) (float64, error) {
 	geoGeom := GeomFromWKTStr(wkt)
+	defer C.GEOSGeom_destroy_r(geosContext, geoGeom)
 	var d C.double
 	i := C.GEOSArea_r(geosContext, geoGeom, &d)
 	if i == 0 {
 		return 0.0, Error()
 	}
-	C.GEOSGeom_destroy_r(geosContext, geoGeom)
 	return float64(d), nil
 }
 
@@ -55,24 +55,23 @@ func Area(wkt string) (float64, error) {
 func Boundary(wkt string) (string, error) {
 	geoGeom := GeomFromWKTStr(wkt)
 	g := C.GEOSBoundary_r(geosContext, geoGeom)
-	s, e := ToWKTStr(g)
-	if e != nil {
-		return "", e
-	}
-	C.GEOSGeom_destroy_r(geosContext, geoGeom)
-	return s, nil
+	defer func() {
+		C.GEOSGeom_destroy_r(geosContext, geoGeom)
+		C.GEOSGeom_destroy_r(geosContext, g)
+	}()
+	return ToWKTStr(g)
 }
 
 // Buffer returns a geometry that represents all points whose distance from
 // this Geometry is less than or equal to distance.
-func Buffer(g string, width float64, quadsegs int32) (wkt string, err error) {
+func Buffer(g string, width float64, quadsegs int32) (string, error) {
 	geom := GeomFromWKTStr(g)
-	defer C.GEOSGeom_destroy_r(geosContext, geom)
 	bufferGeom := C.GEOSBuffer_r(geosContext, geom, C.double(width), C.int(quadsegs))
-	if wkt, err = ToWKTStr(bufferGeom); err != nil {
-		wkt = ""
-	}
-	return
+	defer func() {
+		C.GEOSGeom_destroy_r(geosContext, geom)
+		C.GEOSGeom_destroy_r(geosContext, bufferGeom)
+	}()
+	return ToWKTStr(bufferGeom)
 }
 
 // Centroid Computes the geometric center of a geometry, or equivalently, the center of mass of the geometry as a POINT.
@@ -86,12 +85,11 @@ func Buffer(g string, width float64, quadsegs int32) (wkt string, err error) {
 func Centroid(wkt string) (string, error) {
 	geoGeom := GeomFromWKTStr(wkt)
 	g := C.GEOSGetCentroid_r(geosContext, geoGeom)
-	s, e := ToWKTStr(g)
-	if e != nil {
-		return "", e
-	}
-	C.GEOSGeom_destroy_r(geosContext, geoGeom)
-	return s, nil
+	defer func() {
+		C.GEOSGeom_destroy_r(geosContext, geoGeom)
+		C.GEOSGeom_destroy_r(geosContext, g)
+	}()
+	return ToWKTStr(g)
 }
 
 // Contains Geometry A contains Geometry B if and only if no points of B lie in the exterior of A,
@@ -102,11 +100,11 @@ func Centroid(wkt string) (string, error) {
 // having the same SRID.
 func Contains(g1 string, g2 string) (bool, error) {
 	geom1, geom2 := convertWKTtoGEOSGeometry(g1, g2)
+	c := C.GEOSContains_r(geosContext, geom1, geom2)
 	defer func() {
 		C.GEOSGeom_destroy_r(geosContext, geom1)
 		C.GEOSGeom_destroy_r(geosContext, geom2)
 	}()
-	c := C.GEOSContains_r(geosContext, geom1, geom2)
 	return boolFromC(c)
 }
 
@@ -125,9 +123,11 @@ func convertWKTtoGEOSGeometry(g1 string, g2 string) (GEOSGeometry, GEOSGeometry)
 func ConvexHull(wkt string) (string, error) {
 	geoGeom := GeomFromWKTStr(wkt)
 	g := C.GEOSConvexHull_r(geosContext, geoGeom)
-	s, e := ToWKTStr(g)
-	C.GEOSGeom_destroy_r(geosContext, geoGeom)
-	return s, e
+	defer func() {
+		C.GEOSGeom_destroy_r(geosContext, geoGeom)
+		C.GEOSGeom_destroy_r(geosContext, g)
+	}()
+	return ToWKTStr(g)
 }
 
 // Covers computes whether the prepared geometry covers the other.
@@ -176,16 +176,13 @@ func Crosses(g1 string, g2 string) (bool, error) {
 // If A is completely contained in B then an empty geometry collection is returned.
 func Difference(g1 string, g2 string) (string, error) {
 	geom1, geom2 := convertWKTtoGEOSGeometry(g1, g2)
+	g := C.GEOSDifference_r(geosContext, geom1, geom2)
 	defer func() {
 		C.GEOSGeom_destroy_r(geosContext, geom1)
 		C.GEOSGeom_destroy_r(geosContext, geom2)
+		C.GEOSGeom_destroy_r(geosContext, g)
 	}()
-	g := C.GEOSDifference_r(geosContext, geom1, geom2)
-	wkt, e := ToWKTStr(g)
-	if e != nil {
-		return "", e
-	}
-	return wkt, nil
+	return ToWKTStr(g)
 }
 
 // Disjoint Overlaps, Touches, Within all imply geometries are not spatially disjoint.
@@ -198,24 +195,22 @@ func Disjoint(g1 string, g2 string) (bool, error) {
 		C.GEOSGeom_destroy_r(geosContext, geom2)
 	}()
 	c := C.GEOSDisjoint_r(geosContext, geom1, geom2)
-	b, e := boolFromC(c)
-	if e != nil {
-		return false, e
-	}
-	return b, nil
+	return boolFromC(c)
 }
 
 // Distance returns the minimum 2D Cartesian (planar) distance between two geometries,
 // in projected units (spatial ref units).
 func Distance(g1 string, g2 string) (float64, error) {
 	geom1, geom2 := convertWKTtoGEOSGeometry(g1, g2)
+	defer func() {
+		C.GEOSGeom_destroy_r(geosContext, geom1)
+		C.GEOSGeom_destroy_r(geosContext, geom2)
+	}()
 	var distance C.double
 	i := C.GEOSDistance_r(geosContext, geom1, geom2, &distance)
 	if i == 0 {
 		return 0.0, Error()
 	}
-	C.GEOSGeom_destroy_r(geosContext, geom1)
-	C.GEOSGeom_destroy_r(geosContext, geom2)
 	return float64(distance), nil
 }
 
@@ -225,9 +220,11 @@ func Distance(g1 string, g2 string) (float64, error) {
 func Envelope(wkt string) (string, error) {
 	geoGeom := GeomFromWKTStr(wkt)
 	g := C.GEOSEnvelope_r(geosContext, geoGeom)
-	s, e := ToWKTStr(g)
-	C.GEOSGeom_destroy_r(geosContext, geoGeom)
-	return s, e
+	defer func() {
+		C.GEOSGeom_destroy_r(geosContext, geoGeom)
+		C.GEOSGeom_destroy_r(geosContext, g)
+	}()
+	return ToWKTStr(g)
 }
 
 // Equals returns true if the two geometries have at least one point in common.
@@ -277,6 +274,10 @@ func HasZ(g string) (bool, error) {
 // for one of the geometries
 func HausdorffDistance(g1 string, g2 string) (float64, error) {
 	geom1, geom2 := convertWKTtoGEOSGeometry(g1, g2)
+	defer func() {
+		C.GEOSGeom_destroy_r(geosContext, geom1)
+		C.GEOSGeom_destroy_r(geosContext, geom2)
+	}()
 	var distance C.double
 	i := C.GEOSHausdorffDistance_r(geosContext, geom1, geom2, &distance)
 	if i == 0 {
@@ -306,16 +307,13 @@ func InitGeosContext() GEOSContext {
 // Intersection returns a geometry that represents the point set intersection of the Geometries.
 func Intersection(g1 string, g2 string) (string, error) {
 	geom1, geom2 := convertWKTtoGEOSGeometry(g1, g2)
+	g := C.GEOSIntersection_r(geosContext, geom1, geom2)
 	defer func() {
 		C.GEOSGeom_destroy_r(geosContext, geom1)
 		C.GEOSGeom_destroy_r(geosContext, geom2)
+		C.GEOSGeom_destroy_r(geosContext, g)
 	}()
-	g := C.GEOSIntersection_r(geosContext, geom1, geom2)
-	wkt, e := ToWKTStr(g)
-	if e != nil {
-		return "", e
-	}
-	return wkt, nil
+	return ToWKTStr(g)
 }
 
 //Intersects If a geometry  shares any portion of space then they intersect
@@ -326,11 +324,7 @@ func Intersects(g1 string, g2 string) (bool, error) {
 		C.GEOSGeom_destroy_r(geosContext, geom2)
 	}()
 	c := C.GEOSIntersects_r(geosContext, geom1, geom2)
-	b, e := boolFromC(c)
-	if e != nil {
-		return false, e
-	}
-	return b, nil
+	return boolFromC(c)
 }
 
 // IsClosed returns true if the geometry is closed
@@ -369,12 +363,14 @@ func IsSimple(wkt string) (bool, error) {
 // Length returns the 2D Cartesian length of the geometry if it is a LineString, MultiLineString
 func Length(wkt string) (float64, error) {
 	geoGeom := GeomFromWKTStr(wkt)
+	defer func() {
+		C.GEOSGeom_destroy_r(geosContext, geoGeom)
+	}()
 	var d C.double
 	i := C.GEOSLength_r(geosContext, geoGeom, &d)
 	if i == 0 {
 		return 0.0, Error()
 	}
-	C.GEOSGeom_destroy_r(geosContext, geoGeom)
 	return float64(d), nil
 
 }
@@ -383,9 +379,11 @@ func Length(wkt string) (float64, error) {
 func LineMerge(wkt string) (string, error) {
 	geoGeom := GeomFromWKTStr(wkt)
 	g := C.GEOSLineMerge_r(geosContext, geoGeom)
-	s, e := ToWKTStr(g)
-	C.GEOSGeom_destroy_r(geosContext, geoGeom)
-	return s, e
+	defer func() {
+		C.GEOSGeom_destroy_r(geosContext, geoGeom)
+		C.GEOSGeom_destroy_r(geosContext, g)
+	}()
+	return ToWKTStr(g)
 }
 
 // NGeometry returns the number of component geometries.
@@ -413,9 +411,11 @@ func Overlaps(g1 string, g2 string) (bool, error) {
 func PointOnSurface(wkt string) (string, error) {
 	geoGeom := GeomFromWKTStr(wkt)
 	g := C.GEOSPointOnSurface_r(geosContext, geoGeom)
-	s, e := ToWKTStr(g)
-	C.GEOSGeom_destroy_r(geosContext, geoGeom)
-	return s, e
+	defer func() {
+		C.GEOSGeom_destroy_r(geosContext, geoGeom)
+		C.GEOSGeom_destroy_r(geosContext, g)
+	}()
+	return ToWKTStr(g)
 }
 
 // Relate computes the intersection matrix (Dimensionally Extended
@@ -440,13 +440,12 @@ func Relate(g1 string, g2 string) (string, error) {
 func SharedPaths(g1 string, g2 string) (string, error) {
 	geom1, geom2 := convertWKTtoGEOSGeometry(g1, g2)
 	g := C.GEOSSharedPaths_r(geosContext, geom1, geom2)
-	wkt, e := ToWKTStr(g)
-	if e != nil {
-		return "", e
-	}
-	C.GEOSGeom_destroy_r(geosContext, geom1)
-	C.GEOSGeom_destroy_r(geosContext, geom2)
-	return wkt, nil
+	defer func() {
+		C.GEOSGeom_destroy_r(geosContext, geom1)
+		C.GEOSGeom_destroy_r(geosContext, geom2)
+		C.GEOSGeom_destroy_r(geosContext, g)
+	}()
+	return ToWKTStr(g)
 }
 
 // Simplify returns a "simplified" version of the given geometry using the Douglas-Peucker algorithm,
@@ -454,9 +453,11 @@ func SharedPaths(g1 string, g2 string) (string, error) {
 func Simplify(wkt string, tolerance float64) (string, error) {
 	geoGeom := GeomFromWKTStr(wkt)
 	g := C.GEOSSimplify_r(geosContext, geoGeom, C.double(tolerance))
-	s, e := ToWKTStr(g)
-	C.GEOSGeom_destroy_r(geosContext, geoGeom)
-	return s, e
+	defer func() {
+		C.GEOSGeom_destroy_r(geosContext, geoGeom)
+		C.GEOSGeom_destroy_r(geosContext, g)
+	}()
+	return ToWKTStr(g)
 }
 
 // SimplifyP returns a geometry simplified by amount given by tolerance.
@@ -464,9 +465,11 @@ func Simplify(wkt string, tolerance float64) (string, error) {
 func SimplifyP(wkt string, tolerance float64) (string, error) {
 	geoGeom := GeomFromWKTStr(wkt)
 	g := C.GEOSTopologyPreserveSimplify_r(geosContext, geoGeom, C.double(tolerance))
-	s, e := ToWKTStr(g)
-	C.GEOSGeom_destroy_r(geosContext, geoGeom)
-	return s, e
+	defer func() {
+		C.GEOSGeom_destroy_r(geosContext, geoGeom)
+		C.GEOSGeom_destroy_r(geosContext, g)
+	}()
+	return ToWKTStr(g)
 }
 
 // Snap Snaps the vertices and segments of a geometry to another Geometry's vertices.
@@ -477,11 +480,12 @@ func Snap(input string, reference string, tolerance float64) (string, error) {
 	inputGeom := GeomFromWKTStr(input)
 	referenceGeom := GeomFromWKTStr(reference)
 	g := C.GEOSSnap_r(geosContext, inputGeom, referenceGeom, C.double(tolerance))
-	s, e := ToWKTStr(g)
-	if e != nil {
-		return "", e
-	}
-	return s, nil
+	defer func() {
+		C.GEOSGeom_destroy_r(geosContext, inputGeom)
+		C.GEOSGeom_destroy_r(geosContext, referenceGeom)
+		C.GEOSGeom_destroy_r(geosContext, g)
+	}()
+	return ToWKTStr(g)
 }
 
 // SymDifference returns a geometry that represents the portions of A and B that do not intersect.
@@ -489,16 +493,13 @@ func Snap(input string, reference string, tolerance float64) (string, error) {
 // One can think of this as Union(geomA,geomB) - Intersection(A,B).
 func SymDifference(g1 string, g2 string) (string, error) {
 	geom1, geom2 := convertWKTtoGEOSGeometry(g1, g2)
+	g := C.GEOSSymDifference_r(geosContext, geom1, geom2)
 	defer func() {
 		C.GEOSGeom_destroy_r(geosContext, geom1)
 		C.GEOSGeom_destroy_r(geosContext, geom2)
+		C.GEOSGeom_destroy_r(geosContext, g)
 	}()
-	g := C.GEOSSymDifference_r(geosContext, geom1, geom2)
-	wkt, e := ToWKTStr(g)
-	if e != nil {
-		return "", e
-	}
-	return wkt, nil
+	return ToWKTStr(g)
 }
 
 // Touches returns TRUE if the only points in common between g1 and g2 lie in the union of the boundaries of g1 and g2.
@@ -511,11 +512,7 @@ func Touches(g1 string, g2 string) (bool, error) {
 		C.GEOSGeom_destroy_r(geosContext, geom2)
 	}()
 	c := C.GEOSTouches_r(geosContext, geom1, geom2)
-	b, e := boolFromC(c)
-	if e != nil {
-		return false, e
-	}
-	return b, nil
+	return boolFromC(c)
 }
 
 // UnaryUnion does dissolve boundaries between components of a multipolygon (invalid) and does perform union
@@ -523,39 +520,37 @@ func Touches(g1 string, g2 string) (bool, error) {
 func UnaryUnion(wkt string) (string, error) {
 	geoGeom := GeomFromWKTStr(wkt)
 	g := C.GEOSUnaryUnion_r(geosContext, geoGeom)
-	s, e := ToWKTStr(g)
-	C.GEOSGeom_destroy_r(geosContext, geoGeom)
-	return s, e
+	defer func() {
+		C.GEOSGeom_destroy_r(geosContext, geoGeom)
+		C.GEOSGeom_destroy_r(geosContext, g)
+	}()
+	return ToWKTStr(g)
 }
 
 // Union returns a new geometry representing all points in this geometry and the other.
 func Union(g1 string, g2 string) (string, error) {
 	geom1, geom2 := convertWKTtoGEOSGeometry(g1, g2)
+	g := C.GEOSUnion_r(geosContext, geom1, geom2)
 	defer func() {
 		C.GEOSGeom_destroy_r(geosContext, geom1)
 		C.GEOSGeom_destroy_r(geosContext, geom2)
+		C.GEOSGeom_destroy_r(geosContext, g)
 	}()
-	g := C.GEOSUnion_r(geosContext, geom1, geom2)
-	wkt, e := ToWKTStr(g)
-	if e != nil {
-		return "", e
-	}
-	return wkt, nil
+	return ToWKTStr(g)
 }
 
 // UniquePoints return all distinct vertices of input geometry as a MultiPoint.
 func UniquePoints(g string) (string, error) {
 	geom := GeomFromWKTStr(g)
 	c := C.GEOSGeom_extractUniquePoints_r(geosContext, geom)
+	defer func() {
+		C.GEOSGeom_destroy_r(geosContext, geom)
+		C.GEOSGeom_destroy_r(geosContext, c)
+	}()
 	if c == nil {
 		return "", errors.New("UniquePoints return null")
 	}
-	wkt, e := ToWKTStr(c)
-	if e != nil {
-		return "", e
-	}
-	return wkt, nil
-
+	return ToWKTStr(c)
 }
 
 // Version ...
