@@ -1,5 +1,10 @@
 # Change Log
 
+## [0.1.2.1] - 2021-02-10
+### Fix
+- Fix memory leaks and null pointers
+
+
 ## [0.1.2] - 2021-02-08
 ### Added
 - Add clustering method based on K-means clustering algorithm
