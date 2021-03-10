@@ -563,7 +563,7 @@ func TestGEOSAlgorithm_ConvexHull(t *testing.T) {
 
 func TestGEOSAlgorithm_UnaryUnion(t *testing.T) {
 	multiPolygon, _ := wkt.UnmarshalString(`MULTIPOLYGON(((0 0, 10 0, 10 10, 0 10, 0 0)), ((5 5, 15 5, 15 15, 5 15, 5 5)))`)
-	expectPolygon, _ := wkt.UnmarshalString(`POLYGON ((10 0,0 0,0 10,5 10,5 15,15 15,15 5,10 5,10 0))`)
+	expectPolygon, _ := wkt.UnmarshalString(`POLYGON((10 0,0 0,0 10,5 10,5 15,15 15,15 5,10 5,10 0))`)
 
 	type args struct {
 		g geoos.Geometry
