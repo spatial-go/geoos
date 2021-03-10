@@ -105,4 +105,3 @@ Email Address： [geoos@changjing.ai](geoos@changjing.ai)
 ## Copying
 `Geoos` is licensed under the:
 [LGPL-2.1 ](LICENSE)
-
