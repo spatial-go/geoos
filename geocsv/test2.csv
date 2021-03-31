@@ -1,0 +1,5 @@
+way_id,pt_id,wkt
+1,1,POINT(2 49)
+1,2,POINT(3 50)
+2,1,POINT(-2 49)
+2,2,POINT(-3 50)
