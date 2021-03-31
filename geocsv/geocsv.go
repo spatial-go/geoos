@@ -63,7 +63,7 @@ func (gc *GeoCSV) readRecords() (err error) {
 		encodeRecord := make([]string, 0, len(record))
 		for _, value := range record {
 			var encodeValue string
-			coding := utils.GetStringCoding(value)
+			coding := utils.GetStringEncoding(value)
 			switch coding {
 			case utils.UTF8:
 				encodeValue = value
@@ -135,8 +135,11 @@ func (gc *GeoCSV) ToGeoJSON() (features *geojson.FeatureCollection) {
 		if geometry == nil && lng != defaultCoordValue && lat != defaultCoordValue {
 			geometry = geojson.NewGeometry(geoos.Point{lng, lat})
 		}
-		feature := geojson.NewFeature(*geometry)
-		features.Features = append(features.Features, feature)
+		if geometry != nil {
+			feature := geojson.NewFeature(*geometry)
+			feature.Properties = properties
+			features.Features = append(features.Features, feature)
+		}
 	}
 	return
 }
