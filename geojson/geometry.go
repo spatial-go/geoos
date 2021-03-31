@@ -208,7 +208,7 @@ func (mp *MultiPoint) UnmarshalJSON(data []byte) error {
 // A LineString is a helper type that will marshal to/from a GeoJSON LineString geometry.
 type LineString geoos.LineString
 
-// Geometry will return the orb.Geometry version of the data.
+// Geometry will return the Geometry version of the data.
 func (ls LineString) Geometry() geoos.Geometry {
 	return geoos.LineString(ls)
 }
