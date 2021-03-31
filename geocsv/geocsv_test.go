@@ -63,7 +63,7 @@ func TestGeoCSV_Test2(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "test1",
+			name: "test2",
 			args: args{
 				filePath: "./test2.csv",
 				options: GeoCSVOptions{
