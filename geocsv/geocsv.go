@@ -60,7 +60,7 @@ func (gc *GeoCSV) readRecords() (err error) {
 			err = readErr
 			return
 		}
-		encodeRecord := make([]string, 0, len(record))
+		encodeValues := make([]string, 0, len(record))
 		for _, value := range record {
 			var encodeValue string
 			coding := utils.GetStringEncoding(value)
@@ -82,13 +82,13 @@ func (gc *GeoCSV) readRecords() (err error) {
 			// remove special characters, such as &#65279;
 			encodeValue = strings.ReplaceAll(encodeValue, "\uFEFF", "")
 			encodeValue = strings.TrimSpace(encodeValue)
-			encodeRecord = append(encodeRecord, encodeValue)
+			encodeValues = append(encodeValues, encodeValue)
 		}
 		if !headerRead {
 			headerRead = true
-			gc.headers = encodeRecord
+			gc.headers = encodeValues
 		} else {
-			gc.rows = append(gc.rows, encodeRecord)
+			gc.rows = append(gc.rows, encodeValues)
 		}
 	}
 	return
