@@ -87,7 +87,6 @@ func compare(t testing.TB, e geoos.Geometry, b []byte) {
 		t.Errorf("decoder: incorrect geometry: %v != %v", g, e)
 	}
 
-	// Umarshal
 	g, err = Unmarshal(b)
 	if err != nil {
 		t.Fatalf("unmarshal: read error: %v", err)
