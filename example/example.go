@@ -19,7 +19,7 @@ func main() {
 	// Last， call the Area () method and get result.
 	area, e := strategy.Area(geometry)
 	if e != nil {
-		fmt.Printf(e.Error())
+		fmt.Print(e.Error())
 	}
 	fmt.Printf("%f", area)
 	// get result 4.0
