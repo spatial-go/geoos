@@ -257,8 +257,7 @@ func GeoFromWKBHexStr(wkbHex string) (geometry geoos.Geometry, err error) {
 	if err != nil {
 		return
 	}
-	geometry, err = wkt.UnmarshalString(geoWek)
-	return
+	return wkt.UnmarshalString(geoWek)
 }
 
 func readByteOrderType(r io.Reader, buf []byte) (byteOrder, uint32, error) {
