@@ -40,10 +40,10 @@ func TestMercatorDistance(t *testing.T) {
 		args args
 		want float64
 	}{
-		{name: "testMercatorDistance", args: args{dis: 1, lat: 0}, want: 1},
-		{name: "testMercatorDistance", args: args{dis: 1, lat: 18.2454}, want: 1.0529348778624306},
-		{name: "testMercatorDistance", args: args{dis: 1, lat: 39.886051}, want: 1.3032230353739989},
-		{name: "testMercatorDistance", args: args{dis: 1, lat: 52.987939}, want: 1.6611523970517712},
+		{name: "test lat=0 MercatorDistance", args: args{dis: 1, lat: 0}, want: 1},
+		{name: "test lat=18.2454 MercatorDistance", args: args{dis: 1, lat: 18.2454}, want: 1.0529348778624306},
+		{name: "test lat=39.886051 MercatorDistance", args: args{dis: 1, lat: 39.886051}, want: 1.3032230353739989},
+		{name: "test lat=52.987939 MercatorDistance", args: args{dis: 1, lat: 52.987939}, want: 1.6611523970517712},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
