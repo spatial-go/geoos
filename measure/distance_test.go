@@ -30,3 +30,26 @@ func TestDistance(t *testing.T) {
 		})
 	}
 }
+func TestMercatorDistance(t *testing.T) {
+	type args struct {
+		dis float64
+		lat float64
+	}
+	tests := []struct {
+		name string
+		args args
+		want float64
+	}{
+		{name: "testMercatorDistance", args: args{dis: 1, lat: 0}, want: 1},
+		{name: "testMercatorDistance", args: args{dis: 1, lat: 18.2454}, want: 1.0529348778624306},
+		{name: "testMercatorDistance", args: args{dis: 1, lat: 39.886051}, want: 1.3032230353739989},
+		{name: "testMercatorDistance", args: args{dis: 1, lat: 52.987939}, want: 1.6611523970517712},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := MercatorDistance(tt.args.dis, tt.args.lat); got != tt.want {
+				t.Errorf("MercatorDistance() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
