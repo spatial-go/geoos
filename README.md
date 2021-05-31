@@ -3,7 +3,7 @@ Our organization `spatial-go` is officially established! The first open source p
 All comments and suggestions are welcome!
 
 ## Guides
-http://www.spatial-go.com
+guide.spatial-go.com
 
 ## Contents
 
