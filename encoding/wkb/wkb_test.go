@@ -49,6 +49,14 @@ func TestMustMarshal(t *testing.T) {
 	}
 }
 
+func TestGeoFromWKBHexStr(t *testing.T) {
+	hexStr := `0101000020E61000008EAF3DB324E05C40DC12B9E00C704340`
+	g0 := geoos.Point{115.50224, 38.875393}
+	g1, _ := GeoFromWKBHexStr(hexStr)
+	if g0 != g1 {
+		t.Errorf("GeoFromWKBHexStr() got = %v, want %v", g0, g1)
+	}
+}
 func BenchmarkEncode_Point(b *testing.B) {
 	g := geoos.Point{1, 2}
 	e := NewEncoder(ioutil.Discard)
@@ -87,7 +95,6 @@ func compare(t testing.TB, e geoos.Geometry, b []byte) {
 		t.Errorf("decoder: incorrect geometry: %v != %v", g, e)
 	}
 
-	// Umarshal
 	g, err = Unmarshal(b)
 	if err != nil {
 		t.Fatalf("unmarshal: read error: %v", err)
