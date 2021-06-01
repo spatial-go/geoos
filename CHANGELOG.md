@@ -9,6 +9,11 @@
 - Add hexagon grid method
 - Add GeoCSV file read method
 
+## [0.1.3] - 2021-04-07
+### Added
+- Add hexagon grid method
+- Add GeoCSV file read method
+
 ## [0.1.2.1] - 2021-02-10
 ### Fix
 - Fix memory leaks and null pointers
