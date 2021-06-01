@@ -1,6 +1,6 @@
 # Change Log
 ## [0.1.4] - 2021-06-01
-### 新增
+### Added
 - Add parsing `WKBHexStr` method
 - Add`MercatorDistance`,calculating distance scale factor by latitude for Mercator
 
