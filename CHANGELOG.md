@@ -1,4 +1,13 @@
 # Change Log
+## [0.1.4] - 2021-06-01
+### Added
+- Add parsing `WKBHexStr` method
+- Add`MercatorDistance`,calculating distance scale factor by latitude for Mercator
+
+## [0.1.3] - 2021-04-07
+### Added
+- Add hexagon grid method
+- Add GeoCSV file read method
 
 ## [0.1.3] - 2021-04-07
 ### Added
