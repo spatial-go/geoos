@@ -4,7 +4,7 @@ All comments and suggestions are welcome!
 
 ## Guides
 
-[guide.spatial-go.com](http://guide.spatial-go.com/)
+http://www.spatial-go.com
 
 ## Contents
 
