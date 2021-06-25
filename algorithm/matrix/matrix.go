@@ -1,10 +1,13 @@
 package matrix
 
-// MultiPolygon is a set of polygons.
+// Matrix is a one-dimensional matrix.
 type Matrix []float64
 
-type MatrixLine [][]float64
+// LineMatrix is a two-dimensional matrix.
+type LineMatrix [][]float64
 
-type MatrixPolygon [][][]float64
+// PolygonMatrix is a there-dimensional matrix.
+type PolygonMatrix [][][]float64
 
-type MatrixMultiPolygon [][][][]float64
+// MultiPolygonMatrix is a four-dimensional matrix.
+type MultiPolygonMatrix [][][][]float64

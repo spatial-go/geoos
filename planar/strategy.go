@@ -17,6 +17,7 @@ func NormalStrategy() Algorithm {
 	return GetStrategy(newMegrezAlgorithm)
 }
 
+// GetStrategy returns  algorithm by newAlorithm.
 func GetStrategy(f newAlgorithm) Algorithm {
 	return f()
 }

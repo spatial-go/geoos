@@ -6,5 +6,6 @@
         "stdio.h": "c",
         "stdlib.h": "c",
         "geos_c.h": "c"
-    }
+    },
+    "go.lintTool": "golint"
 }

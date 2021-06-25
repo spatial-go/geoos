@@ -6,7 +6,8 @@ import (
 	"github.com/spatial-go/geoos/algorithm/matrix"
 )
 
-func AreaOfMultiPolygon(mp matrix.MatrixMultiPolygon) float64 {
+// AreaOfMultiPolygon returns the area of a MultiPolygon geometry
+func AreaOfMultiPolygon(mp matrix.MultiPolygonMatrix) float64 {
 	area := 0.0
 	for _, polygon := range mp {
 		area += AreaOfPolygon(polygon)
@@ -14,7 +15,8 @@ func AreaOfMultiPolygon(mp matrix.MatrixMultiPolygon) float64 {
 	return area
 }
 
-func AreaOfPolygon(polygon matrix.MatrixPolygon) float64 {
+// AreaOfPolygon returns the area of a Polygon geometry
+func AreaOfPolygon(polygon matrix.PolygonMatrix) float64 {
 	area := 0.0
 	for i, ring := range polygon {
 		if i == 0 {
@@ -26,8 +28,8 @@ func AreaOfPolygon(polygon matrix.MatrixPolygon) float64 {
 	return area
 }
 
-// OfRing returns the area of a Ring geometry.
-func ofRing(ring matrix.MatrixLine) float64 {
+// ofRing returns the area of a Ring geometry.
+func ofRing(ring matrix.LineMatrix) float64 {
 	rlen := len(ring)
 	if rlen < 3 {
 		return 0.0

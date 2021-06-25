@@ -17,7 +17,6 @@ func (g *MegrezAlgorithm) Area(geom geoos.Geometry) (float64, error) {
 	default:
 		return 0.0, nil
 	}
-
 }
 
 // Boundary returns the closure of the combinatorial boundary of this geoos.Geometry.

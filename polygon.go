@@ -64,14 +64,15 @@ func (p Polygon) Area() (float64, error) {
 	return algorithm.AreaOfPolygon(p.ToMatrix()), nil
 }
 
-func (p Polygon) ToMatrix() matrix.MatrixPolygon {
-	var matrix matrix.MatrixPolygon
+// ToMatrix returns the PolygonMatrix of a polygonal geometry.
+func (p Polygon) ToMatrix() matrix.PolygonMatrix {
+	var matrix3 matrix.PolygonMatrix
 	for _, line := range p {
-		var matrix1 [][]float64
+		var matrix2 [][]float64
 		for _, point := range line {
-			matrix1 = append(matrix1, []float64{point.X(), point.Y()})
+			matrix2 = append(matrix2, []float64{point.X(), point.Y()})
 		}
-		matrix = append(matrix, matrix1)
+		matrix3 = append(matrix3, matrix2)
 	}
-	return matrix
+	return matrix3
 }
