@@ -404,10 +404,3 @@ func (g *GEOAlgorithm) Within(geom1, geom2 geoos.Geometry) (bool, error) {
 	ms1, ms2 := convertGeomToWKT(geom1, geom2)
 	return geo.Within(ms1, ms2)
 }
-
-// convertGeomToWKT help to convert geoos.Geometry to WKT string
-func convertGeomToWKT(geom1, geom2 geoos.Geometry) (string, string) {
-	ms1 := wkt.MarshalString(geom1)
-	ms2 := wkt.MarshalString(geom2)
-	return ms1, ms2
-}
