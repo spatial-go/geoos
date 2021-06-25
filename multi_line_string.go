@@ -97,3 +97,8 @@ func (b Bound) LeftTop() Point {
 func (b Bound) RightBottom() Point {
 	return Point{b.Right(), b.Bottom()}
 }
+
+// Area returns the area of a polygonal geometry. The area of a MultiLineString is 0.
+func (mls MultiLineString) Area() (float64, error) {
+	return 0.0, nil
+}

@@ -60,3 +60,8 @@ func (p Point) Generate(r *rand.Rand, _ int) reflect.Value {
 	}
 	return reflect.ValueOf(p)
 }
+
+// Area returns the area of a polygonal geometry. The area of a point is 0.
+func (p Point) Area() (float64, error) {
+	return 0.0, nil
+}

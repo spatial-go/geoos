@@ -2,8 +2,6 @@ package planar
 
 import (
 	"github.com/spatial-go/geoos"
-	"github.com/spatial-go/geoos/encoding/wkt"
-	"github.com/spatial-go/geoos/geo"
 )
 
 // MegrezAlgorithm algorithm implement
@@ -11,7 +9,15 @@ type MegrezAlgorithm struct{}
 
 // Area returns the area of a polygonal geometry.
 func (g *MegrezAlgorithm) Area(geom geoos.Geometry) (float64, error) {
-	return geo.Area(wkt.MarshalString(geom))
+	switch geom.GeoJSONType() {
+	case geoos.TypePolygon:
+		return geom.(geoos.Polygon).Area()
+	case geoos.TypeMultiPolygon:
+		return geom.(geoos.MultiPolygon).Area()
+	default:
+		return 0.0, nil
+	}
+
 }
 
 // Boundary returns the closure of the combinatorial boundary of this geoos.Geometry.

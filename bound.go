@@ -87,3 +87,8 @@ func (b Bound) Bound() Bound {
 func (b Bound) Equal(c Bound) bool {
 	return b.Min == c.Min && b.Max == c.Max
 }
+
+// Area returns the area of a polygonal geometry. The area of a bound is 0.
+func (b Bound) Area() (float64, error) {
+	return 0.0, nil
+}

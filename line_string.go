@@ -34,3 +34,8 @@ func (ls LineString) Bound() Bound {
 func (ls LineString) Equal(lineString LineString) bool {
 	return MultiPoint(ls).Equal(MultiPoint(lineString))
 }
+
+// Area returns the area of a polygonal geometry. The area of a LineString is 0.
+func (ls LineString) Area() (float64, error) {
+	return 0.0, nil
+}

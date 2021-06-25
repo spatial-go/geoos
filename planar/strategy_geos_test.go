@@ -113,10 +113,10 @@ func TestGEOSAlgorithm_Boundary(t *testing.T) {
 	sPolygon, _ := wkt.UnmarshalString(sourcePolygon)
 	ePolygon, _ := wkt.UnmarshalString(expectPolygon)
 
-	const multiPolygon = `POLYGON (( 10 130, 50 190, 110 190, 140 150, 150 80, 100 10, 20 40, 10 130 ),
-	( 70 40, 100 50, 120 80, 80 110, 50 90, 70 40 ))`
-	const expectMultiPolygon = `MULTILINESTRING((10 130,50 190,110 190,140 150,150 80,100 10,20 40,10 130),
-	(70 40,100 50,120 80,80 110,50 90,70 40))`
+	// const multiPolygon = `POLYGON (( 10 130, 50 190, 110 190, 140 150, 150 80, 100 10, 20 40, 10 130 ),
+	// ( 70 40, 100 50, 120 80, 80 110, 50 90, 70 40 ))`
+	// const expectMultiPolygon = `MULTILINESTRING((10 130,50 190,110 190,140 150,150 80,100 10,20 40,10 130),
+	// (70 40,100 50,120 80,80 110,50 90,70 40))`
 
 	smultiPolygon, _ := wkt.UnmarshalString(sourceLine)
 	emultiPolygon, _ := wkt.UnmarshalString(expectLine)

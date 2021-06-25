@@ -1,5 +1,10 @@
 package geoos
 
+import (
+	"github.com/spatial-go/geoos/algorithm"
+	"github.com/spatial-go/geoos/algorithm/matrix"
+)
+
 // Polygon is a closed area. The first LineString is the outer ring.
 // The others are the holes. Each LineString is expected to be closed
 // ie. the first point matches the last.
@@ -52,4 +57,21 @@ func (p Polygon) Equal(polygon Polygon) bool {
 		}
 	}
 	return true
+}
+
+// Area returns the area of a polygonal geometry.
+func (p Polygon) Area() (float64, error) {
+	return algorithm.AreaOfPolygon(p.ToMatrix()), nil
+}
+
+func (p Polygon) ToMatrix() matrix.MatrixPolygon {
+	var matrix matrix.MatrixPolygon
+	for _, line := range p {
+		var matrix1 [][]float64
+		for _, point := range line {
+			matrix1 = append(matrix1, []float64{point.X(), point.Y()})
+		}
+		matrix = append(matrix, matrix1)
+	}
+	return matrix
 }

@@ -45,3 +45,8 @@ func (mp MultiPoint) Equal(multiPoint MultiPoint) bool {
 	}
 	return true
 }
+
+// Area returns the area of a polygonal geometry. The area of a multipoint is 0.
+func (mp MultiPoint) Area() (float64, error) {
+	return 0.0, nil
+}

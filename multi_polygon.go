@@ -51,3 +51,16 @@ func (mp MultiPolygon) Equal(multiPolygon MultiPolygon) bool {
 
 	return true
 }
+
+// Area returns the area of a polygonal geometry.
+func (mp MultiPolygon) Area() (float64, error) {
+	area := 0.0
+	for _, polygon := range mp {
+		if areaOfPolygon, err := polygon.Area(); err == nil {
+			area += areaOfPolygon
+		} else {
+			return 0, nil
+		}
+	}
+	return area, nil
+}

@@ -5,9 +5,13 @@ type Geometry interface {
 	GeoJSONType() string
 	// e.g. 0d, 1d, 2d
 	Dimensions() int
+
 	Bound() Bound
 	// Num of geometries
 	Nums() int
+
+	// Area returns the area of a polygonal geometry.
+	Area() (float64, error)
 }
 
 // compile time checks

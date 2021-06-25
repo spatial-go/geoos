@@ -69,3 +69,27 @@ func (c Collection) Equal(collection Collection) bool {
 	}
 	return true
 }
+
+// Area returns the area of a Collection geometry.
+func (c Collection) Area() (float64, error) {
+	area := 0.0
+	for _, g := range c {
+		switch g.GeoJSONType() {
+		case TypePolygon:
+			if areaOfPolygon, err := g.(Polygon).Area(); err == nil {
+				area += areaOfPolygon
+			} else {
+				return 0, nil
+			}
+		case TypeMultiPolygon:
+			if areaOfMultiPolygon, err := g.(MultiPolygon).Area(); err == nil {
+				area += areaOfMultiPolygon
+			} else {
+				return 0, nil
+			}
+		default:
+
+		}
+	}
+	return area, nil
+}

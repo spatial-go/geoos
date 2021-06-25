@@ -28,3 +28,8 @@ func (r Ring) Bound() Bound {
 func (r Ring) Equal(ring Ring) bool {
 	return MultiPoint(r).Equal(MultiPoint(ring))
 }
+
+// Area returns the area of a polygonal geometry. The area of a ring is 0.
+func (r Ring) Area() (float64, error) {
+	return 0.0, nil
+}
