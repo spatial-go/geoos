@@ -23,7 +23,6 @@ func Benchmark_Megrez(b *testing.B) {
 			{name: "area", args: args{g: geom}, want: 4.0, wantErr: false},
 		}
 		for _, tt := range tests {
-
 			got, err := NormalStrategy().Area(tt.args.g)
 			if (err != nil) != tt.wantErr {
 				b.Errorf("Area() error = %v, wantErr %v", err, tt.wantErr)
@@ -32,7 +31,6 @@ func Benchmark_Megrez(b *testing.B) {
 			if got != tt.want {
 				b.Errorf("Area() got = %v, want %v", got, tt.want)
 			}
-
 		}
 	}
 }
