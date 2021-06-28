@@ -20,16 +20,16 @@ func AreaOfPolygon(polygon matrix.PolygonMatrix) float64 {
 	area := 0.0
 	for i, ring := range polygon {
 		if i == 0 {
-			area += ofRing(ring)
+			area += Area(ring)
 		} else {
-			area -= ofRing(ring)
+			area -= Area(ring)
 		}
 	}
 	return area
 }
 
-// ofRing returns the area of a Ring geometry.
-func ofRing(ring matrix.LineMatrix) float64 {
+// Area returns the area of a Ring geometry.
+func Area(ring matrix.LineMatrix) float64 {
 	rlen := len(ring)
 	if rlen < 3 {
 		return 0.0

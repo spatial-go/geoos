@@ -98,7 +98,7 @@ func (b Bound) Equal(g Geometry) bool {
 
 // Area returns the area of a polygonal geometry. The area of a bound is 0.
 func (b Bound) Area() (float64, error) {
-	return 0.0, nil
+	return b.ToPolygon().Area()
 }
 
 // IsEmpty returns true if it contains zero area or if

@@ -6,7 +6,7 @@ type Matrix []float64
 // LineMatrix is a two-dimensional matrix.
 type LineMatrix [][]float64
 
-// PolygonMatrix is a there-dimensional matrix.
+// PolygonMatrix is a three-dimensional matrix.
 type PolygonMatrix [][][]float64
 
 // MultiPolygonMatrix is a four-dimensional matrix.

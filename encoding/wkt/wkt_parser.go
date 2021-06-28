@@ -27,7 +27,7 @@ func (p *Parser) Parse() (geoos.Geometry, error) {
 		return p.parsePolygon()
 	case Multipoint:
 		line, err := p.parseLineString()
-		return geoos.MultiPoint(line), err
+		return geoos.MultiPoint(line.ToPointArray()), err
 	case MultilineString:
 		poly, err := p.parsePolygon()
 		multiline := make(geoos.MultiLineString, 0, len(poly))

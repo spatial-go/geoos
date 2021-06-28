@@ -28,13 +28,30 @@ func (ls LineString) Nums() int {
 
 // Bound returns a rect around the line string. Uses rectangular coordinates.
 func (ls LineString) Bound() Bound {
-	return MultiPoint(ls).Bound()
+	if len(ls) == 0 {
+		return emptyBound
+	}
+
+	b := Bound{ls[0], ls[0]}
+	for _, p := range ls {
+		b = b.Extend(p)
+	}
+
+	return b
 }
 
 // EqualLineString compares two line strings. Returns true if lengths are the same
 // and all points are Equal.
 func (ls LineString) EqualLineString(lineString LineString) bool {
-	return MultiPoint(ls).Equal(MultiPoint(lineString))
+	if len(ls) != len(lineString) {
+		return false
+	}
+	for i, v := range ls.ToPointArray() {
+		if !v.Equal(Point(lineString[i])) {
+			return false
+		}
+	}
+	return true
 }
 
 // Equal checks if the LineString represents the same Geometry or vector.

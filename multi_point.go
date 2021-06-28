@@ -1,9 +1,7 @@
 package geoos
 
-import "github.com/spatial-go/geoos/algorithm/matrix"
-
 // A MultiPoint represents a set of points in the 2D Eucledian or Cartesian plane.
-type MultiPoint matrix.LineMatrix
+type MultiPoint []Point
 
 // GeoJSONType returns the GeoJSON type for the object.
 func (mp MultiPoint) GeoJSONType() string {
@@ -63,8 +61,5 @@ func (mp MultiPoint) Area() (float64, error) {
 
 // ToPointArray returns the PointArray
 func (mp MultiPoint) ToPointArray() (pa []Point) {
-	for _, v := range mp {
-		pa = append(pa, v)
-	}
-	return
+	return []Point(mp)
 }
