@@ -13,7 +13,11 @@ func unmarshalLineString(order byteOrder, data []byte) (geoos.LineString, error)
 	if err != nil {
 		return nil, err
 	}
-	return geoos.LineString(ps), nil
+	var line geoos.LineString
+	for _, p := range ps {
+		line = append(line, p)
+	}
+	return line, nil
 }
 
 func readLineString(r io.Reader, order byteOrder, buf []byte) (geoos.LineString, error) {

@@ -23,10 +23,18 @@ func (r Ring) Bound() Bound {
 	return MultiPoint(r).Bound()
 }
 
-// Equal compares two rings. Returns true if lengths are the same
+// EqualRing compares two rings. Returns true if lengths are the same
 // and all points are Equal.
-func (r Ring) Equal(ring Ring) bool {
+func (r Ring) EqualRing(ring Ring) bool {
 	return MultiPoint(r).Equal(MultiPoint(ring))
+}
+
+// Equal checks if the Ring represents the same Geometry or vector.
+func (r Ring) Equal(g Geometry) bool {
+	if g.GeoJSONType() != r.GeoJSONType() {
+		return false
+	}
+	return r.EqualRing(g.(Ring))
 }
 
 // Area returns the area of a polygonal geometry. The area of a ring is 0.

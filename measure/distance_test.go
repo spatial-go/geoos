@@ -12,15 +12,15 @@ func TestDistance(t *testing.T) {
 
 	wantResult := 107405.96007592858
 	type args struct {
-		fromPoint *geoos.Point
-		toPoint   *geoos.Point
+		fromPoint geoos.Point
+		toPoint   geoos.Point
 	}
 	tests := []struct {
 		name string
 		args args
 		want float64
 	}{
-		{name: "testDistance", args: args{fromPoint: &fromPoint, toPoint: &toPoint}, want: wantResult},
+		{name: "testDistance", args: args{fromPoint: fromPoint, toPoint: toPoint}, want: wantResult},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

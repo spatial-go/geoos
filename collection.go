@@ -56,9 +56,9 @@ func (c Collection) Bound() Bound {
 	return b
 }
 
-// Equal compares two collections. Returns true if lengths are the same
+// EqualCollection compares two collections. Returns true if lengths are the same
 // and all the sub geometries are the same and in the same order.
-func (c Collection) Equal(collection Collection) bool {
+func (c Collection) EqualCollection(collection Collection) bool {
 	if len(c) != len(collection) {
 		return false
 	}
@@ -68,6 +68,14 @@ func (c Collection) Equal(collection Collection) bool {
 		}
 	}
 	return true
+}
+
+// Equal checks if the Collection represents the same Geometry or vector.
+func (c Collection) Equal(g Geometry) bool {
+	if g.GeoJSONType() != c.GeoJSONType() {
+		return false
+	}
+	return c.EqualCollection(g.(Collection))
 }
 
 // Area returns the area of a Collection geometry.

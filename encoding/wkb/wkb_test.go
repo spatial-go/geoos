@@ -53,7 +53,7 @@ func TestGeoFromWKBHexStr(t *testing.T) {
 	hexStr := `0101000020E61000008EAF3DB324E05C40DC12B9E00C704340`
 	g0 := geoos.Point{115.50224, 38.875393}
 	g1, _ := GeoFromWKBHexStr(hexStr)
-	if g0 != g1 {
+	if !g0.Equal(g1) {
 		t.Errorf("GeoFromWKBHexStr() got = %v, want %v", g0, g1)
 	}
 }

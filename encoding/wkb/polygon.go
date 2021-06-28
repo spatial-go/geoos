@@ -29,7 +29,12 @@ func unmarshalPolygon(order byteOrder, data []byte) (geoos.Polygon, error) {
 		}
 
 		data = data[16*len(ps)+4:]
-		result = append(result, geoos.Ring(ps))
+
+		var line geoos.LineString
+		for _, p := range ps {
+			line = append(line, p)
+		}
+		result = append(result, line)
 	}
 
 	return result, nil

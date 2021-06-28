@@ -76,7 +76,7 @@ func TestInRange(t *testing.T) {
 		num := 0
 		for i, p := range pts {
 			// dis:=pt.sqDist(&p)
-			dis := DistanceSphericalFast(&pt, &p)
+			dis := DistanceSphericalFast(pt, p)
 			if dis <= r*r {
 				num++
 				if !in[i] {
@@ -104,7 +104,7 @@ func (tree *KDTree) invariantHolds(t *T) ([]geoos.Point, bool) {
 	ok := true
 
 	for _, i := range t.EqualIDs {
-		if tree.Points[i] != tree.Points[t.PointID] {
+		if tree.Points[i].Equal(tree.Points[t.PointID]) {
 			ok = false
 			break
 		}
@@ -162,7 +162,7 @@ func TestPreSort_SplitMed(t *testing.T) {
 		sorted := preSort(clusters.PointList(pts))
 		med, equal, left, right := sorted.splitMed(dim)
 		for _, p := range equal {
-			if pts[p] != pts[med] {
+			if pts[p].Equal(pts[med]) {
 				return false
 			}
 		}

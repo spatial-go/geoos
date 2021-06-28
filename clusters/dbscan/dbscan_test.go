@@ -48,7 +48,7 @@ func TestRangeQueryKDTree(t *testing.T) {
 
 	for _, pt := range s.points {
 		pts1 := tree.InRange(pt, eps, nil)
-		pts2 := RegionQuery(s.points, &pt, eps)
+		pts2 := RegionQuery(s.points, pt, eps)
 
 		sort.Ints(pts1)
 		sort.Ints(pts2)

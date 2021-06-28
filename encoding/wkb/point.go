@@ -161,7 +161,7 @@ func (e *Encoder) writeMultiPoint(mp geoos.MultiPoint) error {
 	}
 
 	for _, p := range mp {
-		err := e.Encode(p)
+		err := e.Encode(geoos.Point(p))
 		if err != nil {
 			return err
 		}

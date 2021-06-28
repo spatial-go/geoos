@@ -12,7 +12,7 @@ const (
 )
 
 // Distance Calculate distance, return unit: meter
-func Distance(fromPoint, toPoint *geoos.Point) float64 {
+func Distance(fromPoint, toPoint geoos.Point) float64 {
 	rad := math.Pi / 180.0
 	lat0 := fromPoint[1] * rad
 	lng0 := fromPoint[0] * rad

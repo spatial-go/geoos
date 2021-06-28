@@ -1,7 +1,9 @@
 package geoos
 
+import "github.com/spatial-go/geoos/algorithm/matrix"
+
 // A MultiPoint represents a set of points in the 2D Eucledian or Cartesian plane.
-type MultiPoint []Point
+type MultiPoint matrix.LineMatrix
 
 // GeoJSONType returns the GeoJSON type for the object.
 func (mp MultiPoint) GeoJSONType() string {
@@ -32,21 +34,37 @@ func (mp MultiPoint) Bound() Bound {
 	return b
 }
 
-// Equal compares two MultiPoint objects. Returns true if lengths are the same
+// EqualMultiPoint compares two MultiPoint objects. Returns true if lengths are the same
 // and all points are Equal, and in the same order.
-func (mp MultiPoint) Equal(multiPoint MultiPoint) bool {
+func (mp MultiPoint) EqualMultiPoint(multiPoint MultiPoint) bool {
 	if len(mp) != len(multiPoint) {
 		return false
 	}
-	for i := range mp {
-		if !mp[i].Equal(multiPoint[i]) {
+	for i, v := range mp.ToPointArray() {
+		if !v.Equal(Point(multiPoint[i])) {
 			return false
 		}
 	}
 	return true
 }
 
+// Equal checks if the MultiPoint represents the same Geometry or vector.
+func (mp MultiPoint) Equal(g Geometry) bool {
+	if g.GeoJSONType() != mp.GeoJSONType() {
+		return false
+	}
+	return mp.EqualMultiPoint(g.(MultiPoint))
+}
+
 // Area returns the area of a polygonal geometry. The area of a multipoint is 0.
 func (mp MultiPoint) Area() (float64, error) {
 	return 0.0, nil
+}
+
+// ToPointArray returns the PointArray
+func (mp MultiPoint) ToPointArray() (pa []Point) {
+	for _, v := range mp {
+		pa = append(pa, v)
+	}
+	return
 }

@@ -27,8 +27,8 @@ func SquareGrid(bound geoos.Bound, cellSize float64) (gridGeoms [][]Grid) {
 	boundHeight := north - south
 
 	// Calculate the latitude and longitude corresponding to the length cellSize
-	cellWidth := cellSize * (boundWidth / measure.Distance(&geoos.Point{west, south}, &geoos.Point{east, south}))
-	cellHeight := cellSize * (boundHeight / measure.Distance(&geoos.Point{west, north}, &geoos.Point{west, south}))
+	cellWidth := cellSize * (boundWidth / measure.Distance(geoos.Point{west, south}, geoos.Point{east, south}))
+	cellHeight := cellSize * (boundHeight / measure.Distance(geoos.Point{west, north}, geoos.Point{west, south}))
 
 	// Round up (including all points)
 	columns := math.Ceil(boundWidth / cellWidth)

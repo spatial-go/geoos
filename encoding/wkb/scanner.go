@@ -170,8 +170,8 @@ func (s *GeometryScanner) Scan(d interface{}) error {
 		}
 
 		if p, ok := m.(geoos.Polygon); ok && len(p) == 1 {
-			*g = p[0]
-			s.Geometry = p[0]
+			*g = p.ToRingArray()[0]
+			s.Geometry = p.ToRingArray()[0]
 			s.Valid = true
 			return nil
 		}

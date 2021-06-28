@@ -63,10 +63,10 @@ func (tree *KDTree) InRange(pt geoos.Point, dist float64, nodes []int) []int {
 	if dist < 0 {
 		return nodes
 	}
-	return tree.inRange(tree.Root, &pt, dist, nodes)
+	return tree.inRange(tree.Root, pt, dist, nodes)
 }
 
-func (tree *KDTree) inRange(t *T, pt *geoos.Point, r float64, nodes []int) []int {
+func (tree *KDTree) inRange(t *T, pt geoos.Point, r float64, nodes []int) []int {
 	if t == nil {
 		return nodes
 	}
@@ -87,11 +87,11 @@ func (tree *KDTree) inRange(t *T, pt *geoos.Point, r float64, nodes []int) []int
 	p2[t.split] = tree.Points[t.PointID][t.split]
 
 	// dis := p1.sqDist(&p2)
-	dis := DistanceSphericalFast(&p1, &p2)
+	dis := DistanceSphericalFast(p1, p2)
 	nodes = tree.inRange(thisSide, pt, r, nodes)
 	if dis <= r*r {
 		// if tree.Points[t.PointID].sqDist(pt) < r*r {
-		if DistanceSphericalFast(&tree.Points[t.PointID], pt) < r*r {
+		if DistanceSphericalFast(tree.Points[t.PointID], pt) < r*r {
 			nodes = append(nodes, t.PointID)
 			nodes = append(nodes, t.EqualIDs...)
 		}
@@ -186,7 +186,7 @@ func (p *preSorted) splitMed(dim int) (med int, equal []int, left, right preSort
 		m--
 	}
 	mh := m
-	for mh < len(p.cur[dim])-1 && p.points[p.cur[dim][mh+1]] == p.points[p.cur[dim][m]] {
+	for mh < len(p.cur[dim])-1 && p.points[p.cur[dim][mh+1]].Equal(p.points[p.cur[dim][m]]) {
 		mh++
 	}
 	med = p.cur[dim][m]

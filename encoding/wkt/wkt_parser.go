@@ -100,7 +100,7 @@ func (p *Parser) parsePoint() (point geoos.Point, err error) {
 }
 
 func (p *Parser) parseLineString() (line geoos.LineString, err error) {
-	line = make([]geoos.Point, 0)
+	line = make([][]float64, 0)
 	t, err := p.scanToken()
 	if err != nil {
 		return nil, err
@@ -140,7 +140,7 @@ func (p *Parser) parseLineString() (line geoos.LineString, err error) {
 }
 
 func (p *Parser) parseLineStringText(ttype tokenType) (line geoos.LineString, err error) {
-	line = make([]geoos.Point, 0)
+	line = make([][]float64, 0)
 	for {
 		var point geoos.Point
 		switch ttype {
@@ -169,7 +169,7 @@ func (p *Parser) parseLineStringText(ttype tokenType) (line geoos.LineString, er
 }
 
 func (p *Parser) parsePolygon() (poly geoos.Polygon, err error) {
-	poly = make([]geoos.Ring, 0)
+	poly = make([][][]float64, 0)
 	t, err := p.scanToken()
 	if err != nil {
 		return poly, err
@@ -209,7 +209,7 @@ func (p *Parser) parsePolygon() (poly geoos.Polygon, err error) {
 }
 
 func (p *Parser) parsePolygonText(ttype tokenType) (poly geoos.Polygon, err error) {
-	poly = make([]geoos.Ring, 0)
+	poly = make([][][]float64, 0)
 	for {
 		var line geoos.LineString
 		t, err := p.scanToken()
