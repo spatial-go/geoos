@@ -72,3 +72,8 @@ func (p Polygon) ToRingArray() (r []Ring) {
 	}
 	return
 }
+
+// IsEmpty returns true if the Geometry is empty.
+func (p Polygon) IsEmpty() bool {
+	return p == nil || len(p) == 0
+}

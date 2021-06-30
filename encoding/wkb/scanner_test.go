@@ -126,7 +126,7 @@ func TestScanPoint(t *testing.T) {
 				t.Log(tc.expected)
 			}
 
-			if p.Equal(s.Geometry) {
+			if !p.Equal(s.Geometry) {
 				t.Errorf("should set to scanner's geometry attribute")
 			}
 

@@ -13,8 +13,11 @@ type Geometry interface {
 	// Area returns the area of a polygonal geometry.
 	Area() (float64, error)
 
-	// Equal checks if the Geometry represents the same Geometry or vector.
+	// Equal returns true if the Geometry represents the same Geometry or vector.
 	Equal(g Geometry) bool
+
+	// IsEmpty returns true if the Geometry is empty.
+	IsEmpty() bool
 }
 
 // compile time checks

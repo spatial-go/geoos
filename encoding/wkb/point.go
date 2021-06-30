@@ -29,15 +29,15 @@ func unmarshalPoints(order byteOrder, data []byte) ([]geoos.Point, error) {
 
 	if order == littleEndian {
 		for i := 0; i < int(num); i++ {
-			result = append(result, geoos.Point{})
-			result[i][0] = math.Float64frombits(binary.LittleEndian.Uint64(data[16*i:]))
-			result[i][1] = math.Float64frombits(binary.LittleEndian.Uint64(data[16*i+8:]))
+			result = append(result, geoos.Point{math.Float64frombits(binary.LittleEndian.Uint64(data[16*i:])),
+				math.Float64frombits(binary.LittleEndian.Uint64(data[16*i+8:])),
+			})
 		}
 	} else {
 		for i := 0; i < int(num); i++ {
-			result = append(result, geoos.Point{})
-			result[i][0] = math.Float64frombits(binary.BigEndian.Uint64(data[16*i:]))
-			result[i][1] = math.Float64frombits(binary.BigEndian.Uint64(data[16*i+8:]))
+			result = append(result, geoos.Point{math.Float64frombits(binary.BigEndian.Uint64(data[16*i:])),
+				math.Float64frombits(binary.BigEndian.Uint64(data[16*i+8:])),
+			})
 		}
 	}
 
@@ -49,7 +49,7 @@ func unmarshalPoint(order byteOrder, buf []byte) (geoos.Point, error) {
 		return geoos.Point{}, ErrNotWKB
 	}
 
-	var p geoos.Point
+	var p geoos.Point = make(geoos.Point, 2)
 	if order == littleEndian {
 		p[0] = math.Float64frombits(binary.LittleEndian.Uint64(buf))
 		p[1] = math.Float64frombits(binary.LittleEndian.Uint64(buf[8:]))
@@ -69,9 +69,9 @@ func readPoint(r io.Reader, order byteOrder, buf []byte) (geoos.Point, error) {
 			return geoos.Point{}, err
 		}
 		if order == littleEndian {
-			p[i] = math.Float64frombits(binary.LittleEndian.Uint64(buf))
+			p = append(p, math.Float64frombits(binary.LittleEndian.Uint64(buf)))
 		} else {
-			p[i] = math.Float64frombits(binary.BigEndian.Uint64(buf))
+			p = append(p, math.Float64frombits(binary.BigEndian.Uint64(buf)))
 		}
 	}
 

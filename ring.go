@@ -51,3 +51,8 @@ func (r Ring) Area() (float64, error) {
 func (r Ring) ToMatrix() matrix.LineMatrix {
 	return matrix.LineMatrix(r)
 }
+
+// IsEmpty returns true if the Geometry is empty.
+func (r Ring) IsEmpty() bool {
+	return r == nil || len(r) == 0
+}

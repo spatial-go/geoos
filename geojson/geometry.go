@@ -26,7 +26,11 @@ func NewGeometry(g geoos.Geometry) *Geometry {
 	case geoos.Ring:
 		jg.Coordinates = geoos.Polygon{g}
 	case geoos.Bound:
-		jg.Coordinates = g.ToPolygon()
+		if g.IsEmpty() {
+			jg.Coordinates = geoos.Polygon{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}}
+		} else {
+			jg.Coordinates = g.ToPolygon()
+		}
 	case geoos.Collection:
 		for _, c := range g {
 			jg.Geometries = append(jg.Geometries, NewGeometry(c))
@@ -67,7 +71,11 @@ func (g Geometry) MarshalJSON() ([]byte, error) {
 	case geoos.Ring:
 		ng.Coordinates = geoos.Polygon{g}
 	case geoos.Bound:
-		ng.Coordinates = g.ToPolygon()
+		if g.IsEmpty() {
+			ng.Coordinates = geoos.Polygon{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}}
+		} else {
+			ng.Coordinates = g.ToPolygon()
+		}
 	case geoos.Collection:
 		ng.Geometries = make([]*Geometry, 0, len(g))
 		for _, c := range g {

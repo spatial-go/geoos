@@ -75,3 +75,8 @@ func (p Point) Generate(r *rand.Rand, _ int) reflect.Value {
 func (p Point) Area() (float64, error) {
 	return 0.0, nil
 }
+
+// IsEmpty returns true if the Geometry is empty.
+func (p Point) IsEmpty() bool {
+	return p == nil || len(p) == 0
+}

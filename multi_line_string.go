@@ -73,3 +73,8 @@ func (mls MultiLineString) Equal(g Geometry) bool {
 func (mls MultiLineString) Area() (float64, error) {
 	return 0.0, nil
 }
+
+// IsEmpty returns true if the Geometry is empty.
+func (mls MultiLineString) IsEmpty() bool {
+	return mls == nil || len(mls) == 0
+}

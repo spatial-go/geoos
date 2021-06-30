@@ -66,3 +66,8 @@ func (mp MultiPolygon) Area() (float64, error) {
 	}
 	return area, nil
 }
+
+// IsEmpty returns true if the Geometry is empty.
+func (mp MultiPolygon) IsEmpty() bool {
+	return mp == nil || len(mp) == 0
+}

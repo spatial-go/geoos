@@ -101,3 +101,8 @@ func (c Collection) Area() (float64, error) {
 	}
 	return area, nil
 }
+
+// IsEmpty returns true if the Geometry is empty.
+func (c Collection) IsEmpty() bool {
+	return c == nil || len(c) == 0
+}

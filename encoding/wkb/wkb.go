@@ -98,7 +98,7 @@ func (e *Encoder) SetByteOrder(bo binary.ByteOrder) {
 
 // Encode will write the geometry encoded as WKB to the given writer.
 func (e *Encoder) Encode(geom geoos.Geometry) error {
-	if geom == nil {
+	if geom == nil || geom.IsEmpty() {
 		return nil
 	}
 
@@ -136,7 +136,14 @@ func (e *Encoder) Encode(geom geoos.Geometry) error {
 		}
 		geom = geoos.Polygon{g}
 	case geoos.Bound:
+		if g.Max == nil || g.Min == nil {
+			return nil
+		}
 		geom = g.ToPolygon()
+	case geoos.Point:
+		if g == nil {
+			return nil
+		}
 	}
 
 	var b []byte

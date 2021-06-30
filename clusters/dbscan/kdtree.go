@@ -78,11 +78,11 @@ func (tree *KDTree) inRange(t *T, pt geoos.Point, r float64, nodes []int) []int 
 		thisSide, otherSide = t.left, t.right
 	}
 
-	p1 := geoos.Point{}
+	p1 := geoos.Point{0, 0}
 	p1[1-t.split] = (pt[1-t.split] + tree.Points[t.PointID][1-t.split]) / 2
 	p1[t.split] = pt[t.split]
 
-	p2 := geoos.Point{}
+	p2 := geoos.Point{0, 0}
 	p2[1-t.split] = (pt[1-t.split] + tree.Points[t.PointID][1-t.split]) / 2
 	p2[t.split] = tree.Points[t.PointID][t.split]
 
@@ -186,6 +186,7 @@ func (p *preSorted) splitMed(dim int) (med int, equal []int, left, right preSort
 		m--
 	}
 	mh := m
+
 	for mh < len(p.cur[dim])-1 && p.points[p.cur[dim][mh+1]].Equal(p.points[p.cur[dim][m]]) {
 		mh++
 	}
@@ -221,7 +222,7 @@ func (p *preSorted) splitMed(dim int) (med int, equal []int, left, right preSort
 			if skip {
 				continue
 			}
-			if p.points[n][dim] < pivot {
+			if !p.points[n].IsEmpty() && p.points[n][dim] < pivot {
 				left.cur[d] = append(left.cur[d], n)
 			} else {
 				right.cur[d] = append(right.cur[d], n)

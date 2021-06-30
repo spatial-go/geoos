@@ -38,9 +38,9 @@ func (b Bound) ToPolygon() Polygon {
 func (b Bound) ToRing() Ring {
 	return Ring{
 		b.Min,
-		Point{b.Max.X(), b.Min.Y()},
+		{b.Max.X(), b.Min.Y()},
 		b.Max,
-		Point{b.Min.X(), b.Max.Y()},
+		{b.Min.X(), b.Max.Y()},
 		b.Min,
 	}
 }
@@ -105,7 +105,11 @@ func (b Bound) Area() (float64, error) {
 // it's in some malformed negative state where the left point is larger than the right.
 // This can be caused by padding too much negative.
 func (b Bound) IsEmpty() bool {
-	return b.Min[0] > b.Max[0] || b.Min[1] > b.Max[1]
+	if b.Max == nil || b.Min == nil {
+		return true
+	} else {
+		return b.Min[0] > b.Max[0] || b.Min[1] > b.Max[1]
+	}
 }
 
 // Top returns the top of the bound.

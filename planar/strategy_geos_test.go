@@ -565,6 +565,8 @@ func TestGEOSAlgorithm_UnaryUnion(t *testing.T) {
 	multiPolygon, _ := wkt.UnmarshalString(`MULTIPOLYGON(((0 0, 10 0, 10 10, 0 10, 0 0)), ((5 5, 15 5, 15 15, 5 15, 5 5)))`)
 	expectPolygon, _ := wkt.UnmarshalString(`POLYGON((10 0,0 0,0 10,5 10,5 15,15 15,15 5,10 5,10 0))`)
 
+	expectPolygon3_8, _ := wkt.UnmarshalString(`POLYGON((10 5,10 0,0 0,0 10,5 10,5 15,15 15,15 5,10 5))`)
+
 	type args struct {
 		g geoos.Geometry
 	}
@@ -572,10 +574,10 @@ func TestGEOSAlgorithm_UnaryUnion(t *testing.T) {
 		name    string
 		G       GEOAlgorithm
 		args    args
-		want    geoos.Geometry
+		want    []geoos.Geometry
 		wantErr bool
 	}{
-		{name: "UnaryUnion Polygon", args: args{g: multiPolygon}, want: expectPolygon, wantErr: false},
+		{name: "UnaryUnion Polygon", args: args{g: multiPolygon}, want: []geoos.Geometry{expectPolygon, expectPolygon3_8}, wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -586,9 +588,11 @@ func TestGEOSAlgorithm_UnaryUnion(t *testing.T) {
 				t.Errorf("GEOAlgorithm.EqualsExact() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			isEqual, _ := G.EqualsExact(gotGeometry, tt.want, 0.000001)
-			if !isEqual {
-				t.Errorf("GEOAlgorithm.Envelope() = %v, want %v", wkt.MarshalString(gotGeometry), wkt.MarshalString(tt.want))
+			isEqual, _ := G.EqualsExact(gotGeometry, tt.want[0], 0.000001)
+			isEqual1, _ := G.EqualsExact(gotGeometry, tt.want[1], 0.000001)
+			if !isEqual && !isEqual1 {
+				t.Errorf("GEOAlgorithm.Envelope() = %v, want %v", wkt.MarshalString(gotGeometry), wkt.MarshalString(tt.want[0]))
+				t.Errorf("GEOAlgorithm.Envelope() = %v, want %v", wkt.MarshalString(gotGeometry), wkt.MarshalString(tt.want[1]))
 			}
 		})
 	}

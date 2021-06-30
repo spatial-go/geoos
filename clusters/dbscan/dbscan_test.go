@@ -6,6 +6,7 @@ import (
 	"sort"
 	"testing"
 
+	"github.com/spatial-go/geoos"
 	"github.com/spatial-go/geoos/clusters"
 	"github.com/spatial-go/geoos/common"
 )
@@ -19,6 +20,14 @@ type DBScanSuite struct {
 var s DBScanSuite
 
 func TestSetUp(t *testing.T) {
+	err := setup()
+	if err != nil {
+		t.Errorf("SetUpTest: %v", err)
+		return
+	}
+}
+
+func setup() error {
 	type jsonPoints [][]float64
 	s = DBScanSuite{}
 
@@ -26,17 +35,21 @@ func TestSetUp(t *testing.T) {
 
 	err := json.Unmarshal([]byte(jsonPointsData), &pts)
 	if err != nil {
-		t.Errorf("SetUpTest: %v", err)
-		return
+		return err
 	}
 	s.points = make(clusters.PointList, len(pts))
 	for i := 0; i < len(pts); i++ {
-		s.points[i][0] = pts[i][0]
-		s.points[i][1] = pts[i][1]
+		s.points[i] = geoos.Point(pts[i])
 	}
+	return nil
 }
 
 func TestRangeQueryKDTree(t *testing.T) {
+	err := setup()
+	if err != nil {
+		t.Errorf("SetUpTest: %v", err)
+		return
+	}
 	tree := NewKDTree(s.points)
 	eps := 0.8 / common.EarthR / common.DegreeRad
 
@@ -146,9 +159,3 @@ func TestDBScan(t *testing.T) {
 		}
 	}
 }
-
-// func BenchmarkDBScan(t *testing.T) {
-// 	for i := 0; i < c.N; i++ {
-// 		DBScan(s.points, 0.8, 10)
-// 	}
-// }

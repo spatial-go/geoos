@@ -63,3 +63,8 @@ func (mp MultiPoint) Area() (float64, error) {
 func (mp MultiPoint) ToPointArray() (pa []Point) {
 	return []Point(mp)
 }
+
+// IsEmpty returns true if the Geometry is empty.
+func (mp MultiPoint) IsEmpty() bool {
+	return mp == nil || len(mp) == 0
+}

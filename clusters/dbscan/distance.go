@@ -56,6 +56,12 @@ func FastCos(x float64) float64 {
 // In this library eps (distance) is adjusted so that we don't need
 // to do sqrt and multiplication
 func DistanceSphericalFast(p1, p2 geoos.Point) float64 {
+	if p1.IsEmpty() {
+		p1 = geoos.Point{0, 0}
+	}
+	if p2.IsEmpty() {
+		p2 = geoos.Point{0, 0}
+	}
 	v1 := (p1[1] - p2[1])
 	v2 := (p1[0] - p2[0]) * FastCos((p1[1]+p2[1])/2.0*common.DegreeRad)
 

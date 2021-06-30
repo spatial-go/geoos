@@ -18,20 +18,10 @@ type pointSlice clusters.PointList
 func (pointSlice) Generate(r *rand.Rand, size int) reflect.Value {
 	ps := make([]geoos.Point, size)
 	for i := range ps {
-		for j := range ps[i] {
-			ps[i][j] = r.Float64()
-		}
+		ps[i] = append(ps[i], r.Float64(), r.Float64())
 	}
 	return reflect.ValueOf(ps)
 }
-
-// // Generate implements the Generator interface for Points
-// func (p geoos.Point) Generate(r *rand.Rand, _ int) reflect.Value {
-// 	for i := range p {
-// 		p[i] = r.Float64()
-// 	}
-// 	return reflect.ValueOf(p)
-// }
 
 // TestInsert tests the insert function, ensuring that random points
 // inserted into an empty tree maintain the K-D tree invariant.
@@ -39,7 +29,11 @@ func TestInsert(t *testing.T) {
 	if err := quick.Check(func(pts pointSlice) bool {
 		var tree = NewKDTree(nil)
 		for _, p := range pts {
-			tree.Insert(p)
+			if p == nil || p.IsEmpty() {
+				//tree.Insert(geoos.Point{0, 0})
+			} else {
+				tree.Insert(p)
+			}
 		}
 		_, ok := tree.invariantHolds(tree.Root)
 		return ok
@@ -65,6 +59,9 @@ func TestMake(t *testing.T) {
 // the range.
 func TestInRange(t *testing.T) {
 	if err := quick.Check(func(pts pointSlice, pt geoos.Point, r float64) bool {
+		if pt.IsEmpty() {
+			pt = geoos.Point{0, 0}
+		}
 		r = math.Abs(r)
 		tree := NewKDTree(clusters.PointList(pts))
 
@@ -98,13 +95,13 @@ func TestInRange(t *testing.T) {
 // the current node.
 func (tree *KDTree) invariantHolds(t *T) ([]geoos.Point, bool) {
 	if t == nil {
-		return []geoos.Point{}, true
+		return nil, true
 	}
 
 	ok := true
 
 	for _, i := range t.EqualIDs {
-		if tree.Points[i].Equal(tree.Points[t.PointID]) {
+		if !tree.Points[i].Equal(tree.Points[t.PointID]) {
 			ok = false
 			break
 		}

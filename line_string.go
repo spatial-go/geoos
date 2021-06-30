@@ -74,3 +74,8 @@ func (ls LineString) ToPointArray() (la []Point) {
 	}
 	return
 }
+
+// IsEmpty returns true if the Geometry is empty.
+func (ls LineString) IsEmpty() bool {
+	return ls == nil || len(ls) == 0
+}

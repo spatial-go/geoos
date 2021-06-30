@@ -96,7 +96,7 @@ var (
 func TestMultiLineString(t *testing.T) {
 	large := geoos.MultiLineString{}
 	for i := 0; i < maxMultiAlloc+100; i++ {
-		large = append(large, geoos.LineString{})
+		large = append(large, geoos.LineString{{0.0, 0.0}, {0.0, 0.0}})
 	}
 
 	cases := []struct {

@@ -12,7 +12,7 @@ type PointList []geoos.Point
 
 // Center returns the center coordinates of a set of Points
 func (points PointList) Center() (p geoos.Point, err error) {
-
+	p = make(geoos.Point, 2)
 	var l = len(points)
 	if l == 0 {
 		return p, fmt.Errorf("there is no mean for an empty set of points")
