@@ -54,6 +54,21 @@ func (mp MultiPolygon) Equal(g Geometry) bool {
 	return mp.EqualMultiPolygon(g.(MultiPolygon))
 }
 
+// EqualsExact Returns true if the two Geometrys are exactly equal,
+// up to a specified distance tolerance.
+// Two Geometries are exactly equal within a distance tolerance
+func (mp MultiPolygon) EqualsExact(g Geometry, tolerance float64) bool {
+	if mp.GeoJSONType() != g.GeoJSONType() {
+		return false
+	}
+	for i, v := range mp {
+		if v.EqualsExact((g.(MultiPolygon)[i]), tolerance) {
+			return false
+		}
+	}
+	return true
+}
+
 // Area returns the area of a polygonal geometry.
 func (mp MultiPolygon) Area() (float64, error) {
 	area := 0.0

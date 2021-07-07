@@ -18,6 +18,11 @@ type Geometry interface {
 
 	// IsEmpty returns true if the Geometry is empty.
 	IsEmpty() bool
+
+	// EqualsExact Returns true if the two Geometrys are exactly equal,
+	// up to a specified distance tolerance.
+	// Two Geometries are exactly equal within a distance tolerance
+	EqualsExact(g Geometry, tolerance float64) bool
 }
 
 // compile time checks

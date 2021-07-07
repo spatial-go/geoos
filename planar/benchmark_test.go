@@ -4,59 +4,40 @@ import (
 	"testing"
 
 	"github.com/spatial-go/geoos"
+	"github.com/spatial-go/geoos/encoding/wkt"
 )
 
 var geom geoos.Geometry = geoos.Polygon{{{-1, -1}, {1, -1}, {1, 1}, {-1, 1}, {-1, -1}}}
 
-// Benchmark_Megrez test megrez
-func Benchmark_Megrez(b *testing.B) {
+// Benchmark_MegrezArea test megrez area
+func Benchmark_MegrezArea(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		type args struct {
-			g geoos.Geometry
-		}
-		tests := []struct {
-			name    string
-			args    args
-			want    float64
-			wantErr bool
-		}{
-			{name: "area", args: args{g: geom}, want: 4.0, wantErr: false},
-		}
-		for _, tt := range tests {
-			got, err := NormalStrategy().Area(tt.args.g)
-			if (err != nil) != tt.wantErr {
-				b.Errorf("Area() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if got != tt.want {
-				b.Errorf("Area() got = %v, want %v", got, tt.want)
-			}
-		}
+		_, _ = NormalStrategy().Area(geom)
 	}
 }
 
-func Benchmark_Geos(b *testing.B) {
+// Benchmark_GeosArea test geos area
+func Benchmark_GeosArea(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		type args struct {
-			g geoos.Geometry
-		}
-		tests := []struct {
-			name    string
-			args    args
-			want    float64
-			wantErr bool
-		}{
-			{name: "area", args: args{g: geom}, want: 4.0, wantErr: false},
-		}
-		for _, tt := range tests {
-			got, err := GetStrategy(newGEOAlgorithm).Area(tt.args.g)
-			if (err != nil) != tt.wantErr {
-				b.Errorf("Area() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if got != tt.want {
-				b.Errorf("Area() got = %v, want %v", got, tt.want)
-			}
-		}
+		_, _ = GetStrategy(newGEOAlgorithm).Area(geom)
+	}
+}
+
+// Benchmark_MegrezUnaryUnion test megrez UnaryUnion
+func Benchmark_MegrezUnaryUnion(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		multiPolygon, _ := wkt.UnmarshalString(`MULTIPOLYGON(((0 0, 10 0, 10 10, 0 10, 0 0)), ((5 5, 15 5, 15 15, 5 15, 5 5)))`)
+		G := NormalStrategy()
+		_, _ = G.UnaryUnion(multiPolygon)
+
+	}
+}
+
+// Benchmark_GeosUnaryUnion test geos UnaryUnion
+func Benchmark_GeosUnaryUnion(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		multiPolygon, _ := wkt.UnmarshalString(`MULTIPOLYGON(((0 0, 10 0, 10 10, 0 10, 0 0)), ((5 5, 15 5, 15 15, 5 15, 5 5)))`)
+		G := GetStrategy(newGEOAlgorithm)
+		_, _ = G.UnaryUnion(multiPolygon)
 	}
 }

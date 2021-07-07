@@ -78,6 +78,21 @@ func (c Collection) Equal(g Geometry) bool {
 	return c.EqualCollection(g.(Collection))
 }
 
+// EqualsExact Returns true if the two Geometrys are exactly equal,
+// up to a specified distance tolerance.
+// Two Geometries are exactly equal within a distance tolerance
+func (c Collection) EqualsExact(g Geometry, tolerance float64) bool {
+	if c.GeoJSONType() != g.GeoJSONType() {
+		return false
+	}
+	for i, v := range c {
+		if v.EqualsExact((g.(Collection)[i]), tolerance) {
+			return false
+		}
+	}
+	return true
+}
+
 // Area returns the area of a Collection geometry.
 func (c Collection) Area() (float64, error) {
 	area := 0.0

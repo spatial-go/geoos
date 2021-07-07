@@ -42,6 +42,16 @@ func (r Ring) Equal(g Geometry) bool {
 	return r.EqualRing(g.(Ring))
 }
 
+// EqualsExact Returns true if the two Geometrys are exactly equal,
+// up to a specified distance tolerance.
+// Two Geometries are exactly equal within a distance tolerance
+func (r Ring) EqualsExact(g Geometry, tolerance float64) bool {
+	if r.GeoJSONType() != g.GeoJSONType() {
+		return false
+	}
+	return LineString(r).Equal(LineString(g.(Ring)))
+}
+
 // Area returns the area of a polygonal geometry. The area of a ring is 0.
 func (r Ring) Area() (float64, error) {
 	return algorithm.Area(r.ToMatrix()), nil

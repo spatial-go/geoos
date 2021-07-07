@@ -96,6 +96,23 @@ func (b Bound) Equal(g Geometry) bool {
 	return b.EqualBound(g.(Bound))
 }
 
+// EqualsExact Returns true if the two Geometrys are exactly equal,
+// up to a specified distance tolerance.
+// Two Geometries are exactly equal within a distance tolerance
+func (b Bound) EqualsExact(g Geometry, tolerance float64) bool {
+	if b.GeoJSONType() != g.GeoJSONType() {
+		return false
+	}
+	if b.IsEmpty() && g.IsEmpty() {
+		return true
+	}
+	if b.IsEmpty() != g.IsEmpty() {
+		return false
+	}
+
+	return b.Max.EqualsExact(g.(Bound).Max, tolerance) && b.Min.EqualsExact(g.(Bound).Min, tolerance)
+}
+
 // Area returns the area of a polygonal geometry. The area of a bound is 0.
 func (b Bound) Area() (float64, error) {
 	return b.ToPolygon().Area()
@@ -107,9 +124,8 @@ func (b Bound) Area() (float64, error) {
 func (b Bound) IsEmpty() bool {
 	if b.Max == nil || b.Min == nil {
 		return true
-	} else {
-		return b.Min[0] > b.Max[0] || b.Min[1] > b.Max[1]
 	}
+	return b.Min[0] > b.Max[0] || b.Min[1] > b.Max[1]
 }
 
 // Top returns the top of the bound.

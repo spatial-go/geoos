@@ -69,6 +69,21 @@ func (mls MultiLineString) Equal(g Geometry) bool {
 	return mls.EqualMultiLineString(g.(MultiLineString))
 }
 
+// EqualsExact Returns true if the two Geometrys are exactly equal,
+// up to a specified distance tolerance.
+// Two Geometries are exactly equal within a distance tolerance
+func (mls MultiLineString) EqualsExact(g Geometry, tolerance float64) bool {
+	if mls.GeoJSONType() != g.GeoJSONType() {
+		return false
+	}
+	for i, v := range mls {
+		if v.EqualsExact((g.(MultiLineString)[i]), tolerance) {
+			return false
+		}
+	}
+	return true
+}
+
 // Area returns the area of a polygonal geometry. The area of a MultiLineString is 0.
 func (mls MultiLineString) Area() (float64, error) {
 	return 0.0, nil

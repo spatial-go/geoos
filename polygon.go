@@ -55,6 +55,32 @@ func (p Polygon) Equal(g Geometry) bool {
 	return p.EqualPolygon(g.(Polygon))
 }
 
+// EqualsExact Returns true if the two Geometrys are exactly equal,
+// up to a specified distance tolerance.
+// Two Geometries are exactly equal within a distance tolerance
+func (p Polygon) EqualsExact(g Geometry, tolerance float64) bool {
+	if p.GeoJSONType() != g.GeoJSONType() {
+		return false
+	}
+	pol := g.(Polygon)
+	if p.IsEmpty() && g.IsEmpty() {
+		return true
+	}
+	if p.IsEmpty() != g.IsEmpty() {
+		return false
+	}
+	if len(p) != len(pol) {
+		return false
+	}
+
+	for i, v := range p {
+		if LineString(v).EqualsExact(LineString(pol[i]), tolerance) {
+			return false
+		}
+	}
+	return true
+}
+
 // Area returns the area of a polygonal geometry.
 func (p Polygon) Area() (float64, error) {
 	return algorithm.AreaOfPolygon(p.ToMatrix()), nil

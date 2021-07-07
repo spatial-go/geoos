@@ -54,6 +54,21 @@ func (mp MultiPoint) Equal(g Geometry) bool {
 	return mp.EqualMultiPoint(g.(MultiPoint))
 }
 
+// EqualsExact Returns true if the two Geometrys are exactly equal,
+// up to a specified distance tolerance.
+// Two Geometries are exactly equal within a distance tolerance
+func (mp MultiPoint) EqualsExact(g Geometry, tolerance float64) bool {
+	if mp.GeoJSONType() != g.GeoJSONType() {
+		return false
+	}
+	for i, v := range mp {
+		if v.EqualsExact((g.(MultiPoint)[i]), tolerance) {
+			return false
+		}
+	}
+	return true
+}
+
 // Area returns the area of a polygonal geometry. The area of a multipoint is 0.
 func (mp MultiPoint) Area() (float64, error) {
 	return 0.0, nil

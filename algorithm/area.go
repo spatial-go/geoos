@@ -30,6 +30,11 @@ func AreaOfPolygon(polygon matrix.PolygonMatrix) float64 {
 
 // Area returns the area of a Ring geometry.
 func Area(ring matrix.LineMatrix) float64 {
+	return math.Abs(AreaDirection(ring))
+}
+
+// AreaDirection returns the area of a Ring geometry.
+func AreaDirection(ring matrix.LineMatrix) float64 {
 	rlen := len(ring)
 	if rlen < 3 {
 		return 0.0
@@ -43,5 +48,5 @@ func Area(ring matrix.LineMatrix) float64 {
 		y2 := ring[i-1][1]
 		sum += x * (y2 - y1)
 	}
-	return math.Abs(sum / 2.0)
+	return sum / 2.0
 }

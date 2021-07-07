@@ -62,6 +62,32 @@ func (ls LineString) Equal(g Geometry) bool {
 	return ls.EqualLineString(g.(LineString))
 }
 
+// EqualsExact Returns true if the two Geometrys are exactly equal,
+// up to a specified distance tolerance.
+// Two Geometries are exactly equal within a distance tolerance
+func (ls LineString) EqualsExact(g Geometry, tolerance float64) bool {
+	if ls.GeoJSONType() != g.GeoJSONType() {
+		return false
+	}
+	line := g.(LineString)
+	if ls.IsEmpty() && g.IsEmpty() {
+		return true
+	}
+	if ls.IsEmpty() != g.IsEmpty() {
+		return false
+	}
+	if len(ls) != len(line) {
+		return false
+	}
+
+	for i, v := range ls {
+		if Point(v).EqualsExact(Point(line[i]), tolerance) {
+			return false
+		}
+	}
+	return true
+}
+
 // Area returns the area of a polygonal geometry. The area of a LineString is 0.
 func (ls LineString) Area() (float64, error) {
 	return 0.0, nil

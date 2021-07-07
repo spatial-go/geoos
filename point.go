@@ -63,6 +63,25 @@ func (p Point) Equal(g Geometry) bool {
 	return p.EqualPoint(g.(Point))
 }
 
+// EqualsExact Returns true if the two Geometrys are exactly equal,
+// up to a specified distance tolerance.
+// Two Geometries are exactly equal within a distance tolerance
+func (p Point) EqualsExact(g Geometry, tolerance float64) bool {
+	if g.GeoJSONType() != p.GeoJSONType() {
+		return false
+	}
+	if p.IsEmpty() && g.IsEmpty() {
+		return true
+	}
+	if p.IsEmpty() != g.IsEmpty() {
+		return false
+	}
+	if tolerance == 0 {
+		return p.Equal(g)
+	}
+	return Distance(p, g.(Point)) <= tolerance
+}
+
 // Generate implements the Generator interface for Points
 func (p Point) Generate(r *rand.Rand, _ int) reflect.Value {
 	for i := range p {

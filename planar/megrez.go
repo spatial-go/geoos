@@ -2,6 +2,8 @@ package planar
 
 import (
 	"github.com/spatial-go/geoos"
+	"github.com/spatial-go/geoos/algorithm/matrix"
+	"github.com/spatial-go/geoos/algorithm/overlay"
 )
 
 // MegrezAlgorithm algorithm implement
@@ -122,7 +124,7 @@ func (g *MegrezAlgorithm) Equals(geom1, geom2 geoos.Geometry) (bool, error) {
 // EqualsExact returns true if both geometries are Equal, as evaluated by their
 // points being within the given tolerance.
 func (g *MegrezAlgorithm) EqualsExact(geom1, geom2 geoos.Geometry, tolerance float64) (bool, error) {
-	return GetStrategy(newGEOAlgorithm).EqualsExact(geom1, geom2, tolerance)
+	return geom1.EqualsExact(geom2, tolerance), nil
 }
 
 // HasZ returns true if the geometry is 3D
@@ -253,6 +255,14 @@ func (g *MegrezAlgorithm) Touches(geom1, geom2 geoos.Geometry) (bool, error) {
 // UnaryUnion does dissolve boundaries between components of a multipolygon (invalid) and does perform union
 // between the components of a geometrycollection
 func (g *MegrezAlgorithm) UnaryUnion(geom geoos.Geometry) (geoos.Geometry, error) {
+	if geom.GeoJSONType() == geoos.TypeMultiPolygon {
+		var matrix4 matrix.MultiPolygonMatrix
+		for _, v := range geom.(geoos.MultiPolygon) {
+			matrix4 = append(matrix4, v)
+		}
+		result := overlay.UnaryUnion(matrix4)
+		return geoos.Polygon(result), nil
+	}
 	return GetStrategy(newGEOAlgorithm).UnaryUnion(geom)
 }
 

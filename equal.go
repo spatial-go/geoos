@@ -2,6 +2,7 @@ package geoos
 
 import (
 	"fmt"
+	"math"
 )
 
 // Equal returns if the two geometrires are equal
@@ -9,11 +10,9 @@ func Equal(g1, g2 Geometry) bool {
 	if g1 == nil || g2 == nil {
 		return g1 == g2
 	}
-
 	if g1.GeoJSONType() != g2.GeoJSONType() {
 		return false
 	}
-
 	switch g1 := g1.(type) {
 	case Point:
 		return g1.Equal(g2.(Point))
@@ -48,4 +47,9 @@ func Equal(g1, g2 Geometry) bool {
 	}
 
 	panic(fmt.Sprintf("geometry type not supported: %T", g1))
+}
+
+// Distance returns Distance of pq.
+func Distance(p, q Point) float64 {
+	return math.Sqrt((p.X()-q.X())*(p.X()-q.X()) + (p.Y()-q.Y())*(p.Y()-q.Y()))
 }
