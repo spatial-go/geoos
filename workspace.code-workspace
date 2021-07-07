@@ -1,0 +1,18 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"*.cjson": "jsonc",
+			"*.wxss": "css",
+			"*.wxs": "javascript",
+			"stdio.h": "c",
+			"stdlib.h": "c",
+			"geos_c.h": "c"
+		},
+		"go.lintTool": "golint"
+	}
+}

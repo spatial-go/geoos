@@ -170,8 +170,8 @@ func (s *GeometryScanner) Scan(d interface{}) error {
 		}
 
 		if p, ok := m.(geoos.Polygon); ok && len(p) == 1 {
-			*g = p[0]
-			s.Geometry = p[0]
+			*g = p.ToRingArray()[0]
+			s.Geometry = p.ToRingArray()[0]
 			s.Valid = true
 			return nil
 		}
@@ -226,7 +226,7 @@ func (s *GeometryScanner) Scan(d interface{}) error {
 func scanPoint(data []byte) (geoos.Point, error) {
 	order, typ, data, err := unmarshalByteOrderType(data)
 	if err != nil {
-		return geoos.Point{}, err
+		return nil, err
 	}
 
 	switch typ {
@@ -235,14 +235,14 @@ func scanPoint(data []byte) (geoos.Point, error) {
 	case multiPointType:
 		mp, err := unmarshalMultiPoint(order, data[5:])
 		if err != nil {
-			return geoos.Point{}, err
+			return nil, err
 		}
 		if len(mp) == 1 {
 			return mp[0], nil
 		}
 	}
 
-	return geoos.Point{}, ErrIncorrectGeometry
+	return nil, ErrIncorrectGeometry
 }
 
 func scanMultiPoint(data []byte) (geoos.MultiPoint, error) {

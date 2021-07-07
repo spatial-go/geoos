@@ -78,12 +78,12 @@ func DBScan(points clusters.PointList, eps float64, minPoints int) (clusterArry 
 // RegionQuery is simple way O(N) to find points in neighbourhood
 //
 // It is roughly equivalent to kdTree.InRange(points[i], eps, nil)
-func RegionQuery(points clusters.PointList, P *geoos.Point, eps float64) []int {
+func RegionQuery(points clusters.PointList, P geoos.Point, eps float64) []int {
 	result := []int{}
 
 	for i := 0; i < len(points); i++ {
 		// if points[i].sqDist(P) < eps*eps {
-		dis := DistanceSphericalFast(&points[i], P)
+		dis := DistanceSphericalFast(points[i], P)
 		if dis < eps*eps {
 			result = append(result, i)
 		}

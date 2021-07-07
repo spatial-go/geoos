@@ -167,7 +167,7 @@ var (
 func TestMultiPolygon(t *testing.T) {
 	large := geoos.MultiPolygon{}
 	for i := 0; i < maxMultiAlloc+100; i++ {
-		large = append(large, geoos.Polygon{})
+		large = append(large, geoos.Polygon{{{0, 0}, {0, 0}}})
 	}
 
 	cases := []struct {

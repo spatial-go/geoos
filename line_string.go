@@ -1,7 +1,9 @@
 package geoos
 
+import "github.com/spatial-go/geoos/algorithm/matrix"
+
 // LineString represents a set of points to be thought of as a polyline.
-type LineString []Point
+type LineString matrix.LineMatrix
 
 // GeoJSONType returns the GeoJSON type for the linestring.
 func (ls LineString) GeoJSONType() string {
@@ -26,11 +28,54 @@ func (ls LineString) Nums() int {
 
 // Bound returns a rect around the line string. Uses rectangular coordinates.
 func (ls LineString) Bound() Bound {
-	return MultiPoint(ls).Bound()
+	if len(ls) == 0 {
+		return emptyBound
+	}
+
+	b := Bound{ls[0], ls[0]}
+	for _, p := range ls {
+		b = b.Extend(p)
+	}
+
+	return b
 }
 
-// Equal compares two line strings. Returns true if lengths are the same
+// EqualLineString compares two line strings. Returns true if lengths are the same
 // and all points are Equal.
-func (ls LineString) Equal(lineString LineString) bool {
-	return MultiPoint(ls).Equal(MultiPoint(lineString))
+func (ls LineString) EqualLineString(lineString LineString) bool {
+	if len(ls) != len(lineString) {
+		return false
+	}
+	for i, v := range ls.ToPointArray() {
+		if !v.Equal(Point(lineString[i])) {
+			return false
+		}
+	}
+	return true
+}
+
+// Equal checks if the LineString represents the same Geometry or vector.
+func (ls LineString) Equal(g Geometry) bool {
+	if g.GeoJSONType() != ls.GeoJSONType() {
+		return false
+	}
+	return ls.EqualLineString(g.(LineString))
+}
+
+// Area returns the area of a polygonal geometry. The area of a LineString is 0.
+func (ls LineString) Area() (float64, error) {
+	return 0.0, nil
+}
+
+// ToPointArray returns the PointArray
+func (ls LineString) ToPointArray() (la []Point) {
+	for _, v := range ls {
+		la = append(la, v)
+	}
+	return
+}
+
+// IsEmpty returns true if the Geometry is empty.
+func (ls LineString) IsEmpty() bool {
+	return ls == nil || len(ls) == 0
 }

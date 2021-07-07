@@ -3,10 +3,12 @@ package geoos
 import (
 	"math/rand"
 	"reflect"
+
+	"github.com/spatial-go/geoos/algorithm/matrix"
 )
 
 // Point describes a geographic point
-type Point [2]float64
+type Point matrix.Matrix
 
 // GeoJSONType returns GeoJSON type for the point
 func (p Point) GeoJSONType() string {
@@ -48,9 +50,17 @@ func (p Point) X() float64 {
 	return p[0]
 }
 
-// Equal checks if the point represents the same point or vector.
-func (p Point) Equal(point Point) bool {
-	return p[0] == point[0] && p[1] == point[1]
+// EqualPoint checks if the point represents the same point or vector.
+func (p Point) EqualPoint(point Point) bool {
+	return matrix.Equal(matrix.Matrix(p), matrix.Matrix(point))
+}
+
+// Equal checks if the point represents the same Geometry or vector.
+func (p Point) Equal(g Geometry) bool {
+	if g.GeoJSONType() != p.GeoJSONType() {
+		return false
+	}
+	return p.EqualPoint(g.(Point))
 }
 
 // Generate implements the Generator interface for Points
@@ -59,4 +69,14 @@ func (p Point) Generate(r *rand.Rand, _ int) reflect.Value {
 		p[i] = r.Float64()
 	}
 	return reflect.ValueOf(p)
+}
+
+// Area returns the area of a polygonal geometry. The area of a point is 0.
+func (p Point) Area() (float64, error) {
+	return 0.0, nil
+}
+
+// IsEmpty returns true if the Geometry is empty.
+func (p Point) IsEmpty() bool {
+	return p == nil || len(p) == 0
 }

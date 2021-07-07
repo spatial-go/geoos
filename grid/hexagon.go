@@ -25,8 +25,8 @@ func HexagonGrid(bound geoos.Bound, cellSize float64) (gridGeoms [][]Grid) {
 	boundWidth := east - west
 
 	// Calculate the latitude and longitude corresponding to the length cellSize.
-	cellHeight := cellSize * (boundHeight / measure.Distance(&geoos.Point{west, north}, &geoos.Point{west, south}))
-	cellWidth := cellSize * (boundWidth / measure.Distance(&geoos.Point{west, south}, &geoos.Point{east, south}))
+	cellHeight := cellSize * (boundHeight / measure.Distance(geoos.Point{west, north}, geoos.Point{west, south}))
+	cellWidth := cellSize * (boundWidth / measure.Distance(geoos.Point{west, south}, geoos.Point{east, south}))
 
 	// Get the number of rows and columns of the grid to be drawn in the bound range
 	columns := math.Ceil(boundWidth/(cellHeight+cellHeight*Cos60) + 1)

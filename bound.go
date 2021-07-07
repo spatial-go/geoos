@@ -38,9 +38,9 @@ func (b Bound) ToPolygon() Polygon {
 func (b Bound) ToRing() Ring {
 	return Ring{
 		b.Min,
-		Point{b.Max.X(), b.Min.Y()},
+		{b.Max.X(), b.Min.Y()},
 		b.Max,
-		Point{b.Min.X(), b.Max.Y()},
+		{b.Min.X(), b.Max.Y()},
 		b.Min,
 	}
 }
@@ -83,7 +83,61 @@ func (b Bound) Bound() Bound {
 	return b
 }
 
-// Equal returns if two bounds are equal.
-func (b Bound) Equal(c Bound) bool {
-	return b.Min == c.Min && b.Max == c.Max
+// EqualBound returns if two bounds are equal.
+func (b Bound) EqualBound(c Bound) bool {
+	return b.Min.EqualPoint(c.Min) && b.Max.EqualPoint(c.Max)
+}
+
+// Equal checks if the Bound represents the same Geometry or vector.
+func (b Bound) Equal(g Geometry) bool {
+	if g.GeoJSONType() != b.GeoJSONType() {
+		return false
+	}
+	return b.EqualBound(g.(Bound))
+}
+
+// Area returns the area of a polygonal geometry. The area of a bound is 0.
+func (b Bound) Area() (float64, error) {
+	return b.ToPolygon().Area()
+}
+
+// IsEmpty returns true if it contains zero area or if
+// it's in some malformed negative state where the left point is larger than the right.
+// This can be caused by padding too much negative.
+func (b Bound) IsEmpty() bool {
+	if b.Max == nil || b.Min == nil {
+		return true
+	} else {
+		return b.Min[0] > b.Max[0] || b.Min[1] > b.Max[1]
+	}
+}
+
+// Top returns the top of the bound.
+func (b Bound) Top() float64 {
+	return b.Max[1]
+}
+
+// Bottom returns the bottom of the bound.
+func (b Bound) Bottom() float64 {
+	return b.Min[1]
+}
+
+// Right returns the right of the bound.
+func (b Bound) Right() float64 {
+	return b.Max[0]
+}
+
+// Left returns the left of the bound.
+func (b Bound) Left() float64 {
+	return b.Min[0]
+}
+
+// LeftTop returns the upper left point of the bound.
+func (b Bound) LeftTop() Point {
+	return Point{b.Left(), b.Top()}
+}
+
+// RightBottom return the lower right point of the bound.
+func (b Bound) RightBottom() Point {
+	return Point{b.Right(), b.Bottom()}
 }

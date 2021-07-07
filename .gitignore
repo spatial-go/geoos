@@ -63,6 +63,7 @@ local.properties
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+workspace.code-workspace
 
 ### Node template
 # Logs

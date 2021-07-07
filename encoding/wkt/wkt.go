@@ -32,7 +32,7 @@ func wkt(buf *bytes.Buffer, geom geoos.Geometry) {
 		}
 
 		buf.Write([]byte(`MULTIPOINT(`))
-		for i, p := range g {
+		for i, p := range g.ToPointArray() {
 			if i != 0 {
 				buf.WriteByte(',')
 			}
@@ -119,7 +119,7 @@ func wkt(buf *bytes.Buffer, geom geoos.Geometry) {
 
 func writeLineString(buf *bytes.Buffer, ls geoos.LineString) {
 	buf.WriteByte('(')
-	for i, p := range ls {
+	for i, p := range ls.ToPointArray() {
 		if i != 0 {
 			buf.WriteByte(',')
 		}

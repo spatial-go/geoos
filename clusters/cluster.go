@@ -33,10 +33,7 @@ func New(k int, dataset PointList) (Clusters, error) {
 
 	rand.Seed(time.Now().UnixNano())
 	for i := 0; i < k; i++ {
-		var p geoos.Point
-		p[0] = rand.Float64()
-		p[1] = rand.Float64()
-
+		var p geoos.Point = geoos.Point{rand.Float64(), rand.Float64()}
 		c = append(c, Cluster{
 			Center: p,
 		})

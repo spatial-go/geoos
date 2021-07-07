@@ -1,9 +1,7 @@
 // Package planar provides support for the implementation of spatial operations and geometric algorithms.
 package planar
 
-import (
-	"github.com/spatial-go/geoos"
-)
+import "github.com/spatial-go/geoos"
 
 // Algorithm is the interface implemented by an object that can implementation
 // spatial algorithm.

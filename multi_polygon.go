@@ -18,12 +18,6 @@ func (mp MultiPolygon) Nums() int {
 	return len(mp)
 }
 
-// // Area Returns the area of this polygonal geometry
-// func (mp MultiPolygon) Area() (float64, error) {
-// 	s := NormalStrategy()
-// 	return s.Area(mp)
-// }
-
 // Bound returns a bound around the multi-polygon.
 func (mp MultiPolygon) Bound() Bound {
 	if len(mp) == 0 {
@@ -37,8 +31,8 @@ func (mp MultiPolygon) Bound() Bound {
 	return bound
 }
 
-// Equal compares two multi-polygons.
-func (mp MultiPolygon) Equal(multiPolygon MultiPolygon) bool {
+// EqualMultiPolygon compares two multi-polygons.
+func (mp MultiPolygon) EqualMultiPolygon(multiPolygon MultiPolygon) bool {
 	if len(mp) != len(multiPolygon) {
 		return false
 	}
@@ -50,4 +44,30 @@ func (mp MultiPolygon) Equal(multiPolygon MultiPolygon) bool {
 	}
 
 	return true
+}
+
+// Equal checks if the MultiPolygon represents the same Geometry or vector.
+func (mp MultiPolygon) Equal(g Geometry) bool {
+	if g.GeoJSONType() != mp.GeoJSONType() {
+		return false
+	}
+	return mp.EqualMultiPolygon(g.(MultiPolygon))
+}
+
+// Area returns the area of a polygonal geometry.
+func (mp MultiPolygon) Area() (float64, error) {
+	area := 0.0
+	for _, polygon := range mp {
+		if areaOfPolygon, err := polygon.Area(); err == nil {
+			area += areaOfPolygon
+		} else {
+			return 0, nil
+		}
+	}
+	return area, nil
+}
+
+// IsEmpty returns true if the Geometry is empty.
+func (mp MultiPolygon) IsEmpty() bool {
+	return mp == nil || len(mp) == 0
 }

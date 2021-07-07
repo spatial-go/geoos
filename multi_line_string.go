@@ -46,9 +46,9 @@ func (b Bound) Union(other Bound) Bound {
 	return b
 }
 
-// Equal compares two multi line strings. Returns true if lengths are the same
+// EqualMultiLineString compares two multi line strings. Returns true if lengths are the same
 // and all points are Equal.
-func (mls MultiLineString) Equal(multiLineString MultiLineString) bool {
+func (mls MultiLineString) EqualMultiLineString(multiLineString MultiLineString) bool {
 	if len(mls) != len(multiLineString) {
 		return false
 	}
@@ -61,39 +61,20 @@ func (mls MultiLineString) Equal(multiLineString MultiLineString) bool {
 	return true
 }
 
-// IsEmpty returns true if it contains zero area or if
-// it's in some malformed negative state where the left point is larger than the right.
-// This can be caused by padding too much negative.
-func (b Bound) IsEmpty() bool {
-	return b.Min[0] > b.Max[0] || b.Min[1] > b.Max[1]
+// Equal checks if the MultiLineString represents the same Geometry or vector.
+func (mls MultiLineString) Equal(g Geometry) bool {
+	if g.GeoJSONType() != mls.GeoJSONType() {
+		return false
+	}
+	return mls.EqualMultiLineString(g.(MultiLineString))
 }
 
-// Top returns the top of the bound.
-func (b Bound) Top() float64 {
-	return b.Max[1]
+// Area returns the area of a polygonal geometry. The area of a MultiLineString is 0.
+func (mls MultiLineString) Area() (float64, error) {
+	return 0.0, nil
 }
 
-// Bottom returns the bottom of the bound.
-func (b Bound) Bottom() float64 {
-	return b.Min[1]
-}
-
-// Right returns the right of the bound.
-func (b Bound) Right() float64 {
-	return b.Max[0]
-}
-
-// Left returns the left of the bound.
-func (b Bound) Left() float64 {
-	return b.Min[0]
-}
-
-// LeftTop returns the upper left point of the bound.
-func (b Bound) LeftTop() Point {
-	return Point{b.Left(), b.Top()}
-}
-
-// RightBottom return the lower right point of the bound.
-func (b Bound) RightBottom() Point {
-	return Point{b.Right(), b.Bottom()}
+// IsEmpty returns true if the Geometry is empty.
+func (mls MultiLineString) IsEmpty() bool {
+	return mls == nil || len(mls) == 0
 }
