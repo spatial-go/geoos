@@ -4,8 +4,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/spatial-go/geoos"
 	"github.com/spatial-go/geoos/encoding/wkt"
+	"github.com/spatial-go/geoos/space"
 )
 
 func TestGEOSAlgorithm_Centroid(t *testing.T) {
@@ -14,7 +14,7 @@ func TestGEOSAlgorithm_Centroid(t *testing.T) {
 	const pointresult = `POINT(2.3076923076923075 3.3076923076923075)`
 
 	type args struct {
-		g geoos.Geometry
+		g space.Geometry
 	}
 	tests := []struct {
 		name    string
@@ -47,7 +47,7 @@ func TestGEOSAlgorithm_IsSimple(t *testing.T) {
 	line, _ := wkt.UnmarshalString(linestring)
 
 	type args struct {
-		g geoos.Geometry
+		g space.Geometry
 	}
 	tests := []struct {
 		name    string
@@ -77,7 +77,7 @@ func TestGEOSAlgorithm_Area(t *testing.T) {
 	const polygon = `POLYGON((-1 -1, 1 -1, 1 1, -1 1, -1 -1))`
 	geometry, _ := wkt.UnmarshalString(polygon)
 	type args struct {
-		g geoos.Geometry
+		g space.Geometry
 	}
 	tests := []struct {
 		name    string
@@ -122,12 +122,12 @@ func TestGEOSAlgorithm_Boundary(t *testing.T) {
 	emultiPolygon, _ := wkt.UnmarshalString(expectLine)
 
 	type args struct {
-		g geoos.Geometry
+		g space.Geometry
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    geoos.Geometry
+		want    space.Geometry
 		wantErr bool
 	}{
 		{name: "line", args: args{g: sLine}, want: eLine, wantErr: false},
@@ -155,7 +155,7 @@ func TestGEOSAlgorithm_Length(t *testing.T) {
 	const line = `LINESTRING(0 0, 1 1)`
 	geometry, _ := wkt.UnmarshalString(line)
 	type args struct {
-		g geoos.Geometry
+		g space.Geometry
 	}
 	tests := []struct {
 		name    string
@@ -187,8 +187,8 @@ func TestGEOSAlgorithm_HausdorffDistance(t *testing.T) {
 	geom2, _ := wkt.UnmarshalString(g2)
 
 	type args struct {
-		g1 geoos.Geometry
-		g2 geoos.Geometry
+		g1 space.Geometry
+		g2 space.Geometry
 	}
 	tests := []struct {
 		name    string
@@ -220,7 +220,7 @@ func TestGEOSAlgorithm_IsEmpty(t *testing.T) {
 	const polygon = `POLYGON((1 2, 3 4, 5 6, 1 2))`
 	geometry, _ := wkt.UnmarshalString(polygon)
 	type args struct {
-		g geoos.Geometry
+		g space.Geometry
 	}
 	tests := []struct {
 		name    string
@@ -252,8 +252,8 @@ func TestGEOSAlgorithm_Crosses(t *testing.T) {
 	geom1, _ := wkt.UnmarshalString(g1)
 	geom2, _ := wkt.UnmarshalString(g2)
 	type args struct {
-		g1 geoos.Geometry
-		g2 geoos.Geometry
+		g1 space.Geometry
+		g2 space.Geometry
 	}
 	tests := []struct {
 		name    string
@@ -291,8 +291,8 @@ func TestGEOSAlgorithm_Within(t *testing.T) {
 	poly, _ := wkt.UnmarshalString(polygon)
 
 	type args struct {
-		g1 geoos.Geometry
-		g2 geoos.Geometry
+		g1 space.Geometry
+		g2 space.Geometry
 	}
 	tests := []struct {
 		name    string
@@ -333,8 +333,8 @@ func TestGEOSAlgorithm_Contains(t *testing.T) {
 	p2, _ := wkt.UnmarshalString(point2)
 	poly, _ := wkt.UnmarshalString(polygon)
 	type args struct {
-		g1 geoos.Geometry
-		g2 geoos.Geometry
+		g1 space.Geometry
+		g2 space.Geometry
 	}
 	tests := []struct {
 		name    string
@@ -373,7 +373,7 @@ func TestGEOSAlgorithm_UniquePoints(t *testing.T) {
 	poly, _ := wkt.UnmarshalString(polygon)
 
 	type args struct {
-		g geoos.Geometry
+		g space.Geometry
 	}
 	tests := []struct {
 		name    string
@@ -410,8 +410,8 @@ func TestGEOSAlgorithm_SharedPaths(t *testing.T) {
 	line, _ := wkt.UnmarshalString(linestring)
 
 	type args struct {
-		g1 geoos.Geometry
-		g2 geoos.Geometry
+		g1 space.Geometry
+		g2 space.Geometry
 	}
 	tests := []struct {
 		name    string
@@ -448,8 +448,8 @@ func TestGEOSAlgorithm_Snap(t *testing.T) {
 	referenceGeom, _ := wkt.UnmarshalString(refernce)
 
 	type args struct {
-		input     geoos.Geometry
-		reference geoos.Geometry
+		input     space.Geometry
+		reference space.Geometry
 		tolerance float64
 	}
 	tests := []struct {
@@ -496,14 +496,14 @@ func TestGEOSAlgorithm_Envelope(t *testing.T) {
 	expectPolygon2, _ := wkt.UnmarshalString(`POLYGON((0 0,1.0000000001 0,1.0000000001 1,0 1,0 0))`)
 
 	type args struct {
-		g geoos.Geometry
+		g space.Geometry
 	}
 
 	tests := []struct {
 		name    string
 		G       GEOAlgorithm
 		args    args
-		want    geoos.Geometry
+		want    space.Geometry
 		wantErr bool
 	}{
 		{name: "envelope Point", args: args{g: point}, want: expectPoint, wantErr: false},
@@ -533,13 +533,13 @@ func TestGEOSAlgorithm_ConvexHull(t *testing.T) {
 	expectPolygon, _ := wkt.UnmarshalString(`POLYGON ((1 1, 1 3, 3 3, 3 1, 1 1))`)
 
 	type args struct {
-		g geoos.Geometry
+		g space.Geometry
 	}
 	tests := []struct {
 		name    string
 		G       GEOAlgorithm
 		args    args
-		want    geoos.Geometry
+		want    space.Geometry
 		wantErr bool
 	}{
 		{name: "ConvexHull Polygon", args: args{g: polygon}, want: expectPolygon, wantErr: false},
@@ -568,16 +568,16 @@ func TestGEOSAlgorithm_UnaryUnion(t *testing.T) {
 	expectPolygon3_8, _ := wkt.UnmarshalString(`POLYGON((10 5,10 0,0 0,0 10,5 10,5 15,15 15,15 5,10 5))`)
 
 	type args struct {
-		g geoos.Geometry
+		g space.Geometry
 	}
 	tests := []struct {
 		name    string
 		G       GEOAlgorithm
 		args    args
-		want    []geoos.Geometry
+		want    []space.Geometry
 		wantErr bool
 	}{
-		{name: "UnaryUnion Polygon", args: args{g: multiPolygon}, want: []geoos.Geometry{expectPolygon, expectPolygon3_8}, wantErr: false},
+		{name: "UnaryUnion Polygon", args: args{g: multiPolygon}, want: []space.Geometry{expectPolygon, expectPolygon3_8}, wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -609,13 +609,13 @@ func TestGEOSAlgorithm_PointOnSurface(t *testing.T) {
 	expectPoint2, _ := wkt.UnmarshalString(`POINT(2.5 2.5)`)
 
 	type args struct {
-		g geoos.Geometry
+		g space.Geometry
 	}
 	tests := []struct {
 		name    string
 		G       GEOAlgorithm
 		args    args
-		want    geoos.Geometry
+		want    space.Geometry
 		wantErr bool
 	}{
 		{name: "PointOnSurface Point", args: args{g: point}, want: expectPoint0, wantErr: false},
@@ -647,13 +647,13 @@ func TestGEOSAlgorithm_LineMerge(t *testing.T) {
 	expectMultiLineString, _ := wkt.UnmarshalString(`MULTILINESTRING((-45.2 -33.2,-46 -32),(-29 -27,-30 -29.7,-36 -31,-45 -33))`)
 
 	type args struct {
-		g geoos.Geometry
+		g space.Geometry
 	}
 	tests := []struct {
 		name    string
 		G       GEOAlgorithm
 		args    args
-		want    geoos.Geometry
+		want    space.Geometry
 		wantErr bool
 	}{
 		{name: "LineMerge Point", args: args{g: multiLineString0}, want: expectLine0, wantErr: false},
@@ -681,14 +681,14 @@ func TestGEOSAlgorithm_Simplify(t *testing.T) {
 	expectLine, _ := wkt.UnmarshalString(`LINESTRING (0 0, 1 5)`)
 
 	type args struct {
-		g         geoos.Geometry
+		g         space.Geometry
 		tolerance float64
 	}
 	tests := []struct {
 		name    string
 		G       GEOAlgorithm
 		args    args
-		want    geoos.Geometry
+		want    space.Geometry
 		wantErr bool
 	}{
 		{name: "Simplify Point", args: args{g: lineString, tolerance: 1.0}, want: expectLine, wantErr: false},
@@ -715,14 +715,14 @@ func TestGEOSAlgorithm_SimplifyP(t *testing.T) {
 	expectLine, _ := wkt.UnmarshalString(`LINESTRING (0 0, 1 5)`)
 
 	type args struct {
-		g         geoos.Geometry
+		g         space.Geometry
 		tolerance float64
 	}
 	tests := []struct {
 		name    string
 		G       GEOAlgorithm
 		args    args
-		want    geoos.Geometry
+		want    space.Geometry
 		wantErr bool
 	}{
 		{name: "SimplifyP Point", args: args{g: lineString, tolerance: 1.0}, want: expectLine, wantErr: false},
@@ -748,7 +748,7 @@ func TestGEOSAlgorithm_Buffer(t *testing.T) {
 	geometry, _ := wkt.UnmarshalString("POINT(100 90)")
 	expectGeometry, _ := wkt.UnmarshalString("POLYGON((150 90,146.193976625564 70.8658283817455,135.355339059327 54.6446609406727,119.134171618255 43.8060233744357,100 40,80.8658283817456 43.8060233744356,64.6446609406727 54.6446609406725,53.8060233744357 70.8658283817454,50 89.9999999999998,53.8060233744356 109.134171618254,64.6446609406725 125.355339059327,80.8658283817453 136.193976625564,99.9999999999998 140,119.134171618254 136.193976625564,135.355339059327 125.355339059328,146.193976625564 109.134171618255,150 90))")
 	type args struct {
-		g        geoos.Geometry
+		g        space.Geometry
 		width    float64
 		quadsegs int32
 	}
@@ -756,7 +756,7 @@ func TestGEOSAlgorithm_Buffer(t *testing.T) {
 		name string
 		G    GEOAlgorithm
 		args args
-		want geoos.Geometry
+		want space.Geometry
 	}{
 		{name: "buffer", args: args{g: geometry, width: 50, quadsegs: 4}, want: expectGeometry},
 	}
@@ -777,8 +777,8 @@ func TestGEOSAlgorithm_EqualsExact(t *testing.T) {
 	geometry2, _ := wkt.UnmarshalString("POINT(116.309878725564 40.0427783827455)")
 	geometry3, _ := wkt.UnmarshalString("POINT(116.309877625564 40.0427783827455)")
 	type args struct {
-		g1        geoos.Geometry
-		g2        geoos.Geometry
+		g1        space.Geometry
+		g2        space.Geometry
 		tolerance float64
 	}
 	tests := []struct {
@@ -814,7 +814,7 @@ func TestGEOSAlgorithm_NGeometry(t *testing.T) {
 	((20 35, 10 30, 10 10, 30 5, 45 20, 20 35)),
 	((30 20, 20 15, 20 25, 30 20)))`)
 	type args struct {
-		g geoos.Geometry
+		g space.Geometry
 	}
 	tests := []struct {
 		name    string
@@ -849,7 +849,7 @@ func TestGEOSAlgorithm_IsClosed(t *testing.T) {
 	closedLine, _ := wkt.UnmarshalString(closedLinestring)
 
 	type args struct {
-		g geoos.Geometry
+		g space.Geometry
 	}
 	tests := []struct {
 		name    string
@@ -870,7 +870,7 @@ func TestGEOSAlgorithm_IsClosed(t *testing.T) {
 				return
 			}
 			if got != tt.want {
-				t.Errorf("geometry: %s IsSimple() got = %v, want %v", tt.name, got, tt.want)
+				t.Errorf("geometry: %s IsClose() got = %v, want %v", tt.name, got, tt.want)
 			}
 		})
 	}
@@ -882,13 +882,13 @@ func TestGEOSAlgorithm_SymDifference(t *testing.T) {
 	expectMultiLines, _ := wkt.UnmarshalString(`MULTILINESTRING((50 150,50 200),(50 50,50 100))`)
 
 	type args struct {
-		g1 geoos.Geometry
-		g2 geoos.Geometry
+		g1 space.Geometry
+		g2 space.Geometry
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    geoos.Geometry
+		want    space.Geometry
 		wantErr bool
 	}{
 		{name: "symDifference", args: args{g1: line01, g2: line02}, want: expectMultiLines},
@@ -914,13 +914,13 @@ func TestGEOSAlgorithm_Difference(t *testing.T) {
 	expectLine, _ := wkt.UnmarshalString(`LINESTRING(50 150,50 200)`)
 
 	type args struct {
-		g1 geoos.Geometry
-		g2 geoos.Geometry
+		g1 space.Geometry
+		g2 space.Geometry
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    geoos.Geometry
+		want    space.Geometry
 		wantErr bool
 	}{
 		{name: "difference", args: args{g1: line01, g2: line02}, want: expectLine},
@@ -948,8 +948,8 @@ func TestGEOSAlgorithm_Intersects(t *testing.T) {
 	line02, _ := wkt.UnmarshalString(`LINESTRING ( 2 0, 0 2 )`)
 
 	type args struct {
-		g1 geoos.Geometry
-		g2 geoos.Geometry
+		g1 space.Geometry
+		g2 space.Geometry
 	}
 	tests := []struct {
 		name    string
@@ -983,8 +983,8 @@ func TestGEOSAlgorithm_Disjoint(t *testing.T) {
 	line02, _ := wkt.UnmarshalString(`LINESTRING ( 0 0, 0 2 )`)
 
 	type args struct {
-		g1 geoos.Geometry
-		g2 geoos.Geometry
+		g1 space.Geometry
+		g2 space.Geometry
 	}
 	tests := []struct {
 		name    string
@@ -1015,8 +1015,8 @@ func TestGEOSAlgorithm_Distance(t *testing.T) {
 	point02, _ := wkt.UnmarshalString(`POINT(4 7)`)
 
 	type args struct {
-		g1 geoos.Geometry
-		g2 geoos.Geometry
+		g1 space.Geometry
+		g2 space.Geometry
 	}
 	tests := []struct {
 		name    string
@@ -1042,13 +1042,13 @@ func TestGEOSAlgorithm_Distance(t *testing.T) {
 }
 
 func TestGEOSAlgorithm_SphericalDistance(t *testing.T) {
-	point01 := geoos.Point{116.397439, 39.909177}
-	point02 := geoos.Point{116.397725, 39.903079}
-	point03 := geoos.Point{118.1487, 39.586671}
+	point01 := space.Point{116.397439, 39.909177}
+	point02 := space.Point{116.397725, 39.903079}
+	point03 := space.Point{118.1487, 39.586671}
 
 	type args struct {
-		p1 geoos.Point
-		p2 geoos.Point
+		p1 space.Point
+		p2 space.Point
 	}
 	tests := []struct {
 		name    string
@@ -1056,13 +1056,13 @@ func TestGEOSAlgorithm_SphericalDistance(t *testing.T) {
 		want    float64
 		wantErr bool
 	}{
-		{name: "SphericalDistance", args: args{p1: point01, p2: point02}, want: 0.6785053586786567, wantErr: false},
-		{name: "SphericalDistance", args: args{p1: point01, p2: point03}, want: 153.95398145619757, wantErr: false},
+		{name: "SphericalDistance", args: args{p1: point01, p2: point02}, want: 678.5053586786567, wantErr: false},
+		{name: "SphericalDistance", args: args{p1: point01, p2: point03}, want: 153953.98145619757, wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			G := GEOAlgorithm{}
-			got := G.SphericalDistance(tt.args.p1, tt.args.p2)
+			got, _ := G.SphericalDistance(tt.args.p1, tt.args.p2)
 			if got != tt.want {
 				t.Errorf("SphericalDistance() got = %v, want %v", got, tt.want)
 			}
@@ -1078,8 +1078,8 @@ func TestGEOSAlgorithm_Touches(t *testing.T) {
 	point02, _ := wkt.UnmarshalString(`POINT(1 1)`)
 
 	type args struct {
-		g1 geoos.Geometry
-		g2 geoos.Geometry
+		g1 space.Geometry
+		g2 space.Geometry
 	}
 	tests := []struct {
 		name    string
@@ -1111,13 +1111,13 @@ func TestGEOSAlgorithm_Union(t *testing.T) {
 	expectMultiPoint, _ := wkt.UnmarshalString(`MULTIPOINT(1 2,-2 3)`)
 
 	type args struct {
-		g1 geoos.Geometry
-		g2 geoos.Geometry
+		g1 space.Geometry
+		g2 space.Geometry
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    geoos.Geometry
+		want    space.Geometry
 		wantErr bool
 	}{
 		{name: "union", args: args{g1: point01, g2: point02}, want: expectMultiPoint},
@@ -1143,13 +1143,13 @@ func TestGEOSAlgorithm_Intersection(t *testing.T) {
 	expectPoint, _ := wkt.UnmarshalString(`POINT(0 0)`)
 
 	type args struct {
-		g1 geoos.Geometry
-		g2 geoos.Geometry
+		g1 space.Geometry
+		g2 space.Geometry
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    geoos.Geometry
+		want    space.Geometry
 		wantErr bool
 	}{
 		{name: "intersection", args: args{g1: point02, g2: line02}, want: expectPoint, wantErr: false},

@@ -1,8 +1,10 @@
-package geoos
+package space
 
 import (
-	"github.com/spatial-go/geoos/algorithm"
+	"errors"
+
 	"github.com/spatial-go/geoos/algorithm/matrix"
+	"github.com/spatial-go/geoos/algorithm/measure"
 )
 
 // Ring represents a set of ring on the earth.
@@ -10,7 +12,7 @@ type Ring LineString
 
 // GeoJSONType returns the GeoJSON type for the ring.
 func (r Ring) GeoJSONType() string {
-	return TypePolygon
+	return TypeLineString
 }
 
 // Dimensions returns 2 because a Ring is a 2d object.
@@ -54,7 +56,7 @@ func (r Ring) EqualsExact(g Geometry, tolerance float64) bool {
 
 // Area returns the area of a polygonal geometry. The area of a ring is 0.
 func (r Ring) Area() (float64, error) {
-	return algorithm.Area(r.ToMatrix()), nil
+	return measure.Area(r.ToMatrix()), nil
 }
 
 // ToMatrix returns the LineMatrix of a Ring geometry.
@@ -65,4 +67,32 @@ func (r Ring) ToMatrix() matrix.LineMatrix {
 // IsEmpty returns true if the Geometry is empty.
 func (r Ring) IsEmpty() bool {
 	return r == nil || len(r) == 0
+}
+
+// Distance returns distance Between the two Geometry.
+func (r Ring) Distance(g Geometry) (float64, error) {
+	return LineString(r).Distance(g)
+}
+
+// SpheroidDistance returns  spheroid distance Between the two Geometry.
+func (r Ring) SpheroidDistance(g Geometry) (float64, error) {
+	return LineString(r).SpheroidDistance(g)
+}
+
+// Boundary returns the closure of the combinatorial boundary of this space.Geometry.
+// The boundary of a lineal geometry is always a zero-dimensional geometry (which may be empty).
+func (r Ring) Boundary() (Geometry, error) {
+	return nil, errors.New("ring's boundary should be nil")
+}
+
+// Length Returns the length of this LineString
+func (r Ring) Length() float64 {
+	return LineString(r).Length()
+}
+
+// IsSimple returns true if this space.Geometry has no anomalous geometric points,
+// such as self intersection or self tangency.
+func (r Ring) IsSimple() bool {
+	elem := ElementValid{LineString(r)}
+	return elem.IsSimple()
 }

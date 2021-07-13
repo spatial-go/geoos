@@ -1,4 +1,4 @@
-package geoos
+package space
 
 // Geometry is the interface implemented by other spatial objects
 type Geometry interface {
@@ -23,6 +23,22 @@ type Geometry interface {
 	// up to a specified distance tolerance.
 	// Two Geometries are exactly equal within a distance tolerance
 	EqualsExact(g Geometry, tolerance float64) bool
+
+	// Distance returns distance Between the two Geometry.
+	Distance(g Geometry) (float64, error)
+
+	// SpheroidDistance returns  spheroid distance Between the two Geometry.
+	SpheroidDistance(g Geometry) (float64, error)
+
+	// Boundary returns the closure of the combinatorial boundary of this space.Geometry.
+	Boundary() (Geometry, error)
+
+	// Length Returns the length of this geometry
+	Length() float64
+
+	// IsSimple returns true if this space.Geometry has no anomalous geometric points,
+	// such as self intersection or self tangency.
+	IsSimple() bool
 }
 
 // compile time checks

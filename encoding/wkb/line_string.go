@@ -5,22 +5,22 @@ import (
 	"io"
 	"math"
 
-	"github.com/spatial-go/geoos"
+	"github.com/spatial-go/geoos/space"
 )
 
-func unmarshalLineString(order byteOrder, data []byte) (geoos.LineString, error) {
+func unmarshalLineString(order byteOrder, data []byte) (space.LineString, error) {
 	ps, err := unmarshalPoints(order, data)
 	if err != nil {
 		return nil, err
 	}
-	var line geoos.LineString
+	var line space.LineString
 	for _, p := range ps {
 		line = append(line, p)
 	}
 	return line, nil
 }
 
-func readLineString(r io.Reader, order byteOrder, buf []byte) (geoos.LineString, error) {
+func readLineString(r io.Reader, order byteOrder, buf []byte) (space.LineString, error) {
 	num, err := readUint32(r, order, buf[:4])
 	if err != nil {
 		return nil, err
@@ -31,7 +31,7 @@ func readLineString(r io.Reader, order byteOrder, buf []byte) (geoos.LineString,
 		// invalid data can come in here and allocate tons of memory.
 		alloc = maxPointsAlloc
 	}
-	result := make(geoos.LineString, 0, alloc)
+	result := make(space.LineString, 0, alloc)
 
 	for i := 0; i < int(num); i++ {
 		p, err := readPoint(r, order, buf)
@@ -45,7 +45,7 @@ func readLineString(r io.Reader, order byteOrder, buf []byte) (geoos.LineString,
 	return result, nil
 }
 
-func (e *Encoder) writeLineString(ls geoos.LineString) error {
+func (e *Encoder) writeLineString(ls space.LineString) error {
 	e.order.PutUint32(e.buf, lineStringType)
 	e.order.PutUint32(e.buf[4:], uint32(len(ls)))
 	_, err := e.w.Write(e.buf[:8])
@@ -65,7 +65,7 @@ func (e *Encoder) writeLineString(ls geoos.LineString) error {
 	return nil
 }
 
-func unmarshalMultiLineString(order byteOrder, data []byte) (geoos.MultiLineString, error) {
+func unmarshalMultiLineString(order byteOrder, data []byte) (space.MultiLineString, error) {
 	if len(data) < 4 {
 		return nil, ErrNotWKB
 	}
@@ -77,7 +77,7 @@ func unmarshalMultiLineString(order byteOrder, data []byte) (geoos.MultiLineStri
 		// invalid data can come in here and allocate tons of memory.
 		alloc = maxMultiAlloc
 	}
-	result := make(geoos.MultiLineString, 0, alloc)
+	result := make(space.MultiLineString, 0, alloc)
 
 	for i := 0; i < int(num); i++ {
 		ls, err := scanLineString(data)
@@ -92,7 +92,7 @@ func unmarshalMultiLineString(order byteOrder, data []byte) (geoos.MultiLineStri
 	return result, nil
 }
 
-func readMultiLineString(r io.Reader, order byteOrder, buf []byte) (geoos.MultiLineString, error) {
+func readMultiLineString(r io.Reader, order byteOrder, buf []byte) (space.MultiLineString, error) {
 	num, err := readUint32(r, order, buf[:4])
 	if err != nil {
 		return nil, err
@@ -103,7 +103,7 @@ func readMultiLineString(r io.Reader, order byteOrder, buf []byte) (geoos.MultiL
 		// invalid data can come in here and allocate tons of memory.
 		alloc = maxMultiAlloc
 	}
-	result := make(geoos.MultiLineString, 0, alloc)
+	result := make(space.MultiLineString, 0, alloc)
 
 	for i := 0; i < int(num); i++ {
 		lOrder, typ, err := readByteOrderType(r, buf)
@@ -126,7 +126,7 @@ func readMultiLineString(r io.Reader, order byteOrder, buf []byte) (geoos.MultiL
 	return result, nil
 }
 
-func (e *Encoder) writeMultiLineString(mls geoos.MultiLineString) error {
+func (e *Encoder) writeMultiLineString(mls space.MultiLineString) error {
 	e.order.PutUint32(e.buf, multiLineStringType)
 	e.order.PutUint32(e.buf[4:], uint32(len(mls)))
 	_, err := e.w.Write(e.buf[:8])

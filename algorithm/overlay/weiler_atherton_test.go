@@ -3,6 +3,7 @@ package overlay
 import (
 	"testing"
 
+	"github.com/spatial-go/geoos/algorithm"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 )
 
@@ -11,37 +12,37 @@ func Test_perform(t *testing.T) {
 	//expectPolygon, _ := wkt.UnmarshalString(`POLYGON((10 0,0 0,0 10,5 10,5 15,15 15,15 5,10 5,10 0))`)
 
 	type args struct {
-		subject  *Polygon
-		clipping *Polygon
+		subject  *algorithm.Plane
+		clipping *algorithm.Plane
 	}
 
-	subject := &Polygon{}
-	subject.AddPoint(&Point{matrix: matrix.Matrix{0, 0}})
-	subject.AddPoint(&Point{matrix: matrix.Matrix{10, 0}})
-	subject.AddPoint(&Point{matrix: matrix.Matrix{10, 10}})
-	subject.AddPoint(&Point{matrix: matrix.Matrix{0, 10}})
+	subject := &algorithm.Plane{}
+	subject.AddPoint(&algorithm.Vertex{Matrix: matrix.Matrix{0, 0}})
+	subject.AddPoint(&algorithm.Vertex{Matrix: matrix.Matrix{10, 0}})
+	subject.AddPoint(&algorithm.Vertex{Matrix: matrix.Matrix{10, 10}})
+	subject.AddPoint(&algorithm.Vertex{Matrix: matrix.Matrix{0, 10}})
 	subject.CloseRing()
-	subject.rank = MAIN
+	subject.Rank = algorithm.MAIN
 
-	clipping := &Polygon{}
-	clipping.AddPoint(&Point{matrix: matrix.Matrix{5, 5}})
-	clipping.AddPoint(&Point{matrix: matrix.Matrix{15, 5}})
-	clipping.AddPoint(&Point{matrix: matrix.Matrix{15, 15}})
-	clipping.AddPoint(&Point{matrix: matrix.Matrix{5, 15}})
+	clipping := &algorithm.Plane{}
+	clipping.AddPoint(&algorithm.Vertex{Matrix: matrix.Matrix{5, 5}})
+	clipping.AddPoint(&algorithm.Vertex{Matrix: matrix.Matrix{15, 5}})
+	clipping.AddPoint(&algorithm.Vertex{Matrix: matrix.Matrix{15, 15}})
+	clipping.AddPoint(&algorithm.Vertex{Matrix: matrix.Matrix{5, 15}})
 	clipping.CloseRing()
-	clipping.rank = CUT
+	clipping.Rank = algorithm.CUT
 
-	want := &Polygon{}
-	want.AddPoint(&Point{matrix: matrix.Matrix{5, 10}})
-	want.AddPoint(&Point{matrix: matrix.Matrix{10, 10}})
-	want.AddPoint(&Point{matrix: matrix.Matrix{10, 5}})
-	want.AddPoint(&Point{matrix: matrix.Matrix{5, 5}})
+	want := &algorithm.Plane{}
+	want.AddPoint(&algorithm.Vertex{Matrix: matrix.Matrix{5, 10}})
+	want.AddPoint(&algorithm.Vertex{Matrix: matrix.Matrix{10, 10}})
+	want.AddPoint(&algorithm.Vertex{Matrix: matrix.Matrix{10, 5}})
+	want.AddPoint(&algorithm.Vertex{Matrix: matrix.Matrix{5, 5}})
 	want.CloseRing()
 
 	tests := []struct {
 		name string
 		args args
-		want *Polygon
+		want *algorithm.Plane
 	}{
 		{name: "perform Polygon",
 			args: args{

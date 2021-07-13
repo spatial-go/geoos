@@ -5,10 +5,10 @@ import (
 	"io"
 	"math"
 
-	"github.com/spatial-go/geoos"
+	"github.com/spatial-go/geoos/space"
 )
 
-func unmarshalPolygon(order byteOrder, data []byte) (geoos.Polygon, error) {
+func unmarshalPolygon(order byteOrder, data []byte) (space.Polygon, error) {
 	if len(data) < 4 {
 		return nil, ErrNotWKB
 	}
@@ -20,7 +20,7 @@ func unmarshalPolygon(order byteOrder, data []byte) (geoos.Polygon, error) {
 		// invalid data can come in here and allocate tons of memory.
 		alloc = maxMultiAlloc
 	}
-	result := make(geoos.Polygon, 0, alloc)
+	result := make(space.Polygon, 0, alloc)
 
 	for i := 0; i < int(num); i++ {
 		ps, err := unmarshalPoints(order, data)
@@ -30,7 +30,7 @@ func unmarshalPolygon(order byteOrder, data []byte) (geoos.Polygon, error) {
 
 		data = data[16*len(ps)+4:]
 
-		var line geoos.LineString
+		var line space.LineString
 		for _, p := range ps {
 			line = append(line, p)
 		}
@@ -40,7 +40,7 @@ func unmarshalPolygon(order byteOrder, data []byte) (geoos.Polygon, error) {
 	return result, nil
 }
 
-func readPolygon(r io.Reader, order byteOrder, buf []byte) (geoos.Polygon, error) {
+func readPolygon(r io.Reader, order byteOrder, buf []byte) (space.Polygon, error) {
 	num, err := readUint32(r, order, buf[:4])
 	if err != nil {
 		return nil, err
@@ -51,7 +51,7 @@ func readPolygon(r io.Reader, order byteOrder, buf []byte) (geoos.Polygon, error
 		// invalid data can come in here and allocate tons of memory.
 		alloc = maxMultiAlloc
 	}
-	result := make(geoos.Polygon, 0, alloc)
+	result := make(space.Polygon, 0, alloc)
 
 	for i := 0; i < int(num); i++ {
 		ls, err := readLineString(r, order, buf)
@@ -59,13 +59,13 @@ func readPolygon(r io.Reader, order byteOrder, buf []byte) (geoos.Polygon, error
 			return nil, err
 		}
 
-		result = append(result, geoos.Ring(ls))
+		result = append(result, space.Ring(ls))
 	}
 
 	return result, nil
 }
 
-func (e *Encoder) writePolygon(p geoos.Polygon) error {
+func (e *Encoder) writePolygon(p space.Polygon) error {
 	e.order.PutUint32(e.buf, polygonType)
 	e.order.PutUint32(e.buf[4:], uint32(len(p)))
 	_, err := e.w.Write(e.buf[:8])
@@ -90,7 +90,7 @@ func (e *Encoder) writePolygon(p geoos.Polygon) error {
 	return nil
 }
 
-func unmarshalMultiPolygon(order byteOrder, data []byte) (geoos.MultiPolygon, error) {
+func unmarshalMultiPolygon(order byteOrder, data []byte) (space.MultiPolygon, error) {
 	if len(data) < 4 {
 		return nil, ErrNotWKB
 	}
@@ -102,7 +102,7 @@ func unmarshalMultiPolygon(order byteOrder, data []byte) (geoos.MultiPolygon, er
 		// invalid data can come in here and allocate tons of memory.
 		alloc = maxMultiAlloc
 	}
-	result := make(geoos.MultiPolygon, 0, alloc)
+	result := make(space.MultiPolygon, 0, alloc)
 
 	for i := 0; i < int(num); i++ {
 		p, err := scanPolygon(data)
@@ -122,7 +122,7 @@ func unmarshalMultiPolygon(order byteOrder, data []byte) (geoos.MultiPolygon, er
 	return result, nil
 }
 
-func readMultiPolygon(r io.Reader, order byteOrder, buf []byte) (geoos.MultiPolygon, error) {
+func readMultiPolygon(r io.Reader, order byteOrder, buf []byte) (space.MultiPolygon, error) {
 	num, err := readUint32(r, order, buf[:4])
 	if err != nil {
 		return nil, err
@@ -133,7 +133,7 @@ func readMultiPolygon(r io.Reader, order byteOrder, buf []byte) (geoos.MultiPoly
 		// invalid data can come in here and allocate tons of memory.
 		alloc = maxMultiAlloc
 	}
-	result := make(geoos.MultiPolygon, 0, alloc)
+	result := make(space.MultiPolygon, 0, alloc)
 
 	for i := 0; i < int(num); i++ {
 		pOrder, typ, err := readByteOrderType(r, buf)
@@ -156,7 +156,7 @@ func readMultiPolygon(r io.Reader, order byteOrder, buf []byte) (geoos.MultiPoly
 	return result, nil
 }
 
-func (e *Encoder) writeMultiPolygon(mp geoos.MultiPolygon) error {
+func (e *Encoder) writeMultiPolygon(mp space.MultiPolygon) error {
 	e.order.PutUint32(e.buf, multiPolygonType)
 	e.order.PutUint32(e.buf[4:], uint32(len(mp)))
 	_, err := e.w.Write(e.buf[:8])

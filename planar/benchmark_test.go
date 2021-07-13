@@ -3,11 +3,11 @@ package planar
 import (
 	"testing"
 
-	"github.com/spatial-go/geoos"
 	"github.com/spatial-go/geoos/encoding/wkt"
+	"github.com/spatial-go/geoos/space"
 )
 
-var geom geoos.Geometry = geoos.Polygon{{{-1, -1}, {1, -1}, {1, 1}, {-1, 1}, {-1, -1}}}
+var geom space.Geometry = space.Polygon{{{-1, -1}, {1, -1}, {1, 1}, {-1, 1}, {-1, -1}}}
 
 // Benchmark_MegrezArea test megrez area
 func Benchmark_MegrezArea(b *testing.B) {

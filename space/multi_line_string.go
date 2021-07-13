@@ -1,4 +1,8 @@
-package geoos
+package space
+
+import (
+	"github.com/spatial-go/geoos/algorithm/measure"
+)
 
 // MultiLineString is a set of polylines.
 type MultiLineString []LineString
@@ -92,4 +96,63 @@ func (mls MultiLineString) Area() (float64, error) {
 // IsEmpty returns true if the Geometry is empty.
 func (mls MultiLineString) IsEmpty() bool {
 	return mls == nil || len(mls) == 0
+}
+
+// Distance returns distance Between the two Geometry.
+func (mls MultiLineString) Distance(g Geometry) (float64, error) {
+	elem := &Element{mls}
+	return elem.distanceWithFunc(g, measure.PlanarDistance)
+}
+
+// SpheroidDistance returns  spheroid distance Between the two Geometry.
+func (mls MultiLineString) SpheroidDistance(g Geometry) (float64, error) {
+	elem := &Element{mls}
+	return elem.distanceWithFunc(g, measure.SpheroidDistance)
+}
+
+// Boundary returns the closure of the combinatorial boundary of this space.Geometry.
+func (mls MultiLineString) Boundary() (Geometry, error) {
+	bdyPts := []Point{}
+	for _, v := range mls {
+		if len(v) == 0 {
+			continue
+		}
+		bdyPts = append(bdyPts, v[0], v[len(v)-1])
+	}
+	// return Point or MultiPoint
+	if len(bdyPts) == 1 {
+		return bdyPts[0], nil
+	}
+	// this handles 0 points case as well
+	return MultiPoint(bdyPts), nil
+}
+
+// IsClosed Returns TRUE if the LINESTRING's start and end points are coincident.
+// For Polyhedral Surfaces, reports if the surface is areal (open) or IsC (closed).
+func (mls MultiLineString) IsClosed() bool {
+	if mls.IsEmpty() {
+		return false
+	}
+	for _, v := range mls {
+		if !v.IsClosed() {
+			return false
+		}
+	}
+	return true
+}
+
+// Length Returns the length of this MultiLineString
+func (mls MultiLineString) Length() float64 {
+	length := 0.0
+	for _, v := range mls {
+		length += v.Length()
+	}
+	return length
+}
+
+// IsSimple returns true if this space.Geometry has no anomalous geometric points,
+// such as self intersection or self tangency.
+func (mls MultiLineString) IsSimple() bool {
+	elem := ElementValid{mls}
+	return elem.IsSimple()
 }

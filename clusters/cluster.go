@@ -5,8 +5,8 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/spatial-go/geoos"
 	"github.com/spatial-go/geoos/planar"
+	"github.com/spatial-go/geoos/space"
 )
 
 // A Cluster which data points gravitate around
@@ -14,7 +14,7 @@ type Cluster struct {
 	C      int   //dbscan
 	Points []int //dbscan
 
-	Center    geoos.Point
+	Center    space.Point
 	PointList PointList
 }
 
@@ -33,7 +33,7 @@ func New(k int, dataset PointList) (Clusters, error) {
 
 	rand.Seed(time.Now().UnixNano())
 	for i := 0; i < k; i++ {
-		var p geoos.Point = geoos.Point{rand.Float64(), rand.Float64()}
+		var p space.Point = space.Point{rand.Float64(), rand.Float64()}
 		c = append(c, Cluster{
 			Center: p,
 		})
@@ -42,12 +42,12 @@ func New(k int, dataset PointList) (Clusters, error) {
 }
 
 // Append adds an observation to the Cluster
-func (c *Cluster) Append(point geoos.Point) {
+func (c *Cluster) Append(point space.Point) {
 	c.PointList = append(c.PointList, point)
 }
 
 // Nearest returns the index of the cluster nearest to point
-func (c Clusters) Nearest(point geoos.Point) int {
+func (c Clusters) Nearest(point space.Point) int {
 	var ci int
 	dist := -1.0
 	G := planar.GEOAlgorithm{}
@@ -64,7 +64,7 @@ func (c Clusters) Nearest(point geoos.Point) int {
 }
 
 // Neighbour returns the neighbouring cluster of a point along with the average distance to its points
-func (c Clusters) Neighbour(point geoos.Point, fromCluster int) (int, float64) {
+func (c Clusters) Neighbour(point space.Point, fromCluster int) (int, float64) {
 	var d float64
 	nc := -1
 

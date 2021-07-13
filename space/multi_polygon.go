@@ -1,4 +1,8 @@
-package geoos
+package space
+
+import (
+	"github.com/spatial-go/geoos/algorithm/measure"
+)
 
 // MultiPolygon is a set of polygons.
 type MultiPolygon []Polygon
@@ -85,4 +89,46 @@ func (mp MultiPolygon) Area() (float64, error) {
 // IsEmpty returns true if the Geometry is empty.
 func (mp MultiPolygon) IsEmpty() bool {
 	return mp == nil || len(mp) == 0
+}
+
+// Distance returns distance Between the two Geometry.
+func (mp MultiPolygon) Distance(g Geometry) (float64, error) {
+	elem := &Element{mp}
+	return elem.distanceWithFunc(g, measure.PlanarDistance)
+}
+
+// SpheroidDistance returns  spheroid distance Between the two Geometry.
+func (mp MultiPolygon) SpheroidDistance(g Geometry) (float64, error) {
+	elem := &Element{mp}
+	return elem.distanceWithFunc(g, measure.SpheroidDistance)
+}
+
+// Boundary returns the closure of the combinatorial boundary of this space.Geometry.
+func (mp MultiPolygon) Boundary() (Geometry, error) {
+	if mp.IsEmpty() {
+		return MultiLineString{}, nil
+	}
+	rings := MultiLineString{}
+	for _, p := range mp {
+		if r, err := p.Boundary(); err == nil {
+			rings = append(rings, r.(MultiLineString)...)
+		}
+	}
+	return rings, nil
+}
+
+// Length Returns the length of this MultiPolygon
+func (mp MultiPolygon) Length() float64 {
+	length := 0.0
+	for _, v := range mp {
+		length += v.Length()
+	}
+	return length
+}
+
+// IsSimple returns true if this space.Geometry has no anomalous geometric points,
+// such as self intersection or self tangency.
+func (mp MultiPolygon) IsSimple() bool {
+	elem := ElementValid{mp}
+	return elem.IsSimple()
 }

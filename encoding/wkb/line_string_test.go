@@ -3,11 +3,11 @@ package wkb
 import (
 	"testing"
 
-	"github.com/spatial-go/geoos"
+	"github.com/spatial-go/geoos/space"
 )
 
 var (
-	testLineString     = geoos.LineString{{1, 2}, {3, 4}}
+	testLineString     = space.LineString{{1, 2}, {3, 4}}
 	testLineStringData = []byte{
 		1, 2, 0, 0, 0,
 		2, 0, 0, 0,
@@ -16,15 +16,15 @@ var (
 )
 
 func TestLineString(t *testing.T) {
-	large := geoos.LineString{}
+	large := space.LineString{}
 	for i := 0; i < maxPointsAlloc+100; i++ {
-		large = append(large, geoos.Point{float64(i), float64(-i)})
+		large = append(large, space.Point{float64(i), float64(-i)})
 	}
 
 	cases := []struct {
 		name     string
 		data     []byte
-		expected geoos.LineString
+		expected space.LineString
 	}{
 		{
 			name:     "line string",
@@ -46,7 +46,7 @@ func TestLineString(t *testing.T) {
 }
 
 var (
-	testMultiLineString = geoos.MultiLineString{
+	testMultiLineString = space.MultiLineString{
 		{{10, 10}, {20, 20}, {10, 40}},
 		{{40, 40}, {30, 30}, {40, 20}, {30, 10}},
 	}
@@ -75,7 +75,7 @@ var (
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x24, 0x40, // Y4 10
 	}
 
-	testMultiLineStringSingle = geoos.MultiLineString{
+	testMultiLineStringSingle = space.MultiLineString{
 		{{10, 10}, {20, 20}, {10, 40}},
 	}
 	testMultiLineStringSingleData = []byte{
@@ -94,15 +94,15 @@ var (
 )
 
 func TestMultiLineString(t *testing.T) {
-	large := geoos.MultiLineString{}
+	large := space.MultiLineString{}
 	for i := 0; i < maxMultiAlloc+100; i++ {
-		large = append(large, geoos.LineString{{0.0, 0.0}, {0.0, 0.0}})
+		large = append(large, space.LineString{{0.0, 0.0}, {0.0, 0.0}})
 	}
 
 	cases := []struct {
 		name     string
 		data     []byte
-		expected geoos.MultiLineString
+		expected space.MultiLineString
 	}{
 		{
 			name:     "multi line string",

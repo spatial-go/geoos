@@ -1,4 +1,8 @@
-package geoos
+package space
+
+import (
+	"errors"
+)
 
 // A Collection is a collection of geometries that is also a Geometry.
 type Collection []Geometry
@@ -63,7 +67,7 @@ func (c Collection) EqualCollection(collection Collection) bool {
 		return false
 	}
 	for i, g := range c {
-		if !Equal(g, collection[i]) {
+		if !g.Equal(collection[i]) {
 			return false
 		}
 	}
@@ -120,4 +124,59 @@ func (c Collection) Area() (float64, error) {
 // IsEmpty returns true if the Geometry is empty.
 func (c Collection) IsEmpty() bool {
 	return c == nil || len(c) == 0
+}
+
+// SpheroidDistance returns  spheroid distance Between the two Geometry.
+func (c Collection) SpheroidDistance(g Geometry) (float64, error) {
+	if c.IsEmpty() && g.IsEmpty() {
+		return 0, nil
+	}
+	if c.IsEmpty() != g.IsEmpty() {
+		return 0, errors.New("Geometry is nil")
+	}
+	var dist float64
+	for _, v := range c {
+		if distP, _ := v.SpheroidDistance(g); dist > distP {
+			dist = distP
+		}
+	}
+	return dist, nil
+}
+
+// Distance returns distance Between the two Geometry.
+func (c Collection) Distance(g Geometry) (float64, error) {
+	if c.IsEmpty() && g.IsEmpty() {
+		return 0, nil
+	}
+	if c.IsEmpty() != g.IsEmpty() {
+		return 0, errors.New("Geometry is nil")
+	}
+	var dist float64
+	for _, v := range c {
+		if distP, _ := v.Distance(g); dist > distP {
+			dist = distP
+		}
+	}
+	return dist, nil
+}
+
+// Boundary returns the closure of the combinatorial boundary of this space.Geometry.
+func (c Collection) Boundary() (Geometry, error) {
+	return nil, errors.New("Operation does not support GeometryCollection arguments")
+}
+
+// Length Returns the length of this Collection
+func (c Collection) Length() float64 {
+	length := 0.0
+	for _, v := range c {
+		length += v.Length()
+	}
+	return length
+}
+
+// IsSimple returns true if this space.Geometry has no anomalous geometric points,
+// such as self intersection or self tangency.
+func (c Collection) IsSimple() bool {
+	elem := ElementValid{c}
+	return elem.IsSimple()
 }

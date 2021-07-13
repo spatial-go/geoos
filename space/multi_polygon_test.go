@@ -1,4 +1,4 @@
-package geoos
+package space
 
 import "testing"
 
