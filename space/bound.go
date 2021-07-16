@@ -207,3 +207,8 @@ func (b Bound) Length() float64 {
 func (b Bound) IsSimple() bool {
 	return true
 }
+
+// Centroid Computes the centroid point of a geometry.
+func (b Bound) Centroid() Point {
+	return Centroid(b.ToRing())
+}

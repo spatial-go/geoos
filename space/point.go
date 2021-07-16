@@ -129,3 +129,8 @@ func (p Point) IsSimple() bool {
 func (p Point) Length() float64 {
 	return 0.0
 }
+
+// Centroid Computes the centroid point of a geometry.
+func (p Point) Centroid() Point {
+	return p
+}

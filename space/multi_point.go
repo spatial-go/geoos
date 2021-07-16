@@ -118,3 +118,8 @@ func (mp MultiPoint) IsSimple() bool {
 	elem := ElementValid{mp}
 	return elem.IsSimple()
 }
+
+// Centroid Computes the centroid point of a geometry.
+func (mp MultiPoint) Centroid() Point {
+	return Centroid(mp)
+}

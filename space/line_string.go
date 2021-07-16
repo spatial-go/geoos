@@ -154,3 +154,14 @@ func (ls LineString) IsSimple() bool {
 	elem := ElementValid{ls}
 	return elem.IsSimple()
 }
+
+// IsRing returns true if the lineal geometry has the ring property.
+func (ls LineString) IsRing() bool {
+	elem := ElementValid{Geometry: ls}
+	return elem.IsClosed() && elem.IsSimple()
+}
+
+// Centroid Computes the centroid point of a geometry.
+func (ls LineString) Centroid() Point {
+	return Centroid(ls)
+}

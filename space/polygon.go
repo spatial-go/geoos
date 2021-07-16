@@ -182,3 +182,22 @@ func (p Polygon) IsSimple() bool {
 	elem := ElementValid{p}
 	return elem.IsSimple()
 }
+
+// Shell returns shell..
+func (p Polygon) Shell() Ring {
+	return p[0]
+}
+
+// Holes returns Holes..
+func (p Polygon) Holes() []Ring {
+	holes := []Ring{}
+	for _, v := range p[1:] {
+		holes = append(holes, v)
+	}
+	return holes
+}
+
+// Centroid Computes the centroid point of a geometry.
+func (p Polygon) Centroid() Point {
+	return Centroid(p)
+}

@@ -132,3 +132,8 @@ func (mp MultiPolygon) IsSimple() bool {
 	elem := ElementValid{mp}
 	return elem.IsSimple()
 }
+
+// Centroid Computes the centroid point of a geometry.
+func (mp MultiPolygon) Centroid() Point {
+	return Centroid(mp)
+}

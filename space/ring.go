@@ -96,3 +96,8 @@ func (r Ring) IsSimple() bool {
 	elem := ElementValid{LineString(r)}
 	return elem.IsSimple()
 }
+
+// Centroid Computes the centroid point of a geometry.
+func (r Ring) Centroid() Point {
+	return Centroid(LineString(r))
+}

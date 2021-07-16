@@ -39,6 +39,9 @@ type Geometry interface {
 	// IsSimple returns true if this space.Geometry has no anomalous geometric points,
 	// such as self intersection or self tangency.
 	IsSimple() bool
+
+	// Centroid Computes the centroid point of a geometry.
+	Centroid() Point
 }
 
 // compile time checks

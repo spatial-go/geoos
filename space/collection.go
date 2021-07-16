@@ -180,3 +180,8 @@ func (c Collection) IsSimple() bool {
 	elem := ElementValid{c}
 	return elem.IsSimple()
 }
+
+// Centroid Computes the centroid point of a geometry.
+func (c Collection) Centroid() Point {
+	return Centroid(c)
+}

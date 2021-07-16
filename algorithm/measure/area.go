@@ -33,7 +33,7 @@ func Area(ring matrix.LineMatrix) float64 {
 	return math.Abs(AreaDirection(ring))
 }
 
-// AreaDirection returns the area of a Ring geometry.
+// AreaDirection returns the area (direction) of a Ring geometry.
 func AreaDirection(ring matrix.LineMatrix) float64 {
 	rlen := len(ring)
 	if rlen < 3 {
@@ -49,4 +49,13 @@ func AreaDirection(ring matrix.LineMatrix) float64 {
 		sum += x * (y2 - y1)
 	}
 	return sum / 2.0
+}
+
+// IsCCW * Tests if a ring is
+// oriented counter-clockwise
+func IsCCW(ring matrix.LineMatrix) bool {
+	if AreaDirection(ring) > 0 {
+		return true
+	}
+	return false
 }

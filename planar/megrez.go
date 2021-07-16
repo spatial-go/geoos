@@ -29,8 +29,7 @@ func (g *MegrezAlgorithm) Boundary(geom space.Geometry) (space.Geometry, error) 
 // Buffer sReturns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
 func (g *MegrezAlgorithm) Buffer(geom space.Geometry, width float64, quadsegs int32) (geometry space.Geometry) {
-	//TODO
-	return GetStrategy(newGEOAlgorithm).Buffer(geom, width, quadsegs)
+	return space.Buffer(geom, width)
 }
 
 // Centroid  computes the geometric center of a geometry, or equivalently, the center of mass of the geometry as a POINT.
@@ -42,8 +41,7 @@ func (g *MegrezAlgorithm) Buffer(geom space.Geometry, width float64, quadsegs in
 // If CIRCULARSTRING or COMPOUNDCURVE are supplied, they are converted to linestring wtih CurveToLine first,
 // then same than for LINESTRING
 func (g *MegrezAlgorithm) Centroid(geom space.Geometry) (space.Geometry, error) {
-	//TODO
-	return GetStrategy(newGEOAlgorithm).Centroid(geom)
+	return space.Centroid(geom), nil
 }
 
 // Contains space.Geometry A contains space.Geometry B if and only if no points of B lie in the exterior of A,

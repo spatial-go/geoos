@@ -156,3 +156,8 @@ func (mls MultiLineString) IsSimple() bool {
 	elem := ElementValid{mls}
 	return elem.IsSimple()
 }
+
+// Centroid Computes the centroid point of a geometry.
+func (mls MultiLineString) Centroid() Point {
+	return Centroid(mls)
+}
