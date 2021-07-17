@@ -1,4 +1,4 @@
-package algorithm
+package measure
 
 import (
 	"math"
@@ -30,6 +30,11 @@ func AreaOfPolygon(polygon matrix.PolygonMatrix) float64 {
 
 // Area returns the area of a Ring geometry.
 func Area(ring matrix.LineMatrix) float64 {
+	return math.Abs(AreaDirection(ring))
+}
+
+// AreaDirection returns the area (direction) of a Ring geometry.
+func AreaDirection(ring matrix.LineMatrix) float64 {
 	rlen := len(ring)
 	if rlen < 3 {
 		return 0.0
@@ -43,5 +48,14 @@ func Area(ring matrix.LineMatrix) float64 {
 		y2 := ring[i-1][1]
 		sum += x * (y2 - y1)
 	}
-	return math.Abs(sum / 2.0)
+	return sum / 2.0
+}
+
+// IsCCW * Tests if a ring is
+// oriented counter-clockwise
+func IsCCW(ring matrix.LineMatrix) bool {
+	if AreaDirection(ring) > 0 {
+		return true
+	}
+	return false
 }

@@ -1,5 +1,7 @@
 package matrix
 
+import "errors"
+
 // Matrix is a one-dimensional matrix.
 type Matrix []float64
 
@@ -11,6 +13,29 @@ type PolygonMatrix [][][]float64
 
 // MultiPolygonMatrix is a four-dimensional matrix.
 type MultiPolygonMatrix [][][][]float64
+
+// Compare returns 0 if m1==m2,1 if positive ,-1 else
+// Compares Coordinate for order.
+func Compare(m1, m2 Matrix) (int, error) {
+	// If one is nil, the other must also be nil.
+	if (m1 == nil) != (m2 == nil) {
+		return -2, errors.New("Matrix is nil")
+	}
+
+	if m1[0] < m2[0] {
+		return -1, nil
+	}
+	if m1[0] > m2[0] {
+		return 1, nil
+	}
+	if m1[1] < m2[1] {
+		return -1, nil
+	}
+	if m1[1] > m2[1] {
+		return 1, nil
+	}
+	return 0, nil
+}
 
 // Equal returns  true if the two Matrix are equal
 func Equal(m1, m2 Matrix) bool {

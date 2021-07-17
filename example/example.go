@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/spatial-go/geoos"
 	"github.com/spatial-go/geoos/encoding/wkt"
 	"github.com/spatial-go/geoos/geojson"
 	"github.com/spatial-go/geoos/planar"
+	"github.com/spatial-go/geoos/space"
 )
 
 func main() {
@@ -21,7 +21,7 @@ func main() {
 	if e != nil {
 		fmt.Print(e.Error())
 	}
-	fmt.Printf("%f", area)
+	fmt.Printf("polygon area:%f", area)
 	// get result 4.0
 
 	rawJSON := []byte(`
@@ -36,10 +36,10 @@ func main() {
 
 	fc := geojson.NewFeatureCollection()
 	_ = json.Unmarshal(rawJSON, &fc)
-	println("%p", fc)
+	fmt.Printf("\n%p", fc)
 
 	// Geometry will be unmarshalled into the correct geo.Geometry type.
-	point := fc.Features[0].Geometry.Coordinates.(geoos.Point)
-	println("%p", &point)
+	point := fc.Features[0].Geometry.Coordinates.(space.Point)
+	fmt.Printf("\n%p", &point)
 
 }

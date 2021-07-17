@@ -4,8 +4,8 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/spatial-go/geoos"
 	"github.com/spatial-go/geoos/clusters"
+	"github.com/spatial-go/geoos/space"
 )
 
 const (
@@ -33,7 +33,7 @@ func TestPartitioningError(t *testing.T) {
 	}
 
 	d = clusters.PointList{
-		geoos.Point{
+		space.Point{
 			0.1,
 			0.1,
 		},
@@ -53,7 +53,7 @@ func TestDimensions(t *testing.T) {
 	var d clusters.PointList
 	for x := 0; x < 255; x += 32 {
 		for y := 0; y < 255; y += 32 {
-			d = append(d, geoos.Point{
+			d = append(d, space.Point{
 				float64(x) / 255.0,
 				float64(y) / 255.0,
 			})
@@ -78,7 +78,7 @@ func benchmarkPartition(size, partitions int, b *testing.B) {
 	var d clusters.PointList
 
 	for i := 0; i < size; i++ {
-		d = append(d, geoos.Point{
+		d = append(d, space.Point{
 			rand.Float64(),
 			rand.Float64(),
 		})

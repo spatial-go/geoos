@@ -3,11 +3,11 @@ package wkb
 import (
 	"testing"
 
-	"github.com/spatial-go/geoos"
+	"github.com/spatial-go/geoos/space"
 )
 
 var (
-	testPolygon = geoos.Polygon{{
+	testPolygon = space.Polygon{{
 		{30, 10}, {40, 40}, {20, 40}, {10, 20}, {30, 10},
 	}}
 	testPolygonData = []byte{
@@ -29,15 +29,15 @@ var (
 )
 
 func TestPolygon(t *testing.T) {
-	large := geoos.Polygon{}
+	large := space.Polygon{}
 	for i := 0; i < maxMultiAlloc+100; i++ {
-		large = append(large, geoos.Ring{})
+		large = append(large, space.Ring{})
 	}
 
 	cases := []struct {
 		name     string
 		data     []byte
-		expected geoos.Polygon
+		expected space.Polygon
 	}{
 		{
 			name:     "polygon",
@@ -76,7 +76,7 @@ func TestPolygon(t *testing.T) {
 				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x34, 0x40, // X4 20
 				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x3e, 0x40, // Y4 30
 			},
-			expected: geoos.Polygon{
+			expected: space.Polygon{
 				{{35, 10}, {45, 45}, {15, 40}, {10, 20}, {35, 10}},
 				{{20, 30}, {35, 35}, {30, 20}, {20, 30}},
 			},
@@ -91,7 +91,7 @@ func TestPolygon(t *testing.T) {
 }
 
 var (
-	testMultiPolygon = geoos.MultiPolygon{
+	testMultiPolygon = space.MultiPolygon{
 		{{{30, 20}, {45, 40}, {10, 40}, {30, 20}}},
 		{{{15, 5}, {40, 10}, {10, 20}, {5, 10}, {15, 5}}},
 	}
@@ -127,7 +127,7 @@ var (
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x14, 0x40, // Y5  5
 	}
 
-	testMultiPolygonSingle = geoos.MultiPolygon{
+	testMultiPolygonSingle = space.MultiPolygon{
 		{
 			{{20, 35}, {10, 30}, {10, 10}, {30, 5}, {45, 20}, {20, 35}},
 			{{30, 20}, {20, 15}, {20, 25}, {30, 20}}},
@@ -165,15 +165,15 @@ var (
 )
 
 func TestMultiPolygon(t *testing.T) {
-	large := geoos.MultiPolygon{}
+	large := space.MultiPolygon{}
 	for i := 0; i < maxMultiAlloc+100; i++ {
-		large = append(large, geoos.Polygon{{{0, 0}, {0, 0}}})
+		large = append(large, space.Polygon{{{0, 0}, {0, 0}}})
 	}
 
 	cases := []struct {
 		name     string
 		data     []byte
-		expected geoos.MultiPolygon
+		expected space.MultiPolygon
 	}{
 		{
 			name:     "multi polygon",
@@ -235,7 +235,7 @@ func TestMultiPolygon(t *testing.T) {
 				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x34, 0x40, // Y4 20
 
 			},
-			expected: geoos.MultiPolygon{
+			expected: space.MultiPolygon{
 				{
 					{{40, 40}, {20, 45}, {45, 30}, {40, 40}},
 				},

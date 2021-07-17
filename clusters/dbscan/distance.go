@@ -3,14 +3,14 @@ package dbscan
 import (
 	"math"
 
-	"github.com/spatial-go/geoos"
 	"github.com/spatial-go/geoos/common"
+	"github.com/spatial-go/geoos/space"
 )
 
 // DistanceSpherical is a spherical (optimized) distance between two points
 //
 // Result is distance in kilometers
-func DistanceSpherical(p1, p2 geoos.Point) float64 {
+func DistanceSpherical(p1, p2 space.Point) float64 {
 	v1 := (p1[1] - p2[1]) * common.DegreeRad
 	v1 = v1 * v1
 
@@ -55,12 +55,12 @@ func FastCos(x float64) float64 {
 //
 // In this library eps (distance) is adjusted so that we don't need
 // to do sqrt and multiplication
-func DistanceSphericalFast(p1, p2 geoos.Point) float64 {
+func DistanceSphericalFast(p1, p2 space.Point) float64 {
 	if p1.IsEmpty() {
-		p1 = geoos.Point{0, 0}
+		p1 = space.Point{0, 0}
 	}
 	if p2.IsEmpty() {
-		p2 = geoos.Point{0, 0}
+		p2 = space.Point{0, 0}
 	}
 	v1 := (p1[1] - p2[1])
 	v2 := (p1[0] - p2[0]) * FastCos((p1[1]+p2[1])/2.0*common.DegreeRad)

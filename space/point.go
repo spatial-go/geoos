@@ -1,10 +1,12 @@
-package geoos
+package space
 
 import (
+	"errors"
 	"math/rand"
 	"reflect"
 
 	"github.com/spatial-go/geoos/algorithm/matrix"
+	"github.com/spatial-go/geoos/algorithm/measure"
 )
 
 // Point describes a geographic point
@@ -63,6 +65,25 @@ func (p Point) Equal(g Geometry) bool {
 	return p.EqualPoint(g.(Point))
 }
 
+// EqualsExact Returns true if the two Geometrys are exactly equal,
+// up to a specified distance tolerance.
+// Two Geometries are exactly equal within a distance tolerance
+func (p Point) EqualsExact(g Geometry, tolerance float64) bool {
+	if g.GeoJSONType() != p.GeoJSONType() {
+		return false
+	}
+	if p.IsEmpty() && g.IsEmpty() {
+		return true
+	}
+	if p.IsEmpty() != g.IsEmpty() {
+		return false
+	}
+	if tolerance == 0 {
+		return p.Equal(g)
+	}
+	return measure.PlanarDistance(matrix.Matrix(p), matrix.Matrix(g.(Point))) <= tolerance
+}
+
 // Generate implements the Generator interface for Points
 func (p Point) Generate(r *rand.Rand, _ int) reflect.Value {
 	for i := range p {
@@ -79,4 +100,37 @@ func (p Point) Area() (float64, error) {
 // IsEmpty returns true if the Geometry is empty.
 func (p Point) IsEmpty() bool {
 	return p == nil || len(p) == 0
+}
+
+// Distance returns distance Between the two Geometry.
+func (p Point) Distance(g Geometry) (float64, error) {
+	elem := &Element{p}
+	return elem.distanceWithFunc(g, measure.PlanarDistance)
+}
+
+// SpheroidDistance returns  spheroid distance Between the two Geometry.
+func (p Point) SpheroidDistance(g Geometry) (float64, error) {
+	elem := &Element{p}
+	return elem.distanceWithFunc(g, measure.SpheroidDistance)
+}
+
+// Boundary returns the closure of the combinatorial boundary of this space.Geometry.
+func (p Point) Boundary() (Geometry, error) {
+	return nil, errors.New("point's boundary should be nil")
+}
+
+// IsSimple returns true if this space.Geometry has no anomalous geometric points,
+// such as self intersection or self tangency.
+func (p Point) IsSimple() bool {
+	return true
+}
+
+// Length Returns the length of this geometry
+func (p Point) Length() float64 {
+	return 0.0
+}
+
+// Centroid Computes the centroid point of a geometry.
+func (p Point) Centroid() Point {
+	return p
 }

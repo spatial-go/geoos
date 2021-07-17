@@ -1,10 +1,10 @@
-package geoos
+package space
 
 import (
 	"fmt"
 )
 
-// Coordinate coord 
+// Coordinate coord
 type Coordinate struct {
 	X float64
 	Y float64

@@ -3,13 +3,13 @@ package wkb
 import (
 	"testing"
 
-	"github.com/spatial-go/geoos"
+	"github.com/spatial-go/geoos/space"
 )
 
 var (
-	testCollection = geoos.Collection{
-		geoos.Point{4, 6},
-		geoos.LineString{{4, 6}, {7, 10}},
+	testCollection = space.Collection{
+		space.Point{4, 6},
+		space.LineString{{4, 6}, {7, 10}},
 	}
 	testCollectionData = []byte{
 		//01    02    03    04    05    06    07    08
@@ -30,15 +30,15 @@ var (
 )
 
 func TestCollection(t *testing.T) {
-	large := geoos.Collection{}
+	large := space.Collection{}
 	for i := 0; i < maxMultiAlloc+100; i++ {
-		large = append(large, geoos.Point{float64(i), float64(-i)})
+		large = append(large, space.Point{float64(i), float64(-i)})
 	}
 
 	cases := []struct {
 		name     string
 		data     []byte
-		expected geoos.Collection
+		expected space.Collection
 	}{
 		{
 			name:     "collection",

@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/spatial-go/geoos"
+	"github.com/spatial-go/geoos/space"
 )
 
 var SRID = []byte{215, 15, 0, 0}
@@ -17,12 +17,12 @@ func TestScanNil(t *testing.T) {
 		t.Fatalf("scan error: %v", err)
 	}
 
-	if !geoos.Equal(s.Geometry, testPoint) {
+	if !s.Geometry.Equal(testPoint) {
 		t.Errorf("incorrect geometry: %v != %v", s.Geometry, testPoint)
 	}
 
 	t.Run("scan nil data", func(t *testing.T) {
-		var p geoos.Point
+		var p space.Point
 		s := Scanner(&p)
 
 		err := s.Scan(nil)
@@ -36,7 +36,7 @@ func TestScanNil(t *testing.T) {
 	})
 
 	t.Run("scan nil byte interface", func(t *testing.T) {
-		var p geoos.Point
+		var p space.Point
 		s := Scanner(&p)
 
 		var b []byte
@@ -55,18 +55,18 @@ func TestScanHexData(t *testing.T) {
 	cases := []struct {
 		name     string
 		data     []byte
-		expected geoos.Point
+		expected space.Point
 	}{
 		{
 			name:     "point",
 			data:     []byte(`\x0101000000e0d57267266e4840b22ac24d46b50240`),
-			expected: geoos.Point{48.860547, 2.338513},
+			expected: space.Point{48.860547, 2.338513},
 		},
 	}
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			var p geoos.Point
+			var p space.Point
 			s := Scanner(&p)
 
 			err := s.Scan(tc.data)
@@ -87,7 +87,7 @@ func TestScanPoint(t *testing.T) {
 	cases := []struct {
 		name     string
 		data     []byte
-		expected geoos.Point
+		expected space.Point
 	}{
 		{
 			name:     "point",
@@ -113,7 +113,7 @@ func TestScanPoint(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			var p geoos.Point
+			var p space.Point
 			s := Scanner(&p)
 			err := s.Scan(tc.data)
 			if err != nil {
@@ -173,7 +173,7 @@ func TestScanPoint_Errors(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			var p geoos.Point
+			var p space.Point
 			s := Scanner(&p)
 			err := s.Scan(tc.data)
 			if err != tc.err {
@@ -195,7 +195,7 @@ func TestScanMultiPoint(t *testing.T) {
 	cases := []struct {
 		name     string
 		data     []byte
-		expected geoos.MultiPoint
+		expected space.MultiPoint
 	}{
 		{
 			name:     "multi point",
@@ -210,13 +210,13 @@ func TestScanMultiPoint(t *testing.T) {
 		{
 			name:     "point should covert to multi point",
 			data:     testPointData,
-			expected: geoos.MultiPoint{testPoint},
+			expected: space.MultiPoint{testPoint},
 		},
 	}
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			var mp geoos.MultiPoint
+			var mp space.MultiPoint
 			s := Scanner(&mp)
 			err := s.Scan(tc.data)
 			if err != nil {
@@ -265,7 +265,7 @@ func TestScanMultiPoint_Errors(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			var mp geoos.MultiPoint
+			var mp space.MultiPoint
 			s := Scanner(&mp)
 			err := s.Scan(tc.data)
 			if err != tc.err {
@@ -287,7 +287,7 @@ func TestScanLineString(t *testing.T) {
 	cases := []struct {
 		name     string
 		data     []byte
-		expected geoos.LineString
+		expected space.LineString
 	}{
 		{
 			name:     "line string",
@@ -308,7 +308,7 @@ func TestScanLineString(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			var ls geoos.LineString
+			var ls space.LineString
 			s := Scanner(&ls)
 			err := s.Scan(tc.data)
 			if err != nil {
@@ -357,7 +357,7 @@ func TestScanLineString_Errors(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			var ls geoos.LineString
+			var ls space.LineString
 			s := Scanner(&ls)
 			err := s.Scan(tc.data)
 			if err != tc.err {
@@ -379,12 +379,12 @@ func TestScanMultiLineString(t *testing.T) {
 	cases := []struct {
 		name     string
 		data     []byte
-		expected geoos.MultiLineString
+		expected space.MultiLineString
 	}{
 		{
 			name:     "line string",
 			data:     testLineStringData,
-			expected: geoos.MultiLineString{testLineString},
+			expected: space.MultiLineString{testLineString},
 		},
 		{
 			name:     "multi line string",
@@ -405,7 +405,7 @@ func TestScanMultiLineString(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			var mls geoos.MultiLineString
+			var mls space.MultiLineString
 			s := Scanner(&mls)
 			err := s.Scan(tc.data)
 			if err != nil {
@@ -454,7 +454,7 @@ func TestScanMultiLineString_Errors(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			var mls geoos.MultiLineString
+			var mls space.MultiLineString
 			s := Scanner(&mls)
 			err := s.Scan(tc.data)
 			if err != tc.err {
@@ -476,7 +476,7 @@ func TestScanRing(t *testing.T) {
 	cases := []struct {
 		name     string
 		data     []byte
-		expected geoos.Ring
+		expected space.Ring
 	}{
 		{
 			name:     "polygon",
@@ -487,7 +487,7 @@ func TestScanRing(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			var r geoos.Ring
+			var r space.Ring
 			s := Scanner(&r)
 			err := s.Scan(tc.data)
 			if err != nil {
@@ -536,7 +536,7 @@ func TestScanRing_Errors(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			var r geoos.Ring
+			var r space.Ring
 			s := Scanner(&r)
 			err := s.Scan(tc.data)
 			if err != tc.err {
@@ -558,7 +558,7 @@ func TestScanPolygon(t *testing.T) {
 	cases := []struct {
 		name     string
 		data     []byte
-		expected geoos.Polygon
+		expected space.Polygon
 	}{
 		{
 			name:     "polygon",
@@ -579,7 +579,7 @@ func TestScanPolygon(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			var p geoos.Polygon
+			var p space.Polygon
 			s := Scanner(&p)
 			err := s.Scan(tc.data)
 			if err != nil {
@@ -628,7 +628,7 @@ func TestScanPolygon_Errors(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			var p geoos.Polygon
+			var p space.Polygon
 			s := Scanner(&p)
 			err := s.Scan(tc.data)
 			if err != tc.err {
@@ -650,7 +650,7 @@ func TestScanMultiPolygon(t *testing.T) {
 	cases := []struct {
 		name     string
 		data     []byte
-		expected geoos.MultiPolygon
+		expected space.MultiPolygon
 	}{
 		{
 			name:     "multi polygon",
@@ -670,13 +670,13 @@ func TestScanMultiPolygon(t *testing.T) {
 		{
 			name:     "polygon",
 			data:     testPolygonData,
-			expected: geoos.MultiPolygon{testPolygon},
+			expected: space.MultiPolygon{testPolygon},
 		},
 	}
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			var mp geoos.MultiPolygon
+			var mp space.MultiPolygon
 			s := Scanner(&mp)
 			err := s.Scan(tc.data)
 			if err != nil {
@@ -725,7 +725,7 @@ func TestScanMultiPolygon_Errors(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			var mp geoos.MultiPolygon
+			var mp space.MultiPolygon
 			s := Scanner(&mp)
 			err := s.Scan(tc.data)
 			if err != tc.err {
@@ -747,7 +747,7 @@ func TestScanCollection(t *testing.T) {
 	cases := []struct {
 		name     string
 		data     []byte
-		expected geoos.Collection
+		expected space.Collection
 	}{
 		{
 			name:     "collection",
@@ -758,7 +758,7 @@ func TestScanCollection(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			var c geoos.Collection
+			var c space.Collection
 			s := Scanner(&c)
 			err := s.Scan(tc.data)
 			if err != nil {
@@ -807,7 +807,7 @@ func TestScanCollection_Errors(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			var c geoos.Collection
+			var c space.Collection
 			s := Scanner(&c)
 			err := s.Scan(tc.data)
 			if err != tc.err {
@@ -829,7 +829,7 @@ func TestScanBound(t *testing.T) {
 	cases := []struct {
 		name     string
 		data     []byte
-		expected geoos.Bound
+		expected space.Bound
 	}{
 		{
 			name:     "point",
@@ -880,7 +880,7 @@ func TestScanBound(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			var b geoos.Bound
+			var b space.Bound
 			s := Scanner(&b)
 			err := s.Scan(tc.data)
 			if err != nil {
@@ -924,7 +924,7 @@ func TestScanBound_Errors(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			var b geoos.Bound
+			var b space.Bound
 			s := Scanner(&b)
 			err := s.Scan(tc.data)
 			if err != tc.err {
@@ -970,18 +970,18 @@ func TestValue(t *testing.T) {
 
 func TestValue_nil(t *testing.T) {
 	var (
-		mp    geoos.MultiPoint
-		ls    geoos.LineString
-		mls   geoos.MultiLineString
-		r     geoos.Ring
-		poly  geoos.Polygon
-		mpoly geoos.MultiPolygon
-		c     geoos.Collection
+		mp    space.MultiPoint
+		ls    space.LineString
+		mls   space.MultiLineString
+		r     space.Ring
+		poly  space.Polygon
+		mpoly space.MultiPolygon
+		c     space.Collection
 	)
 
 	cases := []struct {
 		name string
-		geom geoos.Geometry
+		geom space.Geometry
 	}{
 		{
 			name: "nil multi point",
@@ -1028,13 +1028,13 @@ func TestValue_nil(t *testing.T) {
 }
 
 func BenchmarkScan_point(b *testing.B) {
-	p := geoos.Point{1, 2}
+	p := space.Point{1, 2}
 	data, err := Marshal(p)
 	if err != nil {
 		b.Fatal(err)
 	}
 
-	var r geoos.Point
+	var r space.Point
 	s := Scanner(&r)
 
 	b.ReportAllocs()
@@ -1048,7 +1048,7 @@ func BenchmarkScan_point(b *testing.B) {
 }
 
 func BenchmarkDecode_point(b *testing.B) {
-	p := geoos.Point{1, 2}
+	p := space.Point{1, 2}
 	data, err := Marshal(p)
 	if err != nil {
 		b.Fatal(err)
@@ -1070,16 +1070,16 @@ func BenchmarkDecode_point(b *testing.B) {
 }
 
 func BenchmarkScan_lineString(b *testing.B) {
-	var ls geoos.LineString
+	var ls space.LineString
 	for i := 0; i < 100; i++ {
-		ls = append(ls, geoos.Point{float64(i), float64(i)})
+		ls = append(ls, space.Point{float64(i), float64(i)})
 	}
 	data, err := Marshal(ls)
 	if err != nil {
 		b.Fatal(err)
 	}
 
-	var r geoos.LineString
+	var r space.LineString
 	s := Scanner(&r)
 
 	b.ReportAllocs()
@@ -1093,9 +1093,9 @@ func BenchmarkScan_lineString(b *testing.B) {
 }
 
 func BenchmarkDecode_lineString(b *testing.B) {
-	var ls geoos.LineString
+	var ls space.LineString
 	for i := 0; i < 100; i++ {
-		ls = append(ls, geoos.Point{float64(i), float64(i)})
+		ls = append(ls, space.Point{float64(i), float64(i)})
 	}
 	data, err := Marshal(ls)
 	if err != nil {
@@ -1118,11 +1118,11 @@ func BenchmarkDecode_lineString(b *testing.B) {
 }
 
 func BenchmarkScan_multiLineString(b *testing.B) {
-	var mls geoos.MultiLineString
+	var mls space.MultiLineString
 	for i := 0; i < 10; i++ {
-		var ls geoos.LineString
+		var ls space.LineString
 		for j := 0; j < 100; j++ {
-			ls = append(ls, geoos.Point{float64(i), float64(i)})
+			ls = append(ls, space.Point{float64(i), float64(i)})
 		}
 		mls = append(mls, ls)
 	}
@@ -1131,7 +1131,7 @@ func BenchmarkScan_multiLineString(b *testing.B) {
 		b.Fatal(err)
 	}
 
-	var r geoos.MultiLineString
+	var r space.MultiLineString
 	s := Scanner(&r)
 
 	b.ReportAllocs()
@@ -1145,11 +1145,11 @@ func BenchmarkScan_multiLineString(b *testing.B) {
 }
 
 func BenchmarkDecode_multiLineString(b *testing.B) {
-	var mls geoos.MultiLineString
+	var mls space.MultiLineString
 	for i := 0; i < 10; i++ {
-		var ls geoos.LineString
+		var ls space.LineString
 		for j := 0; j < 100; j++ {
-			ls = append(ls, geoos.Point{float64(i), float64(i)})
+			ls = append(ls, space.Point{float64(i), float64(i)})
 		}
 		mls = append(mls, ls)
 	}
@@ -1174,11 +1174,11 @@ func BenchmarkDecode_multiLineString(b *testing.B) {
 }
 
 func BenchmarkScan_polygon(b *testing.B) {
-	var p geoos.Polygon
+	var p space.Polygon
 	for i := 0; i < 1; i++ {
-		var r geoos.Ring
+		var r space.Ring
 		for j := 0; j < 6; j++ {
-			r = append(r, geoos.Point{float64(i), float64(i)})
+			r = append(r, space.Point{float64(i), float64(i)})
 		}
 		p = append(p, r)
 	}
@@ -1187,7 +1187,7 @@ func BenchmarkScan_polygon(b *testing.B) {
 		b.Fatal(err)
 	}
 
-	var r geoos.Polygon
+	var r space.Polygon
 	s := Scanner(&r)
 
 	b.ReportAllocs()
@@ -1201,11 +1201,11 @@ func BenchmarkScan_polygon(b *testing.B) {
 }
 
 func BenchmarkDecode_polygon(b *testing.B) {
-	var p geoos.Polygon
+	var p space.Polygon
 	for i := 0; i < 1; i++ {
-		var r geoos.Ring
+		var r space.Ring
 		for j := 0; j < 6; j++ {
-			r = append(r, geoos.Point{float64(i), float64(i)})
+			r = append(r, space.Point{float64(i), float64(i)})
 		}
 		p = append(p, r)
 	}

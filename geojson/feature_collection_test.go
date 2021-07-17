@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/spatial-go/geoos"
+	"github.com/spatial-go/geoos/space"
 )
 
 func TestNewFeatureCollection(t *testing.T) {
@@ -105,7 +105,7 @@ func TestUnmarshalFeatureCollection(t *testing.T) {
 	}
 
 	// not a feature collection
-	data, _ = NewFeature(*NewGeometry(geoos.Point{})).MarshalJSON()
+	data, _ = NewFeature(*NewGeometry(space.Point{})).MarshalJSON()
 	_, err = UnmarshalFeatureCollection(data)
 	if err == nil {
 		t.Error("should return error if not a feature collection")

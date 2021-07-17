@@ -3,17 +3,17 @@ package measure
 import (
 	"testing"
 
-	"github.com/spatial-go/geoos"
+	"github.com/spatial-go/geoos/algorithm/matrix"
 )
 
 func TestDistance(t *testing.T) {
-	fromPoint := geoos.Point{12, 15}
-	toPoint := geoos.Point{13, 15}
+	fromPoint := matrix.Matrix{12, 15}
+	toPoint := matrix.Matrix{13, 15}
 
 	wantResult := 107405.96007592858
 	type args struct {
-		fromPoint geoos.Point
-		toPoint   geoos.Point
+		fromPoint matrix.Matrix
+		toPoint   matrix.Matrix
 	}
 	tests := []struct {
 		name string
@@ -24,7 +24,7 @@ func TestDistance(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := Distance(tt.args.fromPoint, tt.args.toPoint); got != tt.want {
+			if got := SpheroidDistance(tt.args.fromPoint, tt.args.toPoint); got != tt.want {
 				t.Errorf("Distance() = %v, want %v", got, tt.want)
 			}
 		})

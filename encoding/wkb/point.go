@@ -6,10 +6,10 @@ import (
 	"io"
 	"math"
 
-	"github.com/spatial-go/geoos"
+	"github.com/spatial-go/geoos/space"
 )
 
-func unmarshalPoints(order byteOrder, data []byte) ([]geoos.Point, error) {
+func unmarshalPoints(order byteOrder, data []byte) ([]space.Point, error) {
 	if len(data) < 4 {
 		return nil, ErrNotWKB
 	}
@@ -25,17 +25,17 @@ func unmarshalPoints(order byteOrder, data []byte) ([]geoos.Point, error) {
 		// invalid data can come in here and allocate tons of memory.
 		alloc = maxPointsAlloc
 	}
-	result := make([]geoos.Point, 0, alloc)
+	result := make([]space.Point, 0, alloc)
 
 	if order == littleEndian {
 		for i := 0; i < int(num); i++ {
-			result = append(result, geoos.Point{math.Float64frombits(binary.LittleEndian.Uint64(data[16*i:])),
+			result = append(result, space.Point{math.Float64frombits(binary.LittleEndian.Uint64(data[16*i:])),
 				math.Float64frombits(binary.LittleEndian.Uint64(data[16*i+8:])),
 			})
 		}
 	} else {
 		for i := 0; i < int(num); i++ {
-			result = append(result, geoos.Point{math.Float64frombits(binary.BigEndian.Uint64(data[16*i:])),
+			result = append(result, space.Point{math.Float64frombits(binary.BigEndian.Uint64(data[16*i:])),
 				math.Float64frombits(binary.BigEndian.Uint64(data[16*i+8:])),
 			})
 		}
@@ -44,12 +44,12 @@ func unmarshalPoints(order byteOrder, data []byte) ([]geoos.Point, error) {
 	return result, nil
 }
 
-func unmarshalPoint(order byteOrder, buf []byte) (geoos.Point, error) {
+func unmarshalPoint(order byteOrder, buf []byte) (space.Point, error) {
 	if len(buf) < 16 {
-		return geoos.Point{}, ErrNotWKB
+		return space.Point{}, ErrNotWKB
 	}
 
-	var p geoos.Point = make(geoos.Point, 2)
+	var p space.Point = make(space.Point, 2)
 	if order == littleEndian {
 		p[0] = math.Float64frombits(binary.LittleEndian.Uint64(buf))
 		p[1] = math.Float64frombits(binary.LittleEndian.Uint64(buf[8:]))
@@ -61,12 +61,12 @@ func unmarshalPoint(order byteOrder, buf []byte) (geoos.Point, error) {
 	return p, nil
 }
 
-func readPoint(r io.Reader, order byteOrder, buf []byte) (geoos.Point, error) {
-	var p geoos.Point
+func readPoint(r io.Reader, order byteOrder, buf []byte) (space.Point, error) {
+	var p space.Point
 
 	for i := 0; i < 2; i++ {
 		if _, err := io.ReadFull(r, buf); err != nil {
-			return geoos.Point{}, err
+			return space.Point{}, err
 		}
 		if order == littleEndian {
 			p = append(p, math.Float64frombits(binary.LittleEndian.Uint64(buf)))
@@ -78,7 +78,7 @@ func readPoint(r io.Reader, order byteOrder, buf []byte) (geoos.Point, error) {
 	return p, nil
 }
 
-func (e *Encoder) writePoint(p geoos.Point) error {
+func (e *Encoder) writePoint(p space.Point) error {
 	e.order.PutUint32(e.buf, pointType)
 	_, err := e.w.Write(e.buf[:4])
 	if err != nil {
@@ -91,7 +91,7 @@ func (e *Encoder) writePoint(p geoos.Point) error {
 	return err
 }
 
-func unmarshalMultiPoint(order byteOrder, data []byte) (geoos.MultiPoint, error) {
+func unmarshalMultiPoint(order byteOrder, data []byte) (space.MultiPoint, error) {
 	if len(data) < 4 {
 		return nil, ErrNotWKB
 	}
@@ -103,7 +103,7 @@ func unmarshalMultiPoint(order byteOrder, data []byte) (geoos.MultiPoint, error)
 		// invalid data can come in here and allocate tons of memory.
 		alloc = maxMultiAlloc
 	}
-	result := make(geoos.MultiPoint, 0, alloc)
+	result := make(space.MultiPoint, 0, alloc)
 
 	for i := 0; i < int(num); i++ {
 		p, err := scanPoint(data)
@@ -118,7 +118,7 @@ func unmarshalMultiPoint(order byteOrder, data []byte) (geoos.MultiPoint, error)
 	return result, nil
 }
 
-func readMultiPoint(r io.Reader, order byteOrder, buf []byte) (geoos.MultiPoint, error) {
+func readMultiPoint(r io.Reader, order byteOrder, buf []byte) (space.MultiPoint, error) {
 	num, err := readUint32(r, order, buf[:4])
 	if err != nil {
 		return nil, err
@@ -129,7 +129,7 @@ func readMultiPoint(r io.Reader, order byteOrder, buf []byte) (geoos.MultiPoint,
 		// invalid data can come in here and allocate tons of memory.
 		alloc = maxPointsAlloc
 	}
-	result := make(geoos.MultiPoint, 0, alloc)
+	result := make(space.MultiPoint, 0, alloc)
 
 	for i := 0; i < int(num); i++ {
 		pOrder, typ, err := readByteOrderType(r, buf)
@@ -152,7 +152,7 @@ func readMultiPoint(r io.Reader, order byteOrder, buf []byte) (geoos.MultiPoint,
 	return result, nil
 }
 
-func (e *Encoder) writeMultiPoint(mp geoos.MultiPoint) error {
+func (e *Encoder) writeMultiPoint(mp space.MultiPoint) error {
 	e.order.PutUint32(e.buf, multiPointType)
 	e.order.PutUint32(e.buf[4:], uint32(len(mp)))
 	_, err := e.w.Write(e.buf[:8])
@@ -161,7 +161,7 @@ func (e *Encoder) writeMultiPoint(mp geoos.MultiPoint) error {
 	}
 
 	for _, p := range mp {
-		err := e.Encode(geoos.Point(p))
+		err := e.Encode(space.Point(p))
 		if err != nil {
 			return err
 		}

@@ -3,16 +3,16 @@ package clusters
 import (
 	"fmt"
 
-	"github.com/spatial-go/geoos"
 	"github.com/spatial-go/geoos/planar"
+	"github.com/spatial-go/geoos/space"
 )
 
 // PointList is a slice of Point
-type PointList []geoos.Point
+type PointList []space.Point
 
 // Center returns the center coordinates of a set of Points
-func (points PointList) Center() (p geoos.Point, err error) {
-	p = make(geoos.Point, 2)
+func (points PointList) Center() (p space.Point, err error) {
+	p = make(space.Point, 2)
 	var l = len(points)
 	if l == 0 {
 		return p, fmt.Errorf("there is no mean for an empty set of points")
@@ -31,7 +31,7 @@ func (points PointList) Center() (p geoos.Point, err error) {
 }
 
 // AverageDistance returns the average distance between o and all PointList
-func AverageDistance(point geoos.Point, points PointList) float64 {
+func AverageDistance(point space.Point, points PointList) float64 {
 	var d float64
 	var l int
 	G := planar.GEOAlgorithm{}

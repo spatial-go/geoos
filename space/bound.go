@@ -1,6 +1,7 @@
-package geoos
+package space
 
 import (
+	"errors"
 	"math"
 )
 
@@ -15,7 +16,7 @@ type Bound struct {
 
 // GeoJSONType returns the GeoJSON type for the object.
 func (b Bound) GeoJSONType() string {
-	return TypePolygon
+	return TypeBound
 }
 
 // Dimensions returns 2 because a Bound is a 2d object.
@@ -78,6 +79,17 @@ func (b Bound) Contains(point Point) bool {
 	return true
 }
 
+// ContainsBound determines if the bound is within the bound.
+func (b Bound) ContainsBound(bound Bound) bool {
+	if b.IsEmpty() || bound.IsEmpty() {
+		return false
+	}
+	return bound.Min.X() >= b.Min.X() &&
+		bound.Max.X() <= b.Max.X() &&
+		bound.Min.Y() >= b.Min.Y() &&
+		bound.Max.Y() <= b.Max.Y()
+}
+
 // Bound returns the the same bound.
 func (b Bound) Bound() Bound {
 	return b
@@ -96,6 +108,23 @@ func (b Bound) Equal(g Geometry) bool {
 	return b.EqualBound(g.(Bound))
 }
 
+// EqualsExact Returns true if the two Geometrys are exactly equal,
+// up to a specified distance tolerance.
+// Two Geometries are exactly equal within a distance tolerance
+func (b Bound) EqualsExact(g Geometry, tolerance float64) bool {
+	if b.GeoJSONType() != g.GeoJSONType() {
+		return false
+	}
+	if b.IsEmpty() && g.IsEmpty() {
+		return true
+	}
+	if b.IsEmpty() != g.IsEmpty() {
+		return false
+	}
+
+	return b.Max.EqualsExact(g.(Bound).Max, tolerance) && b.Min.EqualsExact(g.(Bound).Min, tolerance)
+}
+
 // Area returns the area of a polygonal geometry. The area of a bound is 0.
 func (b Bound) Area() (float64, error) {
 	return b.ToPolygon().Area()
@@ -107,9 +136,8 @@ func (b Bound) Area() (float64, error) {
 func (b Bound) IsEmpty() bool {
 	if b.Max == nil || b.Min == nil {
 		return true
-	} else {
-		return b.Min[0] > b.Max[0] || b.Min[1] > b.Max[1]
 	}
+	return b.Min[0] > b.Max[0] || b.Min[1] > b.Max[1]
 }
 
 // Top returns the top of the bound.
@@ -140,4 +168,47 @@ func (b Bound) LeftTop() Point {
 // RightBottom return the lower right point of the bound.
 func (b Bound) RightBottom() Point {
 	return Point{b.Right(), b.Bottom()}
+}
+
+// Distance returns distance Between the two Geometry.
+func (b Bound) Distance(g Geometry) (float64, error) {
+	if b.IsEmpty() && g.IsEmpty() {
+		return 0, nil
+	}
+	if b.IsEmpty() != g.IsEmpty() {
+		return 0, errors.New("Geometry is nil")
+	}
+	return b.ToRing().Distance(g)
+}
+
+// SpheroidDistance returns  spheroid distance Between the two Geometry.
+func (b Bound) SpheroidDistance(g Geometry) (float64, error) {
+	if b.IsEmpty() && g.IsEmpty() {
+		return 0, nil
+	}
+	if b.IsEmpty() != g.IsEmpty() {
+		return 0, errors.New("Geometry is nil")
+	}
+	return b.ToRing().SpheroidDistance(g)
+}
+
+// Boundary returns the closure of the combinatorial boundary of this space.Geometry.
+func (b Bound) Boundary() (Geometry, error) {
+	return nil, errors.New("Bound's boundary should be nil")
+}
+
+// Length Returns the length of this LineString
+func (b Bound) Length() float64 {
+	return b.ToRing().Length()
+}
+
+// IsSimple returns true if this space.Geometry has no anomalous geometric points,
+// such as self intersection or self tangency.
+func (b Bound) IsSimple() bool {
+	return true
+}
+
+// Centroid Computes the centroid point of a geometry.
+func (b Bound) Centroid() Point {
+	return Centroid(b.ToRing())
 }
