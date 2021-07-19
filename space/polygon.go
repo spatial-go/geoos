@@ -142,13 +142,13 @@ func (p Polygon) IsEmpty() bool {
 
 // Distance returns distance Between the two Geometry.
 func (p Polygon) Distance(g Geometry) (float64, error) {
-	elem := &Element{p}
+	elem := &ElementDistance{p}
 	return elem.distanceWithFunc(g, measure.PlanarDistance)
 }
 
 // SpheroidDistance returns  spheroid distance Between the two Geometry.
 func (p Polygon) SpheroidDistance(g Geometry) (float64, error) {
-	elem := &Element{p}
+	elem := &ElementDistance{p}
 	return elem.distanceWithFunc(g, measure.SpheroidDistance)
 }
 
@@ -200,4 +200,13 @@ func (p Polygon) Holes() []Ring {
 // Centroid Computes the centroid point of a geometry.
 func (p Polygon) Centroid() Point {
 	return Centroid(p)
+}
+
+// UniquePoints return all distinct vertices of input geometry as a MultiPoint.
+func (p Polygon) UniquePoints() MultiPoint {
+	mp := MultiPoint{}
+	for _, v := range p {
+		mp = append(mp, Ring(v).UniquePoints()...)
+	}
+	return mp
 }

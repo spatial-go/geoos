@@ -106,7 +106,6 @@ func (l *LineSimplifier) collapseLine() matrix.LineMatrix {
 			coordList = append(coordList, l.inputLine[i])
 		}
 	}
-	//    if (coordList.size() < inputLine.length)      System.out.println("Simplified " + (inputLine.length - coordList.size()) + " pts")
 	return coordList
 }
 
@@ -121,9 +120,6 @@ func (l *LineSimplifier) isDeletable(i0, i1, i2 int, distanceTol float64) bool {
 	if !l.isShallow(p0, p1, p2, distanceTol) {
 		return false
 	}
-
-	// MD - don't use this heuristic - it's too restricting
-	//  	if (p0.distance(p2) > distanceTol) return false
 
 	return l.isShallowSampled(p0, p1, i0, i2, distanceTol)
 }

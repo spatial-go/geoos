@@ -185,3 +185,12 @@ func (c Collection) IsSimple() bool {
 func (c Collection) Centroid() Point {
 	return Centroid(c)
 }
+
+// UniquePoints return all distinct vertices of input geometry as a MultiPoint.
+func (c Collection) UniquePoints() MultiPoint {
+	mult := MultiPoint{}
+	for _, v := range c {
+		mult = append(mult, v.UniquePoints()...)
+	}
+	return mult
+}

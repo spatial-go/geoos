@@ -41,6 +41,9 @@ func (g *MegrezAlgorithm) Buffer(geom space.Geometry, width float64, quadsegs in
 // If CIRCULARSTRING or COMPOUNDCURVE are supplied, they are converted to linestring wtih CurveToLine first,
 // then same than for LINESTRING
 func (g *MegrezAlgorithm) Centroid(geom space.Geometry) (space.Geometry, error) {
+	if geom == nil || geom.IsEmpty() {
+		return nil, nil
+	}
 	return space.Centroid(geom), nil
 }
 
@@ -203,8 +206,7 @@ func (g *MegrezAlgorithm) LineMerge(geom space.Geometry) (space.Geometry, error)
 
 // NGeometry returns the number of component geometries.
 func (g *MegrezAlgorithm) NGeometry(geom space.Geometry) (int, error) {
-	//TODO
-	return GetStrategy(newGEOAlgorithm).NGeometry(geom)
+	return geom.Nums(), nil
 }
 
 // Overlaps returns TRUE if the Geometries "spatially overlap".
@@ -216,8 +218,7 @@ func (g *MegrezAlgorithm) Overlaps(geom1, geom2 space.Geometry) (bool, error) {
 
 // PointOnSurface Returns a POINT guaranteed to intersect a surface.
 func (g *MegrezAlgorithm) PointOnSurface(geom space.Geometry) (space.Geometry, error) {
-	//TODO
-	return GetStrategy(newGEOAlgorithm).PointOnSurface(geom)
+	return space.InteriorPoint(geom), nil
 }
 
 // Relate computes the intersection matrix (Dimensionally Extended
@@ -305,8 +306,7 @@ func (g *MegrezAlgorithm) Union(geom1, geom2 space.Geometry) (space.Geometry, er
 
 // UniquePoints return all distinct vertices of input geometry as a MultiPoint.
 func (g *MegrezAlgorithm) UniquePoints(geom space.Geometry) (space.Geometry, error) {
-	//TODO
-	return GetStrategy(newGEOAlgorithm).UniquePoints(geom)
+	return geom.UniquePoints(), nil
 }
 
 // Within returns TRUE if geometry A is completely inside geometry B.

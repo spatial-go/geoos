@@ -8,7 +8,7 @@ import (
 	"io"
 
 	"github.com/spatial-go/geoos/encoding/wkt"
-	"github.com/spatial-go/geoos/geo"
+	"github.com/spatial-go/geoos/planar/geo"
 	"github.com/spatial-go/geoos/space"
 )
 

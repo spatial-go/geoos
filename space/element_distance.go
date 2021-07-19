@@ -9,21 +9,7 @@ import (
 	"github.com/spatial-go/geoos/algorithm/overlay"
 )
 
-// const geomtype
-const (
-	TypePoint      = "Point"
-	TypeMultiPoint = "MultiPoint"
 
-	TypeLineString      = "LineString"
-	TypeMultiLineString = "MultiLineString"
-
-	TypePolygon      = "Polygon"
-	TypeMultiPolygon = "MultiPolygon"
-
-	TypeCollection = "GeometryCollection"
-
-	TypeBound = "Bound"
-)
 
 // Line  straight line  .
 type Line struct {
@@ -48,13 +34,13 @@ func (l *Line) Intersection(o *Line) (bool, Point) {
 	return mark, Point(ip.Matrix)
 }
 
-// Element describes a geographic Element
-type Element struct {
+// ElementDistance describes a geographic ElementDistance
+type ElementDistance struct {
 	Geometry
 }
 
 // distanceWithFunc returns distance Between the two Geometry.
-func (el *Element) distanceWithFunc(g Geometry, f measure.Distance) (float64, error) {
+func (el *ElementDistance) distanceWithFunc(g Geometry, f measure.Distance) (float64, error) {
 	if el.IsEmpty() && g.IsEmpty() {
 		return 0, nil
 	}
@@ -66,7 +52,7 @@ func (el *Element) distanceWithFunc(g Geometry, f measure.Distance) (float64, er
 		if el.GeoJSONType() == TypePoint {
 			return el.distancePointWithFunc(g, f)
 		}
-		elem := &Element{g}
+		elem := &ElementDistance{g}
 		return elem.distanceWithFunc(el.Geometry, f)
 	case TypeLineString:
 		if el.GeoJSONType() == TypePoint {
@@ -74,7 +60,7 @@ func (el *Element) distanceWithFunc(g Geometry, f measure.Distance) (float64, er
 		} else if el.GeoJSONType() == TypeLineString {
 			return el.distanceLineWithFunc(g, f)
 		}
-		elem := &Element{g}
+		elem := &ElementDistance{g}
 		return elem.distanceWithFunc(el.Geometry, f)
 	case TypePolygon:
 		if el.GeoJSONType() == TypePoint {
@@ -84,14 +70,14 @@ func (el *Element) distanceWithFunc(g Geometry, f measure.Distance) (float64, er
 		} else if el.GeoJSONType() == TypePolygon {
 			var dist float64
 			for _, v := range el.Geometry.(Polygon) {
-				elem := &Element{LineString(v)}
+				elem := &ElementDistance{LineString(v)}
 				if distP, _ := elem.distanceWithFunc(g, f); dist > distP {
 					dist = distP
 				}
 			}
 			return dist, nil
 		}
-		elem := &Element{g}
+		elem := &ElementDistance{g}
 		return elem.distanceWithFunc(el.Geometry, f)
 	case TypeMultiPoint:
 		var dist float64
@@ -126,7 +112,7 @@ func (el *Element) distanceWithFunc(g Geometry, f measure.Distance) (float64, er
 		}
 		return dist, nil
 	case TypeBound:
-		elem := &Element{el.Bound().ToRing()}
+		elem := &ElementDistance{el.Bound().ToRing()}
 		return elem.distanceWithFunc(g, f)
 	default:
 		return 0, nil
@@ -134,7 +120,7 @@ func (el *Element) distanceWithFunc(g Geometry, f measure.Distance) (float64, er
 }
 
 // distancePointWithFunc returns distance Between the two Geometry.
-func (el *Element) distancePointWithFunc(g Geometry, f measure.Distance) (float64, error) {
+func (el *ElementDistance) distancePointWithFunc(g Geometry, f measure.Distance) (float64, error) {
 	switch g.GeoJSONType() {
 	case TypePoint:
 		return f(matrix.Matrix(el.Geometry.(Point)), matrix.Matrix(g.(Point))), nil
@@ -148,7 +134,7 @@ func (el *Element) distancePointWithFunc(g Geometry, f measure.Distance) (float6
 }
 
 // distanceLineWithFunc returns distance Between the two Geometry.
-func (el *Element) distanceLineWithFunc(g Geometry, f measure.Distance) (float64, error) {
+func (el *ElementDistance) distanceLineWithFunc(g Geometry, f measure.Distance) (float64, error) {
 	switch g.GeoJSONType() {
 	case TypeLineString:
 		var dist float64
@@ -156,7 +142,7 @@ func (el *Element) distanceLineWithFunc(g Geometry, f measure.Distance) (float64
 			return 0, nil
 		}
 		for _, v := range el.Geometry.(LineString) {
-			elem := &Element{Point(v)}
+			elem := &ElementDistance{Point(v)}
 			if distP, _ := elem.distanceWithFunc(g, f); dist > distP {
 				dist = distP
 			}
@@ -165,7 +151,7 @@ func (el *Element) distanceLineWithFunc(g Geometry, f measure.Distance) (float64
 	case TypePolygon:
 		var dist float64
 		for _, v := range g.(Polygon) {
-			elem := &Element{LineString(v)}
+			elem := &ElementDistance{LineString(v)}
 			if distP, _ := elem.distanceWithFunc(el, f); dist > distP {
 				dist = distP
 			}

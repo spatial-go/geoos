@@ -92,13 +92,13 @@ func (mp MultiPoint) IsEmpty() bool {
 
 // Distance returns distance Between the two Geometry.
 func (mp MultiPoint) Distance(g Geometry) (float64, error) {
-	elem := &Element{mp}
+	elem := &ElementDistance{mp}
 	return elem.distanceWithFunc(g, measure.PlanarDistance)
 }
 
 // SpheroidDistance returns  spheroid distance Between the two Geometry.
 func (mp MultiPoint) SpheroidDistance(g Geometry) (float64, error) {
-	elem := &Element{mp}
+	elem := &ElementDistance{mp}
 	return elem.distanceWithFunc(g, measure.SpheroidDistance)
 }
 
@@ -122,4 +122,9 @@ func (mp MultiPoint) IsSimple() bool {
 // Centroid Computes the centroid point of a geometry.
 func (mp MultiPoint) Centroid() Point {
 	return Centroid(mp)
+}
+
+// UniquePoints return all distinct vertices of input geometry as a MultiPoint.
+func (mp MultiPoint) UniquePoints() MultiPoint {
+	return mp
 }

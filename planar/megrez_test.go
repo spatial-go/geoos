@@ -510,3 +510,117 @@ func TestAlgorithm_Buffer(t *testing.T) {
 		})
 	}
 }
+
+func TestAlgorithm_NGeometry(t *testing.T) {
+	multiPoint, _ := wkt.UnmarshalString(`MULTIPOINT ( -1 0, -1 2, -1 3, -1 4, -1 7, 0 1, 0 3, 1 1, 2 0, 6 0, 7 8, 9 8, 10 6 )`)
+	multiLineString, _ := wkt.UnmarshalString(`MULTILINESTRING((10 130,50 190,110 190,140 150,150 80,100 10,20 40,10 130),
+	(70 40,100 50,120 80,80 110,50 90,70 40))`)
+	multiPolygon, _ := wkt.UnmarshalString(`MULTIPOLYGON (((40 40, 20 45, 45 30, 40 40)),
+	((20 35, 10 30, 10 10, 30 5, 45 20, 20 35)),
+	((30 20, 20 15, 20 25, 30 20)))`)
+	type args struct {
+		g space.Geometry
+	}
+	tests := []struct {
+		name    string
+		G       GEOAlgorithm
+		args    args
+		want    int
+		wantErr bool
+	}{
+		{name: "ngeometry multiPoint", args: args{g: multiPoint}, want: 13, wantErr: false},
+		{name: "ngeometry multiLineString", args: args{g: multiLineString}, want: 2, wantErr: false},
+		{name: "ngeometry multiPolygon", args: args{g: multiPolygon}, want: 3, wantErr: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			G := NormalStrategy()
+			got, err := G.NGeometry(tt.args.g)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GEOAlgorithm.NGeometry() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("GEOAlgorithm.NGeometry() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestAlgorithm_UniquePoints(t *testing.T) {
+	const polygon = `POLYGON((0 0, 6 0, 6 6, 0 6, 0 0))`
+	const multipoint = `MULTIPOINT((0 0),(6 0),(6 6),(0 6))`
+
+	poly, _ := wkt.UnmarshalString(polygon)
+
+	type args struct {
+		g space.Geometry
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    string
+		wantErr bool
+	}{
+		{name: "uniquepoints", args: args{g: poly}, want: multipoint, wantErr: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			G := NormalStrategy()
+			got, err := G.UniquePoints(tt.args.g)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("UniquePoints() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			res := wkt.MarshalString(got)
+			t.Log(res)
+			if !reflect.DeepEqual(res, tt.want) {
+				t.Errorf("UniquePoints() got = %v, want %v", res, tt.want)
+			}
+		})
+	}
+}
+
+func TestAlgorithm_PointOnSurface(t *testing.T) {
+	point, _ := wkt.UnmarshalString(`POINT(0 5)`)
+	expectPoint0, _ := wkt.UnmarshalString(`POINT(0 5)`)
+
+	lineString, _ := wkt.UnmarshalString(`LINESTRING(0 5, 0 10)`)
+	expectPoint1, _ := wkt.UnmarshalString(`POINT(0 5)`)
+
+	polygon, _ := wkt.UnmarshalString(`POLYGON((0 0, 0 5, 5 5, 5 0, 0 0))`)
+	expectPoint2, _ := wkt.UnmarshalString(`POINT(2.5 2.5)`)
+
+	type args struct {
+		g space.Geometry
+	}
+	tests := []struct {
+		name    string
+		G       GEOAlgorithm
+		args    args
+		want    space.Geometry
+		wantErr bool
+	}{
+		{name: "PointOnSurface Point", args: args{g: point}, want: expectPoint0, wantErr: false},
+		{name: "PointOnSurface LineString0", args: args{g: lineString}, want: expectPoint1, wantErr: false},
+		{name: "PointOnSurface Polygon", args: args{g: polygon}, want: expectPoint2, wantErr: false},
+	}
+	for i, tt := range tests {
+		if i == 0 || i == 2 {
+			continue
+		}
+		t.Run(tt.name, func(t *testing.T) {
+			G := NormalStrategy()
+			gotGeometry, err := G.PointOnSurface(tt.args.g)
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GEOAlgorithm.EqualsExact() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			isEqual, _ := G.EqualsExact(gotGeometry, tt.want, 0.000001)
+			if !isEqual {
+				t.Errorf("GEOAlgorithm.Envelope() = %v, want %v", wkt.MarshalString(gotGeometry), wkt.MarshalString(tt.want))
+			}
+		})
+	}
+}

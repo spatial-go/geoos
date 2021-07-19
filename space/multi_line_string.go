@@ -100,13 +100,13 @@ func (mls MultiLineString) IsEmpty() bool {
 
 // Distance returns distance Between the two Geometry.
 func (mls MultiLineString) Distance(g Geometry) (float64, error) {
-	elem := &Element{mls}
+	elem := &ElementDistance{mls}
 	return elem.distanceWithFunc(g, measure.PlanarDistance)
 }
 
 // SpheroidDistance returns  spheroid distance Between the two Geometry.
 func (mls MultiLineString) SpheroidDistance(g Geometry) (float64, error) {
-	elem := &Element{mls}
+	elem := &ElementDistance{mls}
 	return elem.distanceWithFunc(g, measure.SpheroidDistance)
 }
 
@@ -160,4 +160,13 @@ func (mls MultiLineString) IsSimple() bool {
 // Centroid Computes the centroid point of a geometry.
 func (mls MultiLineString) Centroid() Point {
 	return Centroid(mls)
+}
+
+// UniquePoints return all distinct vertices of input geometry as a MultiPoint.
+func (mls MultiLineString) UniquePoints() MultiPoint {
+	mp := MultiPoint{}
+	for _, v := range mls {
+		mp = append(mp, v.UniquePoints()...)
+	}
+	return mp
 }

@@ -21,7 +21,7 @@ func Centroid(geom Geometry) Point {
 
 // Add  Adds a Geometry to the centroid total
 func (ec *ElementCentroid) Add(geom Geometry) {
-	if geom.IsEmpty() {
+	if geom == nil || geom.IsEmpty() {
 		return
 	}
 	switch geom.GeoJSONType() {
@@ -66,6 +66,9 @@ func (ec *ElementCentroid) addPoint(pt Point) {
 // addLineSegments Adds the line segments  to the linear centroid accumulators.
 func (ec *ElementCentroid) addLineSegments(lines LineString) {
 	linelen := 0.0
+	if ec.LineCentSum == nil {
+		ec.LineCentSum = matrix.Matrix{0, 0}
+	}
 	for i := 0; i < len(lines)-1; i++ {
 		segmentLen, _ := Point(lines[i]).Distance(Point(lines[i+1]))
 		if segmentLen == 0.0 {
@@ -74,10 +77,12 @@ func (ec *ElementCentroid) addLineSegments(lines LineString) {
 		linelen += segmentLen
 		midx := (lines[i][0] + lines[i+1][0]) / 2
 		midy := (lines[i][1] + lines[i+1][1]) / 2
-		ec.LineCentSum = append(ec.LineCentSum,
-			segmentLen*midx,
-			segmentLen*midy,
-		)
+		ec.LineCentSum[0] += segmentLen * midx
+		ec.LineCentSum[1] += segmentLen * midy
+	}
+	ec.TotalLength += linelen
+	if linelen == 0.0 && len(lines) > 0 {
+		ec.addPoint(lines[0])
 	}
 }
 
@@ -89,11 +94,9 @@ func (ec *ElementCentroid) addPolygon(poly Polygon) {
 			if len(v) > 0 {
 				ec.AreaBasePt = v[0]
 			}
-			isPositiveArea = measure.IsCCW(v)
-
+			isPositiveArea = !measure.IsCCW(v)
 		} else {
 			isPositiveArea = measure.IsCCW(v)
-
 		}
 		for i := 0; i < len(v)-1; i++ {
 			ec.addTriangle(Point(ec.AreaBasePt), v[i], v[i+1], isPositiveArea)
@@ -108,12 +111,14 @@ func (ec *ElementCentroid) addTriangle(p0, p1, p2 Point, isPositiveArea bool) {
 	if !isPositiveArea {
 		sign = -1.0
 	}
-	ec.TriangleCent3 = matrix.Matrix{p0.X() + p1.X() + p2.X(), p1.Y() + p1.Y() + p2.Y()}
+	ec.TriangleCent3 = matrix.Matrix{p0.X() + p1.X() + p2.X(), p0.Y() + p1.Y() + p2.Y()}
 	area2 := (p1.X()-p0.X())*(p2.Y()-p0.Y()) -
 		(p2.X()-p0.X())*(p1.Y()-p0.Y())
-	ec.Cg3 = append(ec.Cg3, sign*area2*ec.TriangleCent3[0],
-		sign*area2*ec.TriangleCent3[1],
-	)
+	if ec.Cg3 == nil {
+		ec.Cg3 = matrix.Matrix{0, 0}
+	}
+	ec.Cg3[0] += sign * area2 * ec.TriangleCent3[0]
+	ec.Cg3[1] += sign * area2 * ec.TriangleCent3[1]
 	ec.Areasum2 += sign * area2
 }
 

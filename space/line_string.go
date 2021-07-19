@@ -115,13 +115,13 @@ func (ls LineString) IsEmpty() bool {
 
 // Distance returns distance Between the two Geometry.
 func (ls LineString) Distance(g Geometry) (float64, error) {
-	elem := &Element{ls}
+	elem := &ElementDistance{ls}
 	return elem.distanceWithFunc(g, measure.PlanarDistance)
 }
 
 // SpheroidDistance returns  spheroid distance Between the two Geometry.
 func (ls LineString) SpheroidDistance(g Geometry) (float64, error) {
-	elem := &Element{ls}
+	elem := &ElementDistance{ls}
 	return elem.distanceWithFunc(g, measure.SpheroidDistance)
 }
 
@@ -164,4 +164,13 @@ func (ls LineString) IsRing() bool {
 // Centroid Computes the centroid point of a geometry.
 func (ls LineString) Centroid() Point {
 	return Centroid(ls)
+}
+
+// UniquePoints return all distinct vertices of input geometry as a MultiPoint.
+func (ls LineString) UniquePoints() MultiPoint {
+	mp := MultiPoint{}
+	for _, v := range ls {
+		mp = append(mp, v)
+	}
+	return mp
 }

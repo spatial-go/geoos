@@ -212,3 +212,8 @@ func (b Bound) IsSimple() bool {
 func (b Bound) Centroid() Point {
 	return Centroid(b.ToRing())
 }
+
+// UniquePoints return all distinct vertices of input geometry as a MultiPoint.
+func (b Bound) UniquePoints() MultiPoint {
+	return MultiPoint{b.Max, b.Min}
+}

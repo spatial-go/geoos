@@ -93,13 +93,13 @@ func (mp MultiPolygon) IsEmpty() bool {
 
 // Distance returns distance Between the two Geometry.
 func (mp MultiPolygon) Distance(g Geometry) (float64, error) {
-	elem := &Element{mp}
+	elem := &ElementDistance{mp}
 	return elem.distanceWithFunc(g, measure.PlanarDistance)
 }
 
 // SpheroidDistance returns  spheroid distance Between the two Geometry.
 func (mp MultiPolygon) SpheroidDistance(g Geometry) (float64, error) {
-	elem := &Element{mp}
+	elem := &ElementDistance{mp}
 	return elem.distanceWithFunc(g, measure.SpheroidDistance)
 }
 
@@ -136,4 +136,13 @@ func (mp MultiPolygon) IsSimple() bool {
 // Centroid Computes the centroid point of a geometry.
 func (mp MultiPolygon) Centroid() Point {
 	return Centroid(mp)
+}
+
+// UniquePoints return all distinct vertices of input geometry as a MultiPoint.
+func (mp MultiPolygon) UniquePoints() MultiPoint {
+	mult := MultiPoint{}
+	for _, v := range mp {
+		mult = append(mult, v.UniquePoints()...)
+	}
+	return mult
 }

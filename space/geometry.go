@@ -1,5 +1,21 @@
 package space
 
+// const geomtype
+const (
+	TypePoint      = "Point"
+	TypeMultiPoint = "MultiPoint"
+
+	TypeLineString      = "LineString"
+	TypeMultiLineString = "MultiLineString"
+
+	TypePolygon      = "Polygon"
+	TypeMultiPolygon = "MultiPolygon"
+
+	TypeCollection = "GeometryCollection"
+
+	TypeBound = "Bound"
+)
+
 // Geometry is the interface implemented by other spatial objects
 type Geometry interface {
 	GeoJSONType() string
@@ -42,6 +58,9 @@ type Geometry interface {
 
 	// Centroid Computes the centroid point of a geometry.
 	Centroid() Point
+
+	// UniquePoints return all distinct vertices of input geometry as a MultiPoint.
+	UniquePoints() MultiPoint
 }
 
 // compile time checks

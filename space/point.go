@@ -104,22 +104,22 @@ func (p Point) IsEmpty() bool {
 
 // Distance returns distance Between the two Geometry.
 func (p Point) Distance(g Geometry) (float64, error) {
-	elem := &Element{p}
+	elem := &ElementDistance{p}
 	return elem.distanceWithFunc(g, measure.PlanarDistance)
 }
 
 // SpheroidDistance returns  spheroid distance Between the two Geometry.
 func (p Point) SpheroidDistance(g Geometry) (float64, error) {
-	elem := &Element{p}
+	elem := &ElementDistance{p}
 	return elem.distanceWithFunc(g, measure.SpheroidDistance)
 }
 
-// Boundary returns the closure of the combinatorial boundary of this space.Geometry.
+// Boundary returns the closure of the combinatorial boundary of this Geometry.
 func (p Point) Boundary() (Geometry, error) {
 	return nil, errors.New("point's boundary should be nil")
 }
 
-// IsSimple returns true if this space.Geometry has no anomalous geometric points,
+// IsSimple returns true if this Geometry has no anomalous geometric points,
 // such as self intersection or self tangency.
 func (p Point) IsSimple() bool {
 	return true
@@ -133,4 +133,9 @@ func (p Point) Length() float64 {
 // Centroid Computes the centroid point of a geometry.
 func (p Point) Centroid() Point {
 	return p
+}
+
+// UniquePoints return all distinct vertices of input geometry as a MultiPoint.
+func (p Point) UniquePoints() MultiPoint {
+	return MultiPoint{p}
 }

@@ -101,3 +101,15 @@ func (r Ring) IsSimple() bool {
 func (r Ring) Centroid() Point {
 	return Centroid(LineString(r))
 }
+
+// UniquePoints return all distinct vertices of input geometry as a MultiPoint.
+func (r Ring) UniquePoints() MultiPoint {
+	mp := MultiPoint{}
+	for i, v := range r {
+		if i == len(r)-1 {
+			break
+		}
+		mp = append(mp, v)
+	}
+	return mp
+}
