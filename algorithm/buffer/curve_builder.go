@@ -3,6 +3,7 @@ package buffer
 import (
 	"math"
 
+	"github.com/spatial-go/geoos/algorithm/calc"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
 )
@@ -107,7 +108,7 @@ func (c *CurveBuilder) isRingCurveInverted(pts matrix.LineMatrix, distance float
 	 * Heuristic based on low chance that a ring with many vertices will invert.
 	 * This low limit ensures this test is fairly efficient.
 	 */
-	if len(pts) >= MaxRingSize {
+	if len(pts) >= calc.MaxRingSize {
 		return false
 	}
 
@@ -124,7 +125,7 @@ func (c *CurveBuilder) isRingCurveInverted(pts matrix.LineMatrix, distance float
 	 * than the buffer distance.
 	 * If so, the curve is NOT a valid buffer curve.
 	 */
-	distTol := NearnessFactor * math.Abs(distance)
+	distTol := calc.NearnessFactor * math.Abs(distance)
 
 	maxDist := 0.0
 	for _, v := range c.Curve.Line {
@@ -140,9 +141,9 @@ func (c *CurveBuilder) isRingCurveInverted(pts matrix.LineMatrix, distance float
 
 func (c *CurveBuilder) computePointCurve(pt matrix.Matrix) {
 	switch c.parameters.EndCapStyle {
-	case CAPROUND:
+	case calc.CAPROUND:
 		c.Curve.CreateCircle(pt, c.distance)
-	case CAPSQUARE:
+	case calc.CAPSQUARE:
 		c.Curve.CreateSquare(pt, c.distance)
 		// otherwise curve is empty (e.g. for a butt cap);
 	}
@@ -159,7 +160,7 @@ func (c *CurveBuilder) computeLineBufferCurve(pts matrix.LineMatrix) {
 	//    Coordinate[] simp1 = inputPts;
 
 	n1 := len(simp1) - 1
-	c.Curve.initSideSegments(simp1[0], simp1[1], LEFT)
+	c.Curve.initSideSegments(simp1[0], simp1[1], calc.LEFT)
 	for i := 2; i <= n1; i++ {
 		c.Curve.Line = append(c.Curve.Line, simp1[i])
 	}
@@ -175,7 +176,7 @@ func (c *CurveBuilder) computeLineBufferCurve(pts matrix.LineMatrix) {
 	n2 := len(simp2) - 1
 
 	// since we are traversing line in opposite order, offset position is still LEFT
-	c.Curve.initSideSegments(simp2[n2], simp2[n2-1], LEFT)
+	c.Curve.initSideSegments(simp2[n2], simp2[n2-1], calc.LEFT)
 	for i := n2 - 2; i >= 0; i-- {
 		c.Curve.Line = append(c.Curve.Line, simp2[i])
 	}
@@ -202,7 +203,7 @@ func (c *CurveBuilder) computeSingleSidedBufferCurve(pts matrix.LineMatrix, isRi
 		n2 := len(simp2) - 1
 
 		// since we are traversing line in opposite order, offset position is still LEFT
-		c.Curve.initSideSegments(simp2[n2], simp2[n2-1], LEFT)
+		c.Curve.initSideSegments(simp2[n2], simp2[n2-1], calc.LEFT)
 		c.Curve.Line = append(c.Curve.Line, c.Curve.offset1[1])
 		for i := n2 - 2; i >= 0; i-- {
 			c.Curve.Line = append(c.Curve.Line, c.Curve.Line[i])
@@ -219,7 +220,7 @@ func (c *CurveBuilder) computeSingleSidedBufferCurve(pts matrix.LineMatrix, isRi
 		//      Coordinate[] simp1 = inputPts;
 
 		n1 := len(simp1) - 1
-		c.Curve.initSideSegments(simp1[0], simp1[1], LEFT)
+		c.Curve.initSideSegments(simp1[0], simp1[1], calc.LEFT)
 		c.Curve.Line = append(c.Curve.Line, c.Curve.offset1[1])
 		for i := 2; i <= n1; i++ {
 			c.Curve.Line = append(c.Curve.Line, c.Curve.Line[i])
@@ -233,7 +234,7 @@ func (c *CurveBuilder) computeRingBufferCurve(pts matrix.LineMatrix, side int) {
 	// simplify input line to improve performance
 	distTol := c.distance * c.parameters.SimplifyFactor
 	// ensure that correct side is simplified
-	if side == RIGHT {
+	if side == calc.RIGHT {
 		distTol = -distTol
 	}
 	simp := &LineSimplifier{inputLine: pts}

@@ -1,15 +1,20 @@
-package space
+package buffer
 
-import "sort"
+import (
+	"sort"
+
+	"github.com/spatial-go/geoos/algorithm/matrix"
+	"github.com/spatial-go/geoos/algorithm/measure"
+)
 
 // Interior  interface Computes a location of an interior point in a Geometry.
 type Interior interface {
-	InteriorPoint() Point
-	Add(geom Geometry)
+	InteriorPoint() matrix.Matrix
+	Add(geom matrix.Steric)
 }
 
 // InteriorPoint Computes a location of an interior point in a Geometry.
-func InteriorPoint(geom Geometry) (interiorPt Point) {
+func InteriorPoint(geom matrix.Steric) (interiorPt matrix.Matrix) {
 	if geom.IsEmpty() {
 		return nil
 	}
@@ -31,9 +36,9 @@ func InteriorPoint(geom Geometry) (interiorPt Point) {
 	return interior.InteriorPoint()
 }
 
-func effectiveDimension(geom Geometry) int {
+func effectiveDimension(geom matrix.Steric) int {
 	dim := -1
-	if geom.GeoJSONType() == TypeCollection {
+	if _, ok := geom.(matrix.Collection); ok {
 		return dim
 	}
 	if !geom.IsEmpty() {
@@ -48,27 +53,28 @@ func effectiveDimension(geom Geometry) int {
 // InteriorPointPoint Computes a point in the interior of an point geometry.
 // Find a point which is closest to the centroid of the geometry.
 type InteriorPointPoint struct {
-	centroid, interiorPoint Point
+	centroid, interiorPoint matrix.Matrix
 	minDistance             float64
-	geom                    Geometry
+	geom                    matrix.Steric
 }
 
 // Add Tests the point(s) defined by a Geometry for the best inside point.
 // If a Geometry is not of dimension 0 it is not tested.
-func (ip *InteriorPointPoint) Add(geom Geometry) {
-	ip.geom = geom
-	ip.centroid = ip.geom.Centroid()
-	if geom.GeoJSONType() == TypePoint {
-		ip.add(geom.(Point))
-	} else if geom.GeoJSONType() == TypeCollection {
-		for _, v := range geom.(Collection) {
-			ip.add(v.(Point))
+func (ip *InteriorPointPoint) Add(point matrix.Steric) {
+	ip.geom = point
+	ip.centroid = ComputerCentroid(point)
+	switch p := point.(type) {
+	case matrix.Matrix:
+		ip.addPoint(p)
+	case matrix.Collection:
+		for _, v := range p {
+			ip.addPoint(v.(matrix.Matrix))
 		}
 	}
 }
 
-func (ip *InteriorPointPoint) add(point Point) {
-	dist, _ := point.Distance(ip.centroid)
+func (ip *InteriorPointPoint) addPoint(point matrix.Matrix) {
+	dist := measure.PlanarDistance(point, ip.centroid)
 	if ip.minDistance == 0.0 || dist < ip.minDistance {
 		ip.interiorPoint = point
 		ip.minDistance = dist
@@ -76,7 +82,7 @@ func (ip *InteriorPointPoint) add(point Point) {
 }
 
 // InteriorPoint returns InteriorPoint.
-func (ip *InteriorPointPoint) InteriorPoint() Point {
+func (ip *InteriorPointPoint) InteriorPoint() matrix.Matrix {
 	return ip.interiorPoint
 }
 
@@ -91,42 +97,43 @@ type InteriorPointLine struct {
 
 // Add Tests the interior vertices (if any)
 // defined by a linear Geometry for the best inside point.
-func (ip *InteriorPointLine) Add(geom Geometry) {
-	ip.geom = geom
-	ip.centroid = ip.geom.Centroid()
-
-	if geom.GeoJSONType() == TypeLineString {
-		ip.addInterior(geom.(LineString))
-	} else if geom.GeoJSONType() == TypeCollection {
-		for _, v := range geom.(Collection) {
-			ip.addInterior(v.(LineString))
+func (ip *InteriorPointLine) Add(line matrix.Steric) {
+	ip.geom = line
+	ip.centroid = ComputerCentroid(line)
+	switch p := line.(type) {
+	case matrix.LineMatrix:
+		ip.addInterior(p)
+	case matrix.Collection:
+		for _, v := range p {
+			ip.addInterior(v.(matrix.LineMatrix))
 		}
 	}
 	if ip.interiorPoint == nil {
-		ip.addEndpoint(geom)
+		ip.addEndpoint(line)
 	}
 }
 
-func (ip *InteriorPointLine) addInterior(pts LineString) {
+func (ip *InteriorPointLine) addInterior(pts matrix.LineMatrix) {
 	for _, v := range pts {
-		ip.add(Point(v))
+		ip.addPoint(v)
 	}
 }
 
 // addEndpoint Tests the endpoint vertices
 // defined by a linear Geometry for the best inside point.
-func (ip *InteriorPointLine) addEndpoint(geom Geometry) {
-	if geom.GeoJSONType() == TypeLineString {
-		ip.addEndpoints(geom.(LineString))
-	} else if geom.GeoJSONType() == TypeCollection {
-		for _, v := range geom.(Collection) {
-			ip.addEndpoints(v.(LineString))
+func (ip *InteriorPointLine) addEndpoint(line matrix.Steric) {
+	switch p := line.(type) {
+	case matrix.LineMatrix:
+		ip.addEndpoints(p)
+	case matrix.Collection:
+		for _, v := range p {
+			ip.addEndpoints(v.(matrix.LineMatrix))
 		}
 	}
 }
-func (ip *InteriorPointLine) addEndpoints(pts LineString) {
-	ip.add(pts[0])
-	ip.add(pts[len(pts)-1])
+func (ip *InteriorPointLine) addEndpoints(pts matrix.LineMatrix) {
+	ip.addPoint(pts[0])
+	ip.addPoint(pts[len(pts)-1])
 }
 
 // InteriorPointArea Computes a point in the interior of an areal geometry.
@@ -144,24 +151,23 @@ func avg(a, b float64) float64 {
 
 // Add  Processes a geometry to determine the best interior point for
 // all component polygons.
-func (ip *InteriorPointArea) Add(geom Geometry) {
-	ip.geom = geom
-	ip.centroid = ip.geom.Centroid()
+func (ip *InteriorPointArea) Add(poly matrix.Steric) {
+	ip.geom = poly
+	ip.centroid = ComputerCentroid(poly)
 
-	ip.interiorPointY = ScanLineY(geom.(Polygon))
-
-	if geom.GeoJSONType() == TypePolygon {
-		ip.processPolygon(geom.(Polygon))
-	} else if geom.GeoJSONType() == TypeCollection {
-		for _, v := range geom.(Collection) {
-			ip.processPolygon(v.(Polygon))
+	switch p := poly.(type) {
+	case matrix.PolygonMatrix:
+		ip.processPolygon(p)
+	case matrix.Collection:
+		for _, v := range p {
+			ip.processPolygon(v.(matrix.PolygonMatrix))
 		}
 	}
 }
 
 // processPolygon Computes an interior point of a component Polygon
 // and updates current best interior point if appropriate.
-func (ip *InteriorPointArea) processPolygon(polygon Polygon) {
+func (ip *InteriorPointArea) processPolygon(polygon matrix.PolygonMatrix) {
 	ip.process()
 	width := ip.Width()
 	if width > ip.maxWidth {
@@ -188,16 +194,16 @@ func (ip *InteriorPointArea) process() {
 	 * set default interior point in case polygon has zero area
 	 */
 	crossings := []float64{}
-	ip.scanRing(ip.geom.(Polygon).Shell(), crossings)
-	for _, v := range ip.geom.(Polygon).Holes() {
+	ip.scanRing(ip.geom.(matrix.PolygonMatrix)[0], crossings)
+	for _, v := range ip.geom.(matrix.PolygonMatrix)[1:] {
 		ip.scanRing(v, crossings)
 	}
 	ip.findBestMidpoint(crossings)
 }
 
-func (ip *InteriorPointArea) scanRing(ring Ring, crossings []float64) {
+func (ip *InteriorPointArea) scanRing(ring matrix.LineMatrix, crossings []float64) {
 	// skip rings which don't cross scan line
-	if !ip.intersectsHorizontalLine(ring.Bound().Min, ring.Bound().Max, ip.interiorPointY) {
+	if !ip.intersectsHorizontalLine(ring.Bound()[0], ring.Bound()[1], ip.interiorPointY) {
 		return
 	}
 
@@ -211,7 +217,7 @@ func (ip *InteriorPointArea) scanRing(ring Ring, crossings []float64) {
 	}
 }
 
-func (ip *InteriorPointArea) addEdgeCrossing(p0, p1 Point, scanY float64, crossings []float64) {
+func (ip *InteriorPointArea) addEdgeCrossing(p0, p1 matrix.Matrix, scanY float64, crossings []float64) {
 	// skip non-crossing segments
 	if !ip.intersectsHorizontalLine(p0, p1, scanY) {
 		return
@@ -249,7 +255,7 @@ func (ip *InteriorPointArea) findBestMidpoint(crossings []float64) {
 		if width > ip.interiorSectionWidth {
 			ip.interiorSectionWidth = width
 			interiorPointX := avg(x1, x2)
-			ip.interiorPoint = Point{interiorPointX, ip.interiorPointY}
+			ip.interiorPoint = matrix.Matrix{interiorPointX, ip.interiorPointY}
 		}
 	}
 }
@@ -258,9 +264,9 @@ func (ip *InteriorPointArea) findBestMidpoint(crossings []float64) {
 // Some crossing situations are not counted,
 //  to ensure that the list of crossings
 //  captures strict inside/outside topology.
-func (ip *InteriorPointArea) isEdgeCrossingCounted(p0, p1 Point, scanY float64) bool {
-	y0 := p0.Y()
-	y1 := p1.Y()
+func (ip *InteriorPointArea) isEdgeCrossingCounted(p0, p1 matrix.Matrix, scanY float64) bool {
+	y0 := p0[1]
+	y1 := p1[1]
 	// skip horizontal lines
 	if y0 == y1 {
 		return false
@@ -280,29 +286,29 @@ func (ip *InteriorPointArea) isEdgeCrossingCounted(p0, p1 Point, scanY float64) 
 // intersection Computes the intersection of a segment with a horizontal line.
 // The segment is expected to cross the horizontal line
 // - this condition is not checked.
-func (ip *InteriorPointArea) intersection(p0, p1 Point, Y float64) float64 {
-	x0 := p0.X()
-	x1 := p1.X()
+func (ip *InteriorPointArea) intersection(p0, p1 matrix.Matrix, Y float64) float64 {
+	x0 := p0[0]
+	x1 := p1[0]
 
 	if x0 == x1 {
 		return x0
 	}
 	// Assert: segDX is non-zero, due to previous equality test
 	segDX := x1 - x0
-	segDY := p1.Y() - p0.Y()
+	segDY := p1[1] - p0[1]
 	m := segDY / segDX
-	x := x0 + ((Y - p0.Y()) / m)
+	x := x0 + ((Y - p0[1]) / m)
 	return x
 }
 
 // Tests if a line segment intersects a horizontal line.
-func (ip *InteriorPointArea) intersectsHorizontalLine(p0, p1 Point, y float64) bool {
+func (ip *InteriorPointArea) intersectsHorizontalLine(p0, p1 matrix.Matrix, y float64) bool {
 	// both ends above?
-	if p0.Y() > y && p1.Y() > y {
+	if p0[1] > y && p1[1] > y {
 		return false
 	}
 	// both ends below?
-	if p0.Y() < y && p1.Y() < y {
+	if p0[1] < y && p1[1] < y {
 		return false
 	}
 	// segment must intersect line
@@ -312,17 +318,17 @@ func (ip *InteriorPointArea) intersectsHorizontalLine(p0, p1 Point, y float64) b
 // ScanLineYOrdinateFinder Finds a safe scan line Y ordinate by projecting
 // the polygon segments
 type ScanLineYOrdinateFinder struct {
-	poly Polygon
+	poly matrix.PolygonMatrix
 
 	centreY, hiY, loY float64
 }
 
 // ScanLineY Finds a safe scan line Y ordinate by projecting
 // the polygon segments
-func ScanLineY(poly Polygon) float64 {
+func ScanLineY(poly matrix.PolygonMatrix) float64 {
 	finder := &ScanLineYOrdinateFinder{poly: poly}
-	finder.hiY = poly.Bound().Top()
-	finder.loY = poly.Bound().Bottom()
+	finder.hiY = poly.Bound()[1][1]
+	finder.loY = poly.Bound()[0][1]
 	finder.centreY = avg(finder.loY, finder.hiY)
 	return finder.ScanLineY()
 }
@@ -330,7 +336,7 @@ func ScanLineY(poly Polygon) float64 {
 // ScanLineY Finds a safe scan line Y ordinate by projecting
 // the polygon segments
 func (s *ScanLineYOrdinateFinder) ScanLineY() float64 {
-	s.process(LineString(s.poly.Shell()))
+	s.process(matrix.LineMatrix(s.poly[0]))
 	for _, v := range s.poly {
 		s.process(v)
 	}
@@ -338,7 +344,7 @@ func (s *ScanLineYOrdinateFinder) ScanLineY() float64 {
 	return scanLineY
 }
 
-func (s *ScanLineYOrdinateFinder) process(line LineString) {
+func (s *ScanLineYOrdinateFinder) process(line matrix.LineMatrix) {
 
 	for _, v := range line {
 		s.updateInterval(v[1])

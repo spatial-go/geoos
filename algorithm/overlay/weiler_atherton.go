@@ -1,12 +1,12 @@
 package overlay
 
 import (
-	"errors"
-	"math"
-
 	"github.com/spatial-go/geoos/algorithm"
+	"github.com/spatial-go/geoos/algorithm/algoerr"
+	"github.com/spatial-go/geoos/algorithm/calc"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
+	"github.com/spatial-go/geoos/algorithm/relate"
 )
 
 // Atherton is a func of overlay.
@@ -19,29 +19,17 @@ func SliceContains(list []algorithm.Vertex, p *algorithm.Vertex) (int, error) {
 			return i, nil
 		}
 	}
-	return len(list), errors.New("point is not in slice")
-}
-
-// CrossProduct Returns cross product of a,b point.
-func CrossProduct(a, b *algorithm.Vertex) float64 {
-	return a.X()*b.Y() - a.Y()*b.X()
-}
-
-// InLine returns true if spot in ab,false else.
-func InLine(spot, a, b *algorithm.Vertex) bool {
-	x := spot.X() <= math.Max(a.X(), b.X()) && spot.X() >= math.Min(a.X(), b.X())
-	y := spot.Y() <= math.Max(a.Y(), b.Y()) && spot.Y() >= math.Min(a.Y(), b.Y())
-	return x && y
+	return len(list), algoerr.ErrNotInSlice
 }
 
 // Merge merge polygon.
 func Merge(walkings []*algorithm.Edge, pol *algorithm.Plane, start *algorithm.Vertex, which bool) *algorithm.Vertex {
-	return Overlay(walkings, pol, start, which, algorithm.MERGE)
+	return Overlay(walkings, pol, start, which, calc.MERGE)
 }
 
 // Clip clip polygon.
 func Clip(walkings []*algorithm.Edge, pol *algorithm.Plane, start *algorithm.Vertex, which bool) *algorithm.Vertex {
-	return Overlay(walkings, pol, start, which, algorithm.CLIP)
+	return Overlay(walkings, pol, start, which, calc.CLIP)
 }
 
 // Overlay overlay polygon.
@@ -52,13 +40,13 @@ func Overlay(walkings []*algorithm.Edge, pol *algorithm.Plane, start *algorithm.
 			for {
 				pol.AddPointWhich(&w.Vertexs[iter], which)
 				switch kind {
-				case algorithm.CLIP:
+				case calc.CLIP:
 					if w.IsClockwise {
 						iter++
 					} else {
 						iter--
 					}
-				case algorithm.MERGE:
+				case calc.MERGE:
 					if w.IsClockwise {
 						iter--
 					} else {
@@ -85,73 +73,6 @@ func Overlay(walkings []*algorithm.Edge, pol *algorithm.Plane, start *algorithm.
 	return &algorithm.Vertex{}
 }
 
-// Intersection returns intersection of a and b.
-func Intersection(aStart, aEnd, bStart, bEnd *algorithm.Vertex) (mark bool, p *algorithm.Vertex) {
-	a1 := aEnd.Y() - aStart.Y()
-	b1 := aStart.X() - aEnd.X()
-	c1 := -aStart.X()*a1 - b1*aStart.Y()
-	a2 := bEnd.Y() - bStart.Y()
-	b2 := bStart.X() - bEnd.X()
-	c2 := -a2*bStart.X() - b2*bStart.Y()
-
-	var u, v *algorithm.Vertex
-	u = aEnd.Sub(aStart)
-	v = bEnd.Sub(bStart)
-
-	determinant := CrossProduct(u, v)
-
-	if determinant == 0 {
-		mark = false
-	} else {
-		p = &algorithm.Vertex{}
-		p.Matrix = matrix.Matrix{(b1*c2 - b2*c1) / determinant, (a2*c1 - a1*c2) / determinant}
-
-		// check if point belongs to segment
-		if InLine(p, aStart, aEnd) && InLine(p, bStart, bEnd) {
-			p.IsIntersectionPoint = true
-			// determine if the point is entering by determinant
-			p.IsEntering = determinant < 0
-			mark = true
-		} else {
-			mark = false
-		}
-	}
-	return
-}
-
-// IsIntersectionEdge returns intersection of edge a and b.
-func IsIntersectionEdge(aLine, bLine algorithm.Edge) (mark bool) {
-	mark = false
-	for i, v := range aLine.Vertexs {
-		for j, vClip := range bLine.Vertexs {
-			if i < len(aLine.Vertexs)-1 && j < len(bLine.Vertexs)-1 {
-				markInter, _ := Intersection(&v, &aLine.Vertexs[i+1], &vClip, &aLine.Vertexs[i+1])
-				if markInter {
-					return
-				}
-			}
-		}
-	}
-	return
-}
-
-// IntersectionEdge returns intersection of edge a and b.
-func IntersectionEdge(aLine, bLine algorithm.Edge) (mark bool, ps []*algorithm.Vertex) {
-	mark = false
-	for i, v := range aLine.Vertexs {
-		for j, vClip := range bLine.Vertexs {
-			if i < len(aLine.Vertexs)-1 && j < len(bLine.Vertexs)-1 {
-				markInter, ip := Intersection(&v, &aLine.Vertexs[i+1], &vClip, &aLine.Vertexs[i+1])
-				if markInter {
-					mark = markInter
-					ps = append(ps, ip)
-				}
-			}
-		}
-	}
-	return
-}
-
 // Weiler Weiler overlay.
 func Weiler(subject, clipping *algorithm.Plane, ath Atherton) *algorithm.Plane {
 	var pol *algorithm.Plane = &algorithm.Plane{}
@@ -163,7 +84,8 @@ func Weiler(subject, clipping *algorithm.Plane, ath Atherton) *algorithm.Plane {
 	for _, v := range subject.Lines {
 		for _, vClip := range clipping.Lines {
 			ip := &algorithm.Vertex{}
-			mark, ip = Intersection(v.Start, v.End, vClip.Start, vClip.End)
+			mark, ip.Matrix, ip.IsIntersectionPoint, ip.IsEntering =
+				relate.Intersection(v.Start.Matrix, v.End.Matrix, vClip.Start.Matrix, vClip.End.Matrix)
 
 			if mark {
 				if ip.IsEntering {

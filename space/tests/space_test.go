@@ -17,7 +17,7 @@ func Test_Centroid(t *testing.T) {
 			if got == nil {
 				t.Errorf("Centroid() got = %v, want %v", got, tt.want)
 			}
-			if !got.Equal(tt.want) {
+			if !got.Equals(tt.want) {
 				t.Errorf("Centroid() got = %v, want %v", got, tt.want)
 			}
 		})

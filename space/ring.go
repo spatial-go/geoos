@@ -1,10 +1,9 @@
 package space
 
 import (
-	"errors"
-
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
+	"github.com/spatial-go/geoos/space/spaceerr"
 )
 
 // Ring represents a set of ring on the earth.
@@ -25,6 +24,11 @@ func (r Ring) Nums() int {
 	return 1
 }
 
+// IsCollection returns true if the Geometry is  collection.
+func (r Ring) IsCollection() bool {
+	return false
+}
+
 // Bound returns a rect around the ring. Uses rectangular coordinates.
 func (r Ring) Bound() Bound {
 	return LineString(r).Bound()
@@ -33,11 +37,11 @@ func (r Ring) Bound() Bound {
 // EqualRing compares two rings. Returns true if lengths are the same
 // and all points are Equal.
 func (r Ring) EqualRing(ring Ring) bool {
-	return LineString(r).Equal(LineString(ring))
+	return LineString(r).Equals(LineString(ring))
 }
 
-// Equal checks if the Ring represents the same Geometry or vector.
-func (r Ring) Equal(g Geometry) bool {
+// Equals checks if the Ring represents the same Geometry or vector.
+func (r Ring) Equals(g Geometry) bool {
 	if g.GeoJSONType() != r.GeoJSONType() {
 		return false
 	}
@@ -51,17 +55,17 @@ func (r Ring) EqualsExact(g Geometry, tolerance float64) bool {
 	if r.GeoJSONType() != g.GeoJSONType() {
 		return false
 	}
-	return LineString(r).Equal(LineString(g.(Ring)))
+	return LineString(r).Equals(LineString(g.(Ring)))
 }
 
 // Area returns the area of a polygonal geometry. The area of a ring is 0.
 func (r Ring) Area() (float64, error) {
-	return measure.Area(r.ToMatrix()), nil
+	return measure.Area(r.ToMatrix().(matrix.LineMatrix)), nil
 }
 
 // ToMatrix returns the LineMatrix of a Ring geometry.
-func (r Ring) ToMatrix() matrix.LineMatrix {
-	return matrix.LineMatrix(r)
+func (r Ring) ToMatrix() matrix.Steric {
+	return LineString(r).ToMatrix()
 }
 
 // IsEmpty returns true if the Geometry is empty.
@@ -82,7 +86,7 @@ func (r Ring) SpheroidDistance(g Geometry) (float64, error) {
 // Boundary returns the closure of the combinatorial boundary of this space.Geometry.
 // The boundary of a lineal geometry is always a zero-dimensional geometry (which may be empty).
 func (r Ring) Boundary() (Geometry, error) {
-	return nil, errors.New("ring's boundary should be nil")
+	return nil, spaceerr.ErrBoundBeNil
 }
 
 // Length Returns the length of this LineString

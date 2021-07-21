@@ -36,7 +36,7 @@ type LineSimplifier struct {
 func (l *LineSimplifier) Simplify(distanceTol float64) matrix.LineMatrix {
 	l.distanceTol = math.Abs(distanceTol)
 	if distanceTol < 0 {
-		l.angleOrientation = CLOCKWISE
+		l.angleOrientation = calc.CLOCKWISE
 	}
 
 	// rely on fact that boolean array is filled with false value
@@ -181,10 +181,10 @@ func (l *LineSimplifier) orientationIndex(p1x, p1y,
 		return index
 	}
 	// normalize coordinates
-	dx1 := (&calc.DD{Hi: p2x, Lo: 0.0}).SelfAdd(-p1x, 0.0)
-	dy1 := (&calc.DD{Hi: p2y, Lo: 0.0}).SelfAdd(-p1y, 0.0)
-	dx2 := (&calc.DD{Hi: qx, Lo: 0.0}).SelfAdd(-p2x, 0.0)
-	dy2 := (&calc.DD{Hi: qy, Lo: 0.0}).SelfAdd(-p2y, 0.0)
+	dx1 := (&calc.PairFloat{Hi: p2x, Lo: 0.0}).SelfAdd(-p1x, 0.0)
+	dy1 := (&calc.PairFloat{Hi: p2y, Lo: 0.0}).SelfAdd(-p1y, 0.0)
+	dx2 := (&calc.PairFloat{Hi: qx, Lo: 0.0}).SelfAdd(-p2x, 0.0)
+	dy2 := (&calc.PairFloat{Hi: qy, Lo: 0.0}).SelfAdd(-p2y, 0.0)
 	dy11 := dy1.SelfMultiply(dx2.Hi, dx2.Lo)
 
 	// sign of determinant - unrolled for performance

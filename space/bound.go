@@ -1,8 +1,10 @@
 package space
 
 import (
-	"errors"
 	"math"
+
+	"github.com/spatial-go/geoos/algorithm/matrix"
+	"github.com/spatial-go/geoos/space/spaceerr"
 )
 
 var emptyBound = Bound{Min: Point{1, 1}, Max: Point{-1, -1}}
@@ -29,9 +31,19 @@ func (b Bound) Nums() int {
 	return 2
 }
 
+// IsCollection returns true if the Geometry is  collection.
+func (b Bound) IsCollection() bool {
+	return false
+}
+
 // ToPolygon converts the bound into a Polygon object.
 func (b Bound) ToPolygon() Polygon {
 	return Polygon{b.ToRing()}
+}
+
+// ToMatrix returns the Steric of a  geometry.
+func (b Bound) ToMatrix() matrix.Steric {
+	return b.ToPolygon().ToMatrix()
 }
 
 // ToRing converts the bound into a loop defined
@@ -95,17 +107,17 @@ func (b Bound) Bound() Bound {
 	return b
 }
 
-// EqualBound returns if two bounds are equal.
-func (b Bound) EqualBound(c Bound) bool {
-	return b.Min.EqualPoint(c.Min) && b.Max.EqualPoint(c.Max)
+// EqualsBound returns if two bounds are equal.
+func (b Bound) EqualsBound(c Bound) bool {
+	return b.Min.EqualsPoint(c.Min) && b.Max.EqualsPoint(c.Max)
 }
 
-// Equal checks if the Bound represents the same Geometry or vector.
-func (b Bound) Equal(g Geometry) bool {
+// Equals checks if the Bound represents the same Geometry or vector.
+func (b Bound) Equals(g Geometry) bool {
 	if g.GeoJSONType() != b.GeoJSONType() {
 		return false
 	}
-	return b.EqualBound(g.(Bound))
+	return b.EqualsBound(g.(Bound))
 }
 
 // EqualsExact Returns true if the two Geometrys are exactly equal,
@@ -176,7 +188,7 @@ func (b Bound) Distance(g Geometry) (float64, error) {
 		return 0, nil
 	}
 	if b.IsEmpty() != g.IsEmpty() {
-		return 0, errors.New("Geometry is nil")
+		return 0, spaceerr.ErrNilGeometry
 	}
 	return b.ToRing().Distance(g)
 }
@@ -187,14 +199,14 @@ func (b Bound) SpheroidDistance(g Geometry) (float64, error) {
 		return 0, nil
 	}
 	if b.IsEmpty() != g.IsEmpty() {
-		return 0, errors.New("Geometry is nil")
+		return 0, spaceerr.ErrNilGeometry
 	}
 	return b.ToRing().SpheroidDistance(g)
 }
 
 // Boundary returns the closure of the combinatorial boundary of this space.Geometry.
 func (b Bound) Boundary() (Geometry, error) {
-	return nil, errors.New("Bound's boundary should be nil")
+	return nil, spaceerr.ErrNotSupportBound
 }
 
 // Length Returns the length of this LineString
@@ -216,4 +228,16 @@ func (b Bound) Centroid() Point {
 // UniquePoints return all distinct vertices of input geometry as a MultiPoint.
 func (b Bound) UniquePoints() MultiPoint {
 	return MultiPoint{b.Max, b.Min}
+}
+
+// IntersectsBound Tests if the region defined by other
+// intersects the region of this Envelope.
+func (b Bound) IntersectsBound(other Bound) bool {
+	if b.IsEmpty() || other.IsEmpty() {
+		return false
+	}
+	return !(other.Min.X() > b.Max.X() ||
+		other.Max.X() < b.Min.X() ||
+		other.Min.Y() > b.Max.Y() ||
+		other.Max.Y() < b.Min.Y())
 }

@@ -25,12 +25,22 @@ func (p Polygon) Nums() int {
 	return 1
 }
 
+// IsCollection returns true if the Geometry is  collection.
+func (p Polygon) IsCollection() bool {
+	return false
+}
+
 // Bound returns a bound around the polygon.
 func (p Polygon) Bound() Bound {
 	if len(p) == 0 {
 		return emptyBound
 	}
 	return p.ToRingArray()[0].Bound()
+}
+
+// ToMatrix returns the LineMatrix of a Ring geometry.
+func (p Polygon) ToMatrix() matrix.Steric {
+	return matrix.PolygonMatrix(p)
 }
 
 // IsRectangle returns true if  the polygon is rectangle.
@@ -69,26 +79,26 @@ func (p Polygon) IsRectangle() bool {
 	return true
 }
 
-// EqualPolygon comEqualPolygonpares two polygons. Returns true if lengths are the same
+// EqualsPolygon comEqualPolygonpares two polygons. Returns true if lengths are the same
 // and all points are Equal.
-func (p Polygon) EqualPolygon(polygon Polygon) bool {
+func (p Polygon) EqualsPolygon(polygon Polygon) bool {
 	if len(p) != len(polygon) {
 		return false
 	}
 	for i, v := range p.ToRingArray() {
-		if !v.Equal(Ring(polygon[i])) {
+		if !v.Equals(Ring(polygon[i])) {
 			return false
 		}
 	}
 	return true
 }
 
-// Equal checks if the Polygon represents the same Geometry or vector.
-func (p Polygon) Equal(g Geometry) bool {
+// Equals checks if the Polygon represents the same Geometry or vector.
+func (p Polygon) Equals(g Geometry) bool {
 	if g.GeoJSONType() != p.GeoJSONType() {
 		return false
 	}
-	return p.EqualPolygon(g.(Polygon))
+	return p.EqualsPolygon(g.(Polygon))
 }
 
 // EqualsExact Returns true if the two Geometrys are exactly equal,
@@ -119,12 +129,7 @@ func (p Polygon) EqualsExact(g Geometry, tolerance float64) bool {
 
 // Area returns the area of a polygonal geometry.
 func (p Polygon) Area() (float64, error) {
-	return measure.AreaOfPolygon(p.ToMatrix()), nil
-}
-
-// ToMatrix returns the PolygonMatrix of a polygonal geometry.
-func (p Polygon) ToMatrix() matrix.PolygonMatrix {
-	return matrix.PolygonMatrix(p)
+	return measure.AreaOfPolygon(p.ToMatrix().(matrix.PolygonMatrix)), nil
 }
 
 // ToRingArray returns the RingArray
@@ -142,14 +147,12 @@ func (p Polygon) IsEmpty() bool {
 
 // Distance returns distance Between the two Geometry.
 func (p Polygon) Distance(g Geometry) (float64, error) {
-	elem := &ElementDistance{p}
-	return elem.distanceWithFunc(g, measure.PlanarDistance)
+	return Distance(p, g, measure.PlanarDistance)
 }
 
 // SpheroidDistance returns  spheroid distance Between the two Geometry.
 func (p Polygon) SpheroidDistance(g Geometry) (float64, error) {
-	elem := &ElementDistance{p}
-	return elem.distanceWithFunc(g, measure.SpheroidDistance)
+	return Distance(p, g, measure.SpheroidDistance)
 }
 
 // Boundary returns the closure of the combinatorial boundary of this space.Geometry.

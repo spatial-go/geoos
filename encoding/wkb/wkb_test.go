@@ -53,7 +53,7 @@ func TestGeoFromWKBHexStr(t *testing.T) {
 	hexStr := `0101000020E61000008EAF3DB324E05C40DC12B9E00C704340`
 	g0 := space.Point{115.50224, 38.875393}
 	g1, _ := GeoFromWKBHexStr(hexStr)
-	if !g0.Equal(g1) {
+	if !g0.Equals(g1) {
 		t.Errorf("GeoFromWKBHexStr() got = %v, want %v", g0, g1)
 	}
 }
@@ -91,7 +91,7 @@ func compare(t testing.TB, e space.Geometry, b []byte) {
 		t.Fatalf("decoder: read error: %v", err)
 	}
 
-	if !g.Equal(e) {
+	if !g.Equals(e) {
 		t.Errorf("decoder: incorrect geometry: %v != %v", g, e)
 	}
 
@@ -100,7 +100,7 @@ func compare(t testing.TB, e space.Geometry, b []byte) {
 		t.Fatalf("unmarshal: read error: %v", err)
 	}
 
-	if !g.Equal(e) {
+	if !g.Equals(e) {
 		t.Errorf("unmarshal: incorrect geometry: %v != %v", g, e)
 	}
 
@@ -169,7 +169,7 @@ func compare(t testing.TB, e space.Geometry, b []byte) {
 		t.Errorf("scanning to wrong type: %v != %v", sg.GeoJSONType(), e.GeoJSONType())
 	}
 
-	if !sg.Equal(e) {
+	if !sg.Equals(e) {
 		t.Errorf("scan: incorrect geometry: %v != %v", sg, e)
 	}
 }

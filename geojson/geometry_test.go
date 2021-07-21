@@ -145,7 +145,7 @@ func TestGeometryUnmarshal(t *testing.T) {
 				t.Errorf("incorrenct type: %v != %v", g.Type, tc.geom.GeoJSONType())
 			}
 
-			if !g.Geometry().Equal(tc.geom) {
+			if !g.Geometry().Equals(tc.geom) {
 				t.Errorf("incorrect geometry")
 				t.Logf("%[1]T, %[1]v", g.Geometry())
 				t.Log(tc.geom)
@@ -267,7 +267,7 @@ func TestHelperTypes(t *testing.T) {
 				t.Fatalf("unmarshal error: %v", err)
 			}
 
-			if !tc.output.(geom).Geometry().Equal(geo.Coordinates) {
+			if !tc.output.(geom).Geometry().Equals(geo.Coordinates) {
 				t.Errorf("should unmarshal the same")
 				t.Log(tc.output)
 				t.Log(geo.Coordinates)

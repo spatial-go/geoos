@@ -4,6 +4,8 @@ import (
 	"math"
 
 	"github.com/spatial-go/geoos/algorithm/matrix"
+	"github.com/spatial-go/geoos/algorithm/relate"
+	"github.com/spatial-go/geoos/space/spaceerr"
 )
 
 const (
@@ -112,4 +114,91 @@ func DistancePolygonToPoint(poly matrix.PolygonMatrix, pt matrix.Matrix, f Dista
 		}
 	}
 	return
+}
+
+// ElementDistance describes a geographic ElementDistance
+type ElementDistance struct {
+	From, To matrix.Steric
+	F        Distance
+}
+
+// Distance returns distance Between the two Geometry.
+func (el *ElementDistance) Distance() (float64, error) {
+	if el.From.IsEmpty() && el.From.IsEmpty() {
+		return 0, nil
+	}
+	if el.From.IsEmpty() != el.From.IsEmpty() {
+		return 0, spaceerr.ErrNilGeometry
+	}
+	switch to := el.To.(type) {
+	case matrix.Matrix:
+		if from, ok := el.From.(matrix.Matrix); ok {
+			return el.F(to, from), nil
+		}
+		elem := &ElementDistance{el.To, el.From, el.F}
+		return elem.Distance()
+	case matrix.LineMatrix:
+		if from, ok := el.From.(matrix.Matrix); ok {
+			return DistanceLineToPoint(to, from, el.F), nil
+		} else if _, ok := el.From.(matrix.LineMatrix); ok {
+			return el.distanceLineAndLine()
+		}
+		elem := &ElementDistance{el.To, el.From, el.F}
+		return elem.Distance()
+	case matrix.PolygonMatrix:
+		if from, ok := el.From.(matrix.Matrix); ok {
+			return DistancePolygonToPoint(to, from, el.F), nil
+		} else if _, ok := el.From.(matrix.LineMatrix); ok {
+			return el.distancePolygonAndLine()
+		} else if from, ok := el.From.(matrix.PolygonMatrix); ok {
+			var dist float64
+			for _, v := range from {
+				elem := &ElementDistance{matrix.LineMatrix(v), el.To, el.F}
+				if distP, _ := elem.Distance(); dist > distP {
+					dist = distP
+				}
+			}
+			return dist, nil
+		}
+		elem := &ElementDistance{el.To, el.From, el.F}
+		return elem.Distance()
+	case matrix.Collection:
+		var dist float64
+		for _, v := range to {
+			elem := &ElementDistance{v, el.From, el.F}
+			if distP, err := elem.Distance(); err == nil && dist > distP {
+				dist = distP
+			}
+		}
+		return dist, nil
+	default:
+		return 0, nil
+	}
+}
+
+// distanceLineAndLine returns distance Between the two Geometry.
+func (el *ElementDistance) distanceLineAndLine() (float64, error) {
+	var dist float64
+	if mark := relate.IsIntersectionEdge(el.From.(matrix.LineMatrix), el.To.(matrix.LineMatrix)); mark {
+		return 0, nil
+	}
+	for _, v := range el.From.(matrix.LineMatrix) {
+		elem := &ElementDistance{matrix.Matrix(v), el.To, el.F}
+		if distP, _ := elem.Distance(); dist > distP {
+			dist = distP
+		}
+	}
+	return dist, nil
+}
+
+// distancePolygonAndLine returns distance Between the two Geometry.
+func (el *ElementDistance) distancePolygonAndLine() (float64, error) {
+	var dist float64
+	for _, v := range el.To.(matrix.PolygonMatrix) {
+		elem := &ElementDistance{matrix.LineMatrix(v), el.From, el.F}
+		if distP, _ := elem.Distance(); dist > distP {
+			dist = distP
+		}
+	}
+	return dist, nil
 }

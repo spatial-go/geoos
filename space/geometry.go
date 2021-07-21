@@ -1,5 +1,7 @@
 package space
 
+import "github.com/spatial-go/geoos/algorithm/matrix"
+
 // const geomtype
 const (
 	TypePoint      = "Point"
@@ -23,14 +25,21 @@ type Geometry interface {
 	Dimensions() int
 
 	Bound() Bound
+
 	// Num of geometries
 	Nums() int
+
+	// IsCollection returns true if the Geometry is  collection.
+	IsCollection() bool
+
+	// ToMatrix returns the Steric of a  geometry.
+	ToMatrix() matrix.Steric
 
 	// Area returns the area of a polygonal geometry.
 	Area() (float64, error)
 
-	// Equal returns true if the Geometry represents the same Geometry or vector.
-	Equal(g Geometry) bool
+	// Equals returns true if the Geometry represents the same Geometry or vector.
+	Equals(g Geometry) bool
 
 	// IsEmpty returns true if the Geometry is empty.
 	IsEmpty() bool

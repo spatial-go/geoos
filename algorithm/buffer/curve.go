@@ -3,6 +3,7 @@ package buffer
 import (
 	"math"
 
+	"github.com/spatial-go/geoos/algorithm/calc"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 )
 
@@ -35,7 +36,7 @@ func (c *Curve) CloseRing() {
 	}
 	startPt := c.Line[0]
 	lastPt := c.Line[len(c.Line)-1]
-	if matrix.Equal(matrix.Matrix(startPt), matrix.Matrix(lastPt)) {
+	if matrix.Matrix(startPt).Equals(matrix.Matrix(lastPt)) {
 		return
 	}
 	c.Line = append(c.Line, startPt)
@@ -51,8 +52,8 @@ func (c *Curve) CreateCircle(p matrix.Matrix, distance float64) matrix.LineMatri
 	// add start point
 	c.Line = append(c.Line, matrix.Matrix{p[0] + distance, p[1]})
 
-	directionFactor := CLOCKWISE
-	totalAngle := math.Abs(0.0 - ANGLE*math.Pi)
+	directionFactor := calc.CLOCKWISE
+	totalAngle := math.Abs(0.0 - calc.ANGLE*math.Pi)
 	nSegs := totalAngle/(math.Pi/2.0/float64(c.parameters.QuadrantSegments)) + 0.5
 
 	if nSegs < 1 {
@@ -90,25 +91,25 @@ func (c *Curve) AddLineEndCap(p0, p1 matrix.Matrix, distance float64) {
 	seg := matrix.LineMatrix{p0, p1}
 
 	offsetL := make(matrix.LineMatrix, 2)
-	c.computeOffsetSegment(seg, LEFT, distance, offsetL)
+	c.computeOffsetSegment(seg, calc.LEFT, distance, offsetL)
 	offsetR := make(matrix.LineMatrix, 2)
-	c.computeOffsetSegment(seg, RIGHT, distance, offsetR)
+	c.computeOffsetSegment(seg, calc.RIGHT, distance, offsetR)
 
 	dx := p1[0] - p0[0]
 	dy := p1[1] - p0[1]
 	angle := math.Atan2(dy, dx)
 
 	switch c.parameters.EndCapStyle {
-	case CAPROUND:
+	case calc.CAPROUND:
 		// add offset seg points with a fillet between them
 		c.Line = append(c.Line, offsetL[1])
-		c.addDirectedFillet(p1, distance, angle+math.Pi/2, angle-math.Pi/2, CLOCKWISE)
+		c.addDirectedFillet(p1, distance, angle+math.Pi/2, angle-math.Pi/2, calc.CLOCKWISE)
 		c.Line = append(c.Line, offsetR[1])
-	case CAPFLAT:
+	case calc.CAPFLAT:
 		// only offset segment points are added
 		c.Line = append(c.Line, offsetL[1])
 		c.Line = append(c.Line, offsetR[1])
-	case CAPSQUARE:
+	case calc.CAPSQUARE:
 		// add a square defined by extensions of the offset segment endpoints
 		squareCapSideOffset := matrix.Matrix{}
 		squareCapSideOffset[0] = math.Abs(distance) * math.Cos(angle)
@@ -131,7 +132,7 @@ func (c *Curve) AddLineEndCap(p0, p1 matrix.Matrix, distance float64) {
 // the caller must add them if required.
 func (c *Curve) addDirectedFillet(p matrix.Matrix, radius, startAngle, endAngle float64, direction int) {
 	directionFactor := 1.0
-	if direction == CLOCKWISE {
+	if direction == calc.CLOCKWISE {
 		directionFactor = -1.0
 	}
 
@@ -165,7 +166,7 @@ func (c *Curve) initSideSegments(s1, s2 matrix.Matrix, side int) {
 // The offset points are computed in full double precision, for accuracy.
 func (c *Curve) computeOffsetSegment(seg matrix.LineMatrix, side int, distance float64, offset matrix.LineMatrix) {
 	sideSign := -1.0
-	if side == LEFT {
+	if side == calc.LEFT {
 		sideSign = 1.0
 	}
 	dx := seg[1][0] - seg[0][0]

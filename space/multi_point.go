@@ -1,9 +1,9 @@
 package space
 
 import (
-	"errors"
-
+	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
+	"github.com/spatial-go/geoos/space/spaceerr"
 )
 
 // A MultiPoint represents a set of points in the 2D Eucledian or Cartesian plane.
@@ -24,6 +24,20 @@ func (mp MultiPoint) Nums() int {
 	return len(mp)
 }
 
+// IsCollection returns true if the Geometry is  collection.
+func (mp MultiPoint) IsCollection() bool {
+	return true
+}
+
+// ToMatrix returns the Steric of a  geometry.
+func (mp MultiPoint) ToMatrix() matrix.Steric {
+	matr := matrix.Collection{}
+	for _, v := range mp {
+		matr = append(matr, v.ToMatrix())
+	}
+	return matr
+}
+
 // Bound returns a bound around the points. Uses rectangular coordinates.
 func (mp MultiPoint) Bound() Bound {
 	if len(mp) == 0 {
@@ -38,26 +52,26 @@ func (mp MultiPoint) Bound() Bound {
 	return b
 }
 
-// EqualMultiPoint compares two MultiPoint objects. Returns true if lengths are the same
+// EqualsMultiPoint compares two MultiPoint objects. Returns true if lengths are the same
 // and all points are Equal, and in the same order.
-func (mp MultiPoint) EqualMultiPoint(multiPoint MultiPoint) bool {
+func (mp MultiPoint) EqualsMultiPoint(multiPoint MultiPoint) bool {
 	if len(mp) != len(multiPoint) {
 		return false
 	}
 	for i, v := range mp.ToPointArray() {
-		if !v.Equal(Point(multiPoint[i])) {
+		if !v.Equals(Point(multiPoint[i])) {
 			return false
 		}
 	}
 	return true
 }
 
-// Equal checks if the MultiPoint represents the same Geometry or vector.
-func (mp MultiPoint) Equal(g Geometry) bool {
+// Equals checks if the MultiPoint represents the same Geometry or vector.
+func (mp MultiPoint) Equals(g Geometry) bool {
 	if g.GeoJSONType() != mp.GeoJSONType() {
 		return false
 	}
-	return mp.EqualMultiPoint(g.(MultiPoint))
+	return mp.EqualsMultiPoint(g.(MultiPoint))
 }
 
 // EqualsExact Returns true if the two Geometrys are exactly equal,
@@ -92,19 +106,17 @@ func (mp MultiPoint) IsEmpty() bool {
 
 // Distance returns distance Between the two Geometry.
 func (mp MultiPoint) Distance(g Geometry) (float64, error) {
-	elem := &ElementDistance{mp}
-	return elem.distanceWithFunc(g, measure.PlanarDistance)
+	return Distance(mp, g, measure.PlanarDistance)
 }
 
 // SpheroidDistance returns  spheroid distance Between the two Geometry.
 func (mp MultiPoint) SpheroidDistance(g Geometry) (float64, error) {
-	elem := &ElementDistance{mp}
-	return elem.distanceWithFunc(g, measure.SpheroidDistance)
+	return Distance(mp, g, measure.SpheroidDistance)
 }
 
 // Boundary returns the closure of the combinatorial boundary of this space.Geometry.
 func (mp MultiPoint) Boundary() (Geometry, error) {
-	return nil, errors.New("multipoint's boundary should be nil")
+	return nil, spaceerr.ErrNotSupportCollection
 }
 
 // Length Returns the length of this geometry

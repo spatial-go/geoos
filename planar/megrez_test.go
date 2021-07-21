@@ -107,7 +107,7 @@ func TestAlgorithm_Boundary(t *testing.T) {
 			}
 			t.Log(wkt.MarshalString(got))
 			t.Log(wkt.MarshalString(tt.want))
-			if !got.Equal(tt.want) {
+			if !got.Equals(tt.want) {
 				t.Errorf("Boundary() got = %v, want %v", got, tt.want)
 			}
 		})
@@ -620,6 +620,64 @@ func TestAlgorithm_PointOnSurface(t *testing.T) {
 			isEqual, _ := G.EqualsExact(gotGeometry, tt.want, 0.000001)
 			if !isEqual {
 				t.Errorf("GEOAlgorithm.Envelope() = %v, want %v", wkt.MarshalString(gotGeometry), wkt.MarshalString(tt.want))
+			}
+		})
+	}
+}
+
+func TestAlgorithm_Relate(t *testing.T) {
+	const g0 = `POINT(0 0)`
+	const g1 = `POLYGON((0 0, 0 5, 5 5, 5 0, 0 0))`
+	const g2 = `POLYGON((10 0, 0 10,10 10,10 0))`
+	const g5 = `POLYGON((0 1, 0 5, 5 5, 5 1, 0 1))`
+	const g3 = `POLYGON((0 0, 0 5, 5 5, 5 0, 0 0))`
+	const g4 = `POLYGON((-1 -1, 1 -1,1 1,-1 1,-1 -1))`
+
+	geom1, _ := wkt.UnmarshalString(g1)
+	geom2, _ := wkt.UnmarshalString(g2)
+	geom0, _ := wkt.UnmarshalString(g0)
+	geom3, _ := wkt.UnmarshalString(g3)
+	geom4, _ := wkt.UnmarshalString(g4)
+	geom5, _ := wkt.UnmarshalString(g5)
+	type args struct {
+		g1 space.Geometry
+		g2 space.Geometry
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    bool
+		wantErr bool
+	}{
+		{name: "crosses", args: args{
+			g1: geom0,
+			g2: geom1,
+		}, want: true, wantErr: false},
+		{name: "crosses", args: args{
+			g1: geom0,
+			g2: geom2,
+		}, want: true, wantErr: false},
+		{name: "crosses", args: args{
+			g1: geom0,
+			g2: geom3,
+		}, want: true, wantErr: false},
+		{name: "crosses", args: args{
+			g1: geom1,
+			g2: geom4,
+		}, want: true, wantErr: false},
+		{name: "crosses", args: args{
+			g1: geom1,
+			g2: geom5,
+		}, want: true, wantErr: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			G := GEOAlgorithm{}
+			got, err := G.Relate(tt.args.g1, tt.args.g2)
+			t.Errorf(got, tt.args.g2)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Crosses() error = %v, wantErr %v", err, tt.wantErr)
+				return
 			}
 		})
 	}

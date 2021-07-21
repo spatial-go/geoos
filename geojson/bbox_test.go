@@ -73,7 +73,7 @@ func TestBBoxBound(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			if v := tc.bbox.Bound(); !v.Equal(tc.result) {
+			if v := tc.bbox.Bound(); !v.Equals(tc.result) {
 				t.Errorf("incorrect result: %v != %v", v, tc.result)
 			}
 		})

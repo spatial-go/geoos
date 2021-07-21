@@ -187,7 +187,7 @@ func (p *preSorted) splitMed(dim int) (med int, equal []int, left, right preSort
 	}
 	mh := m
 
-	for mh < len(p.cur[dim])-1 && p.points[p.cur[dim][mh+1]].Equal(p.points[p.cur[dim][m]]) {
+	for mh < len(p.cur[dim])-1 && p.points[p.cur[dim][mh+1]].Equals(p.points[p.cur[dim][m]]) {
 		mh++
 	}
 	med = p.cur[dim][m]

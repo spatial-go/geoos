@@ -17,7 +17,7 @@ func TestScanNil(t *testing.T) {
 		t.Fatalf("scan error: %v", err)
 	}
 
-	if !s.Geometry.Equal(testPoint) {
+	if !s.Geometry.Equals(testPoint) {
 		t.Errorf("incorrect geometry: %v != %v", s.Geometry, testPoint)
 	}
 
@@ -74,7 +74,7 @@ func TestScanHexData(t *testing.T) {
 				t.Fatalf("scan error: %v", err)
 			}
 
-			if !p.Equal(tc.expected) {
+			if !p.Equals(tc.expected) {
 				t.Errorf("unequal data")
 				t.Log(p)
 				t.Log(tc.expected)
@@ -120,13 +120,13 @@ func TestScanPoint(t *testing.T) {
 				t.Fatalf("scan error: %v", err)
 			}
 
-			if !p.Equal(tc.expected) {
+			if !p.Equals(tc.expected) {
 				t.Errorf("unequal data")
 				t.Log(p)
 				t.Log(tc.expected)
 			}
 
-			if !p.Equal(s.Geometry) {
+			if !p.Equals(s.Geometry) {
 				t.Errorf("should set to scanner's geometry attribute")
 			}
 
@@ -223,7 +223,7 @@ func TestScanMultiPoint(t *testing.T) {
 				t.Fatalf("scan error: %v", err)
 			}
 
-			if !mp.Equal(tc.expected) {
+			if !mp.Equals(tc.expected) {
 				t.Errorf("unequal data")
 				t.Log(mp)
 				t.Log(tc.expected)
@@ -315,7 +315,7 @@ func TestScanLineString(t *testing.T) {
 				t.Fatalf("scan error: %v", err)
 			}
 
-			if !ls.Equal(tc.expected) {
+			if !ls.Equals(tc.expected) {
 				t.Errorf("unequal data")
 				t.Log(ls)
 				t.Log(tc.expected)
@@ -412,7 +412,7 @@ func TestScanMultiLineString(t *testing.T) {
 				t.Fatalf("scan error: %v", err)
 			}
 
-			if !mls.Equal(tc.expected) {
+			if !mls.Equals(tc.expected) {
 				t.Errorf("unequal data")
 				t.Log(mls)
 				t.Log(tc.expected)
@@ -494,7 +494,7 @@ func TestScanRing(t *testing.T) {
 				t.Fatalf("scan error: %v", err)
 			}
 
-			if !r.Equal(tc.expected) {
+			if !r.Equals(tc.expected) {
 				t.Errorf("unequal data")
 				t.Log(r)
 				t.Log(tc.expected)
@@ -586,7 +586,7 @@ func TestScanPolygon(t *testing.T) {
 				t.Fatalf("scan error: %v", err)
 			}
 
-			if !p.Equal(tc.expected) {
+			if !p.Equals(tc.expected) {
 				t.Errorf("unequal data")
 				t.Log(p)
 				t.Log(tc.expected)
@@ -683,7 +683,7 @@ func TestScanMultiPolygon(t *testing.T) {
 				t.Fatalf("scan error: %v", err)
 			}
 
-			if !mp.Equal(tc.expected) {
+			if !mp.Equals(tc.expected) {
 				t.Errorf("unequal data")
 				t.Log(mp)
 				t.Log(tc.expected)
@@ -765,7 +765,7 @@ func TestScanCollection(t *testing.T) {
 				t.Fatalf("scan error: %v", err)
 			}
 
-			if !c.Equal(tc.expected) {
+			if !c.Equals(tc.expected) {
 				t.Errorf("unequal data")
 				t.Log(c)
 				t.Log(tc.expected)
@@ -887,7 +887,7 @@ func TestScanBound(t *testing.T) {
 				t.Fatalf("scan error: %v", err)
 			}
 
-			if !b.Equal(tc.expected) {
+			if !b.Equals(tc.expected) {
 				t.Errorf("unequal data")
 				t.Log(b)
 				t.Log(tc.expected)

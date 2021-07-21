@@ -3,22 +3,8 @@ package algorithm
 import (
 	"strconv"
 
+	"github.com/spatial-go/geoos/algorithm/calc"
 	"github.com/spatial-go/geoos/algorithm/matrix"
-)
-
-const (
-	// POINTS ...
-	POINTS = iota
-	// CLOSED egde is closed.
-	CLOSED
-	// MAIN overlay main polygon.
-	MAIN
-	// CUT overlay cut polygon.
-	CUT
-	// CLIP overlay clip.
-	CLIP
-	// MERGE overlay merge.
-	MERGE
 )
 
 // Plane is a closed area. The first edge is the outer ring.
@@ -33,7 +19,7 @@ type Plane struct {
 
 // AddPointWhich add a point in polyon with which.
 func (p *Plane) AddPointWhich(point *Vertex, which bool) {
-	if p.Edge == nil || p.Edge.NowStatus == CLOSED {
+	if p.Edge == nil || p.Edge.NowStatus == calc.CLOSED {
 		newCirCuit := Edge{IsClockwise: false}
 		p.Edge = &newCirCuit
 		p.Edge.Vertexs = append(p.Edge.Vertexs, Vertex{Matrix: matrix.Matrix{point.X(), point.Y()}})
@@ -59,7 +45,7 @@ func (p *Plane) AddPoint(point *Vertex) {
 // CloseRing close edge to ring.
 func (p *Plane) CloseRing() {
 	if p.Edge != nil {
-		p.Edge.NowStatus = CLOSED
+		p.Edge.NowStatus = calc.CLOSED
 		p.Edge.SetClockwise()
 
 		// add line
@@ -87,10 +73,10 @@ func (p *Plane) Equal(pol *Plane) bool {
 
 // ChangeRank change rank .
 func (p *Plane) ChangeRank() {
-	if p.Rank == MAIN {
-		p.Rank = CUT
+	if p.Rank == calc.MAIN {
+		p.Rank = calc.CUT
 	} else {
-		p.Rank = MAIN
+		p.Rank = calc.MAIN
 	}
 }
 

@@ -2,6 +2,7 @@ package overlay
 
 import (
 	"github.com/spatial-go/geoos/algorithm"
+	"github.com/spatial-go/geoos/algorithm/calc"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 )
 
@@ -28,7 +29,7 @@ func UnaryUnionByHalf(matrix4 matrix.MultiPolygonMatrix, start, end int) matrix.
 	}
 }
 
-// Computes the Union of two geometries,either or both of which may be null.
+// Union  Computes the Union of two geometries,either or both of which may be null.
 func Union(m0, m1 matrix.PolygonMatrix) matrix.PolygonMatrix {
 
 	if m0 == nil && m1 == nil {
@@ -56,7 +57,7 @@ func unionActual(m0, m1 matrix.PolygonMatrix) matrix.PolygonMatrix {
 			}
 		}
 		subject.CloseRing()
-		subject.Rank = algorithm.MAIN
+		subject.Rank = calc.MAIN
 	}
 	clipping := &algorithm.Plane{}
 	for _, v2 := range m1 {
@@ -66,7 +67,7 @@ func unionActual(m0, m1 matrix.PolygonMatrix) matrix.PolygonMatrix {
 			}
 		}
 		clipping.CloseRing()
-		clipping.Rank = algorithm.CUT
+		clipping.Rank = calc.CUT
 	}
 	poly := Weiler(subject, clipping, Merge)
 	var result matrix.PolygonMatrix
@@ -75,7 +76,7 @@ func unionActual(m0, m1 matrix.PolygonMatrix) matrix.PolygonMatrix {
 		for _, v1 := range v2.Vertexs {
 			edge = append(edge, v1.Matrix)
 		}
-		if !matrix.Equal(edge[len(edge)-1], edge[0]) {
+		if !matrix.Matrix(edge[len(edge)-1]).Equals(matrix.Matrix(edge[0])) {
 			edge = append(edge, edge[0])
 		}
 		result = append(result, edge)

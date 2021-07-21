@@ -1,10 +1,9 @@
 package space
 
 import (
-	"errors"
-
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
+	"github.com/spatial-go/geoos/space/spaceerr"
 )
 
 // LineString represents a set of points to be thought of as a polyline.
@@ -23,6 +22,16 @@ func (ls LineString) Dimensions() int {
 // Nums num of linestrings
 func (ls LineString) Nums() int {
 	return 1
+}
+
+// IsCollection returns true if the Geometry is  collection.
+func (ls LineString) IsCollection() bool {
+	return false
+}
+
+// ToMatrix returns the LineMatrix of a Ring geometry.
+func (ls LineString) ToMatrix() matrix.Steric {
+	return matrix.LineMatrix(ls)
 }
 
 // Bound returns a rect around the line string. Uses rectangular coordinates.
@@ -46,15 +55,15 @@ func (ls LineString) EqualLineString(lineString LineString) bool {
 		return false
 	}
 	for i, v := range ls.ToPointArray() {
-		if !v.Equal(Point(lineString[i])) {
+		if !v.Equals(Point(lineString[i])) {
 			return false
 		}
 	}
 	return true
 }
 
-// Equal checks if the LineString represents the same Geometry or vector.
-func (ls LineString) Equal(g Geometry) bool {
+// Equals checks if the LineString represents the same Geometry or vector.
+func (ls LineString) Equals(g Geometry) bool {
 	if g.GeoJSONType() != ls.GeoJSONType() {
 		return false
 	}
@@ -115,21 +124,19 @@ func (ls LineString) IsEmpty() bool {
 
 // Distance returns distance Between the two Geometry.
 func (ls LineString) Distance(g Geometry) (float64, error) {
-	elem := &ElementDistance{ls}
-	return elem.distanceWithFunc(g, measure.PlanarDistance)
+	return Distance(ls, g, measure.PlanarDistance)
 }
 
 // SpheroidDistance returns  spheroid distance Between the two Geometry.
 func (ls LineString) SpheroidDistance(g Geometry) (float64, error) {
-	elem := &ElementDistance{ls}
-	return elem.distanceWithFunc(g, measure.SpheroidDistance)
+	return Distance(ls, g, measure.SpheroidDistance)
 }
 
 // Boundary returns the closure of the combinatorial boundary of this space.Geometry.
 // The boundary of a lineal geometry is always a zero-dimensional geometry (which may be empty).
 func (ls LineString) Boundary() (Geometry, error) {
 	if ls.IsClosed() {
-		return nil, errors.New("closeedline's boundary should be nil")
+		return nil, spaceerr.ErrBoundBeNil
 	}
 	return MultiPoint{ls[0], ls[len(ls)-1]}, nil
 }
@@ -137,7 +144,7 @@ func (ls LineString) Boundary() (Geometry, error) {
 // IsClosed Returns TRUE if the LINESTRING's start and end points are coincident.
 // For Polyhedral Surfaces, reports if the surface is areal (open) or IsC (closed).
 func (ls LineString) IsClosed() bool {
-	if Point(ls[0]).Equal(Point(ls[len(ls)-1])) {
+	if Point(ls[0]).Equals(Point(ls[len(ls)-1])) {
 		return true
 	}
 	return false

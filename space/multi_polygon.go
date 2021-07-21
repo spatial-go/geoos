@@ -1,6 +1,7 @@
 package space
 
 import (
+	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
 )
 
@@ -22,6 +23,20 @@ func (mp MultiPolygon) Nums() int {
 	return len(mp)
 }
 
+// IsCollection returns true if the Geometry is  collection.
+func (mp MultiPolygon) IsCollection() bool {
+	return true
+}
+
+// ToMatrix returns the Steric of a  geometry.
+func (mp MultiPolygon) ToMatrix() matrix.Steric {
+	matr := matrix.Collection{}
+	for _, v := range mp {
+		matr = append(matr, v.ToMatrix())
+	}
+	return matr
+}
+
 // Bound returns a bound around the multi-polygon.
 func (mp MultiPolygon) Bound() Bound {
 	if len(mp) == 0 {
@@ -35,14 +50,14 @@ func (mp MultiPolygon) Bound() Bound {
 	return bound
 }
 
-// EqualMultiPolygon compares two multi-polygons.
-func (mp MultiPolygon) EqualMultiPolygon(multiPolygon MultiPolygon) bool {
+// EqualsMultiPolygon compares two multi-polygons.
+func (mp MultiPolygon) EqualsMultiPolygon(multiPolygon MultiPolygon) bool {
 	if len(mp) != len(multiPolygon) {
 		return false
 	}
 
 	for i, p := range mp {
-		if !p.Equal(multiPolygon[i]) {
+		if !p.Equals(multiPolygon[i]) {
 			return false
 		}
 	}
@@ -50,12 +65,12 @@ func (mp MultiPolygon) EqualMultiPolygon(multiPolygon MultiPolygon) bool {
 	return true
 }
 
-// Equal checks if the MultiPolygon represents the same Geometry or vector.
-func (mp MultiPolygon) Equal(g Geometry) bool {
+// Equals checks if the MultiPolygon represents the same Geometry or vector.
+func (mp MultiPolygon) Equals(g Geometry) bool {
 	if g.GeoJSONType() != mp.GeoJSONType() {
 		return false
 	}
-	return mp.EqualMultiPolygon(g.(MultiPolygon))
+	return mp.EqualsMultiPolygon(g.(MultiPolygon))
 }
 
 // EqualsExact Returns true if the two Geometrys are exactly equal,
@@ -93,14 +108,12 @@ func (mp MultiPolygon) IsEmpty() bool {
 
 // Distance returns distance Between the two Geometry.
 func (mp MultiPolygon) Distance(g Geometry) (float64, error) {
-	elem := &ElementDistance{mp}
-	return elem.distanceWithFunc(g, measure.PlanarDistance)
+	return Distance(mp, g, measure.PlanarDistance)
 }
 
 // SpheroidDistance returns  spheroid distance Between the two Geometry.
 func (mp MultiPolygon) SpheroidDistance(g Geometry) (float64, error) {
-	elem := &ElementDistance{mp}
-	return elem.distanceWithFunc(g, measure.SpheroidDistance)
+	return Distance(mp, g, measure.SpheroidDistance)
 }
 
 // Boundary returns the closure of the combinatorial boundary of this space.Geometry.

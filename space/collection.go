@@ -1,7 +1,8 @@
 package space
 
 import (
-	"errors"
+	"github.com/spatial-go/geoos/algorithm/matrix"
+	"github.com/spatial-go/geoos/space/spaceerr"
 )
 
 // A Collection is a collection of geometries that is also a Geometry.
@@ -26,6 +27,20 @@ func (c Collection) Dimensions() int {
 // Nums ...
 func (c Collection) Nums() int {
 	return len(c)
+}
+
+// IsCollection returns true if the Geometry is  collection.
+func (c Collection) IsCollection() bool {
+	return true
+}
+
+// ToMatrix returns the Steric of a  geometry.
+func (c Collection) ToMatrix() matrix.Steric {
+	matr := matrix.Collection{}
+	for _, v := range c {
+		matr = append(matr, v.ToMatrix())
+	}
+	return matr
 }
 
 // Bound returns the bounding box of all the Geometries combined.
@@ -60,26 +75,26 @@ func (c Collection) Bound() Bound {
 	return b
 }
 
-// EqualCollection compares two collections. Returns true if lengths are the same
+// EqualsCollection compares two collections. Returns true if lengths are the same
 // and all the sub geometries are the same and in the same order.
-func (c Collection) EqualCollection(collection Collection) bool {
+func (c Collection) EqualsCollection(collection Collection) bool {
 	if len(c) != len(collection) {
 		return false
 	}
 	for i, g := range c {
-		if !g.Equal(collection[i]) {
+		if !g.Equals(collection[i]) {
 			return false
 		}
 	}
 	return true
 }
 
-// Equal checks if the Collection represents the same Geometry or vector.
-func (c Collection) Equal(g Geometry) bool {
+// Equals checks if the Collection represents the same Geometry or vector.
+func (c Collection) Equals(g Geometry) bool {
 	if g.GeoJSONType() != c.GeoJSONType() {
 		return false
 	}
-	return c.EqualCollection(g.(Collection))
+	return c.EqualsCollection(g.(Collection))
 }
 
 // EqualsExact Returns true if the two Geometrys are exactly equal,
@@ -132,7 +147,7 @@ func (c Collection) SpheroidDistance(g Geometry) (float64, error) {
 		return 0, nil
 	}
 	if c.IsEmpty() != g.IsEmpty() {
-		return 0, errors.New("Geometry is nil")
+		return 0, spaceerr.ErrNilGeometry
 	}
 	var dist float64
 	for _, v := range c {
@@ -149,7 +164,7 @@ func (c Collection) Distance(g Geometry) (float64, error) {
 		return 0, nil
 	}
 	if c.IsEmpty() != g.IsEmpty() {
-		return 0, errors.New("Geometry is nil")
+		return 0, spaceerr.ErrNilGeometry
 	}
 	var dist float64
 	for _, v := range c {
@@ -162,7 +177,7 @@ func (c Collection) Distance(g Geometry) (float64, error) {
 
 // Boundary returns the closure of the combinatorial boundary of this space.Geometry.
 func (c Collection) Boundary() (Geometry, error) {
-	return nil, errors.New("Operation does not support GeometryCollection arguments")
+	return nil, spaceerr.ErrNotSupportCollection
 }
 
 // Length Returns the length of this Collection

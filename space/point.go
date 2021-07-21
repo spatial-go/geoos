@@ -1,12 +1,12 @@
 package space
 
 import (
-	"errors"
 	"math/rand"
 	"reflect"
 
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
+	"github.com/spatial-go/geoos/space/spaceerr"
 )
 
 // Point describes a geographic point
@@ -32,6 +32,11 @@ func (p Point) Nums() int {
 	return 1
 }
 
+// IsCollection returns true if the Geometry is  collection.
+func (p Point) IsCollection() bool {
+	return false
+}
+
 // Lat returns the vertical, latitude coordinate of the point.
 func (p Point) Lat() float64 {
 	return p[1]
@@ -52,17 +57,17 @@ func (p Point) X() float64 {
 	return p[0]
 }
 
-// EqualPoint checks if the point represents the same point or vector.
-func (p Point) EqualPoint(point Point) bool {
-	return matrix.Equal(matrix.Matrix(p), matrix.Matrix(point))
+// EqualsPoint checks if the point represents the same point or vector.
+func (p Point) EqualsPoint(point Point) bool {
+	return matrix.Matrix(p).Equals(matrix.Matrix(point))
 }
 
-// Equal checks if the point represents the same Geometry or vector.
-func (p Point) Equal(g Geometry) bool {
+// Equals checks if the point represents the same Geometry or vector.
+func (p Point) Equals(g Geometry) bool {
 	if g.GeoJSONType() != p.GeoJSONType() {
 		return false
 	}
-	return p.EqualPoint(g.(Point))
+	return p.EqualsPoint(g.(Point))
 }
 
 // EqualsExact Returns true if the two Geometrys are exactly equal,
@@ -79,7 +84,7 @@ func (p Point) EqualsExact(g Geometry, tolerance float64) bool {
 		return false
 	}
 	if tolerance == 0 {
-		return p.Equal(g)
+		return p.Equals(g)
 	}
 	return measure.PlanarDistance(matrix.Matrix(p), matrix.Matrix(g.(Point))) <= tolerance
 }
@@ -90,6 +95,11 @@ func (p Point) Generate(r *rand.Rand, _ int) reflect.Value {
 		p[i] = r.Float64()
 	}
 	return reflect.ValueOf(p)
+}
+
+// ToMatrix returns the Steric of a  geometry.
+func (p Point) ToMatrix() matrix.Steric {
+	return matrix.Matrix(p)
 }
 
 // Area returns the area of a polygonal geometry. The area of a point is 0.
@@ -104,19 +114,17 @@ func (p Point) IsEmpty() bool {
 
 // Distance returns distance Between the two Geometry.
 func (p Point) Distance(g Geometry) (float64, error) {
-	elem := &ElementDistance{p}
-	return elem.distanceWithFunc(g, measure.PlanarDistance)
+	return Distance(p, g, measure.PlanarDistance)
 }
 
 // SpheroidDistance returns  spheroid distance Between the two Geometry.
 func (p Point) SpheroidDistance(g Geometry) (float64, error) {
-	elem := &ElementDistance{p}
-	return elem.distanceWithFunc(g, measure.SpheroidDistance)
+	return Distance(p, g, measure.SpheroidDistance)
 }
 
 // Boundary returns the closure of the combinatorial boundary of this Geometry.
 func (p Point) Boundary() (Geometry, error) {
-	return nil, errors.New("point's boundary should be nil")
+	return nil, spaceerr.ErrBoundBeNil
 }
 
 // IsSimple returns true if this Geometry has no anomalous geometric points,

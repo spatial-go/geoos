@@ -1,51 +1,21 @@
 package calc
 
-// const
-const (
-	// The smallest representable relative difference between two  values.
-	EPS   = 1.23259516440783e-32 /* = 2^-106 */
-	SPLIT = 134217729.0          // 2^27+1, for IEEE
-
-	MAXPRINTDIGITS = 32
-
-	SCINOTEXPONENTCHAR = "E"
-	SCINOTZERO         = "0.0E0"
-)
-
-var (
-	// PI The value nearest to the constant Pi.
-	PI = &DD{3.141592653589793116e+00,
-		1.224646799147353207e-16}
-	// TWOPI The value nearest to the constant 2 * Pi.
-	TWOPI = &DD{
-		6.283185307179586232e+00,
-		2.449293598294706414e-16}
-	// PI2 The value nearest to the constant Pi / 2.
-	PI2 = &DD{
-		1.570796326794896558e+00,
-		6.123233995736766036e-17}
-	//E  The value nearest to the constant e (the natural logarithm base).
-	E = &DD{
-		2.718281828459045091e+00,
-		1.445646891729250158e-16}
-)
-
-// DD A DoubleDouble uses a representation containing two double-precision values.
+// PairFloat A DoubleDouble uses a representation containing two double-precision values.
 // A number x is represented as a pair of doubles, x.hi and x.lo
-type DD struct {
+type PairFloat struct {
 	Hi, Lo float64
 }
 
 // ValueOf Converts the  argument to a  number.
-func ValueOf(x float64) *DD {
-	return &DD{x, 0.0}
+func ValueOf(x float64) *PairFloat {
+	return &PairFloat{x, 0.0}
 }
 
 // SelfAdd  Adds the argument to the value of DD.
 // To prevent altering constants,
 // this method must only be used on values known to
 // be newly created.
-func (d *DD) SelfAdd(yhi, ylo float64) *DD {
+func (d *PairFloat) SelfAdd(yhi, ylo float64) *PairFloat {
 	var H, h, T, t, S, s, e, f float64
 	S = d.Hi + yhi
 	T = d.Lo + ylo
@@ -71,7 +41,7 @@ func (d *DD) SelfAdd(yhi, ylo float64) *DD {
 // To prevent altering constants,
 // this method must only be used on values known to
 // be newly created.
-func (d *DD) SelfSubtract(yhi, ylo float64) *DD {
+func (d *PairFloat) SelfSubtract(yhi, ylo float64) *PairFloat {
 	return d.SelfAdd(-yhi, -ylo)
 }
 
@@ -79,7 +49,7 @@ func (d *DD) SelfSubtract(yhi, ylo float64) *DD {
 // To prevent altering constants,
 // this method must only be used on values known to
 // be newly created.
-func (d *DD) SelfMultiply(yhi, ylo float64) *DD {
+func (d *PairFloat) SelfMultiply(yhi, ylo float64) *PairFloat {
 	var hx, tx, hy, ty, C, c float64
 	C = SPLIT * d.Hi
 	hx = C - d.Hi
@@ -103,7 +73,7 @@ func (d *DD) SelfMultiply(yhi, ylo float64) *DD {
 // To prevent altering constants,
 // this method must only be used on values known to
 // be newly created.
-func (d *DD) SelfDivide(yhi, ylo float64) *DD {
+func (d *PairFloat) SelfDivide(yhi, ylo float64) *PairFloat {
 	var hc, tc, hy, ty, C, c, U, u float64
 	C = d.Hi / yhi
 	c = SPLIT * C
@@ -125,7 +95,7 @@ func (d *DD) SelfDivide(yhi, ylo float64) *DD {
 }
 
 // Signum Returns an integer indicating the sign of this value.
-func (d *DD) Signum() int {
+func (d *PairFloat) Signum() int {
 	if d.Hi > 0 {
 		return 1
 	}
@@ -142,37 +112,37 @@ func (d *DD) Signum() int {
 }
 
 // IsZero Tests whether this value is equal to 0.
-func (d *DD) IsZero() bool {
+func (d *PairFloat) IsZero() bool {
 	return d.Hi == 0.0 && d.Lo == 0.0
 }
 
 // Equals Tests whether this value is equal to another value.
-func (d *DD) Equals(y *DD) bool {
+func (d *PairFloat) Equals(y *PairFloat) bool {
 	return d.Hi == y.Hi && d.Lo == y.Lo
 }
 
 // Gt Tests whether this value is greater than another value.
-func (d *DD) Gt(y *DD) bool {
+func (d *PairFloat) Gt(y *PairFloat) bool {
 	return (d.Hi > y.Hi) || (d.Hi == y.Hi && d.Lo > y.Lo)
 }
 
 // Ge Tests whether this value is greater than or equals to another value.
-func (d *DD) Ge(y *DD) bool {
+func (d *PairFloat) Ge(y *PairFloat) bool {
 	return (d.Hi > y.Hi) || (d.Hi == y.Hi && d.Lo >= y.Lo)
 }
 
 // Lt Tests whether this value is less than another  value.
-func (d *DD) Lt(y *DD) bool {
+func (d *PairFloat) Lt(y *PairFloat) bool {
 	return (d.Hi < y.Hi) || (d.Hi == y.Hi && d.Lo < y.Lo)
 }
 
 // Le Tests whether this value is less than or equal to another  value.
-func (d *DD) Le(y *DD) bool {
+func (d *PairFloat) Le(y *PairFloat) bool {
 	return (d.Hi < y.Hi) || (d.Hi == y.Hi && d.Lo <= y.Lo)
 }
 
 // CompareTo Compares two  objects numerically.
-func (d *DD) CompareTo(other *DD) int {
+func (d *PairFloat) CompareTo(other *PairFloat) int {
 
 	if d.Hi < other.Hi {
 		return -1

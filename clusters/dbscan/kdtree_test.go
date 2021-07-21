@@ -101,7 +101,7 @@ func (tree *KDTree) invariantHolds(t *T) ([]space.Point, bool) {
 	ok := true
 
 	for _, i := range t.EqualIDs {
-		if !tree.Points[i].Equal(tree.Points[t.PointID]) {
+		if !tree.Points[i].Equals(tree.Points[t.PointID]) {
 			ok = false
 			break
 		}
@@ -159,7 +159,7 @@ func TestPreSort_SplitMed(t *testing.T) {
 		sorted := preSort(clusters.PointList(pts))
 		med, equal, left, right := sorted.splitMed(dim)
 		for _, p := range equal {
-			if pts[p].Equal(pts[med]) {
+			if pts[p].Equals(pts[med]) {
 				return false
 			}
 		}

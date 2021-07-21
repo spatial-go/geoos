@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/spatial-go/geoos/algorithm"
+	"github.com/spatial-go/geoos/algorithm/calc"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 )
 
@@ -22,7 +23,7 @@ func Test_perform(t *testing.T) {
 	subject.AddPoint(&algorithm.Vertex{Matrix: matrix.Matrix{10, 10}})
 	subject.AddPoint(&algorithm.Vertex{Matrix: matrix.Matrix{0, 10}})
 	subject.CloseRing()
-	subject.Rank = algorithm.MAIN
+	subject.Rank = calc.MAIN
 
 	clipping := &algorithm.Plane{}
 	clipping.AddPoint(&algorithm.Vertex{Matrix: matrix.Matrix{5, 5}})
@@ -30,7 +31,7 @@ func Test_perform(t *testing.T) {
 	clipping.AddPoint(&algorithm.Vertex{Matrix: matrix.Matrix{15, 15}})
 	clipping.AddPoint(&algorithm.Vertex{Matrix: matrix.Matrix{5, 15}})
 	clipping.CloseRing()
-	clipping.Rank = algorithm.CUT
+	clipping.Rank = calc.CUT
 
 	want := &algorithm.Plane{}
 	want.AddPoint(&algorithm.Vertex{Matrix: matrix.Matrix{5, 10}})

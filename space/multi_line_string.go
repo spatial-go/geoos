@@ -1,6 +1,7 @@
 package space
 
 import (
+	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
 )
 
@@ -20,6 +21,20 @@ func (mls MultiLineString) Dimensions() int {
 // Nums num of multiLinstrings
 func (mls MultiLineString) Nums() int {
 	return len(mls)
+}
+
+// IsCollection returns true if the Geometry is  collection.
+func (mls MultiLineString) IsCollection() bool {
+	return true
+}
+
+// ToMatrix returns the Steric of a  geometry.
+func (mls MultiLineString) ToMatrix() matrix.Steric {
+	matr := matrix.Collection{}
+	for _, v := range mls {
+		matr = append(matr, v.ToMatrix())
+	}
+	return matr
 }
 
 // Bound returns a bound around all the line strings.
@@ -50,14 +65,14 @@ func (b Bound) Union(other Bound) Bound {
 	return b
 }
 
-// EqualMultiLineString compares two multi line strings. Returns true if lengths are the same
+// EqualsMultiLineString compares two multi line strings. Returns true if lengths are the same
 // and all points are Equal.
-func (mls MultiLineString) EqualMultiLineString(multiLineString MultiLineString) bool {
+func (mls MultiLineString) EqualsMultiLineString(multiLineString MultiLineString) bool {
 	if len(mls) != len(multiLineString) {
 		return false
 	}
 	for i, ls := range mls {
-		if !ls.Equal(multiLineString[i]) {
+		if !ls.Equals(multiLineString[i]) {
 			return false
 		}
 	}
@@ -65,12 +80,12 @@ func (mls MultiLineString) EqualMultiLineString(multiLineString MultiLineString)
 	return true
 }
 
-// Equal checks if the MultiLineString represents the same Geometry or vector.
-func (mls MultiLineString) Equal(g Geometry) bool {
+// Equals checks if the MultiLineString represents the same Geometry or vector.
+func (mls MultiLineString) Equals(g Geometry) bool {
 	if g.GeoJSONType() != mls.GeoJSONType() {
 		return false
 	}
-	return mls.EqualMultiLineString(g.(MultiLineString))
+	return mls.EqualsMultiLineString(g.(MultiLineString))
 }
 
 // EqualsExact Returns true if the two Geometrys are exactly equal,
@@ -100,14 +115,12 @@ func (mls MultiLineString) IsEmpty() bool {
 
 // Distance returns distance Between the two Geometry.
 func (mls MultiLineString) Distance(g Geometry) (float64, error) {
-	elem := &ElementDistance{mls}
-	return elem.distanceWithFunc(g, measure.PlanarDistance)
+	return Distance(mls, g, measure.PlanarDistance)
 }
 
 // SpheroidDistance returns  spheroid distance Between the two Geometry.
 func (mls MultiLineString) SpheroidDistance(g Geometry) (float64, error) {
-	elem := &ElementDistance{mls}
-	return elem.distanceWithFunc(g, measure.SpheroidDistance)
+	return Distance(mls, g, measure.SpheroidDistance)
 }
 
 // Boundary returns the closure of the combinatorial boundary of this space.Geometry.

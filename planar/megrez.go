@@ -1,6 +1,7 @@
 package planar
 
 import (
+	"github.com/spatial-go/geoos/algorithm/buffer"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/overlay"
 	"github.com/spatial-go/geoos/space"
@@ -29,7 +30,14 @@ func (g *MegrezAlgorithm) Boundary(geom space.Geometry) (space.Geometry, error) 
 // Buffer sReturns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
 func (g *MegrezAlgorithm) Buffer(geom space.Geometry, width float64, quadsegs int32) (geometry space.Geometry) {
-	return space.Buffer(geom, width)
+	buff := buffer.Buffer(geom.ToMatrix(), width)
+	switch b := buff.(type) {
+	case matrix.LineMatrix:
+		return space.LineString(b)
+	case matrix.PolygonMatrix:
+		return space.Polygon(b)
+	}
+	return nil
 }
 
 // Centroid  computes the geometric center of a geometry, or equivalently, the center of mass of the geometry as a POINT.
@@ -133,7 +141,7 @@ func (g *MegrezAlgorithm) Envelope(geom space.Geometry) (space.Geometry, error) 
 
 // Equals returns TRUE if the given Geometries are "spatially equal".
 func (g *MegrezAlgorithm) Equals(geom1, geom2 space.Geometry) (bool, error) {
-	return geom1.Equal(geom2), nil
+	return geom1.Equals(geom2), nil
 }
 
 // EqualsExact returns true if both geometries are Equal, as evaluated by their
@@ -218,7 +226,8 @@ func (g *MegrezAlgorithm) Overlaps(geom1, geom2 space.Geometry) (bool, error) {
 
 // PointOnSurface Returns a POINT guaranteed to intersect a surface.
 func (g *MegrezAlgorithm) PointOnSurface(geom space.Geometry) (space.Geometry, error) {
-	return space.InteriorPoint(geom), nil
+	m := buffer.InteriorPoint(geom.ToMatrix())
+	return space.Point(m), nil
 }
 
 // Relate computes the intersection matrix (Dimensionally Extended
