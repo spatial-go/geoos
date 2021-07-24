@@ -79,22 +79,25 @@ func Weiler(subject, clipping *algorithm.Plane, ath Atherton) *algorithm.Plane {
 
 	var enteringPoints, exitingPoints []algorithm.Vertex
 
-	var mark bool
-
 	for _, v := range subject.Lines {
 		for _, vClip := range clipping.Lines {
-			ip := &algorithm.Vertex{}
-			mark, ip.Matrix, ip.IsIntersectionPoint, ip.IsEntering =
-				relate.Intersection(v.Start.Matrix, v.End.Matrix, vClip.Start.Matrix, vClip.End.Matrix)
 
-			if mark {
-				if ip.IsEntering {
-					enteringPoints = append(enteringPoints, *ip)
-				} else {
-					exitingPoints = append(exitingPoints, *ip)
+			mark, ips :=
+				relate.Intersection(v.Start.Matrix, v.End.Matrix, vClip.Start.Matrix, vClip.End.Matrix)
+			for _, ip := range ips {
+				ipVer := &algorithm.Vertex{}
+				ipVer.Matrix = ip.Matrix
+				ipVer.IsIntersectionPoint = ip.IsIntersectionPoint
+				ipVer.IsEntering = ip.IsEntering
+				if mark {
+					if ipVer.IsEntering {
+						enteringPoints = append(enteringPoints, *ipVer)
+					} else {
+						exitingPoints = append(exitingPoints, *ipVer)
+					}
+					AddPointToVertexSlice(subject.Rings, v.Start, v.End, ipVer)
+					AddPointToVertexSlice(clipping.Rings, vClip.Start, vClip.End, ipVer)
 				}
-				AddPointToVertexSlice(subject.Rings, v.Start, v.End, ip)
-				AddPointToVertexSlice(clipping.Rings, vClip.Start, vClip.End, ip)
 			}
 		}
 	}

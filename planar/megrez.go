@@ -3,8 +3,12 @@ package planar
 import (
 	"github.com/spatial-go/geoos/algorithm/buffer"
 	"github.com/spatial-go/geoos/algorithm/matrix"
+	"github.com/spatial-go/geoos/algorithm/measure"
 	"github.com/spatial-go/geoos/algorithm/overlay"
+	"github.com/spatial-go/geoos/algorithm/overlay/snap"
+	"github.com/spatial-go/geoos/algorithm/relate"
 	"github.com/spatial-go/geoos/space"
+	"github.com/spatial-go/geoos/space/spaceerr"
 )
 
 // MegrezAlgorithm algorithm implement
@@ -61,9 +65,8 @@ func (g *MegrezAlgorithm) Centroid(geom space.Geometry) (space.Geometry, error) 
 // Returns TRUE if geometry B is completely inside geometry A.
 // For this function to make sense, the source geometries must both be of the same coordinate projection,
 // having the same SRID.
-func (g *MegrezAlgorithm) Contains(geom1, geom2 space.Geometry) (bool, error) {
-	//TODO
-	return GetStrategy(newGEOAlgorithm).Contains(geom1, geom2)
+func (g *MegrezAlgorithm) Contains(A, B space.Geometry) (bool, error) {
+	return space.Contains(A, B)
 }
 
 // ConvexHull computes the convex hull of a geometry. The convex hull is the smallest convex geometry
@@ -77,15 +80,13 @@ func (g *MegrezAlgorithm) ConvexHull(geom space.Geometry) (space.Geometry, error
 }
 
 // CoveredBy returns TRUE if no point in space.Geometry A is outside space.Geometry B
-func (g *MegrezAlgorithm) CoveredBy(geom1, geom2 space.Geometry) (bool, error) {
-	//TODO
-	return GetStrategy(newGEOAlgorithm).CoveredBy(geom1, geom2)
+func (g *MegrezAlgorithm) CoveredBy(A, B space.Geometry) (bool, error) {
+	return space.CoveredBy(A, B)
 }
 
 // Covers returns TRUE if no point in space.Geometry B is outside space.Geometry A
-func (g *MegrezAlgorithm) Covers(geom1, geom2 space.Geometry) (bool, error) {
-	//TODO
-	return GetStrategy(newGEOAlgorithm).Covers(geom1, geom2)
+func (g *MegrezAlgorithm) Covers(A, B space.Geometry) (bool, error) {
+	return space.Covers(A, B)
 }
 
 // Crosses takes two geometry objects and returns TRUE if their intersection "spatially cross",
@@ -94,9 +95,8 @@ func (g *MegrezAlgorithm) Covers(geom1, geom2 space.Geometry) (bool, error) {
 // and must have a dimensionality less than the maximum dimension of the two input geometries.
 // Additionally, the intersection of the two geometries must not equal either of the source geometries.
 // Otherwise, it returns FALSE.
-func (g *MegrezAlgorithm) Crosses(geom1, geom2 space.Geometry) (bool, error) {
-	//TODO
-	return GetStrategy(newGEOAlgorithm).Crosses(geom1, geom2)
+func (g *MegrezAlgorithm) Crosses(A, B space.Geometry) (bool, error) {
+	return space.Crosses(A, B)
 }
 
 // Difference returns a geometry that represents that part of geometry A that does not intersect with geometry B.
@@ -110,9 +110,8 @@ func (g *MegrezAlgorithm) Difference(geom1, geom2 space.Geometry) (space.Geometr
 // Disjoint Overlaps, Touches, Within all imply geometries are not spatially disjoint.
 // If any of the aforementioned returns true, then the geometries are not spatially disjoint.
 // Disjoint implies false for spatial intersection.
-func (g *MegrezAlgorithm) Disjoint(geom1, geom2 space.Geometry) (bool, error) {
-	//TODO
-	return GetStrategy(newGEOAlgorithm).Disjoint(geom1, geom2)
+func (g *MegrezAlgorithm) Disjoint(A, B space.Geometry) (bool, error) {
+	return space.Disjoint(A, B)
 }
 
 // Distance returns the minimum 2D Cartesian (planar) distance between two geometries, in projected units (spatial ref units).
@@ -155,26 +154,34 @@ func (g *MegrezAlgorithm) EqualsExact(geom1, geom2 space.Geometry, tolerance flo
 // thought of as the "Discrete Hausdorff Distance". This is the Hausdorff distance restricted
 // to discrete points for one of the geometries
 func (g *MegrezAlgorithm) HausdorffDistance(geom1, geom2 space.Geometry) (float64, error) {
-	//TODO
-	return GetStrategy(newGEOAlgorithm).HausdorffDistance(geom1, geom2)
+	return (&measure.HausdorffDistance{}).Distance(geom1.ToMatrix(), geom2.ToMatrix()), nil
 }
 
 // HausdorffDistanceDensify computes the Hausdorff distance with an additional densification fraction amount
-func (g *MegrezAlgorithm) HausdorffDistanceDensify(s, d space.Geometry, densifyFrac float64) (float64, error) {
-	//TODO
-	return GetStrategy(newGEOAlgorithm).HausdorffDistanceDensify(s, d, densifyFrac)
+func (g *MegrezAlgorithm) HausdorffDistanceDensify(geom1, geom2 space.Geometry, densifyFrac float64) (float64, error) {
+	return (&measure.HausdorffDistance{}).DistanceDensifyFrac(geom1.ToMatrix(), geom2.ToMatrix(), densifyFrac)
 }
 
 // Intersection returns a geometry that represents the point set intersection of the Geometries.
 func (g *MegrezAlgorithm) Intersection(geom1, geom2 space.Geometry) (space.Geometry, error) {
-	//TODO
-	return GetStrategy(newGEOAlgorithm).Intersection(geom1, geom2)
+	switch geom1.GeoJSONType() {
+	case space.TypePoint:
+		mark := relate.InLineMatrix(geom1.ToMatrix().(matrix.Matrix), geom2.ToMatrix().(matrix.LineMatrix))
+		if mark {
+			return geom1, nil
+		}
+	case space.TypeLineString:
+		mark, ips := relate.IntersectionEdge(geom1.ToMatrix().(matrix.LineMatrix), geom2.ToMatrix().(matrix.LineMatrix))
+		if mark {
+			return space.Point(ips[0].Matrix), nil
+		}
+	}
+	return nil, nil
 }
 
 // Intersects If a geometry  shares any portion of space then they intersect
-func (g *MegrezAlgorithm) Intersects(geom1, geom2 space.Geometry) (bool, error) {
-	//todo
-	return GetStrategy(newGEOAlgorithm).Intersects(geom1, geom2)
+func (g *MegrezAlgorithm) Intersects(A, B space.Geometry) (bool, error) {
+	return space.Intersects(A, B)
 }
 
 // IsClosed Returns TRUE if the LINESTRING's start and end points are coincident.
@@ -208,8 +215,16 @@ func (g *MegrezAlgorithm) Length(geom space.Geometry) (float64, error) {
 
 // LineMerge returns a (set of) LineString(s) formed by sewing together the constituent line work of a MULTILINESTRING.
 func (g *MegrezAlgorithm) LineMerge(geom space.Geometry) (space.Geometry, error) {
-	//TODO
-	return GetStrategy(newGEOAlgorithm).LineMerge(geom)
+	if geom.GeoJSONType() != space.TypeMultiLineString {
+		return nil, spaceerr.ErrNotSupportGeometry
+	}
+	result := overlay.LineMerge(geom.ToMatrix().(matrix.Collection))
+	var lm space.MultiLineString
+	for _, v := range result {
+		lm = append(lm, space.LineString(v.(matrix.LineMatrix)))
+	}
+
+	return lm, nil
 }
 
 // NGeometry returns the number of component geometries.
@@ -219,9 +234,8 @@ func (g *MegrezAlgorithm) NGeometry(geom space.Geometry) (int, error) {
 
 // Overlaps returns TRUE if the Geometries "spatially overlap".
 // By that we mean they intersect, but one does not completely contain another.
-func (g *MegrezAlgorithm) Overlaps(geom1, geom2 space.Geometry) (bool, error) {
-	//TODO
-	return GetStrategy(newGEOAlgorithm).Overlaps(geom1, geom2)
+func (g *MegrezAlgorithm) Overlaps(A, B space.Geometry) (bool, error) {
+	return space.Overlaps(A, B)
 }
 
 // PointOnSurface Returns a POINT guaranteed to intersect a surface.
@@ -234,8 +248,11 @@ func (g *MegrezAlgorithm) PointOnSurface(geom space.Geometry) (space.Geometry, e
 // Nine-Intersection Model (DE-9IM) matrix) for the spatial relationship between
 // the two geometries.
 func (g *MegrezAlgorithm) Relate(s, d space.Geometry) (string, error) {
-	//TODO
-	return GetStrategy(newGEOAlgorithm).Relate(s, d)
+	intersectBound := s.Bound().IntersectsBound(d.Bound())
+	if s.Bound().ContainsBound(d.Bound()) || d.Bound().ContainsBound(s.Bound()) {
+		intersectBound = true
+	}
+	return relate.Relate(s.ToMatrix(), d.ToMatrix(), intersectBound), nil
 }
 
 // SharedPaths returns a collection containing paths shared by the two input geometries.
@@ -266,8 +283,21 @@ func (g *MegrezAlgorithm) SimplifyP(geom space.Geometry, tolerance float64) (spa
 // The result geometry is the input geometry with the vertices snapped.
 // If no snapping occurs then the input geometry is returned unchanged.
 func (g *MegrezAlgorithm) Snap(input, reference space.Geometry, tolerance float64) (space.Geometry, error) {
-	//TODO
-	return GetStrategy(newGEOAlgorithm).Snap(input, reference, tolerance)
+	result := snap.Snap(input.ToMatrix(), reference.ToMatrix(), tolerance)
+
+	switch g := result[0].(type) {
+	case matrix.Matrix:
+		return space.Point(g), nil
+	case matrix.LineMatrix:
+		if len(g) == 1 {
+			return space.Point(matrix.Matrix(g[0])), nil
+		}
+		return space.LineString(g), nil
+	case matrix.PolygonMatrix:
+		return space.Polygon(g), nil
+	default:
+		return nil, nil
+	}
 }
 
 // SymDifference returns a geometry that represents the portions of A and B that do not intersect.
@@ -278,12 +308,11 @@ func (g *MegrezAlgorithm) SymDifference(geom1, geom2 space.Geometry) (space.Geom
 	return GetStrategy(newGEOAlgorithm).SymDifference(geom1, geom2)
 }
 
-// Touches returns TRUE if the only points in common between geom1 and geom2 lie in the union of the boundaries of geom1 and geom2.
+// Touches returns TRUE if the only points in common between A and B lie in the union of the boundaries of A and B.
 // The ouches relation applies to all Area/Area, Line/Line, Line/Area, Point/Area and Point/Line pairs of relationships,
 // but not to the Point/Point pair.
-func (g *MegrezAlgorithm) Touches(geom1, geom2 space.Geometry) (bool, error) {
-	//TODO
-	return GetStrategy(newGEOAlgorithm).Touches(geom1, geom2)
+func (g *MegrezAlgorithm) Touches(A, B space.Geometry) (bool, error) {
+	return space.Touches(A, B)
 }
 
 // UnaryUnion does dissolve boundaries between components of a multipolygon (invalid) and does perform union
@@ -321,28 +350,6 @@ func (g *MegrezAlgorithm) UniquePoints(geom space.Geometry) (space.Geometry, err
 // Within returns TRUE if geometry A is completely inside geometry B.
 // For this function to make sense, the source geometries must both be of the same coordinate projection,
 // having the same SRID.
-func (g *MegrezAlgorithm) Within(geom1, geom2 space.Geometry) (bool, error) {
-	// optimization - lower dimension cannot contain areas
-	if geom2.Dimensions() == 2 && geom1.Dimensions() < 2 {
-		return false, nil
-	}
-	// optimization - P cannot contain a non-zero-length L
-	// Note that a point can contain a zero-length lineal geometry,
-	// since the line has no boundary due to Mod-2 Boundary Rule
-	if geom2.Dimensions() == 1 && geom1.Dimensions() < 1 && geom2.Length() > 0.0 {
-		return false, nil
-	}
-	// optimization - envelope test
-	if !geom2.Bound().ContainsBound(geom1.Bound()) {
-		return false, nil
-	}
-	// optimization for rectangle arguments
-	if geom2.GeoJSONType() == space.TypePolygon && geom2.(space.Polygon).IsRectangle() {
-		return geom2.Bound().ContainsBound(geom1.Bound()), nil
-	}
-	// general case
-	//return relate(g).isContains()
-
-	//todo
-	return GetStrategy(newGEOAlgorithm).Within(geom1, geom2)
+func (g *MegrezAlgorithm) Within(A, B space.Geometry) (bool, error) {
+	return space.Within(A, B)
 }

@@ -25,7 +25,10 @@ type IntersectionMatrix struct {
 // IntersectionMatrixDefault Creates an IntersectionMatrix with  FALSE  dimension values.
 func IntersectionMatrixDefault() *IntersectionMatrix {
 	im := &IntersectionMatrix{}
-	im.matrix = make([][]int, 3, 3)
+	im.matrix = make([][]int, 3)
+	for i := range im.matrix {
+		im.matrix[i] = make([]int, 3)
+	}
 	im.SetAll(calc.FALSE)
 	return im
 }
@@ -235,6 +238,20 @@ func (im *IntersectionMatrix) SetAtLeastString(minimumDimensionSymbols string) {
 		dv, _ := toDimensionValue(minimumDimensionSymbols[i])
 		im.SetAtLeast(row, col, dv)
 	}
+}
+
+// Transpose  this IntersectionMatrix.
+func (im *IntersectionMatrix) Transpose() *IntersectionMatrix {
+	temp := im.matrix[1][0]
+	im.matrix[1][0] = im.matrix[0][1]
+	im.matrix[0][1] = temp
+	temp = im.matrix[2][0]
+	im.matrix[2][0] = im.matrix[0][2]
+	im.matrix[0][2] = temp
+	temp = im.matrix[2][1]
+	im.matrix[2][1] = im.matrix[1][2]
+	im.matrix[1][2] = temp
+	return im
 }
 
 //  toDimensionSymbol Converts the dimension value to a dimension symbol, for example, TRUE = 'T'

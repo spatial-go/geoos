@@ -23,14 +23,26 @@ func (r *Computer) computeIM(arg []matrix.Steric, intersectBound bool) *matrix.I
 		return im
 	}
 	if arg[0].Equals(arg[1]) {
-		im.SetAtLeastString("T*F**FFF*")
+		switch arg[0].(type) {
+		case matrix.Matrix:
+			im.SetAtLeastString("0FFFFFFF2")
+		case matrix.LineMatrix:
+			im.SetAtLeastString("1FFF0FFF2")
+		case matrix.PolygonMatrix:
+			im.SetAtLeastString("2FFF1FFF2")
+		}
+		return im
 	}
 	switch r := arg[0].(type) {
 	case matrix.Matrix:
-		rp := &Point{r, arg[1]}
+		rp := &PointRelate{r, arg[1]}
 		return rp.IntersectionMatrix(im)
 	case matrix.LineMatrix:
+		rp := &LineRelate{r, arg[1]}
+		return rp.IntersectionMatrix(im)
 	case matrix.PolygonMatrix:
+		rp := &PolygonRelate{r, arg[1]}
+		return rp.IntersectionMatrix(im)
 	}
 
 	r.computeProperIntersectionIM(im)

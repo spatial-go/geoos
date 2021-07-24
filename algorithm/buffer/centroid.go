@@ -7,8 +7,8 @@ import (
 	"github.com/spatial-go/geoos/algorithm/measure"
 )
 
-// ComputerCentroid Computes the centroid point of a geometry.
-func ComputerCentroid(geom matrix.Steric) matrix.Matrix {
+// ComputeCentroid Computes the centroid point of a geometry.
+func ComputeCentroid(geom matrix.Steric) matrix.Matrix {
 	cent := &Centroid{}
 
 	if geom == nil || geom.IsEmpty() {

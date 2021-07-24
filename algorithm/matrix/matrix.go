@@ -251,6 +251,7 @@ func (c Collection) Equals(ms Steric) bool {
 				return false
 			}
 		}
+		return true
 	}
 	return false
 }
@@ -295,6 +296,7 @@ func (m Matrix) Equals(ms Steric) bool {
 				return false
 			}
 		}
+		return true
 	}
 	return false
 }
@@ -316,6 +318,7 @@ func (l LineMatrix) Equals(ms Steric) bool {
 				return false
 			}
 		}
+		return true
 	}
 	return false
 }
@@ -337,6 +340,7 @@ func (p PolygonMatrix) Equals(ms Steric) bool {
 				return false
 			}
 		}
+		return true
 	}
 	return false
 }
@@ -359,5 +363,37 @@ func (m MultiPolygonMatrix) Equals(ms Steric) bool {
 			}
 		}
 	}
-	return false
+	return true
+}
+
+// TransMatrixs trans steric to array matrixs.
+func TransMatrixs(inputGeom Steric) []Matrix {
+
+	switch m := inputGeom.(type) {
+	case Matrix:
+		return []Matrix{m}
+	case LineMatrix:
+		tm := []Matrix{}
+		for _, v := range m {
+			tm = append(tm, v)
+		}
+		return tm
+	case PolygonMatrix:
+		tm := []Matrix{}
+		for _, v := range m {
+			for _, p := range v {
+				tm = append(tm, p)
+			}
+		}
+		return tm
+	case Collection:
+		tm := []Matrix{}
+		for _, v := range m {
+			p := TransMatrixs(v)
+			tm = append(tm, p...)
+		}
+		return tm
+	default:
+		return []Matrix{}
+	}
 }

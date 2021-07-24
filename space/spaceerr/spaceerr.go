@@ -16,6 +16,9 @@ var ErrNotSupportCollection = fmt.Errorf("Operation does not support GeometryCol
 // ErrNotSupportBound ...
 var ErrNotSupportBound = fmt.Errorf("Operation does not support Bound arguments")
 
+// ErrNotSupportGeometry ...
+var ErrNotSupportGeometry = fmt.Errorf("Operation does not support arguments")
+
 // ErrWrongUsageFunc ...
 var ErrWrongUsageFunc = fmt.Errorf("Wrong usage function")
 

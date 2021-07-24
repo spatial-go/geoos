@@ -90,11 +90,17 @@ func (el *ValidOP) isSimpleLine(matr matrix.LineMatrix) bool {
 			if line1.IsIntersection(&line2) {
 				if (i == 0 && j == numLine-1) ||
 					(j == 0 && i == numLine-1) {
-					_, ip := line1.Intersection(&line2)
-					if ip.Equals(line1.Start) ||
-						ip.Equals(line1.End) ||
-						ip.Equals(line2.Start) ||
-						ip.Equals(line2.End) {
+					_, ips := line1.Intersection(&line2)
+					isIPoint := true
+					for _, ip := range ips {
+						if ip.Equals(line1.Start) ||
+							ip.Equals(line1.End) ||
+							ip.Equals(line2.Start) ||
+							ip.Equals(line2.End) {
+							isIPoint = false
+						}
+					}
+					if isIPoint {
 						continue
 					}
 				}

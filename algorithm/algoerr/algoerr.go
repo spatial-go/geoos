@@ -16,6 +16,9 @@ var ErrNotSupportCollection = fmt.Errorf("Operation does not support StericColle
 // ErrWrongUsageFunc ...
 var ErrWrongUsageFunc = fmt.Errorf("Wrong usage function")
 
+// ErrWrongFractionRange ...
+var ErrWrongFractionRange = fmt.Errorf("Fraction is not in range (0.0 - 1.0]")
+
 // ErrorDimension create new ErrorDimension by object.
 func ErrorDimension(obj ...interface{}) error {
 	return fmt.Errorf("Steric Should be Dimension: %v", obj...)

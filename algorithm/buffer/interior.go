@@ -62,7 +62,7 @@ type InteriorPointPoint struct {
 // If a Geometry is not of dimension 0 it is not tested.
 func (ip *InteriorPointPoint) Add(point matrix.Steric) {
 	ip.geom = point
-	ip.centroid = ComputerCentroid(point)
+	ip.centroid = ComputeCentroid(point)
 	switch p := point.(type) {
 	case matrix.Matrix:
 		ip.addPoint(p)
@@ -99,7 +99,7 @@ type InteriorPointLine struct {
 // defined by a linear Geometry for the best inside point.
 func (ip *InteriorPointLine) Add(line matrix.Steric) {
 	ip.geom = line
-	ip.centroid = ComputerCentroid(line)
+	ip.centroid = ComputeCentroid(line)
 	switch p := line.(type) {
 	case matrix.LineMatrix:
 		ip.addInterior(p)
@@ -153,7 +153,7 @@ func avg(a, b float64) float64 {
 // all component polygons.
 func (ip *InteriorPointArea) Add(poly matrix.Steric) {
 	ip.geom = poly
-	ip.centroid = ComputerCentroid(poly)
+	ip.centroid = ComputeCentroid(poly)
 
 	switch p := poly.(type) {
 	case matrix.PolygonMatrix:

@@ -43,11 +43,28 @@ func Union(m0, m1 matrix.PolygonMatrix) matrix.PolygonMatrix {
 		return m0
 	}
 
-	return unionActual(m0, m1)
+	return unionActual(m0, m1, Merge)
+}
+
+// Intersection  Computes the Intersection of two geometries,either or both of which may be null.
+func Intersection(m0, m1 matrix.PolygonMatrix) matrix.PolygonMatrix {
+
+	if m0 == nil && m1 == nil {
+		return nil
+	}
+	if m0 == nil {
+		return m1
+	}
+
+	if m1 == nil {
+		return m0
+	}
+
+	return unionActual(m0, m1, Clip)
 }
 
 // unionActual the actual unioning of two polygonal geometries.
-func unionActual(m0, m1 matrix.PolygonMatrix) matrix.PolygonMatrix {
+func unionActual(m0, m1 matrix.PolygonMatrix, ath Atherton) matrix.PolygonMatrix {
 
 	subject := &algorithm.Plane{}
 	for _, v2 := range m0 {
@@ -69,7 +86,7 @@ func unionActual(m0, m1 matrix.PolygonMatrix) matrix.PolygonMatrix {
 		clipping.CloseRing()
 		clipping.Rank = calc.CUT
 	}
-	poly := Weiler(subject, clipping, Merge)
+	poly := Weiler(subject, clipping, ath)
 	var result matrix.PolygonMatrix
 	for _, v2 := range poly.Rings {
 		var edge matrix.LineMatrix
