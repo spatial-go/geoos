@@ -120,16 +120,15 @@ func ProjectionFactor(p, a, b matrix.Matrix) float64 {
 		return 1.0
 	}
 	// Otherwise, use comp.graphics.algorithms Frequently Asked Questions method
-	/*     	      AC dot AB
-		r = ---------
-			  ||AB||^2
-	 r has the following meaning:
-	 r=0 P = A
-	 r=1 P = B
-	 r<0 P is on the backward extension of AB
-	 r>1 P is on the forward extension of AB
-	 0<r<1 P is interior to AB
-	*/
+	//     	      AC dot AB
+	// 	r = ---------
+	// 		  ||AB||^2
+	//  r has the following meaning:
+	//  r=0 P = A
+	//  r=1 P = B
+	//  r<0 P is on the backward extension of AB
+	//  r>1 P is on the forward extension of AB
+	//  0<r<1 P is interior to AB
 	dx := b[0] - a[0]
 	dy := b[1] - a[1]
 	lenD := dx*dx + dy*dy

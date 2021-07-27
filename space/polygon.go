@@ -120,7 +120,7 @@ func (p Polygon) EqualsExact(g Geometry, tolerance float64) bool {
 	}
 
 	for i, v := range p {
-		if LineString(v).EqualsExact(LineString(pol[i]), tolerance) {
+		if !LineString(v).EqualsExact(LineString(pol[i]), tolerance) {
 			return false
 		}
 	}

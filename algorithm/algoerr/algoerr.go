@@ -19,6 +19,17 @@ var ErrWrongUsageFunc = fmt.Errorf("Wrong usage function")
 // ErrWrongFractionRange ...
 var ErrWrongFractionRange = fmt.Errorf("Fraction is not in range (0.0 - 1.0]")
 
+// ErrWrongTolerance ...
+var ErrWrongTolerance = fmt.Errorf("Tolerance must be non-negative")
+
+// ErrWrongExponent ...
+var ErrWrongExponent = fmt.Errorf("Exponent out of bounds")
+
+// ErrUnknownType ...
+func ErrUnknownType(obj ...interface{}) error {
+	return fmt.Errorf("Unknown Geometry subtype: %v", obj...)
+}
+
 // ErrorDimension create new ErrorDimension by object.
 func ErrorDimension(obj ...interface{}) error {
 	return fmt.Errorf("Steric Should be Dimension: %v", obj...)

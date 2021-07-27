@@ -26,6 +26,11 @@ type Steric interface {
 	Bound() []Matrix
 }
 
+// LineSegment is line.
+type LineSegment struct {
+	P0, P1 Matrix
+}
+
 // Matrix is a one-dimensional matrix.
 type Matrix []float64
 
@@ -112,6 +117,11 @@ func (l LineMatrix) Bound() []Matrix {
 	}
 
 	return b
+}
+
+// ToLineArray returns the LineArray
+func (l LineMatrix) ToLineArray() (lines []*LineSegment) {
+	return LineArray(l)
 }
 
 // Dimensions returns 0 because a polygon matrix is a 0d object.
@@ -396,4 +406,12 @@ func TransMatrixs(inputGeom Steric) []Matrix {
 	default:
 		return []Matrix{}
 	}
+}
+
+// LineArray returns the LineArray
+func LineArray(l LineMatrix) (lines []*LineSegment) {
+	for i := 0; i < len(l)-1; i++ {
+		lines = append(lines, &LineSegment{Matrix(l[i]), Matrix(l[i+1])})
+	}
+	return
 }

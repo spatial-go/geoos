@@ -129,9 +129,7 @@ func (m *MaxDensifiedByFractionDistanceFilter) apply(pts []matrix.Matrix) {
 }
 
 func (m *MaxDensifiedByFractionDistanceFilter) filter(pts []matrix.Matrix, index int) {
-	/**
-	 * This logic also handles skipping Point geometries
-	 */
+	//This logic also handles skipping Point geometries
 	if index == 0 {
 		return
 	}

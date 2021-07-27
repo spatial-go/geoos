@@ -1176,3 +1176,71 @@ func TestAlgorithm_HausdorffDistance(t *testing.T) {
 		})
 	}
 }
+
+func TestAlgorithm_Simplify(t *testing.T) {
+	lineString, _ := wkt.UnmarshalString(`LINESTRING(0 0, 1 1, 0 2, 1 3, 0 4, 1 5)`)
+	expectLine, _ := wkt.UnmarshalString(`LINESTRING (0 0, 1 5)`)
+
+	type args struct {
+		g         space.Geometry
+		tolerance float64
+	}
+	tests := []struct {
+		name    string
+		G       GEOAlgorithm
+		args    args
+		want    space.Geometry
+		wantErr bool
+	}{
+		{name: "Simplify Point", args: args{g: lineString, tolerance: 1.0}, want: expectLine, wantErr: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			G := NormalStrategy()
+			gotGeometry, err := G.Simplify(tt.args.g, tt.args.tolerance)
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GEOAlgorithm.EqualsExact() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			isEqual, _ := G.EqualsExact(gotGeometry, tt.want, 0.000001)
+			if !isEqual {
+				t.Errorf("GEOAlgorithm.Simplify() = %v, want %v", wkt.MarshalString(gotGeometry), wkt.MarshalString(tt.want))
+			}
+		})
+	}
+}
+
+func TestAlgorithm_SimplifyP(t *testing.T) {
+	lineString, _ := wkt.UnmarshalString(`LINESTRING(0 0, 1 1, 0 2, 1 3, 0 4, 1 5)`)
+	expectLine, _ := wkt.UnmarshalString(`LINESTRING (0 0, 1 5)`)
+
+	type args struct {
+		g         space.Geometry
+		tolerance float64
+	}
+	tests := []struct {
+		name    string
+		G       GEOAlgorithm
+		args    args
+		want    space.Geometry
+		wantErr bool
+	}{
+		{name: "SimplifyP Point", args: args{g: lineString, tolerance: 1.0}, want: expectLine, wantErr: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			G := NormalStrategy()
+			gotGeometry, err := G.SimplifyP(tt.args.g, tt.args.tolerance)
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GEOAlgorithm.EqualsExact() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			isEqual, _ := G.EqualsExact(gotGeometry, tt.want, 0.000001)
+			if !isEqual {
+				t.Errorf("GEOAlgorithm.Envelope() = %v, want %v", wkt.MarshalString(gotGeometry), wkt.MarshalString(tt.want))
+			}
+		})
+	}
+}

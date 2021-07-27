@@ -2,6 +2,7 @@ package planar
 
 import (
 	"github.com/spatial-go/geoos/algorithm/buffer"
+	"github.com/spatial-go/geoos/algorithm/buffer/simplify"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
 	"github.com/spatial-go/geoos/algorithm/overlay"
@@ -267,15 +268,16 @@ func (g *MegrezAlgorithm) SharedPaths(geom1, geom2 space.Geometry) (string, erro
 // Simplify returns a "simplified" version of the given geometry using the Douglas-Peucker algorithm,
 // May not preserve topology
 func (g *MegrezAlgorithm) Simplify(geom space.Geometry, tolerance float64) (space.Geometry, error) {
-	//TODO
-	return GetStrategy(newGEOAlgorithm).Simplify(geom, tolerance)
+	result := simplify.Simplify(geom.ToMatrix(), tolerance)
+	return space.TransGeometry(result), nil
 }
 
 // SimplifyP returns a geometry simplified by amount given by tolerance.
 // Unlike Simplify, SimplifyP guarantees it will preserve topology.
 func (g *MegrezAlgorithm) SimplifyP(geom space.Geometry, tolerance float64) (space.Geometry, error) {
-	//TODO
-	return GetStrategy(newGEOAlgorithm).SimplifyP(geom, tolerance)
+	tls := &simplify.TopologyPreservingSimplifier{}
+	result := tls.Simplify(geom.ToMatrix(), tolerance)
+	return space.TransGeometry(result), nil
 }
 
 // Snap the vertices and segments of a geometry to another space.Geometry's vertices.
@@ -284,20 +286,7 @@ func (g *MegrezAlgorithm) SimplifyP(geom space.Geometry, tolerance float64) (spa
 // If no snapping occurs then the input geometry is returned unchanged.
 func (g *MegrezAlgorithm) Snap(input, reference space.Geometry, tolerance float64) (space.Geometry, error) {
 	result := snap.Snap(input.ToMatrix(), reference.ToMatrix(), tolerance)
-
-	switch g := result[0].(type) {
-	case matrix.Matrix:
-		return space.Point(g), nil
-	case matrix.LineMatrix:
-		if len(g) == 1 {
-			return space.Point(matrix.Matrix(g[0])), nil
-		}
-		return space.LineString(g), nil
-	case matrix.PolygonMatrix:
-		return space.Polygon(g), nil
-	default:
-		return nil, nil
-	}
+	return space.TransGeometry(result[0]), nil
 }
 
 // SymDifference returns a geometry that represents the portions of A and B that do not intersect.

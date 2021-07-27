@@ -35,28 +35,15 @@ func (ips IntersectionPointLine) IsOriginal() bool {
 	return false
 }
 
-// Line  straight line  .
-type Line struct {
-	Start, End matrix.Matrix
-}
-
-// LineArray returns the LineArray
-func LineArray(l matrix.LineMatrix) (lines []Line) {
-	for i := 0; i < len(l)-1; i++ {
-		lines = append(lines, Line{matrix.Matrix(l[i]), matrix.Matrix(l[i+1])})
-	}
-	return
-}
-
-// IsIntersection returns intersection of a and other.
-func (l *Line) IsIntersection(o *Line) bool {
-	mark, _ := Intersection(l.Start, l.End, o.Start, o.End)
+// IsIntersectionLineSegment returns intersection of a and other.
+func IsIntersectionLineSegment(l, o *matrix.LineSegment) bool {
+	mark, _ := Intersection(l.P0, l.P1, o.P0, o.P1)
 	return mark
 }
 
-// Intersection returns intersection of a and other.
-func (l *Line) Intersection(o *Line) (bool, IntersectionPointLine) {
-	mark, ips := Intersection(l.Start, l.End, o.Start, o.End)
+// IntersectionLineSegment returns intersection of a and other.
+func IntersectionLineSegment(l, o *matrix.LineSegment) (bool, IntersectionPointLine) {
+	mark, ips := Intersection(l.P0, l.P1, o.P0, o.P1)
 	return mark, ips
 }
 
@@ -142,9 +129,9 @@ func InLineVertex(spot matrix.Matrix, matr matrix.LineMatrix) (bool, bool) {
 
 // InLineMatrix returns true if spot in LineMatrix,false else..
 func InLineMatrix(spot matrix.Matrix, matr matrix.LineMatrix) bool {
-	lines := LineArray(matr)
+	lines := matr.ToLineArray()
 	for _, line := range lines {
-		if InLine(spot, line.Start, line.End) {
+		if InLine(spot, line.P0, line.P1) {
 			return true
 		}
 	}

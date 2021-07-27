@@ -220,3 +220,26 @@ func aInB(A, B Geometry) (bool, bool) {
 	return intersectBound, false
 
 }
+
+// TransGeometry trans steric to geometry.
+func TransGeometry(inputGeom matrix.Steric) Geometry {
+	switch g := inputGeom.(type) {
+	case matrix.Matrix:
+		return Point(g)
+	case matrix.LineMatrix:
+		if len(g) == 1 {
+			return Point(matrix.Matrix(g[0]))
+		}
+		return LineString(g)
+	case matrix.PolygonMatrix:
+		return Polygon(g)
+	case matrix.Collection:
+		var coll Collection
+		for _, v := range g {
+			coll = append(coll, TransGeometry(v))
+		}
+		return coll
+	default:
+		return nil
+	}
+}

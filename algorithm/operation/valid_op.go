@@ -80,23 +80,23 @@ func (el *ValidOP) isSimpleCollection(matr matrix.Collection) bool {
 // geometries are simple if they do not self-intersect at interior points
 // (i.e. points other than the endpoints)..
 func (el *ValidOP) isSimpleLine(matr matrix.LineMatrix) bool {
-	lines := relate.LineArray(matr)
+	lines := matr.ToLineArray()
 	numLine := len(lines)
 	for i, line1 := range lines {
 		for j, line2 := range lines {
 			if i == j || j-i == 1 || i-j == 1 {
 				continue
 			}
-			if line1.IsIntersection(&line2) {
+			if relate.IsIntersectionLineSegment(line1, line2) {
 				if (i == 0 && j == numLine-1) ||
 					(j == 0 && i == numLine-1) {
-					_, ips := line1.Intersection(&line2)
+					_, ips := relate.IntersectionLineSegment(line1, line2)
 					isIPoint := true
 					for _, ip := range ips {
-						if ip.Equals(line1.Start) ||
-							ip.Equals(line1.End) ||
-							ip.Equals(line2.Start) ||
-							ip.Equals(line2.End) {
+						if ip.Equals(line1.P0) ||
+							ip.Equals(line1.P1) ||
+							ip.Equals(line2.P0) ||
+							ip.Equals(line2.P1) {
 							isIPoint = false
 						}
 					}

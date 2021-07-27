@@ -89,7 +89,7 @@ func (ls LineString) EqualsExact(g Geometry, tolerance float64) bool {
 	}
 
 	for i, v := range ls {
-		if Point(v).EqualsExact(Point(line[i]), tolerance) {
+		if !Point(v).EqualsExact(Point(line[i]), tolerance) {
 			return false
 		}
 	}
