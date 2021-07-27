@@ -234,11 +234,42 @@ func TransGeometry(inputGeom matrix.Steric) Geometry {
 	case matrix.PolygonMatrix:
 		return Polygon(g)
 	case matrix.Collection:
-		var coll Collection
+		multiType := ""
 		for _, v := range g {
-			coll = append(coll, TransGeometry(v))
+			if multiType == "" {
+				multiType = TransGeometry(v).GeoJSONType()
+			}
+			if multiType != TransGeometry(v).GeoJSONType() {
+				multiType = ""
+				break
+			}
 		}
-		return coll
+		switch multiType {
+		case TypeLineString:
+			var coll MultiLineString
+			for _, v := range g {
+				coll = append(coll, TransGeometry(v).(LineString))
+			}
+			return coll
+		case TypePoint:
+			var coll MultiPoint
+			for _, v := range g {
+				coll = append(coll, TransGeometry(v).(Point))
+			}
+			return coll
+		case TypePolygon:
+			var coll MultiPolygon
+			for _, v := range g {
+				coll = append(coll, TransGeometry(v).(Polygon))
+			}
+			return coll
+		default:
+			var coll Collection
+			for _, v := range g {
+				coll = append(coll, TransGeometry(v))
+			}
+			return coll
+		}
 	default:
 		return nil
 	}

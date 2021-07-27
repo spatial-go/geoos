@@ -10,6 +10,9 @@ var ErrNilSteric = fmt.Errorf("Steric is nil")
 // ErrNotInSlice ...
 var ErrNotInSlice = fmt.Errorf("Steric not in slice")
 
+// ErrNotMatchType ...
+var ErrNotMatchType = fmt.Errorf("Operation does not support not match type arguments")
+
 // ErrNotSupportCollection ...
 var ErrNotSupportCollection = fmt.Errorf("Operation does not support StericCollection arguments")
 

@@ -1,6 +1,7 @@
 package planar
 
 import (
+	"github.com/spatial-go/geoos/algorithm/algoerr"
 	"github.com/spatial-go/geoos/algorithm/buffer"
 	"github.com/spatial-go/geoos/algorithm/buffer/simplify"
 	"github.com/spatial-go/geoos/algorithm/matrix"
@@ -104,8 +105,14 @@ func (g *MegrezAlgorithm) Crosses(A, B space.Geometry) (bool, error) {
 // One can think of this as GeometryA - Intersection(A,B).
 // If A is completely contained in B then an empty geometry collection is returned.
 func (g *MegrezAlgorithm) Difference(geom1, geom2 space.Geometry) (space.Geometry, error) {
-	//TODO
-	return GetStrategy(newGEOAlgorithm).Difference(geom1, geom2)
+	if geom1.GeoJSONType() != geom1.GeoJSONType() {
+		return nil, algoerr.ErrNotMatchType
+	}
+	var err error
+	if result, err := overlay.Difference(geom1.ToMatrix(), geom2.ToMatrix()); err == nil {
+		return space.TransGeometry(result), nil
+	}
+	return nil, err
 }
 
 // Disjoint Overlaps, Touches, Within all imply geometries are not spatially disjoint.
@@ -293,8 +300,14 @@ func (g *MegrezAlgorithm) Snap(input, reference space.Geometry, tolerance float6
 // It is called a symmetric difference because SymDifference(A,B) = SymDifference(B,A).
 // One can think of this as Union(geomA,geomB) - Intersection(A,B).
 func (g *MegrezAlgorithm) SymDifference(geom1, geom2 space.Geometry) (space.Geometry, error) {
-	//TODO
-	return GetStrategy(newGEOAlgorithm).SymDifference(geom1, geom2)
+	if geom1.GeoJSONType() != geom1.GeoJSONType() {
+		return nil, algoerr.ErrNotMatchType
+	}
+	var err error
+	if result, err := overlay.SymDifference(geom1.ToMatrix(), geom2.ToMatrix()); err == nil {
+		return space.TransGeometry(result), nil
+	}
+	return nil, err
 }
 
 // Touches returns TRUE if the only points in common between A and B lie in the union of the boundaries of A and B.
