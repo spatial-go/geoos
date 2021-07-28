@@ -1,6 +1,8 @@
 package filter
 
-import "github.com/spatial-go/geoos/algorithm/matrix"
+import (
+	"github.com/spatial-go/geoos/algorithm/matrix"
+)
 
 // Filter  An interface  which use the values of the coordinates in a  Geometry.
 //  Coordinate filters can be used to implement centroid and

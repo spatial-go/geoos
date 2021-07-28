@@ -9,6 +9,8 @@ import (
 	"github.com/spatial-go/geoos/algorithm/overlay"
 	"github.com/spatial-go/geoos/algorithm/overlay/snap"
 	"github.com/spatial-go/geoos/algorithm/relate"
+	"github.com/spatial-go/geoos/algorithm/sharedpaths"
+	"github.com/spatial-go/geoos/encoding/wkt"
 	"github.com/spatial-go/geoos/space"
 	"github.com/spatial-go/geoos/space/spaceerr"
 )
@@ -268,8 +270,21 @@ func (g *MegrezAlgorithm) Relate(s, d space.Geometry) (string, error) {
 // those going in the opposite direction are in the second element.
 // The paths themselves are given in the direction of the first geometry.
 func (g *MegrezAlgorithm) SharedPaths(geom1, geom2 space.Geometry) (string, error) {
-	//TODO
-	return GetStrategy(newGEOAlgorithm).SharedPaths(geom1, geom2)
+	forwDir, backDir, _ := sharedpaths.CreateSharedPathsWithGeom(geom1.ToMatrix(), geom2.ToMatrix()).SharedPaths()
+	var forw, back space.Geometry
+	if forwDir == nil {
+		forw = space.MultiLineString{}
+	} else {
+		forw = space.TransGeometry(forwDir)
+	}
+	if backDir == nil {
+		back = space.MultiLineString{}
+	} else {
+		back = space.TransGeometry(backDir)
+	}
+	coll := space.Collection{forw, back}
+
+	return wkt.MarshalString(coll), nil
 }
 
 // Simplify returns a "simplified" version of the given geometry using the Douglas-Peucker algorithm,

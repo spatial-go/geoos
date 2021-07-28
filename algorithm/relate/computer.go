@@ -88,11 +88,11 @@ func Intersection(aStart, aEnd, bStart, bEnd matrix.Matrix) (mark bool, ips Inte
 			ips = append(ips, IntersectionPoint{bEnd, true, determinant < 0, true})
 			mark = true
 		}
-		if InLine(aStart, bStart, bEnd) {
+		if InLine(aStart, bStart, bEnd) && !aStart.Equals(bStart) && !aStart.Equals(bEnd) {
 			ips = append(ips, IntersectionPoint{aStart, true, determinant < 0, true})
 			mark = true
 		}
-		if InLine(aEnd, bStart, bEnd) {
+		if InLine(aEnd, bStart, bEnd) && !aEnd.Equals(bStart) && !aEnd.Equals(bEnd) {
 			ips = append(ips, IntersectionPoint{aEnd, true, determinant < 0, true})
 			mark = true
 		}
@@ -179,5 +179,33 @@ func IntersectionEdge(aLine, bLine matrix.LineMatrix) (mark bool, ps Intersectio
 			}
 		}
 	}
+	filt := &UniqueIntersectionEdgeFilter{}
+	for _, v := range ps {
+		filt.Filter(v)
+	}
+	ps = filt.Ips
 	return
+}
+
+// UniqueIntersectionEdgeFilter  A Filter that extracts a unique array.
+type UniqueIntersectionEdgeFilter struct {
+	Ips IntersectionPointLine
+}
+
+// Filter Performs an operation with the provided .
+func (u *UniqueIntersectionEdgeFilter) Filter(ip IntersectionPoint) {
+	u.add(ip)
+}
+
+func (u *UniqueIntersectionEdgeFilter) add(ip IntersectionPoint) {
+	hasMatrix := false
+	for _, v := range u.Ips {
+		if v.Matrix.Equals(ip.Matrix) {
+			hasMatrix = true
+			break
+		}
+	}
+	if !hasMatrix {
+		u.Ips = append(u.Ips, ip)
+	}
 }

@@ -73,10 +73,10 @@ func differenceLine(m, m1 matrix.LineMatrix) (matrix.Steric, error) {
 			if relate.InLine(ip.Matrix, line.P0, line.P1) {
 				il.pos = i
 				il.line = *line
-				il.ips = append(il.ips, ip)
+				il.Ips = append(il.Ips, ip)
 			}
 		}
-		sort.Sort(il.ips)
+		sort.Sort(il.Ips)
 		ils = append(ils, il)
 		il = IntersectionLineSegment{}
 	}
@@ -84,22 +84,22 @@ func differenceLine(m, m1 matrix.LineMatrix) (matrix.Steric, error) {
 	line := matrix.LineMatrix{}
 	startPos := 0
 	for _, v := range ils {
-		if matrix.Matrix(m[v.pos]).Equals(v.ips[0].Matrix) {
+		if matrix.Matrix(m[v.pos]).Equals(v.Ips[0].Matrix) {
 			line = append(line, m[startPos:v.pos]...)
 		} else {
 			line = append(line, m[startPos:v.pos+1]...)
-			line = append(line, v.ips[0].Matrix)
+			line = append(line, v.Ips[0].Matrix)
 		}
 		if len(line) > 1 {
 			result = append(result, line)
 		}
-		if v.pos < len(m)-1 && matrix.Matrix(m[v.pos+1]).Equals(v.ips[len(ips)-1].Matrix) {
+		if v.pos < len(m)-1 && matrix.Matrix(m[v.pos+1]).Equals(v.Ips[len(ips)-1].Matrix) {
 			startPos = v.pos + 2
 		} else {
 			startPos = v.pos + 1
 		}
 		line = matrix.LineMatrix{}
-		line = append(line, v.ips[len(v.ips)-1].Matrix)
+		line = append(line, v.Ips[len(v.Ips)-1].Matrix)
 	}
 	line = append(line, m[startPos:]...)
 	if len(line) > 1 {
@@ -108,9 +108,35 @@ func differenceLine(m, m1 matrix.LineMatrix) (matrix.Steric, error) {
 	return result, nil
 }
 
+// IntersectLine returns a array  that represents that part of geometry A intersect with geometry B.
+func IntersectLine(m, m1 matrix.LineMatrix) []IntersectionLineSegment {
+	mark, ips := relate.IntersectionEdge(m, m1)
+	if !mark || len(ips) <= 1 {
+		return nil
+	}
+	ils := []IntersectionLineSegment{}
+	il := IntersectionLineSegment{Ips: relate.IntersectionPointLine{}}
+	for i, line := range m.ToLineArray() {
+		for _, ip := range ips {
+			if relate.InLine(ip.Matrix, line.P0, line.P1) {
+				il.pos = i
+				il.line = *line
+				il.Ips = append(il.Ips, ip)
+			}
+		}
+		//sort.Sort(il.ips)
+		if len(il.Ips) > 1 {
+			ils = append(ils, il)
+		}
+		il = IntersectionLineSegment{Ips: relate.IntersectionPointLine{}}
+	}
+
+	return ils
+}
+
 // IntersectionLineSegment ...
 type IntersectionLineSegment struct {
 	pos  int
 	line matrix.LineSegment
-	ips  relate.IntersectionPointLine
+	Ips  relate.IntersectionPointLine
 }
