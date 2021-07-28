@@ -1315,3 +1315,36 @@ func TestAlgorithm_SymDifference(t *testing.T) {
 		})
 	}
 }
+
+func TestAlgorithm_ConvexHull(t *testing.T) {
+	polygon, _ := wkt.UnmarshalString(`POLYGON((1 1, 3 1, 2 2, 3 3, 1 3, 1 1))`)
+	expectPolygon, _ := wkt.UnmarshalString(`POLYGON ((1 1, 1 3, 3 3, 3 1, 1 1))`)
+
+	type args struct {
+		g space.Geometry
+	}
+	tests := []struct {
+		name    string
+		G       GEOAlgorithm
+		args    args
+		want    space.Geometry
+		wantErr bool
+	}{
+		{name: "ConvexHull Polygon", args: args{g: polygon}, want: expectPolygon, wantErr: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			G := NormalStrategy()
+			gotGeometry, err := G.ConvexHull(tt.args.g)
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GEOAlgorithm.EqualsExact() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			isEqual, _ := G.EqualsExact(gotGeometry, tt.want, 0.000001)
+			if !isEqual {
+				t.Errorf("GEOAlgorithm.Envelope() = %v, want %v", wkt.MarshalString(gotGeometry), wkt.MarshalString(tt.want))
+			}
+		})
+	}
+}

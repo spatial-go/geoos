@@ -77,8 +77,8 @@ func (g *MegrezAlgorithm) Contains(A, B space.Geometry) (bool, error) {
 // The convex hull of two or more collinear points is a two-point LineString.
 // The convex hull of one or more identical points is a Point.
 func (g *MegrezAlgorithm) ConvexHull(geom space.Geometry) (space.Geometry, error) {
-	//TODO
-	return GetStrategy(newGEOAlgorithm).ConvexHull(geom)
+	result := buffer.ConvexHullWithGeom(geom.ToMatrix()).ConvexHull()
+	return space.TransGeometry(result), nil
 }
 
 // CoveredBy returns TRUE if no point in space.Geometry A is outside space.Geometry B

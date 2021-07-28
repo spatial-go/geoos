@@ -11,6 +11,25 @@ func ValueOf(x float64) *PairFloat {
 	return &PairFloat{x, 0.0}
 }
 
+// SelfAddOne  Adds the argument to the value of DD.
+// To prevent altering constants,
+// this method must only be used on values known to
+// be newly created.
+func (d *PairFloat) SelfAddOne(y float64) *PairFloat {
+	var H, h, S, s, e, f float64
+	S = d.Hi + y
+	e = S - d.Hi
+	s = S - e
+	s = (y - e) + (d.Hi - s)
+	f = s + d.Lo
+	H = S + f
+	h = f + (S - H)
+	d.Hi = H + h
+	d.Lo = h + (H - d.Hi)
+	return d
+	// return selfAdd(y, 0.0);
+}
+
 // SelfAdd  Adds the argument to the value of DD.
 // To prevent altering constants,
 // this method must only be used on values known to
@@ -43,6 +62,14 @@ func (d *PairFloat) SelfAdd(yhi, ylo float64) *PairFloat {
 // be newly created.
 func (d *PairFloat) SelfSubtract(yhi, ylo float64) *PairFloat {
 	return d.SelfAdd(-yhi, -ylo)
+}
+
+// SelfMultiplyPair Multiplies this object by the argument, returning DD.
+// To prevent altering constants,
+// this method must only be used on values known to
+// be newly created.
+func (d *PairFloat) SelfMultiplyPair(y *PairFloat) *PairFloat {
+	return d.SelfMultiply(y.Hi, y.Lo)
 }
 
 // SelfMultiply Multiplies this object by the argument, returning DD.
