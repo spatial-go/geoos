@@ -80,20 +80,26 @@ func Intersection(aStart, aEnd, bStart, bEnd matrix.Matrix) (mark bool, ips Inte
 	determinant := CrossProduct(u, v)
 
 	if determinant == 0 {
+		isEnter := true
+		if (u[0] > 0 && v[0] > 0) || (u[1] > 0 && v[1] > 0) {
+			isEnter = false
+		} else if (u[0] < 0 && v[0] < 0) || (u[1] < 0 && v[1] < 0) {
+			isEnter = false
+		}
 		if InLine(bStart, aStart, aEnd) {
-			ips = append(ips, IntersectionPoint{bStart, true, determinant < 0, true})
+			ips = append(ips, IntersectionPoint{bStart, true, isEnter, true})
 			mark = true
 		}
 		if InLine(bEnd, aStart, aEnd) {
-			ips = append(ips, IntersectionPoint{bEnd, true, determinant < 0, true})
+			ips = append(ips, IntersectionPoint{bEnd, true, isEnter, true})
 			mark = true
 		}
 		if InLine(aStart, bStart, bEnd) && !aStart.Equals(bStart) && !aStart.Equals(bEnd) {
-			ips = append(ips, IntersectionPoint{aStart, true, determinant < 0, true})
+			ips = append(ips, IntersectionPoint{aStart, true, isEnter, true})
 			mark = true
 		}
 		if InLine(aEnd, bStart, bEnd) && !aEnd.Equals(bStart) && !aEnd.Equals(bEnd) {
-			ips = append(ips, IntersectionPoint{aEnd, true, determinant < 0, true})
+			ips = append(ips, IntersectionPoint{aEnd, true, isEnter, true})
 			mark = true
 		}
 	} else {
