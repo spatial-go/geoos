@@ -37,8 +37,8 @@ func (g *MegrezAlgorithm) Boundary(geom space.Geometry) (space.Geometry, error) 
 
 // Buffer sReturns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
-func (g *MegrezAlgorithm) Buffer(geom space.Geometry, width float64, quadsegs int32) (geometry space.Geometry) {
-	buff := buffer.Buffer(geom.ToMatrix(), width)
+func (g *MegrezAlgorithm) Buffer(geom space.Geometry, width float64, quadsegs int) (geometry space.Geometry) {
+	buff := buffer.Buffer(geom.ToMatrix(), width, quadsegs)
 	switch b := buff.(type) {
 	case matrix.LineMatrix:
 		return space.LineString(b)
@@ -354,7 +354,8 @@ func (g *MegrezAlgorithm) Union(geom1, geom2 space.Geometry) (space.Geometry, er
 	} else if geom1.GeoJSONType() == space.TypePoint && geom2.GeoJSONType() == space.TypePoint {
 		return space.MultiPoint{geom1.(space.Point), geom2.(space.Point)}, nil
 	} else if geom1.GeoJSONType() == space.TypeLineString && geom2.GeoJSONType() == space.TypeLineString {
-		return space.MultiLineString{geom1.(space.LineString), geom2.(space.LineString)}, nil
+		result := overlay.UnionLine(geom1.ToMatrix().(matrix.LineMatrix), geom2.ToMatrix().(matrix.LineMatrix))
+		return space.TransGeometry(result), nil
 	}
 	return space.Collection{geom1, geom2}, nil
 }

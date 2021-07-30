@@ -30,8 +30,8 @@ func (g *GEOAlgorithm) Boundary(geom space.Geometry) (space.Geometry, error) {
 
 // Buffer sReturns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
-func (g *GEOAlgorithm) Buffer(geom space.Geometry, width float64, quadsegs int32) (geometry space.Geometry) {
-	result, err := geo.Buffer(wkt.MarshalString(geom), width, quadsegs)
+func (g *GEOAlgorithm) Buffer(geom space.Geometry, width float64, quadsegs int) (geometry space.Geometry) {
+	result, err := geo.Buffer(wkt.MarshalString(geom), width, int32(quadsegs))
 	if err != nil {
 		return
 	}

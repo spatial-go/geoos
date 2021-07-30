@@ -46,21 +46,17 @@ func Union(m0, m1 matrix.PolygonMatrix) matrix.PolygonMatrix {
 	return unionActual(m0, m1, Merge)
 }
 
-// Intersection  Computes the Intersection of two geometries,either or both of which may be null.
-func Intersection(m0, m1 matrix.PolygonMatrix) matrix.PolygonMatrix {
-
-	if m0 == nil && m1 == nil {
-		return nil
+// UnionLine  Computes the Union of two geometries,either or both of which may be null.
+func UnionLine(m0, m1 matrix.LineMatrix) matrix.Steric {
+	result := matrix.Collection{}
+	ils := IntersectLine(m0, m1)
+	for _, il := range ils {
+		result = append(result, matrix.LineMatrix{il.Ips[0].Matrix, il.Ips[1].Matrix})
 	}
-	if m0 == nil {
-		return m1
+	if sd, err := SymDifference(m0, m1); err == nil {
+		result = append(result, sd.(matrix.Collection)...)
 	}
-
-	if m1 == nil {
-		return m0
-	}
-
-	return unionActual(m0, m1, Clip)
+	return result
 }
 
 // unionActual the actual unioning of two polygonal geometries.

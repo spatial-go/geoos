@@ -154,7 +154,7 @@ func TestAlgorithm_Union(t *testing.T) {
 
 	line01, _ := wkt.UnmarshalString(`LINESTRING(50 100, 50 200)`)
 	line02, _ := wkt.UnmarshalString(`LINESTRING(50 50, 50 150)`)
-	expectMultiline, _ := wkt.UnmarshalString(`MULTILINESTRING((50 150,50 200),(50 50,50 100))`)
+	expectMultiline, _ := wkt.UnmarshalString(`MULTILINESTRING((50 100,50 150),(50 150,50 200),(50 50,50 100))`)
 
 	type args struct {
 		g1 space.Geometry
@@ -412,6 +412,7 @@ func TestAlgorithm_IsSimple(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			G := NormalStrategy()
+			//G := GetStrategy(newGEOAlgorithm)
 			got, err := G.IsSimple(tt.args.g)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("IsSimple() error = %v, wantErr %v", err, tt.wantErr)
@@ -425,7 +426,7 @@ func TestAlgorithm_IsSimple(t *testing.T) {
 }
 
 func TestAlgorithm_IsRing(t *testing.T) {
-	const linestring1 = `LINESTRING((1 2, 3 4, 5 6, 5 3, 1 2))`
+	const linestring1 = `LINESTRING(1 2, 3 4, 5 6, 5 3, 1 2)`
 	const linestring2 = `LINESTRING(1 1,2 2,2 3.5,1 3,1 2,2 1)`
 	line1, _ := wkt.UnmarshalString(linestring1)
 	line2, _ := wkt.UnmarshalString(linestring2)
@@ -439,13 +440,13 @@ func TestAlgorithm_IsRing(t *testing.T) {
 		want    bool
 		wantErr bool
 	}{
-		{name: "polygon", args: args{g: line1}, want: true, wantErr: false},
-		{name: "line", args: args{g: line2}, want: false, wantErr: false},
+		{name: "line1", args: args{g: line1}, want: true, wantErr: false},
+		{name: "line2", args: args{g: line2}, want: false, wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			G := NormalStrategy()
-			got, err := G.IsSimple(tt.args.g)
+			got, err := G.IsRing(tt.args.g)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("IsRing() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -495,7 +496,7 @@ func TestAlgorithm_Buffer(t *testing.T) {
 	type args struct {
 		g        space.Geometry
 		width    float64
-		quadsegs int32
+		quadsegs int
 	}
 	tests := []struct {
 		name string
@@ -511,7 +512,7 @@ func TestAlgorithm_Buffer(t *testing.T) {
 			gotGeometry := G.Buffer(tt.args.g, tt.args.width, tt.args.quadsegs)
 			isEqual, _ := G.EqualsExact(gotGeometry, tt.want, 0.000001)
 			if !isEqual {
-				t.Errorf("GEOAlgorithm.Buffer() = %v, want %v", wkt.MarshalString(gotGeometry), wkt.MarshalString(tt.want))
+				t.Errorf("GEOAlgorithm.Buffer() = %v\n, want %v", wkt.MarshalString(gotGeometry), wkt.MarshalString(tt.want))
 			}
 		})
 	}
@@ -1063,7 +1064,7 @@ func TestAlgorithm_LineMerge(t *testing.T) {
 	expectLine0, _ := wkt.UnmarshalString(`MULTILINESTRING((-29 -27,-30 -29.7,-36 -31,-45 -33,-46 -32))`)
 
 	multiLineString1, _ := wkt.UnmarshalString(`MULTILINESTRING((-29 -27,-30 -29.7,-36 -31,-45 -33),(-45.2 -33.2,-46 -32))`)
-	expectMultiLineString, _ := wkt.UnmarshalString(`MULTILINESTRING((-45.2 -33.2,-46 -32),(-29 -27,-30 -29.7,-36 -31,-45 -33))`)
+	expectMultiLineString, _ := wkt.UnmarshalString(`MULTILINESTRING((-29 -27,-30 -29.7,-36 -31,-45 -33),(-45.2 -33.2,-46 -32))`)
 
 	type args struct {
 		g space.Geometry
@@ -1084,12 +1085,12 @@ func TestAlgorithm_LineMerge(t *testing.T) {
 			gotGeometry, err := G.LineMerge(tt.args.g)
 
 			if (err != nil) != tt.wantErr {
-				t.Errorf("GEOAlgorithm.EqualsExact() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			isEqual, _ := G.EqualsExact(gotGeometry, tt.want, 0.000001)
 			if !isEqual {
-				t.Errorf("GEOAlgorithm.Envelope() = %v, want %v", wkt.MarshalString(gotGeometry), wkt.MarshalString(tt.want))
+				t.Errorf(" Error got = %v, want %v", wkt.MarshalString(gotGeometry), wkt.MarshalString(tt.want))
 			}
 		})
 	}

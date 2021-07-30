@@ -108,32 +108,6 @@ func differenceLine(m, m1 matrix.LineMatrix) (matrix.Steric, error) {
 	return result, nil
 }
 
-// IntersectLine returns a array  that represents that part of geometry A intersect with geometry B.
-func IntersectLine(m, m1 matrix.LineMatrix) []IntersectionLineSegment {
-	mark, ips := relate.IntersectionEdge(m, m1)
-	if !mark || len(ips) <= 1 {
-		return nil
-	}
-	ils := []IntersectionLineSegment{}
-	il := IntersectionLineSegment{Ips: relate.IntersectionPointLine{}}
-	for i, line := range m.ToLineArray() {
-		for _, ip := range ips {
-			if relate.InLine(ip.Matrix, line.P0, line.P1) {
-				il.pos = i
-				il.line = *line
-				il.Ips = append(il.Ips, ip)
-			}
-		}
-		//sort.Sort(il.ips)
-		if len(il.Ips) > 1 {
-			ils = append(ils, il)
-		}
-		il = IntersectionLineSegment{Ips: relate.IntersectionPointLine{}}
-	}
-
-	return ils
-}
-
 // IntersectionLineSegment ...
 type IntersectionLineSegment struct {
 	pos  int

@@ -16,9 +16,16 @@ type ComputeBuffer struct {
 // Buffer Computes the set of raw offset curves for the buffer.
 // Each offset curve has an attached {@link Label} indicating
 // its left and right location.
-func Buffer(geom matrix.Steric, distance float64) matrix.Steric {
+func Buffer(geom matrix.Steric, distance float64, quadsegs int) matrix.Steric {
 	eb := ComputeBuffer{}
+	eb.param = DefaultCurveParameters()
+	eb.param.QuadrantSegments = quadsegs
+
+	eb.CurveBuilder = &CurveBuilder{
+		Curve: &Curve{parameters: eb.param},
+	}
 	eb.distance = distance
+
 	eb.Add(geom)
 	bufferSeg := eb.CurveBuilder.Curves
 	if len(bufferSeg) <= 0 {
@@ -39,7 +46,7 @@ func (eb *ComputeBuffer) Add(geom matrix.Steric) {
 	if eb.param == nil || eb.param.IsEmpty() {
 		eb.param = DefaultCurveParameters()
 		eb.CurveBuilder = &CurveBuilder{
-			Curve: DefaultCurve(),
+			Curve: &Curve{parameters: eb.param},
 		}
 	}
 	switch st := geom.(type) {

@@ -240,7 +240,7 @@ func (d *DPTransformer) createValidArea(rawAreaGeom matrix.Steric) matrix.Steric
 	isValidArea := rawAreaGeom.Dimensions() == 2
 	// if geometry is invalid then make it valid
 	if d.isEnsureValidTopology && !isValidArea {
-		return buffer.Buffer(rawAreaGeom, 0.0)
+		return buffer.Buffer(rawAreaGeom, 0.0, 8)
 	}
 	return rawAreaGeom
 }

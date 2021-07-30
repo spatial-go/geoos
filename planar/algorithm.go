@@ -17,7 +17,7 @@ type Algorithm interface {
 
 	Boundary(geom space.Geometry) (space.Geometry, error)
 
-	Buffer(geom space.Geometry, width float64, quadsegs int32) space.Geometry
+	Buffer(geom space.Geometry, width float64, quadsegs int) space.Geometry
 
 	Centroid(geom space.Geometry) (space.Geometry, error)
 

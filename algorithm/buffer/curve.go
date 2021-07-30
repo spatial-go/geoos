@@ -52,23 +52,25 @@ func (c *Curve) CreateCircle(p matrix.Matrix, distance float64) matrix.LineMatri
 	// add start point
 	c.Line = append(c.Line, matrix.Matrix{p[0] + distance, p[1]})
 
+	startAngle, endAngle := 0.0, calc.ANGLE*math.Pi
 	directionFactor := calc.CLOCKWISE
-	totalAngle := math.Abs(0.0 - calc.ANGLE*math.Pi)
-	nSegs := totalAngle/(math.Pi/2.0/float64(c.parameters.QuadrantSegments)) + 0.5
+	totalAngle := math.Abs(startAngle - endAngle)
+	nSegs := int(totalAngle/(math.Pi/2.0/float64(c.parameters.QuadrantSegments)) + 0.5)
 
 	if nSegs < 1 {
 		return c.Line // no segments because angle is less than increment - nothing to do!
 	}
 
 	// choose angle increment so that each segment has equal length
-	angleInc := totalAngle / nSegs
+	angleInc := totalAngle / float64(nSegs)
 
 	pt := matrix.Matrix{0, 0}
-	for i := 0; float64(i) < nSegs; i++ {
+	for i := 1; i < nSegs; i++ {
 		angle := float64(directionFactor) * float64(i) * angleInc
 		pt[0] = p[0] + distance*math.Cos(angle)
 		pt[1] = p[1] + distance*math.Sin(angle)
 		c.Line = append(c.Line, pt)
+		pt = matrix.Matrix{0, 0}
 	}
 
 	c.CloseRing()

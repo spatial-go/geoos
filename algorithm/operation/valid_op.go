@@ -93,10 +93,8 @@ func (el *ValidOP) isSimpleLine(matr matrix.LineMatrix) bool {
 					_, ips := relate.IntersectionLineSegment(line1, line2)
 					isIPoint := true
 					for _, ip := range ips {
-						if ip.Equals(line1.P0) ||
-							ip.Equals(line1.P1) ||
-							ip.Equals(line2.P0) ||
-							ip.Equals(line2.P1) {
+						if !ip.Equals(lines[0].P0) &&
+							!ip.Equals(lines[numLine-1].P1) {
 							isIPoint = false
 						}
 					}

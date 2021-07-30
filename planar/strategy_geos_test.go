@@ -750,7 +750,7 @@ func TestGEOSAlgorithm_Buffer(t *testing.T) {
 	type args struct {
 		g        space.Geometry
 		width    float64
-		quadsegs int32
+		quadsegs int
 	}
 	tests := []struct {
 		name string
@@ -1110,6 +1110,10 @@ func TestGEOSAlgorithm_Union(t *testing.T) {
 	point02, _ := wkt.UnmarshalString(`POINT(-2 3)`)
 	expectMultiPoint, _ := wkt.UnmarshalString(`MULTIPOINT(1 2,-2 3)`)
 
+	line01, _ := wkt.UnmarshalString(`LINESTRING(50 100, 50 200)`)
+	line02, _ := wkt.UnmarshalString(`LINESTRING(50 50, 50 150)`)
+	expectMultiline, _ := wkt.UnmarshalString(`MULTILINESTRING((50 100,50 150),(50 150,50 200),(50 50,50 100))`)
+
 	type args struct {
 		g1 space.Geometry
 		g2 space.Geometry
@@ -1121,6 +1125,7 @@ func TestGEOSAlgorithm_Union(t *testing.T) {
 		wantErr bool
 	}{
 		{name: "union", args: args{g1: point01, g2: point02}, want: expectMultiPoint},
+		{name: "union line", args: args{g1: line01, g2: line02}, want: expectMultiline},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

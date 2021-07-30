@@ -96,7 +96,7 @@ func (mls MultiLineString) EqualsExact(g Geometry, tolerance float64) bool {
 		return false
 	}
 	for i, v := range mls {
-		if v.EqualsExact((g.(MultiLineString)[i]), tolerance) {
+		if !v.EqualsExact((g.(MultiLineString)[i]), tolerance) {
 			return false
 		}
 	}
