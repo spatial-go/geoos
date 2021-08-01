@@ -108,12 +108,12 @@ func (l LineMatrix) Bound() []Matrix {
 		return []Matrix{}
 	}
 
-	b := []Matrix{l[0], l[0]}
+	b := []Matrix{{0, 0}, {0, 0}}
 	for _, p := range l {
 		b[0][0] = math.Min(b[0][0], p[0])
 		b[0][1] = math.Min(b[0][1], p[1])
-		b[1][0] = math.Min(b[1][0], p[0])
-		b[1][1] = math.Min(b[1][1], p[1])
+		b[1][0] = math.Max(b[1][0], p[0])
+		b[1][1] = math.Max(b[1][1], p[1])
 	}
 
 	return b

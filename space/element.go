@@ -42,7 +42,7 @@ func (el *ElementValid) IsSimple() bool {
 
 // Centroid Computes the centroid point of a geometry.
 func Centroid(geom Geometry) Point {
-	cent := &buffer.Centroid{}
+	cent := &buffer.CentroidComputer{}
 
 	if geom == nil || geom.IsEmpty() {
 		return nil

@@ -612,10 +612,7 @@ func TestAlgorithm_PointOnSurface(t *testing.T) {
 		{name: "PointOnSurface LineString0", args: args{g: lineString}, want: expectPoint1, wantErr: false},
 		{name: "PointOnSurface Polygon", args: args{g: polygon}, want: expectPoint2, wantErr: false},
 	}
-	for i, tt := range tests {
-		if i == 0 || i == 2 {
-			continue
-		}
+	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			G := NormalStrategy()
 			gotGeometry, err := G.PointOnSurface(tt.args.g)

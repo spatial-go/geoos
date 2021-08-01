@@ -6,8 +6,8 @@ import (
 	"github.com/spatial-go/geoos/algorithm/measure"
 )
 
-// ComputeBuffer describes a geographic Element buffer
-type ComputeBuffer struct {
+// BufferComputer describes a geographic Element buffer
+type BufferComputer struct {
 	*CurveBuilder
 	distance float64
 	param    *CurveParameters
@@ -17,7 +17,7 @@ type ComputeBuffer struct {
 // Each offset curve has an attached {@link Label} indicating
 // its left and right location.
 func Buffer(geom matrix.Steric, distance float64, quadsegs int) matrix.Steric {
-	eb := ComputeBuffer{}
+	eb := BufferComputer{}
 	eb.param = DefaultCurveParameters()
 	eb.param.QuadrantSegments = quadsegs
 
@@ -39,7 +39,7 @@ func Buffer(geom matrix.Steric, distance float64, quadsegs int) matrix.Steric {
 }
 
 // Add Add a geometry to the graph.
-func (eb *ComputeBuffer) Add(geom matrix.Steric) {
+func (eb *BufferComputer) Add(geom matrix.Steric) {
 	if geom.IsEmpty() {
 		return
 	}
@@ -64,7 +64,7 @@ func (eb *ComputeBuffer) Add(geom matrix.Steric) {
 }
 
 // addPoint Add a Point to the graph.
-func (eb *ComputeBuffer) addPoint(p matrix.Matrix) {
+func (eb *BufferComputer) addPoint(p matrix.Matrix) {
 	// a zero or negative width buffer of a point is empty
 	if eb.distance <= 0.0 {
 		return
@@ -73,7 +73,7 @@ func (eb *ComputeBuffer) addPoint(p matrix.Matrix) {
 }
 
 // addLineString Add a LineString to the graph.
-func (eb *ComputeBuffer) addLineString(line matrix.LineMatrix) {
+func (eb *BufferComputer) addLineString(line matrix.LineMatrix) {
 	if eb.isLineOffsetEmpty(eb.distance) {
 		return
 	}
@@ -91,7 +91,7 @@ func (eb *ComputeBuffer) addLineString(line matrix.LineMatrix) {
 // This is the case if:
 // the distance is zero,
 // the distance is negative, except for the case of singled-sided buffers
-func (eb *ComputeBuffer) isLineOffsetEmpty(distance float64) bool {
+func (eb *BufferComputer) isLineOffsetEmpty(distance float64) bool {
 	// a zero width buffer of a line or point is empty
 	if distance == 0.0 {
 		return true
@@ -103,7 +103,7 @@ func (eb *ComputeBuffer) isLineOffsetEmpty(distance float64) bool {
 	}
 	return false
 }
-func (eb *ComputeBuffer) addPolygon(p matrix.PolygonMatrix) {
+func (eb *BufferComputer) addPolygon(p matrix.PolygonMatrix) {
 	offsetDistance := eb.distance
 	offsetSide := calc.LEFT
 	if eb.distance < 0.0 {
@@ -145,7 +145,7 @@ func (eb *ComputeBuffer) addPolygon(p matrix.PolygonMatrix) {
 			calc.EXTERIOR)
 	}
 }
-func (eb *ComputeBuffer) addRingBothSides(ring matrix.LineMatrix, distance float64) {
+func (eb *BufferComputer) addRingBothSides(ring matrix.LineMatrix, distance float64) {
 	eb.addRingSide(ring, distance,
 		calc.LEFT,
 		calc.EXTERIOR, calc.INTERIOR)
@@ -162,7 +162,7 @@ func (eb *ComputeBuffer) addRingBothSides(ring matrix.LineMatrix, distance float
 // (If the ring is in the opposite orientation,
 // this is detected and
 // the left and right locations are interchanged and the side is flipped.)
-func (eb *ComputeBuffer) addRingSide(ring matrix.LineMatrix, offsetDistance float64, side, cwLeftLoc, cwRightLoc int) {
+func (eb *BufferComputer) addRingSide(ring matrix.LineMatrix, offsetDistance float64, side, cwLeftLoc, cwRightLoc int) {
 	// don't bother adding ring if it is "flat" and will disappear in the output
 	if offsetDistance == 0.0 && len(ring) < calc.MinRingSize {
 		return

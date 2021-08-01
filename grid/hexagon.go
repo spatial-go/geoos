@@ -5,8 +5,14 @@ import (
 
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
-	"github.com/spatial-go/geoos/common"
 	"github.com/spatial-go/geoos/space"
+)
+
+// const ...
+const (
+	// Angle of sin 60 = 0.866025403785
+	Sin60 = 0.866025403785
+	Cos60 = 0.5
 )
 
 // HexagonGrid Draw a grid according to the distance, including the given area
@@ -19,8 +25,8 @@ func HexagonGrid(bound space.Bound, cellSize float64) (gridGeoms [][]Grid) {
 		east     = maxPoint[0]
 		north    = maxPoint[1]
 
-		Sin60 = common.Sin60
-		Cos60 = common.Cos60
+		Sin60 = Sin60
+		Cos60 = Cos60
 	)
 	boundHeight := north - south
 	boundWidth := east - west

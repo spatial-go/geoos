@@ -6,22 +6,22 @@ import (
 	"github.com/spatial-go/geoos/algorithm/overlay"
 )
 
-// SharedPaths returns a collection containing paths shared by the two input geometries.
+// Computer returns a collection containing paths shared by the two input geometries.
 // Those going in the same direction are in the first element of the collection,
 // those going in the opposite direction are in the second element.
 // The paths themselves are given in the direction of the first geometry.
-type SharedPaths struct {
+type Computer struct {
 	g1, g2 matrix.Steric
 }
 
-// CreateSharedPathsWithGeom create  SharedPaths with geom.
-func CreateSharedPathsWithGeom(g1, g2 matrix.Steric) *SharedPaths {
-	sp := &SharedPaths{g1, g2}
-	return sp
+// SharedPaths create  SharedPaths with geom.
+func SharedPaths(g1, g2 matrix.Steric) (forwDir matrix.Collection, backDir matrix.Collection, err error) {
+	sp := &Computer{g1, g2}
+	return sp.SharedPaths()
 }
 
 // SharedPaths get SharedPaths returns forwDir,backDir.
-func (s *SharedPaths) SharedPaths() (forwDir matrix.Collection, backDir matrix.Collection, err error) {
+func (s *Computer) SharedPaths() (forwDir matrix.Collection, backDir matrix.Collection, err error) {
 	if !s.checkLinealInput() {
 		return nil, nil, algoerr.ErrNotMatchType
 	}
@@ -36,7 +36,7 @@ func (s *SharedPaths) SharedPaths() (forwDir matrix.Collection, backDir matrix.C
 
 }
 
-func (s *SharedPaths) findLinearIntersections() (forwDir []matrix.LineMatrix, backDir []matrix.LineMatrix) {
+func (s *Computer) findLinearIntersections() (forwDir []matrix.LineMatrix, backDir []matrix.LineMatrix) {
 	if ml, ok := s.g1.(matrix.Collection); ok {
 		for _, v := range ml {
 			r1, r2 := findLinearIntersections(v.(matrix.LineMatrix), s.g2)
@@ -76,7 +76,7 @@ func findLinearIntersections(g1 matrix.LineMatrix, g2 matrix.Steric) (forwDir []
 	return
 }
 
-func (s *SharedPaths) checkLinealInput() bool {
+func (s *Computer) checkLinealInput() bool {
 	return checkLinealInput(s.g1) && checkLinealInput(s.g2)
 }
 func checkLinealInput(g matrix.Steric) bool {

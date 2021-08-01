@@ -62,7 +62,7 @@ type InteriorPointPoint struct {
 // If a Geometry is not of dimension 0 it is not tested.
 func (ip *InteriorPointPoint) Add(point matrix.Steric) {
 	ip.geom = point
-	ip.centroid = ComputeCentroid(point)
+	ip.centroid = Centroid(point)
 	switch p := point.(type) {
 	case matrix.Matrix:
 		ip.addPoint(p)
@@ -99,7 +99,7 @@ type InteriorPointLine struct {
 // defined by a linear Geometry for the best inside point.
 func (ip *InteriorPointLine) Add(line matrix.Steric) {
 	ip.geom = line
-	ip.centroid = ComputeCentroid(line)
+	ip.centroid = Centroid(line)
 	switch p := line.(type) {
 	case matrix.LineMatrix:
 		ip.addInterior(p)
@@ -142,7 +142,7 @@ func (ip *InteriorPointLine) addEndpoints(pts matrix.LineMatrix) {
 type InteriorPointArea struct {
 	InteriorPointPoint
 	maxWidth, interiorSectionWidth float64
-	interiorPointY                 float64
+	interiorPointY, centreY        float64
 }
 
 func avg(a, b float64) float64 {
@@ -153,7 +153,7 @@ func avg(a, b float64) float64 {
 // all component polygons.
 func (ip *InteriorPointArea) Add(poly matrix.Steric) {
 	ip.geom = poly
-	ip.centroid = ComputeCentroid(poly)
+	ip.centroid = Centroid(poly)
 
 	switch p := poly.(type) {
 	case matrix.PolygonMatrix:
@@ -165,10 +165,44 @@ func (ip *InteriorPointArea) Add(poly matrix.Steric) {
 	}
 }
 
+// ScanLineY ...
+func (ip *InteriorPointArea) ScanLineY(polygon matrix.PolygonMatrix) float64 {
+	b := polygon.Bound()
+	loY := b[0][1]
+	hiY := b[1][1]
+	ip.centreY = (loY + hiY) / 2.0
+	for _, v := range polygon {
+		loY, hiY = ip.processY(v, loY, hiY)
+	}
+	scanLineY := avg(hiY, loY)
+	return scanLineY
+}
+func (ip *InteriorPointArea) processY(ring matrix.LineMatrix, loY, hiY float64) (float64, float64) {
+	for _, v := range ring {
+		y := v[1]
+		loY, hiY = ip.updateInterval(loY, hiY, y)
+	}
+	return loY, hiY
+}
+
+func (ip *InteriorPointArea) updateInterval(loY, hiY, y float64) (float64, float64) {
+	if y <= ip.centreY {
+		if y > loY {
+			loY = y
+		}
+	} else if y > ip.centreY {
+		if y < hiY {
+			hiY = y
+		}
+	}
+	return loY, hiY
+}
+
 // processPolygon Computes an interior point of a component Polygon
 // and updates current best interior point if appropriate.
 func (ip *InteriorPointArea) processPolygon(polygon matrix.PolygonMatrix) {
-	ip.process()
+	ip.interiorPointY = ip.ScanLineY(polygon)
+	ip.process(polygon)
 	width := ip.Width()
 	if width > ip.maxWidth {
 		ip.maxWidth = width
@@ -183,28 +217,27 @@ func (ip *InteriorPointArea) Width() float64 {
 }
 
 // process Compute the interior point.
-func (ip *InteriorPointArea) process() {
+func (ip *InteriorPointArea) process(polygon matrix.PolygonMatrix) {
 	/**
 	 * This results in returning a null Coordinate
 	 */
-	if ip.geom.IsEmpty() {
+	if polygon.IsEmpty() {
 		return
 	}
 	/**
 	 * set default interior point in case polygon has zero area
 	 */
 	crossings := []float64{}
-	ip.scanRing(ip.geom.(matrix.PolygonMatrix)[0], crossings)
-	for _, v := range ip.geom.(matrix.PolygonMatrix)[1:] {
-		ip.scanRing(v, crossings)
+	for _, v := range polygon {
+		crossings = ip.scanRing(v, crossings)
 	}
 	ip.findBestMidpoint(crossings)
 }
 
-func (ip *InteriorPointArea) scanRing(ring matrix.LineMatrix, crossings []float64) {
+func (ip *InteriorPointArea) scanRing(ring matrix.LineMatrix, crossings []float64) []float64 {
 	// skip rings which don't cross scan line
 	if !ip.intersectsHorizontalLine(ring.Bound()[0], ring.Bound()[1], ip.interiorPointY) {
-		return
+		return crossings
 	}
 
 	for i, v := range ring {
@@ -213,22 +246,24 @@ func (ip *InteriorPointArea) scanRing(ring matrix.LineMatrix, crossings []float6
 		}
 		ptPrev := ring[i-1]
 		pt := v
-		ip.addEdgeCrossing(ptPrev, pt, ip.interiorPointY, crossings)
+		crossings = ip.addEdgeCrossing(ptPrev, pt, ip.interiorPointY, crossings)
 	}
+	return crossings
 }
 
-func (ip *InteriorPointArea) addEdgeCrossing(p0, p1 matrix.Matrix, scanY float64, crossings []float64) {
+func (ip *InteriorPointArea) addEdgeCrossing(p0, p1 matrix.Matrix, scanY float64, crossings []float64) []float64 {
 	// skip non-crossing segments
 	if !ip.intersectsHorizontalLine(p0, p1, scanY) {
-		return
+		return crossings
 	}
 	if !ip.isEdgeCrossingCounted(p0, p1, scanY) {
-		return
+		return crossings
 	}
 
 	// edge intersects scan line, so add a crossing
 	xInt := ip.intersection(p0, p1, scanY)
 	crossings = append(crossings, xInt)
+	return crossings
 	//checkIntersectionDD(p0, p1, scanY, xInt);
 }
 

@@ -3,21 +3,29 @@ package dbscan
 import (
 	"math"
 
-	"github.com/spatial-go/geoos/common"
 	"github.com/spatial-go/geoos/space"
+)
+
+// const ...
+const (
+	// DegreeRad is coefficient to translate from degrees to radians
+	DegreeRad = math.Pi / 180.0
+	// EarthR is earth radius in km
+	EarthR = 6371.0
+	// radius := 6371000.0 //6378137.0
 )
 
 // DistanceSpherical is a spherical (optimized) distance between two points
 //
 // Result is distance in kilometers
 func DistanceSpherical(p1, p2 space.Point) float64 {
-	v1 := (p1[1] - p2[1]) * common.DegreeRad
+	v1 := (p1[1] - p2[1]) * DegreeRad
 	v1 = v1 * v1
 
-	v2 := (p1[0] - p2[0]) * common.DegreeRad * math.Cos((p1[1]+p2[1])/2.0*common.DegreeRad)
+	v2 := (p1[0] - p2[0]) * DegreeRad * math.Cos((p1[1]+p2[1])/2.0*DegreeRad)
 	v2 = v2 * v2
 
-	return common.EarthR * math.Sqrt(v1+v2)
+	return EarthR * math.Sqrt(v1+v2)
 }
 
 // FastSine caclulates sinus approximated to parabola
@@ -63,7 +71,7 @@ func DistanceSphericalFast(p1, p2 space.Point) float64 {
 		p2 = space.Point{0, 0}
 	}
 	v1 := (p1[1] - p2[1])
-	v2 := (p1[0] - p2[0]) * FastCos((p1[1]+p2[1])/2.0*common.DegreeRad)
+	v2 := (p1[0] - p2[0]) * FastCos((p1[1]+p2[1])/2.0*DegreeRad)
 
 	return v1*v1 + v2*v2
 }

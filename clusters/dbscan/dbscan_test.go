@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/spatial-go/geoos/clusters"
-	"github.com/spatial-go/geoos/common"
 	"github.com/spatial-go/geoos/space"
 )
 
@@ -51,7 +50,7 @@ func TestRangeQueryKDTree(t *testing.T) {
 		return
 	}
 	tree := NewKDTree(s.points)
-	eps := 0.8 / common.EarthR / common.DegreeRad
+	eps := 0.8 / EarthR / DegreeRad
 
 	_, ok := tree.invariantHolds(tree.Root)
 	if ok != true {

@@ -7,23 +7,23 @@ import (
 	"github.com/spatial-go/geoos/algorithm/measure"
 )
 
-// ComputeCentroid Computes the centroid point of a geometry.
-func ComputeCentroid(geom matrix.Steric) matrix.Matrix {
-	cent := &Centroid{}
+// Centroid Computes the centroid point of a geometry.
+func Centroid(geom matrix.Steric) matrix.Matrix {
+	cent := &CentroidComputer{}
 
 	if geom == nil || geom.IsEmpty() {
 		return nil
 	}
 	cent.Add(geom)
-	m := cent.GetCentroid()
-	return m
+	centroid := cent.GetCentroid()
+	return centroid
 }
 
-// Centroid Computes the centroid of a  matrix.Steric of any dimension.
+// CentroidComputer Computes the centroid of a  matrix.Steric of any dimension.
 // For collections the centroid is computed for the collection of
 // non-empty elements of highest dimension.
 // The centroid of an empty matrix.Steric is nil.
-type Centroid struct {
+type CentroidComputer struct {
 	AreaBasePt    matrix.Matrix // the point all triangles are based at
 	TriangleCent3 matrix.Matrix // temporary variable to hold centroid of triangle
 	Areasum2      float64       /* Partial area sum */
@@ -39,32 +39,29 @@ type Centroid struct {
 
 // GetCentroid Gets the computed centroid.
 // returns he computed centroid, or nil if the input is empty
-func (c *Centroid) GetCentroid() matrix.Matrix {
+func (c *CentroidComputer) GetCentroid() matrix.Matrix {
 	/**
 	 * The centroid is computed from the highest dimension components present in the input.
 	 * I.e. areas dominate lineal matrix.Steric, which dominates points.
 	 * Degenerate matrix.Steric are computed using their effective dimension
 	 * (e.g. areas may degenerate to lines or points)
 	 */
-	cent := matrix.Matrix{0, 0}
+	cent := matrix.Matrix{}
 	if math.Abs(c.Areasum2) > 0.0 {
 		/**
 		* Input contains areal matrix.Steric
 		 */
-		cent[0] = c.Cg3[0] / 3 / c.Areasum2
-		cent[1] = c.Cg3[1] / 3 / c.Areasum2
+		cent = append(cent, c.Cg3[0]/3/c.Areasum2, c.Cg3[1]/3/c.Areasum2)
 	} else if c.TotalLength > 0.0 {
 		/**
 		* Input contains lineal matrix.Steric
 		 */
-		cent[0] = c.LineCentSum[0] / c.TotalLength
-		cent[1] = c.LineCentSum[1] / c.TotalLength
+		cent = append(cent, c.LineCentSum[0]/c.TotalLength, c.LineCentSum[1]/c.TotalLength)
 	} else if c.PtCount > 0 {
 		/**
 		* Input contains puntal matrix.Steric only
 		 */
-		cent[0] = c.PtCentSum[0] / float64(c.PtCount)
-		cent[1] = c.PtCentSum[1] / float64(c.PtCount)
+		cent = append(cent, c.PtCentSum[0]/float64(c.PtCount), c.PtCentSum[1]/float64(c.PtCount))
 	} else {
 		return nil
 	}
@@ -72,7 +69,7 @@ func (c *Centroid) GetCentroid() matrix.Matrix {
 }
 
 // Add Adds a Steric to the centroid accumulator.
-func (c *Centroid) Add(pt matrix.Steric) {
+func (c *CentroidComputer) Add(pt matrix.Steric) {
 	switch st := pt.(type) {
 	case matrix.Matrix:
 		c.AddPoint(st)
@@ -88,7 +85,7 @@ func (c *Centroid) Add(pt matrix.Steric) {
 }
 
 // AddPoint Adds a point to the point centroid accumulator.
-func (c *Centroid) AddPoint(pt matrix.Matrix) {
+func (c *CentroidComputer) AddPoint(pt matrix.Matrix) {
 	c.PtCount++
 	if c.PtCentSum == nil {
 		c.PtCentSum = make(matrix.Matrix, 2)
@@ -98,7 +95,7 @@ func (c *Centroid) AddPoint(pt matrix.Matrix) {
 }
 
 // AddLineSegments Adds the line segments  to the linear centroid accumulators.
-func (c *Centroid) AddLineSegments(lines matrix.LineMatrix) {
+func (c *CentroidComputer) AddLineSegments(lines matrix.LineMatrix) {
 	linelen := 0.0
 	if c.LineCentSum == nil {
 		c.LineCentSum = matrix.Matrix{0, 0}
@@ -121,7 +118,7 @@ func (c *Centroid) AddLineSegments(lines matrix.LineMatrix) {
 }
 
 // AddPolygon Adds the polygon  to the polygon centroid accumulators.
-func (c *Centroid) AddPolygon(poly matrix.PolygonMatrix) {
+func (c *CentroidComputer) AddPolygon(poly matrix.PolygonMatrix) {
 	for i, v := range poly {
 		isPositiveArea := false
 		if i == 0 {
@@ -140,7 +137,7 @@ func (c *Centroid) AddPolygon(poly matrix.PolygonMatrix) {
 }
 
 // addTriangle Adds the Triangle  to the Triangle centroid accumulators.
-func (c *Centroid) addTriangle(p0, p1, p2 matrix.Matrix, isPositiveArea bool) {
+func (c *CentroidComputer) addTriangle(p0, p1, p2 matrix.Matrix, isPositiveArea bool) {
 	sign := 1.0
 	if !isPositiveArea {
 		sign = -1.0

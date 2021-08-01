@@ -270,7 +270,7 @@ func (g *MegrezAlgorithm) Relate(s, d space.Geometry) (string, error) {
 // those going in the opposite direction are in the second element.
 // The paths themselves are given in the direction of the first geometry.
 func (g *MegrezAlgorithm) SharedPaths(geom1, geom2 space.Geometry) (string, error) {
-	forwDir, backDir, _ := sharedpaths.CreateSharedPathsWithGeom(geom1.ToMatrix(), geom2.ToMatrix()).SharedPaths()
+	forwDir, backDir, _ := sharedpaths.SharedPaths(geom1.ToMatrix(), geom2.ToMatrix())
 	var forw, back space.Geometry
 	if forwDir == nil {
 		forw = space.MultiLineString{}

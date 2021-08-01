@@ -2,7 +2,6 @@ package dbscan
 
 import (
 	"github.com/spatial-go/geoos/clusters"
-	"github.com/spatial-go/geoos/common"
 	"github.com/spatial-go/geoos/space"
 )
 
@@ -25,7 +24,7 @@ func DBScan(points clusters.PointList, eps float64, minPoints int) (clusterArry 
 
 	// Our SphericalDistanceFast returns distance which is not mutiplied
 	// by EarthR * DegreeRad, adjust eps accordingly
-	eps = eps / common.EarthR / common.DegreeRad
+	eps = eps / EarthR / DegreeRad
 
 	// neighborUnique := bitset.New(uint(len(points)))
 	neighborUnique := make(map[int]int)
