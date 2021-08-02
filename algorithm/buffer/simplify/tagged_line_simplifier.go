@@ -111,7 +111,7 @@ func (t *TaggedLineStringSimplifier) hasBadOutputIntersection(candidateSeg *matr
 	querySegs := t.outputIndex.Query(candidateSeg)
 	for _, v := range querySegs {
 		querySeg := v
-		if HasInteriorIntersection(querySeg.LineSegment, candidateSeg) {
+		if HasInteriorIntersection(querySeg, candidateSeg) {
 			return true
 		}
 	}
@@ -123,7 +123,7 @@ func (t *TaggedLineStringSimplifier) hasBadInputIntersection(parentLine *TaggedL
 	querySegs := t.inputIndex.Query(candidateSeg)
 	for _, v := range querySegs {
 		querySeg := v
-		if HasInteriorIntersection(querySeg.LineSegment, candidateSeg) {
+		if HasInteriorIntersection(querySeg, candidateSeg) {
 			if IsInLineSection(parentLine, sectionIndex, querySeg) {
 				continue
 			}
@@ -137,14 +137,13 @@ func (t *TaggedLineStringSimplifier) hasBadInputIntersection(parentLine *TaggedL
 func IsInLineSection(
 	line *TaggedLineString,
 	sectionIndex []int,
-	seg *TaggedLineSegment) bool {
-	// not in this line
-	if !seg.Parent.Equals(line.ParentLine) {
-		return false
-	}
-	segIndex := seg.Index
-	if segIndex >= sectionIndex[0] && segIndex < sectionIndex[1] {
-		return true
+	seg *matrix.LineSegment) bool {
+	for i, v := range line.Segs {
+		if seg.P0.Equals(v.P0) && seg.P1.Equals(v.P1) {
+			if i >= sectionIndex[0] && i < sectionIndex[1] {
+				return true
+			}
+		}
 	}
 	return false
 }

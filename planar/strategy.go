@@ -25,17 +25,8 @@ func GetStrategy(f newAlgorithm) Algorithm {
 func newMegrezAlgorithm() Algorithm {
 	once.Do(func() {
 		algorithmMegrez = &MegrezAlgorithm{}
-		algorithmGeos = &GEOAlgorithm{}
 	})
 	return algorithmMegrez
-}
-
-func newGEOAlgorithm() Algorithm {
-	once.Do(func() {
-		algorithmMegrez = &MegrezAlgorithm{}
-		algorithmGeos = &GEOAlgorithm{}
-	})
-	return algorithmGeos
 }
 
 // convertGeomToWKT help to convert geoos.Geometry to WKT string

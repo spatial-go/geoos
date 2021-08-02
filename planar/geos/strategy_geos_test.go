@@ -1,4 +1,4 @@
-package planar
+package geos
 
 import (
 	"reflect"

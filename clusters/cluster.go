@@ -50,7 +50,7 @@ func (c *Cluster) Append(point space.Point) {
 func (c Clusters) Nearest(point space.Point) int {
 	var ci int
 	dist := -1.0
-	G := planar.GEOAlgorithm{}
+	G := planar.NormalStrategy()
 
 	// Find the nearest cluster for this data point
 	for i, cluster := range c {

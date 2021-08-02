@@ -48,15 +48,6 @@ func TestMustMarshal(t *testing.T) {
 		MustMarshal(g, binary.BigEndian)
 	}
 }
-
-func TestGeoFromWKBHexStr(t *testing.T) {
-	hexStr := `0101000020E61000008EAF3DB324E05C40DC12B9E00C704340`
-	g0 := space.Point{115.50224, 38.875393}
-	g1, _ := GeoFromWKBHexStr(hexStr)
-	if !g0.Equals(g1) {
-		t.Errorf("GeoFromWKBHexStr() got = %v, want %v", g0, g1)
-	}
-}
 func BenchmarkEncode_Point(b *testing.B) {
 	g := space.Point{1, 2}
 	e := NewEncoder(ioutil.Discard)

@@ -34,7 +34,7 @@ func (points PointList) Center() (p space.Point, err error) {
 func AverageDistance(point space.Point, points PointList) float64 {
 	var d float64
 	var l int
-	G := planar.GEOAlgorithm{}
+	G := planar.NormalStrategy()
 
 	for _, observation := range points {
 		dist, _ := G.Distance(point, observation)

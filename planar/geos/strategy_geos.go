@@ -1,10 +1,23 @@
-package planar
+package geos
 
 import (
+	"sync"
+
 	"github.com/spatial-go/geoos/encoding/wkt"
-	"github.com/spatial-go/geoos/planar/geo"
+	"github.com/spatial-go/geoos/planar"
+	"github.com/spatial-go/geoos/planar/geos/geo"
 	"github.com/spatial-go/geoos/space"
 )
+
+var algorithmGeos, algorithmMegrez planar.Algorithm
+var once sync.Once
+
+func newGEOAlgorithm() planar.Algorithm {
+	once.Do(func() {
+		algorithmGeos = &GEOAlgorithm{}
+	})
+	return algorithmGeos
+}
 
 // GEOAlgorithm algorithm implement by geos
 type GEOAlgorithm struct{}
@@ -386,4 +399,11 @@ func (g *GEOAlgorithm) UniquePoints(geom space.Geometry) (space.Geometry, error)
 func (g *GEOAlgorithm) Within(geom1, geom2 space.Geometry) (bool, error) {
 	ms1, ms2 := convertGeomToWKT(geom1, geom2)
 	return geo.Within(ms1, ms2)
+}
+
+// convertGeomToWKT help to convert geoos.Geometry to WKT string
+func convertGeomToWKT(geom1, geom2 space.Geometry) (string, string) {
+	ms1 := wkt.MarshalString(geom1)
+	ms2 := wkt.MarshalString(geom2)
+	return ms1, ms2
 }

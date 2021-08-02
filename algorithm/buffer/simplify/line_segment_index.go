@@ -32,27 +32,12 @@ func (l *LineSegmentIndex) Remove(seg *TaggedLineSegment) {
 }
 
 // Query query LineSegment returns array TaggedLineSegment.
-func (l *LineSegmentIndex) Query(querySeg *matrix.LineSegment) []*TaggedLineSegment {
+func (l *LineSegmentIndex) Query(querySeg *matrix.LineSegment) []*matrix.LineSegment {
 	env := matrix.EnvelopeTwoMatrix(querySeg.P0, querySeg.P1)
 
-	visitor := &LineSegmentVisitor{QuerySeg: querySeg}
-	l.index.QueryVisitor(env, visitor.ItemVisitor)
+	visitor := &index.LineSegmentVisitor{QuerySeg: querySeg}
+	l.index.QueryVisitor(env, visitor)
 	itemsFound := visitor.Items
 
 	return itemsFound
-}
-
-// LineSegmentVisitor ItemVisitor subclass to reduce volume of query results.
-type LineSegmentVisitor struct {
-	index.ItemVisitor
-	QuerySeg *matrix.LineSegment
-	Items    []*TaggedLineSegment
-}
-
-// VisitItem ...
-func (l *LineSegmentVisitor) VisitItem(item *TaggedLineSegment) {
-	seg := item
-	if matrix.IsIntersectsTwo(seg.P0, seg.P1, l.QuerySeg.P0, l.QuerySeg.P1) {
-		l.Items = append(l.Items, item)
-	}
 }

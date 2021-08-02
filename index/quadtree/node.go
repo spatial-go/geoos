@@ -1,6 +1,8 @@
 package quadtree
 
 import (
+	"reflect"
+
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/index"
 )
@@ -72,7 +74,7 @@ func NodeEnv(env *matrix.Envelope, level int) *Node {
 
 // HasItems ...
 func (n *Node) HasItems() bool {
-	if n.Items == nil || len(n.Items) == 0 {
+	if n == nil || n.Items == nil || len(n.Items) == 0 {
 		return false
 	}
 	return true
@@ -93,7 +95,7 @@ func (n *Node) Remove(itemEnv *matrix.Envelope, item interface{}) bool {
 	}
 	found := false
 	for i := 0; i < 4; i++ {
-		if !n.Subnode[i].HasItems() {
+		if n.Subnode[i] != nil && n.Subnode[i].HasItems() {
 			found = n.Subnode[i].Remove(itemEnv, item)
 			if found {
 				// trim subtree if empty
@@ -109,9 +111,20 @@ func (n *Node) Remove(itemEnv *matrix.Envelope, item interface{}) bool {
 		return found
 	}
 	// otherwise, try and remove the item from the list of items in this node
-	//TODO
-	//	found = n.Items.remove(item)
+
+	found = n.remove(item)
 	return found
+}
+
+// remove Removes a single item from this subtree.
+func (n *Node) remove(item interface{}) bool {
+	for i, v := range n.Items {
+		if reflect.DeepEqual(v, item) {
+			n.Items = append(n.Items[:i], n.Items[i+1:]...)
+			return true
+		}
+	}
+	return false
 }
 
 // IsPrunable ...
@@ -136,7 +149,7 @@ func (n *Node) Visit(searchEnv *matrix.Envelope, visitor index.ItemVisitor) {
 	}
 	// this node may have items as well as subnodes (since items may not
 	// be wholely contained in any single subnode
-	n.VisitItems(searchEnv, visitor)
+	n.VisitItems(searchEnv, n.Env, visitor)
 
 	for i := 0; i < 4; i++ {
 		if !n.Subnode[i].IsEmpty() {
@@ -146,10 +159,12 @@ func (n *Node) Visit(searchEnv *matrix.Envelope, visitor index.ItemVisitor) {
 }
 
 // VisitItems ...
-func (n *Node) VisitItems(searchEnv *matrix.Envelope, visitor index.ItemVisitor) {
+func (n *Node) VisitItems(searchEnv, nodeEnv *matrix.Envelope, visitor index.ItemVisitor) {
 	// would be nice to filter items based on search envelope, but can't until they contain an envelope
 	for _, v := range n.Items {
-		visitor.VisitItem(v)
+		if searchEnv.IsIntersects(nodeEnv) {
+			visitor.VisitItem(v)
+		}
 	}
 }
 
@@ -191,11 +206,17 @@ func (n *Node) NodeCount() int {
 
 // IsEmpty ...
 func (n *Node) IsEmpty() bool {
+	if n == nil {
+		return true
+	}
 	isEmpty := true
 	if n.Items != nil && len(n.Items) > 0 {
 		isEmpty = false
 	} else {
 		for i := 0; i < 4; i++ {
+			if n.Subnode[i] == nil {
+				continue
+			}
 			if !n.Subnode[i].HasItems() {
 				if !n.Subnode[i].IsEmpty() {
 					isEmpty = false

@@ -7,8 +7,6 @@ import (
 	"encoding/binary"
 	"io"
 
-	"github.com/spatial-go/geoos/encoding/wkt"
-	"github.com/spatial-go/geoos/planar/geo"
 	"github.com/spatial-go/geoos/space"
 )
 
@@ -252,19 +250,6 @@ func (d *Decoder) Decode() (space.Geometry, error) {
 	}
 
 	return nil, ErrUnsupportedGeometry
-}
-
-// GeoFromWKBHexStr convert hex string to geometry
-func GeoFromWKBHexStr(wkbHex string) (geometry space.Geometry, err error) {
-	geom, err := geo.GeomFromWKBHexStr(wkbHex)
-	if err != nil {
-		return
-	}
-	geoWek, err := geo.ToWKTStr(geom)
-	if err != nil {
-		return
-	}
-	return wkt.UnmarshalString(geoWek)
 }
 
 func readByteOrderType(r io.Reader, buf []byte) (byteOrder, uint32, error) {

@@ -1,9 +1,10 @@
-package planar
+package geos
 
 import (
 	"testing"
 
 	"github.com/spatial-go/geoos/encoding/wkt"
+	"github.com/spatial-go/geoos/planar"
 	"github.com/spatial-go/geoos/space"
 )
 
@@ -12,14 +13,14 @@ var geom space.Geometry = space.Polygon{{{-1, -1}, {1, -1}, {1, 1}, {-1, 1}, {-1
 // Benchmark_MegrezArea test megrez area
 func Benchmark_MegrezArea(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_, _ = NormalStrategy().Area(geom)
+		_, _ = planar.NormalStrategy().Area(geom)
 	}
 }
 
 // Benchmark_GeosArea test geos area
 func Benchmark_GeosArea(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_, _ = GetStrategy(newGEOAlgorithm).Area(geom)
+		_, _ = planar.GetStrategy(newGEOAlgorithm).Area(geom)
 	}
 }
 
@@ -27,7 +28,7 @@ func Benchmark_GeosArea(b *testing.B) {
 func Benchmark_MegrezUnaryUnion(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		multiPolygon, _ := wkt.UnmarshalString(`MULTIPOLYGON(((0 0, 10 0, 10 10, 0 10, 0 0)), ((5 5, 15 5, 15 15, 5 15, 5 5)))`)
-		G := NormalStrategy()
+		G := planar.NormalStrategy()
 		_, _ = G.UnaryUnion(multiPolygon)
 
 	}
@@ -37,7 +38,7 @@ func Benchmark_MegrezUnaryUnion(b *testing.B) {
 func Benchmark_GeosUnaryUnion(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		multiPolygon, _ := wkt.UnmarshalString(`MULTIPOLYGON(((0 0, 10 0, 10 10, 0 10, 0 0)), ((5 5, 15 5, 15 15, 5 15, 5 5)))`)
-		G := GetStrategy(newGEOAlgorithm)
+		G := planar.GetStrategy(newGEOAlgorithm)
 		_, _ = G.UnaryUnion(multiPolygon)
 	}
 }

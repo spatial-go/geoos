@@ -123,7 +123,6 @@ func TestAlgorithm_UnaryUnion(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		G       GEOAlgorithm
 		args    args
 		want    []space.Geometry
 		wantErr bool
@@ -289,7 +288,6 @@ func TestAlgorithm_EqualsExact(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		G       GEOAlgorithm
 		args    args
 		want    bool
 		wantErr bool
@@ -323,7 +321,6 @@ func TestAlgorithm_Equals(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		G       GEOAlgorithm
 		args    args
 		want    bool
 		wantErr bool
@@ -500,7 +497,6 @@ func TestAlgorithm_Buffer(t *testing.T) {
 	}
 	tests := []struct {
 		name string
-		G    GEOAlgorithm
 		args args
 		want space.Geometry
 	}{
@@ -530,7 +526,6 @@ func TestAlgorithm_NGeometry(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		G       GEOAlgorithm
 		args    args
 		want    int
 		wantErr bool
@@ -603,7 +598,6 @@ func TestAlgorithm_PointOnSurface(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		G       GEOAlgorithm
 		args    args
 		want    space.Geometry
 		wantErr bool
@@ -1068,7 +1062,6 @@ func TestAlgorithm_LineMerge(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		G       GEOAlgorithm
 		args    args
 		want    space.Geometry
 		wantErr bool
@@ -1190,7 +1183,6 @@ func TestAlgorithm_Simplify(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		G       GEOAlgorithm
 		args    args
 		want    space.Geometry
 		wantErr bool
@@ -1224,7 +1216,6 @@ func TestAlgorithm_SimplifyP(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		G       GEOAlgorithm
 		args    args
 		want    space.Geometry
 		wantErr bool
@@ -1323,7 +1314,6 @@ func TestAlgorithm_ConvexHull(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		G       GEOAlgorithm
 		args    args
 		want    space.Geometry
 		wantErr bool
