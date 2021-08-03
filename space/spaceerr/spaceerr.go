@@ -7,6 +7,9 @@ import (
 // ErrNilGeometry ...
 var ErrNilGeometry = fmt.Errorf("Geometry is nil")
 
+// ErrNotValidGeometry ...
+var ErrNotValidGeometry = fmt.Errorf("Geometry is not valid")
+
 // ErrNotPolygon UnaryUnion parameter is not polygon
 var ErrNotPolygon = fmt.Errorf("Geometry is not polygon")
 

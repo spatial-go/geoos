@@ -133,3 +133,46 @@ func (r Ring) SimplifyP(tolerance float64) Geometry {
 	result := tls.Simplify(r.ToMatrix(), tolerance)
 	return TransGeometry(result)
 }
+
+// Buffer sReturns a geometry that represents all points whose distance
+// from this space.Geometry is less than or equal to distance.
+func (r Ring) Buffer(width float64, quadsegs int) Geometry {
+	return LineString(r).Buffer(width, quadsegs)
+}
+
+// Envelope returns the  minimum bounding box for the supplied geometry, as a geometry.
+// The polygon is defined by the corner points of the bounding box
+// ((MINX, MINY), (MINX, MAXY), (MAXX, MAXY), (MAXX, MINY), (MINX, MINY)).
+func (r Ring) Envelope() Geometry {
+	return LineString(r).Envelope()
+}
+
+// ConvexHull computes the convex hull of a geometry. The convex hull is the smallest convex geometry
+// that encloses all geometries in the input.
+// In the general case the convex hull is a Polygon.
+// The convex hull of two or more collinear points is a two-point LineString.
+// The convex hull of one or more identical points is a Point.
+func (r Ring) ConvexHull() Geometry {
+	return LineString(r).ConvexHull()
+}
+
+// PointOnSurface Returns a POINT guaranteed to intersect a surface.
+func (r Ring) PointOnSurface() Geometry {
+	return LineString(r).PointOnSurface()
+}
+
+// IsClosed Returns TRUE if the LINESTRING's start and end points are coincident.
+// For Polyhedral Surfaces, reports if the surface is areal (open) or IsC (closed).
+func (r Ring) IsClosed() bool {
+	return LineString(r).IsClosed()
+}
+
+// IsRing returns true if the lineal geometry has the ring property.
+func (r Ring) IsRing() bool {
+	return LineString(r).IsRing()
+}
+
+// IsValid returns true if the  geometry is valid.
+func (r Ring) IsValid() bool {
+	return (!r.IsEmpty()) && r.IsClosed()
+}

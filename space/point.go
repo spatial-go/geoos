@@ -4,6 +4,7 @@ import (
 	"math/rand"
 	"reflect"
 
+	"github.com/spatial-go/geoos/algorithm/buffer"
 	"github.com/spatial-go/geoos/algorithm/buffer/simplify"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
@@ -162,4 +163,59 @@ func (p Point) SimplifyP(tolerance float64) Geometry {
 	tls := &simplify.TopologyPreservingSimplifier{}
 	result := tls.Simplify(p.ToMatrix(), tolerance)
 	return TransGeometry(result)
+}
+
+// Buffer sReturns a geometry that represents all points whose distance
+// from this space.Geometry is less than or equal to distance.
+func (p Point) Buffer(width float64, quadsegs int) Geometry {
+	buff := buffer.Buffer(p.ToMatrix(), width, quadsegs)
+	switch b := buff.(type) {
+	case matrix.LineMatrix:
+		return LineString(b)
+	case matrix.PolygonMatrix:
+		return Polygon(b)
+	}
+	return nil
+}
+
+// Envelope returns the  minimum bounding box for the supplied geometry, as a geometry.
+// The polygon is defined by the corner points of the bounding box
+// ((MINX, MINY), (MINX, MAXY), (MAXX, MAXY), (MAXX, MINY), (MINX, MINY)).
+func (p Point) Envelope() Geometry {
+	return p
+}
+
+// ConvexHull computes the convex hull of a geometry. The convex hull is the smallest convex geometry
+// that encloses all geometries in the input.
+// In the general case the convex hull is a Polygon.
+// The convex hull of two or more collinear points is a two-point LineString.
+// The convex hull of one or more identical points is a Point.
+func (p Point) ConvexHull() Geometry {
+	result := buffer.ConvexHullWithGeom(p.ToMatrix()).ConvexHull()
+	return TransGeometry(result)
+}
+
+// PointOnSurface Returns a POINT guaranteed to intersect a surface.
+func (p Point) PointOnSurface() Geometry {
+	m := buffer.InteriorPoint(p.ToMatrix())
+	return Point(m)
+}
+
+// IsClosed Returns TRUE if the LINESTRING's start and end points are coincident.
+// For Polyhedral Surfaces, reports if the surface is areal (open) or IsC (closed).
+func (p Point) IsClosed() bool {
+	return true
+}
+
+// IsRing returns true if the lineal geometry has the ring property.
+func (p Point) IsRing() bool {
+	return p.IsClosed() && p.IsSimple()
+}
+
+// IsValid returns true if the  geometry is valid.
+func (p Point) IsValid() bool {
+	if len(p) >= 2 {
+		return true
+	}
+	return false
 }

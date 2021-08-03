@@ -1,6 +1,7 @@
 package space
 
 import (
+	"github.com/spatial-go/geoos/algorithm/buffer"
 	"github.com/spatial-go/geoos/algorithm/buffer/simplify"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
@@ -163,12 +164,6 @@ func (ls LineString) IsSimple() bool {
 	return elem.IsSimple()
 }
 
-// IsRing returns true if the lineal geometry has the ring property.
-func (ls LineString) IsRing() bool {
-	elem := ElementValid{Geometry: ls}
-	return elem.IsClosed() && elem.IsSimple()
-}
-
 // Centroid Computes the centroid point of a geometry.
 func (ls LineString) Centroid() Point {
 	return Centroid(ls)
@@ -196,4 +191,53 @@ func (ls LineString) SimplifyP(tolerance float64) Geometry {
 	tls := &simplify.TopologyPreservingSimplifier{}
 	result := tls.Simplify(ls.ToMatrix(), tolerance)
 	return TransGeometry(result)
+}
+
+// Buffer sReturns a geometry that represents all points whose distance
+// from this space.Geometry is less than or equal to distance.
+func (ls LineString) Buffer(width float64, quadsegs int) Geometry {
+	buff := buffer.Buffer(ls.ToMatrix(), width, quadsegs)
+	switch b := buff.(type) {
+	case matrix.LineMatrix:
+		return LineString(b)
+	case matrix.PolygonMatrix:
+		return Polygon(b)
+	}
+	return nil
+}
+
+// Envelope returns the  minimum bounding box for the supplied geometry, as a geometry.
+// The polygon is defined by the corner points of the bounding box
+// ((MINX, MINY), (MINX, MAXY), (MAXX, MAXY), (MAXX, MINY), (MINX, MINY)).
+func (ls LineString) Envelope() Geometry {
+	return ls.Bound().ToPolygon()
+}
+
+// ConvexHull computes the convex hull of a geometry. The convex hull is the smallest convex geometry
+// that encloses all geometries in the input.
+// In the general case the convex hull is a Polygon.
+// The convex hull of two or more collinear points is a two-point LineString.
+// The convex hull of one or more identical points is a Point.
+func (ls LineString) ConvexHull() Geometry {
+	result := buffer.ConvexHullWithGeom(ls.ToMatrix()).ConvexHull()
+	return TransGeometry(result)
+}
+
+// PointOnSurface Returns a POINT guaranteed to intersect a surface.
+func (ls LineString) PointOnSurface() Geometry {
+	m := buffer.InteriorPoint(ls.ToMatrix())
+	return Point(m)
+}
+
+// IsRing returns true if the lineal geometry has the ring property.
+func (ls LineString) IsRing() bool {
+	return ls.IsClosed() && ls.IsSimple()
+}
+
+// IsValid returns true if the  geometry is valid.
+func (ls LineString) IsValid() bool {
+	if len(ls) >= 1 {
+		return true
+	}
+	return false
 }

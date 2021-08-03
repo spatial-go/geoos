@@ -19,6 +19,14 @@ type ElementValid struct {
 	Geometry
 }
 
+// CreateElementValid Returns valid geom element. returns nil if geom is invalid.
+func CreateElementValid(geom Geometry) (*ElementValid, error) {
+	if geom.IsValid() {
+		return &ElementValid{geom}, nil
+	}
+	return nil, spaceerr.ErrNotValidGeometry
+}
+
 // IsClosed Returns TRUE if the LINESTRING's start and end points are coincident.
 // For Polyhedral Surfaces, reports if the surface is areal (open) or IsC (closed).
 func (el *ElementValid) IsClosed() bool {

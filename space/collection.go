@@ -1,6 +1,7 @@
 package space
 
 import (
+	"github.com/spatial-go/geoos/algorithm/buffer"
 	"github.com/spatial-go/geoos/algorithm/buffer/simplify"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/space/spaceerr"
@@ -224,4 +225,61 @@ func (c Collection) SimplifyP(tolerance float64) Geometry {
 	tls := &simplify.TopologyPreservingSimplifier{}
 	result := tls.Simplify(c.ToMatrix(), tolerance)
 	return TransGeometry(result)
+}
+
+// Buffer sReturns a geometry that represents all points whose distance
+// from this space.Geometry is less than or equal to distance.
+func (c Collection) Buffer(width float64, quadsegs int) Geometry {
+	buff := buffer.Buffer(c.ToMatrix(), width, quadsegs)
+	switch b := buff.(type) {
+	case matrix.LineMatrix:
+		return LineString(b)
+	case matrix.PolygonMatrix:
+		return Polygon(b)
+	}
+	return nil
+}
+
+// Envelope returns the  minimum bounding box for the supplied geometry, as a geometry.
+// The polygon is defined by the corner points of the bounding box
+// ((MINX, MINY), (MINX, MAXY), (MAXX, MAXY), (MAXX, MINY), (MINX, MINY)).
+func (c Collection) Envelope() Geometry {
+	return c.Bound().ToPolygon()
+}
+
+// ConvexHull computes the convex hull of a geometry. The convex hull is the smallest convex geometry
+// that encloses all geometries in the input.
+// In the general case the convex hull is a Polygon.
+// The convex hull of two or more collinear points is a two-point LineString.
+// The convex hull of one or more identical points is a Point.
+func (c Collection) ConvexHull() Geometry {
+	result := buffer.ConvexHullWithGeom(c.ToMatrix()).ConvexHull()
+	return TransGeometry(result)
+}
+
+// PointOnSurface Returns a POINT guaranteed to intersect a surface.
+func (c Collection) PointOnSurface() Geometry {
+	m := buffer.InteriorPoint(c.ToMatrix())
+	return Point(m)
+}
+
+// IsClosed Returns TRUE if the LINESTRING's start and end points are coincident.
+// For Polyhedral Surfaces, reports if the surface is areal (open) or IsC (closed).
+func (c Collection) IsClosed() bool {
+	return true
+}
+
+// IsRing returns true if the lineal geometry has the ring property.
+func (c Collection) IsRing() bool {
+	return c.IsClosed() && c.IsSimple()
+}
+
+// IsValid returns true if the  geometry is valid.
+func (c Collection) IsValid() bool {
+	for _, v := range c {
+		if !v.IsValid() {
+			return false
+		}
+	}
+	return true
 }

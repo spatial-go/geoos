@@ -1,6 +1,7 @@
 package space
 
 import (
+	"github.com/spatial-go/geoos/algorithm/buffer"
 	"github.com/spatial-go/geoos/algorithm/buffer/simplify"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
@@ -198,4 +199,55 @@ func (mls MultiLineString) SimplifyP(tolerance float64) Geometry {
 	tls := &simplify.TopologyPreservingSimplifier{}
 	result := tls.Simplify(mls.ToMatrix(), tolerance)
 	return TransGeometry(result)
+}
+
+// Buffer sReturns a geometry that represents all points whose distance
+// from this space.Geometry is less than or equal to distance.
+func (mls MultiLineString) Buffer(width float64, quadsegs int) Geometry {
+	buff := buffer.Buffer(mls.ToMatrix(), width, quadsegs)
+	switch b := buff.(type) {
+	case matrix.LineMatrix:
+		return LineString(b)
+	case matrix.PolygonMatrix:
+		return Polygon(b)
+	}
+	return nil
+}
+
+// Envelope returns the  minimum bounding box for the supplied geometry, as a geometry.
+// The polygon is defined by the corner points of the bounding box
+// ((MINX, MINY), (MINX, MAXY), (MAXX, MAXY), (MAXX, MINY), (MINX, MINY)).
+func (mls MultiLineString) Envelope() Geometry {
+	return mls.Bound().ToPolygon()
+}
+
+// ConvexHull computes the convex hull of a geometry. The convex hull is the smallest convex geometry
+// that encloses all geometries in the input.
+// In the general case the convex hull is a Polygon.
+// The convex hull of two or more collinear points is a two-point LineString.
+// The convex hull of one or more identical points is a Point.
+func (mls MultiLineString) ConvexHull() Geometry {
+	result := buffer.ConvexHullWithGeom(mls.ToMatrix()).ConvexHull()
+	return TransGeometry(result)
+}
+
+// PointOnSurface Returns a POINT guaranteed to intersect a surface.
+func (mls MultiLineString) PointOnSurface() Geometry {
+	m := buffer.InteriorPoint(mls.ToMatrix())
+	return Point(m)
+}
+
+// IsRing returns true if the lineal geometry has the ring property.
+func (mls MultiLineString) IsRing() bool {
+	return mls.IsClosed() && mls.IsSimple()
+}
+
+// IsValid returns true if the  geometry is valid.
+func (mls MultiLineString) IsValid() bool {
+	for _, v := range mls {
+		if !v.IsValid() {
+			return false
+		}
+	}
+	return true
 }
