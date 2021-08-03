@@ -70,6 +70,14 @@ type Geometry interface {
 
 	// UniquePoints return all distinct vertices of input geometry as a MultiPoint.
 	UniquePoints() MultiPoint
+
+	// Simplify returns a "simplified" version of the given geometry using the Douglas-Peucker algorithm,
+	// May not preserve topology
+	Simplify(tolerance float64) Geometry
+
+	// SimplifyP returns a geometry simplified by amount given by tolerance.
+	// Unlike Simplify, SimplifyP guarantees it will preserve topology.
+	SimplifyP(tolerance float64) Geometry
 }
 
 // compile time checks

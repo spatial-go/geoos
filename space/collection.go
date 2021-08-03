@@ -1,6 +1,7 @@
 package space
 
 import (
+	"github.com/spatial-go/geoos/algorithm/buffer/simplify"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/space/spaceerr"
 )
@@ -208,4 +209,19 @@ func (c Collection) UniquePoints() MultiPoint {
 		mult = append(mult, v.UniquePoints()...)
 	}
 	return mult
+}
+
+// Simplify returns a "simplified" version of the given geometry using the Douglas-Peucker algorithm,
+// May not preserve topology
+func (c Collection) Simplify(tolerance float64) Geometry {
+	result := simplify.Simplify(c.ToMatrix(), tolerance)
+	return TransGeometry(result)
+}
+
+// SimplifyP returns a geometry simplified by amount given by tolerance.
+// Unlike Simplify, SimplifyP guarantees it will preserve topology.
+func (c Collection) SimplifyP(tolerance float64) Geometry {
+	tls := &simplify.TopologyPreservingSimplifier{}
+	result := tls.Simplify(c.ToMatrix(), tolerance)
+	return TransGeometry(result)
 }

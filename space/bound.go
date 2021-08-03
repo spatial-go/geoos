@@ -241,3 +241,15 @@ func (b Bound) IntersectsBound(other Bound) bool {
 		other.Min.Y() > b.Max.Y() ||
 		other.Max.Y() < b.Min.Y())
 }
+
+// Simplify returns a "simplified" version of the given geometry using the Douglas-Peucker algorithm,
+// May not preserve topology
+func (b Bound) Simplify(tolerance float64) Geometry {
+	return b.ToPolygon()
+}
+
+// SimplifyP returns a geometry simplified by amount given by tolerance.
+// Unlike Simplify, SimplifyP guarantees it will preserve topology.
+func (b Bound) SimplifyP(tolerance float64) Geometry {
+	return b.ToPolygon()
+}
