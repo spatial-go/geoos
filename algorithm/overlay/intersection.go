@@ -38,18 +38,10 @@ func IntersectLine(m, m1 matrix.LineMatrix) []IntersectionLineSegment {
 }
 
 // Intersection  Computes the Intersection of two geometries,either or both of which may be null.
-func Intersection(m0, m1 matrix.PolygonMatrix) matrix.PolygonMatrix {
+func Intersection(m0, m1 matrix.PolygonMatrix) matrix.Steric {
 
-	if m0 == nil && m1 == nil {
-		return nil
-	}
-	if m0 == nil {
-		return m1
-	}
+	polyOver := &PolygonOverlay{PointOverlay: &PointOverlay{subject: m0, clipping: m1}}
 
-	if m1 == nil {
-		return m0
-	}
-
-	return unionActual(m0, m1, Clip)
+	result, _ := polyOver.Intersection()
+	return result
 }

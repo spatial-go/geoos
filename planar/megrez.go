@@ -341,7 +341,7 @@ func (g *MegrezAlgorithm) UnaryUnion(geom space.Geometry) (space.Geometry, error
 			matrix4 = append(matrix4, v)
 		}
 		result := overlay.UnaryUnion(matrix4)
-		return space.Polygon(result), nil
+		return space.Polygon(result.(matrix.PolygonMatrix)), nil
 	}
 	return nil, ErrNotPolygon
 }
@@ -350,7 +350,7 @@ func (g *MegrezAlgorithm) UnaryUnion(geom space.Geometry) (space.Geometry, error
 func (g *MegrezAlgorithm) Union(geom1, geom2 space.Geometry) (space.Geometry, error) {
 	if geom1.GeoJSONType() == space.TypePolygon && geom2.GeoJSONType() == space.TypePolygon {
 		result := overlay.Union(matrix.PolygonMatrix(geom1.(space.Polygon)), matrix.PolygonMatrix(geom2.(space.Polygon)))
-		return space.Polygon(result), nil
+		return space.Polygon(result.(matrix.PolygonMatrix)), nil
 	} else if geom1.GeoJSONType() == space.TypePoint && geom2.GeoJSONType() == space.TypePoint {
 		return space.MultiPoint{geom1.(space.Point), geom2.(space.Point)}, nil
 	} else if geom1.GeoJSONType() == space.TypeLineString && geom2.GeoJSONType() == space.TypeLineString {
