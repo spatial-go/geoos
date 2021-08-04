@@ -4,9 +4,33 @@ import (
 	"github.com/spatial-go/geoos/algorithm/buffer"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
-	"github.com/spatial-go/geoos/algorithm/operation"
 	"github.com/spatial-go/geoos/algorithm/relate"
 	"github.com/spatial-go/geoos/space/spaceerr"
+)
+
+// const Coordinate System
+const (
+	BJ54 = iota + 1000000
+	XA80
+	CGCS2000
+
+	// WGS84 World Geodetic System一1984 Coordinate System
+	WGS84 = 4326
+
+	// PseudoMercator  WGS 84 / Pseudo-Mercator
+	PseudoMercator = 3857
+
+	//GCJ02 Guojia cehui ju 02 ,unit degree
+	GCJ02 = 104326
+
+	//GCJ02Web Guojia cehui ju 02 Mercator, unit m
+	GCJ02Web = 103857
+
+	// BD09 Guojia cehui ju 02+BD ,unit degree
+	BD09 = 114326
+
+	// BD09 Guojia cehui ju 02+BD, unit m
+	BD09Web = 113857
 )
 
 // Line  straight line  .
@@ -17,35 +41,20 @@ type Line struct {
 // ElementValid describes a geographic Element Valid
 type ElementValid struct {
 	Geometry
+	CoordinateSystem int
 }
 
 // CreateElementValid Returns valid geom element. returns nil if geom is invalid.
 func CreateElementValid(geom Geometry) (*ElementValid, error) {
+	return CreateElementValidWithCoordSys(geom, GCJ02)
+}
+
+// CreateElementValidWithCoordSys Returns valid geom element. returns nil if geom is invalid.
+func CreateElementValidWithCoordSys(geom Geometry, coordSys int) (*ElementValid, error) {
 	if geom.IsValid() {
-		return &ElementValid{geom}, nil
+		return &ElementValid{geom, coordSys}, nil
 	}
 	return nil, spaceerr.ErrNotValidGeometry
-}
-
-// IsClosed Returns TRUE if the LINESTRING's start and end points are coincident.
-// For Polyhedral Surfaces, reports if the surface is areal (open) or IsC (closed).
-func (el *ElementValid) IsClosed() bool {
-	switch el.GeoJSONType() {
-	case TypeLineString:
-		return el.Geometry.(LineString).IsClosed()
-	case TypeMultiLineString:
-		return el.Geometry.(MultiLineString).IsClosed()
-	}
-	return true
-}
-
-// IsSimple Computes simplicity for geometries.
-func (el *ElementValid) IsSimple() bool {
-	if el.IsEmpty() {
-		return true
-	}
-	vop := &operation.ValidOP{Steric: el.ToMatrix()}
-	return vop.IsSimple()
 }
 
 // Centroid Computes the centroid point of a geometry.
@@ -60,6 +69,16 @@ func Centroid(geom Geometry) Point {
 	return Point(m)
 }
 
+// Distance returns distance Between the two Geometry.
+func Distance(from, to Geometry, f measure.Distance) (float64, error) {
+	if from == nil || from.IsEmpty() ||
+		to == nil || to.IsEmpty() {
+		return 0, nil
+	}
+	elem := &measure.ElementDistance{From: from.ToMatrix(), To: to.ToMatrix(), F: f}
+	return elem.Distance()
+}
+
 // Relate Computes the  Intersection Matrix for the spatial relationship
 // between two Sterics, using the default (OGC SFS) Boundary Node Rule
 func Relate(a, b Geometry) (string, error) {
@@ -70,16 +89,6 @@ func Relate(a, b Geometry) (string, error) {
 		IntersectBound: a.Bound().IntersectsBound(b.Bound())}
 	im := rel.IntersectionMatrix()
 	return im.ToString(), nil
-}
-
-// Distance returns distance Between the two Geometry.
-func Distance(from, to Geometry, f measure.Distance) (float64, error) {
-	if from == nil || from.IsEmpty() ||
-		to == nil || to.IsEmpty() {
-		return 0, nil
-	}
-	elem := &measure.ElementDistance{From: from.ToMatrix(), To: to.ToMatrix(), F: f}
-	return elem.Distance()
 }
 
 // Within returns TRUE if geometry A is completely inside geometry B.

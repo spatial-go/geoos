@@ -5,6 +5,7 @@ import (
 	"github.com/spatial-go/geoos/algorithm/buffer/simplify"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
+	"github.com/spatial-go/geoos/algorithm/operation"
 	"github.com/spatial-go/geoos/space/spaceerr"
 )
 
@@ -129,8 +130,11 @@ func (mp MultiPoint) Length() float64 {
 // IsSimple returns true if this space.Geometry has no anomalous geometric points,
 // such as self intersection or self tangency.
 func (mp MultiPoint) IsSimple() bool {
-	elem := ElementValid{mp}
-	return elem.IsSimple()
+	if mp.IsEmpty() {
+		return true
+	}
+	vop := &operation.ValidOP{Steric: mp.ToMatrix()}
+	return vop.IsSimple()
 }
 
 // Centroid Computes the centroid point of a geometry.

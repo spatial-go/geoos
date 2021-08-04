@@ -5,6 +5,7 @@ import (
 	"github.com/spatial-go/geoos/algorithm/buffer/simplify"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
+	"github.com/spatial-go/geoos/algorithm/operation"
 )
 
 // Polygon is a closed area. The first LineString is the outer ring.
@@ -184,8 +185,11 @@ func (p Polygon) Length() float64 {
 // IsSimple returns true if this space.Geometry has no anomalous geometric points,
 // such as self intersection or self tangency.
 func (p Polygon) IsSimple() bool {
-	elem := ElementValid{p}
-	return elem.IsSimple()
+	if p.IsEmpty() {
+		return true
+	}
+	vop := &operation.ValidOP{Steric: p.ToMatrix()}
+	return vop.IsSimple()
 }
 
 // Shell returns shell..

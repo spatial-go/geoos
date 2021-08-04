@@ -98,8 +98,7 @@ func (r Ring) Length() float64 {
 // IsSimple returns true if this space.Geometry has no anomalous geometric points,
 // such as self intersection or self tangency.
 func (r Ring) IsSimple() bool {
-	elem := ElementValid{LineString(r)}
-	return elem.IsSimple()
+	return LineString(r).IsSimple()
 }
 
 // Centroid Computes the centroid point of a geometry.
@@ -174,5 +173,5 @@ func (r Ring) IsRing() bool {
 
 // IsValid returns true if the  geometry is valid.
 func (r Ring) IsValid() bool {
-	return (!r.IsEmpty()) && r.IsClosed()
+	return (!r.IsEmpty()) && r.IsRing()
 }

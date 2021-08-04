@@ -5,6 +5,7 @@ import (
 	"github.com/spatial-go/geoos/algorithm/buffer/simplify"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
+	"github.com/spatial-go/geoos/algorithm/operation"
 )
 
 // MultiLineString is a set of polylines.
@@ -168,8 +169,11 @@ func (mls MultiLineString) Length() float64 {
 // IsSimple returns true if this space.Geometry has no anomalous geometric points,
 // such as self intersection or self tangency.
 func (mls MultiLineString) IsSimple() bool {
-	elem := ElementValid{mls}
-	return elem.IsSimple()
+	if mls.IsEmpty() {
+		return true
+	}
+	vop := &operation.ValidOP{Steric: mls.ToMatrix()}
+	return vop.IsSimple()
 }
 
 // Centroid Computes the centroid point of a geometry.

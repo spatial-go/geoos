@@ -194,7 +194,7 @@ func (c Collection) Length() float64 {
 // IsSimple returns true if this space.Geometry has no anomalous geometric points,
 // such as self intersection or self tangency.
 func (c Collection) IsSimple() bool {
-	elem := ElementValid{c}
+	elem := &ElementValid{c, GCJ02}
 	return elem.IsSimple()
 }
 
