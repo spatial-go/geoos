@@ -20,8 +20,8 @@ func (p *PolygonOverlay) Union() (matrix.Steric, error) {
 	if res, ok := p.unionCheck(); !ok {
 		return res, nil
 	}
-	if _, ok := p.subject.(matrix.PolygonMatrix); ok {
-		if _, ok := p.clipping.(matrix.PolygonMatrix); ok {
+	if _, ok := p.Subject.(matrix.PolygonMatrix); ok {
+		if _, ok := p.Clipping.(matrix.PolygonMatrix); ok {
 			cpo := &ComputeMergeOverlay{p}
 
 			cpo.prepare()
@@ -39,12 +39,12 @@ func (p *PolygonOverlay) Intersection() (matrix.Steric, error) {
 		return res, nil
 	}
 	var poly matrix.PolygonMatrix
-	if p, ok := p.subject.(matrix.PolygonMatrix); ok {
+	if p, ok := p.Subject.(matrix.PolygonMatrix); ok {
 		poly = p
 	} else {
 		return nil, algoerr.ErrNotMatchType
 	}
-	switch c := p.clipping.(type) {
+	switch c := p.Clipping.(type) {
 	case matrix.Matrix:
 
 		inter := envelope.Bound(poly.Bound()).IsIntersects(envelope.Bound(c.Bound()))
@@ -96,8 +96,8 @@ func (p *PolygonOverlay) Difference() (matrix.Steric, error) {
 	if res, ok := p.differenceCheck(); !ok {
 		return res, nil
 	}
-	if _, ok := p.subject.(matrix.PolygonMatrix); ok {
-		if _, ok := p.clipping.(matrix.PolygonMatrix); ok {
+	if _, ok := p.Subject.(matrix.PolygonMatrix); ok {
+		if _, ok := p.Clipping.(matrix.PolygonMatrix); ok {
 			cpo := &ComputeMainOverlay{p}
 
 			cpo.prepare()
@@ -113,7 +113,7 @@ func (p *PolygonOverlay) Difference() (matrix.Steric, error) {
 // One can think of this as GeometryB - Intersection(A,B).
 // If B is completely contained in A then an empty geometry collection is returned.
 func (p *PolygonOverlay) DifferenceReverse() (matrix.Steric, error) {
-	newPoly := &PolygonOverlay{PointOverlay: &PointOverlay{subject: p.clipping, clipping: p.subject}}
+	newPoly := &PolygonOverlay{PointOverlay: &PointOverlay{Subject: p.Clipping, Clipping: p.Subject}}
 	return newPoly.Difference()
 }
 
@@ -134,7 +134,7 @@ func (p *PolygonOverlay) SymDifference() (matrix.Steric, error) {
 // prepare prepare two polygonal geometries.
 func (p *PolygonOverlay) prepare() {
 	p.subjectPlane = &algorithm.Plane{}
-	for _, v2 := range p.subject.(matrix.PolygonMatrix) {
+	for _, v2 := range p.Subject.(matrix.PolygonMatrix) {
 		for i, v1 := range v2 {
 			if i < len(v2)-1 {
 				p.subjectPlane.AddPoint(&algorithm.Vertex{Matrix: matrix.Matrix(v1)})
@@ -144,7 +144,7 @@ func (p *PolygonOverlay) prepare() {
 		p.subjectPlane.Rank = calc.MAIN
 	}
 	p.clippingPlane = &algorithm.Plane{}
-	for _, v2 := range p.clipping.(matrix.PolygonMatrix) {
+	for _, v2 := range p.Clipping.(matrix.PolygonMatrix) {
 		for i, v1 := range v2 {
 			if i < len(v2)-1 {
 				p.clippingPlane.AddPoint(&algorithm.Vertex{Matrix: matrix.Matrix(v1)})
@@ -157,6 +157,8 @@ func (p *PolygonOverlay) prepare() {
 
 // Weiler Weiler overlay.
 func (p *PolygonOverlay) Weiler() (enteringPoints, exitingPoints []algorithm.Vertex) {
+
+	// TODO overlay ...
 	for _, v := range p.subjectPlane.Lines {
 		for _, vClip := range p.clippingPlane.Lines {
 
@@ -179,7 +181,41 @@ func (p *PolygonOverlay) Weiler() (enteringPoints, exitingPoints []algorithm.Ver
 			}
 		}
 	}
+
+	filt := &UniqueVertexFilter{}
+	for _, v := range enteringPoints {
+		filt.Filter(v)
+	}
+	enteringPoints = filt.Ips
+	filt = &UniqueVertexFilter{}
+	for _, v := range exitingPoints {
+		filt.Filter(v)
+	}
+	exitingPoints = filt.Ips
 	return
+}
+
+// UniqueVertexFilter  A Filter that extracts a unique array.
+type UniqueVertexFilter struct {
+	Ips []algorithm.Vertex
+}
+
+// Filter Performs an operation with the provided .
+func (u *UniqueVertexFilter) Filter(ip algorithm.Vertex) {
+	u.add(ip)
+}
+
+func (u *UniqueVertexFilter) add(ip algorithm.Vertex) {
+	hasMatrix := false
+	for _, v := range u.Ips {
+		if v.Matrix.Equals(ip.Matrix) {
+			hasMatrix = true
+			break
+		}
+	}
+	if !hasMatrix {
+		u.Ips = append(u.Ips, ip)
+	}
 }
 
 // ComputePolygon compute overlay.

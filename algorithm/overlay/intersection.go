@@ -9,11 +9,11 @@ import (
 func Intersection(m0, m1 matrix.Steric) (matrix.Steric, error) {
 	switch m := m0.(type) {
 	case matrix.Matrix:
-		over := &PointOverlay{subject: m, clipping: m1}
+		over := &PointOverlay{Subject: m, Clipping: m1}
 		return over.Intersection()
 	case matrix.LineMatrix:
 		var err error
-		newLine := &LineOverlay{PointOverlay: &PointOverlay{subject: m, clipping: m1}}
+		newLine := &LineOverlay{PointOverlay: &PointOverlay{Subject: m, Clipping: m1}}
 		if result, err := newLine.Intersection(); err == nil {
 			if len(result.(matrix.Collection)) == 1 {
 				return result.(matrix.Collection)[0], nil
@@ -22,7 +22,7 @@ func Intersection(m0, m1 matrix.Steric) (matrix.Steric, error) {
 		}
 		return nil, err
 	case matrix.PolygonMatrix:
-		polyOver := &PolygonOverlay{PointOverlay: &PointOverlay{subject: m, clipping: m1}}
+		polyOver := &PolygonOverlay{PointOverlay: &PointOverlay{Subject: m, Clipping: m1}}
 		return polyOver.Intersection()
 	default:
 		return nil, algoerr.ErrNotSupportCollection

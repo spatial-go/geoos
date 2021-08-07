@@ -29,8 +29,8 @@ func TestPointOverlay_Intersection(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := &PointOverlay{
-				subject:  tt.fields.subject,
-				clipping: tt.fields.clipping,
+				Subject:  tt.fields.subject,
+				Clipping: tt.fields.clipping,
 			}
 			got, err := p.Intersection()
 			if (err != nil) != tt.wantErr {

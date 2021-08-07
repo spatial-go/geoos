@@ -18,8 +18,8 @@ func (p *LineOverlay) Union() (matrix.Steric, error) {
 	if res, ok := p.unionCheck(); !ok {
 		return res, nil
 	}
-	if s, ok := p.subject.(matrix.LineMatrix); ok {
-		if c, ok := p.clipping.(matrix.LineMatrix); ok {
+	if s, ok := p.Subject.(matrix.LineMatrix); ok {
+		if c, ok := p.Clipping.(matrix.LineMatrix); ok {
 			return LineMerge(matrix.Collection{s, c}), nil
 		}
 	}
@@ -32,12 +32,12 @@ func (p *LineOverlay) Intersection() (matrix.Steric, error) {
 		return res, nil
 	}
 	var line matrix.LineMatrix
-	if l, ok := p.subject.(matrix.LineMatrix); ok {
+	if l, ok := p.Subject.(matrix.LineMatrix); ok {
 		line = l
 	} else {
 		return nil, algoerr.ErrNotMatchType
 	}
-	switch c := p.clipping.(type) {
+	switch c := p.Clipping.(type) {
 	case matrix.Matrix:
 		if mark := relate.InLineMatrix(c, line); mark {
 			return c, nil
@@ -85,8 +85,8 @@ func (p *LineOverlay) Difference() (matrix.Steric, error) {
 	if res, ok := p.differenceCheck(); !ok {
 		return res, nil
 	}
-	if s, ok := p.subject.(matrix.LineMatrix); ok {
-		if c, ok := p.clipping.(matrix.LineMatrix); ok {
+	if s, ok := p.Subject.(matrix.LineMatrix); ok {
+		if c, ok := p.Clipping.(matrix.LineMatrix); ok {
 			var err error
 			if result, err := differenceLine(s, c); err == nil {
 				return result, nil
@@ -101,7 +101,7 @@ func (p *LineOverlay) Difference() (matrix.Steric, error) {
 // One can think of this as GeometryB - Intersection(A,B).
 // If B is completely contained in A then an empty geometry collection is returned.
 func (p *LineOverlay) DifferenceReverse() (matrix.Steric, error) {
-	newPoly := &LineOverlay{PointOverlay: &PointOverlay{subject: p.clipping, clipping: p.subject}}
+	newPoly := &LineOverlay{PointOverlay: &PointOverlay{Subject: p.Clipping, Clipping: p.Subject}}
 	return newPoly.Difference()
 }
 

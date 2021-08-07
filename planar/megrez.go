@@ -173,20 +173,33 @@ func (g *MegrezAlgorithm) HausdorffDistanceDensify(geom1, geom2 space.Geometry, 
 }
 
 // Intersection returns a geometry that represents the point set intersection of the Geometries.
-func (g *MegrezAlgorithm) Intersection(geom1, geom2 space.Geometry) (space.Geometry, error) {
+func (g *MegrezAlgorithm) Intersection(geom1, geom2 space.Geometry) (intersectGeom space.Geometry, intersectErr error) {
 	switch geom1.GeoJSONType() {
 	case space.TypePoint:
-		mark := relate.InLineMatrix(geom1.ToMatrix().(matrix.Matrix), geom2.ToMatrix().(matrix.LineMatrix))
-		if mark {
-			return geom1, nil
+		over := &overlay.PointOverlay{Subject: geom1.ToMatrix(), Clipping: geom2.ToMatrix()}
+		if result, err := over.Intersection(); err == nil {
+			intersectGeom = space.TransGeometry(result)
+		} else {
+			intersectErr = err
 		}
 	case space.TypeLineString:
-		mark, ips := relate.IntersectionEdge(geom1.ToMatrix().(matrix.LineMatrix), geom2.ToMatrix().(matrix.LineMatrix))
-		if mark {
-			return space.Point(ips[0].Matrix), nil
+		over := &overlay.LineOverlay{PointOverlay: &overlay.PointOverlay{Subject: geom1.ToMatrix(), Clipping: geom2.ToMatrix()}}
+		if result, err := over.Intersection(); err == nil {
+			intersectGeom = space.TransGeometry(result)
+		} else {
+			intersectErr = err
 		}
+	case space.TypePolygon:
+		over := &overlay.PolygonOverlay{PointOverlay: &overlay.PointOverlay{Subject: geom1.ToMatrix(), Clipping: geom2.ToMatrix()}}
+		if result, err := over.Intersection(); err != nil {
+			intersectGeom = space.TransGeometry(result)
+		} else {
+			intersectErr = err
+		}
+	default:
+		intersectErr = algoerr.ErrNotMatchType
 	}
-	return nil, nil
+	return
 }
 
 // Intersects If a geometry  shares any portion of space then they intersect

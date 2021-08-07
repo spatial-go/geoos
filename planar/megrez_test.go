@@ -686,9 +686,9 @@ func TestAlgorithm_Relate(t *testing.T) {
 		args{space.Point{1, 1}, space.LineString{{0, 0}, {1, 1}, {0, 2}}}, "0FFFFF102", false})
 	tests = append(tests, TestStruct{fmt.Sprintf("linepoint%v", "01"),
 		args{space.Point{0, 2}, space.LineString{{0, 0}, {1, 1}, {0, 2}}}, "F0FFFF102", false})
-	// tests = append(tests, TestStruct{fmt.Sprintf("polyPoly%v", "0f"),
-	// 	args{space.Polygon{{{100, 100}, {100, 101}, {101, 101}, {101, 100}, {100, 100}}},
-	// 		space.Polygon{{{90, 90}, {90, 101}, {101, 101}, {101, 90}, {90, 90}}}}, "2FF11F212", false})
+	tests = append(tests, TestStruct{fmt.Sprintf("polyPoly%v", "0f"),
+		args{space.Polygon{{{100, 100}, {100, 101}, {101, 101}, {101, 100}, {100, 100}}},
+			space.Polygon{{{90, 90}, {90, 101}, {101, 101}, {101, 90}, {90, 90}}}}, "2FF1FF212", false})
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -970,6 +970,8 @@ func TestAlgorithm_Intersection(t *testing.T) {
 		wantErr bool
 	}{
 		{name: "intersection", args: args{g1: point02, g2: line02}, want: expectPoint, wantErr: false},
+		{name: "intersection error", args: args{g1: space.Collection{point02}, g2: space.Collection{line02}}, want: nil, wantErr: true},
+		{name: "intersection error", args: args{g1: point02, g2: space.Collection{line02}}, want: nil, wantErr: true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

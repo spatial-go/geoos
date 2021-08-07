@@ -25,7 +25,7 @@ type Overlay interface {
 
 // PointOverlay  Computes the overlay of two geometries,either or both of which may be nil.
 type PointOverlay struct {
-	subject, clipping matrix.Steric
+	Subject, Clipping matrix.Steric
 }
 
 // Union  Computes the Union of two geometries,either or both of which may be nil.
@@ -33,8 +33,8 @@ func (p *PointOverlay) Union() (matrix.Steric, error) {
 	if res, ok := p.unionCheck(); !ok {
 		return res, nil
 	}
-	if s, ok := p.subject.(matrix.Matrix); ok {
-		if c, ok := p.clipping.(matrix.Matrix); ok {
+	if s, ok := p.Subject.(matrix.Matrix); ok {
+		if c, ok := p.Clipping.(matrix.Matrix); ok {
 			if s.Equals(c) {
 				return s, nil
 			}
@@ -49,24 +49,24 @@ func (p *PointOverlay) Intersection() (matrix.Steric, error) {
 	if res, ok := p.intersectionCheck(); !ok {
 		return res, nil
 	}
-	if _, ok := p.subject.(matrix.Matrix); !ok {
+	if _, ok := p.Subject.(matrix.Matrix); !ok {
 		return nil, algoerr.ErrNotMatchType
 	}
-	switch c := p.clipping.(type) {
+	switch c := p.Clipping.(type) {
 	case matrix.Matrix:
-		if p.subject.(matrix.Matrix).Equals(c) {
-			return p.subject.(matrix.Matrix), nil
+		if p.Subject.(matrix.Matrix).Equals(c) {
+			return p.Subject.(matrix.Matrix), nil
 		}
 		return nil, nil
 	case matrix.LineMatrix:
-		if mark := relate.InLineMatrix(p.subject.(matrix.Matrix), c); mark {
-			return p.subject.(matrix.Matrix), nil
+		if mark := relate.InLineMatrix(p.Subject.(matrix.Matrix), c); mark {
+			return p.Subject.(matrix.Matrix), nil
 		}
 		return nil, nil
 	case matrix.PolygonMatrix:
-		inter := envelope.Bound(c.Bound()).IsIntersects(envelope.Bound(p.subject.Bound()))
-		if mark := relate.IM(c, p.subject.(matrix.Matrix), inter).IsCovers(); mark {
-			return p.subject.(matrix.Matrix), nil
+		inter := envelope.Bound(c.Bound()).IsIntersects(envelope.Bound(p.Subject.Bound()))
+		if mark := relate.IM(c, p.Subject.(matrix.Matrix), inter).IsCovers(); mark {
+			return p.Subject.(matrix.Matrix), nil
 		}
 		return nil, nil
 	}
@@ -80,8 +80,8 @@ func (p *PointOverlay) Difference() (matrix.Steric, error) {
 	if res, ok := p.differenceCheck(); !ok {
 		return res, nil
 	}
-	if s, ok := p.subject.(matrix.Matrix); ok {
-		if c, ok := p.clipping.(matrix.Matrix); ok {
+	if s, ok := p.Subject.(matrix.Matrix); ok {
+		if c, ok := p.Clipping.(matrix.Matrix); ok {
 			if s.Equals(c) {
 				return nil, nil
 			}
@@ -95,7 +95,7 @@ func (p *PointOverlay) Difference() (matrix.Steric, error) {
 // One can think of this as GeometryB - Intersection(A,B).
 // If B is completely contained in A then an empty geometry collection is returned.
 func (p *PointOverlay) DifferenceReverse() (matrix.Steric, error) {
-	newP := &PointOverlay{subject: p.clipping, clipping: p.subject}
+	newP := &PointOverlay{Subject: p.Clipping, Clipping: p.Subject}
 	return newP.Difference()
 }
 
@@ -116,15 +116,15 @@ func (p *PointOverlay) SymDifference() (matrix.Steric, error) {
 // unionCheck  Computes the Union of two geometries,either or both of which may be null.
 func (p *PointOverlay) unionCheck() (matrix.Steric, bool) {
 
-	if p.subject == nil && p.clipping == nil {
+	if p.Subject == nil && p.Clipping == nil {
 		return nil, false
 	}
-	if p.subject == nil {
-		return p.clipping, false
+	if p.Subject == nil {
+		return p.Clipping, false
 	}
 
-	if p.clipping == nil {
-		return p.subject, false
+	if p.Clipping == nil {
+		return p.Subject, false
 	}
 
 	return nil, true
@@ -133,14 +133,14 @@ func (p *PointOverlay) unionCheck() (matrix.Steric, bool) {
 // intersectionCheck  Computes the Union of two geometries,either or both of which may be null.
 func (p *PointOverlay) intersectionCheck() (matrix.Steric, bool) {
 
-	if p.subject == nil && p.clipping == nil {
+	if p.Subject == nil && p.Clipping == nil {
 		return nil, false
 	}
-	if p.subject == nil {
+	if p.Subject == nil {
 		return nil, false
 	}
 
-	if p.clipping == nil {
+	if p.Clipping == nil {
 		return nil, false
 	}
 
@@ -150,15 +150,15 @@ func (p *PointOverlay) intersectionCheck() (matrix.Steric, bool) {
 // differenceCheck  Computes the Union of two geometries,either or both of which may be null.
 func (p *PointOverlay) differenceCheck() (matrix.Steric, bool) {
 
-	if p.subject == nil && p.clipping == nil {
+	if p.Subject == nil && p.Clipping == nil {
 		return nil, false
 	}
-	if p.subject == nil {
+	if p.Subject == nil {
 		return nil, false
 	}
 
-	if p.clipping == nil {
-		return p.subject, false
+	if p.Clipping == nil {
+		return p.Subject, false
 	}
 
 	return nil, true

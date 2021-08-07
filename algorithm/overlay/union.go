@@ -30,7 +30,7 @@ func UnaryUnionByHalf(matrix4 matrix.MultiPolygonMatrix, start, end int) matrix.
 // Union  Computes the Union of two geometries,either or both of which may be null.
 func Union(m0, m1 matrix.PolygonMatrix) matrix.Steric {
 
-	polyOver := &PolygonOverlay{PointOverlay: &PointOverlay{subject: m0, clipping: m1}}
+	polyOver := &PolygonOverlay{PointOverlay: &PointOverlay{Subject: m0, Clipping: m1}}
 
 	result, _ := polyOver.Union()
 	return result

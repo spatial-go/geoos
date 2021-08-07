@@ -33,19 +33,63 @@ func (p *PolygonRelate) computePolygon(im *matrix.IntersectionMatrix) {
 		l := p.PolygonMatrix[0]
 		if IsIntersectionEdge(l, v) {
 			inRing = 1
-			break
 		}
 		if i == 0 {
-			if InPolygon(l[0], v) {
-				inRing = 0
+			if inRing != 1 {
+				if InPolygon(l[0], v) {
+					inRing = 0
+				} else {
+					inRing = 2
+				}
 			} else {
-				inRing = 2
+				lInRing := 0
+				lOutRing := 0
+				for _, m := range l {
+					if InLineMatrix(m, v) {
+						continue
+					}
+					if InPolygon(m, v) {
+						lInRing++
+					} else {
+						lOutRing++
+					}
+				}
+				if lInRing > 0 && lOutRing == 0 {
+					inRing = 0
+				} else if lInRing > 0 && lOutRing > 0 {
+					inRing = 1
+				} else if lInRing == 0 && lOutRing > 0 {
+					inRing = 2
+				}
 			}
 		} else {
-
-			if InPolygon(l[0], matrix.LineMatrix(v)) {
-				if inRing != 2 {
-					inRing = 2
+			if inRing != 1 {
+				if InPolygon(l[0], v) {
+					if inRing != 2 {
+						inRing = 2
+						break
+					}
+				}
+			} else {
+				lInRing := 0
+				lOutRing := 0
+				for _, m := range l {
+					if InLineMatrix(m, v) {
+						continue
+					}
+					if InPolygon(m, v) {
+						lInRing++
+					} else {
+						lOutRing++
+					}
+				}
+				if lInRing > 0 && lOutRing == 0 {
+					if inRing != 2 {
+						inRing = 2
+						break
+					}
+				} else if lInRing > 0 && lOutRing > 0 {
+					inRing = 1
 					break
 				}
 			}
