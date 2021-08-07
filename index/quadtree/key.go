@@ -4,6 +4,7 @@ import (
 	"math"
 
 	"github.com/spatial-go/geoos/algorithm/matrix"
+	"github.com/spatial-go/geoos/algorithm/matrix/envelope"
 )
 
 // Key A Key is a unique identifier for a node in a quadtree.
@@ -12,11 +13,11 @@ import (
 type Key struct {
 	Pt    matrix.Matrix
 	Level int
-	Env   *matrix.Envelope
+	Env   *envelope.Envelope
 }
 
 // ComputeQuadLevel ...
-func ComputeQuadLevel(env *matrix.Envelope) int {
+func ComputeQuadLevel(env *envelope.Envelope) int {
 	dx := env.Width()
 	dy := env.Height()
 	dMax := math.Max(dx, dy)
@@ -25,7 +26,7 @@ func ComputeQuadLevel(env *matrix.Envelope) int {
 }
 
 // KeyEnv ...
-func KeyEnv(itemEnv *matrix.Envelope) *Key {
+func KeyEnv(itemEnv *envelope.Envelope) *Key {
 	k := &Key{Pt: matrix.Matrix{0, 0}}
 	k.ComputeKey(itemEnv)
 	return k
@@ -41,9 +42,9 @@ func (k *Key) Centre() matrix.Matrix {
 
 // ComputeKey return a square envelope containing the argument envelope,
 // whose extent is a power of two and which is based at a power of 2
-func (k *Key) ComputeKey(itemEnv *matrix.Envelope) {
+func (k *Key) ComputeKey(itemEnv *envelope.Envelope) {
 	k.Level = ComputeQuadLevel(itemEnv)
-	k.Env = &matrix.Envelope{}
+	k.Env = &envelope.Envelope{}
 	k.computeKey(k.Level, itemEnv)
 	// MD - would be nice to have a non-iterative form of this algorithm
 	for !k.Env.Contains(itemEnv) {
@@ -52,10 +53,10 @@ func (k *Key) ComputeKey(itemEnv *matrix.Envelope) {
 	}
 }
 
-func (k *Key) computeKey(level int, itemEnv *matrix.Envelope) {
+func (k *Key) computeKey(level int, itemEnv *envelope.Envelope) {
 	quadSize := math.Exp2(float64(level))
 	x, y := itemEnv.MinX, itemEnv.MinY
 	k.Pt[0] = math.Floor(x/quadSize) * quadSize
 	k.Pt[1] = math.Floor(y/quadSize) * quadSize
-	k.Env = matrix.EnvelopeF(k.Pt[0], k.Pt[0]+quadSize, k.Pt[1], k.Pt[1]+quadSize)
+	k.Env = envelope.FourFloat(k.Pt[0], k.Pt[0]+quadSize, k.Pt[1], k.Pt[1]+quadSize)
 }

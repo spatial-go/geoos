@@ -162,9 +162,9 @@ func (c *CurveBuilder) computeLineBufferCurve(pts matrix.LineMatrix) {
 	n1 := len(simp1) - 1
 	c.Curve.initSideSegments(simp1[0], simp1[1], calc.LEFT)
 	for i := 2; i <= n1; i++ {
-		c.Curve.Line = append(c.Curve.Line, simp1[i])
+		c.Curve.addNextSegment(simp1[i], true)
 	}
-	c.Curve.Line = append(c.Curve.Line, c.Curve.offset1[1])
+	c.Curve.Add(c.Curve.offset1.P1)
 	// add line cap for end of line
 	c.AddLineEndCap(simp1[n1-1], simp1[n1], c.distance)
 
@@ -178,9 +178,9 @@ func (c *CurveBuilder) computeLineBufferCurve(pts matrix.LineMatrix) {
 	// since we are traversing line in opposite order, offset position is still LEFT
 	c.Curve.initSideSegments(simp2[n2], simp2[n2-1], calc.LEFT)
 	for i := n2 - 2; i >= 0; i-- {
-		c.Curve.Line = append(c.Curve.Line, simp2[i])
+		c.Curve.addNextSegment(simp2[i], true)
 	}
-	c.Curve.Line = append(c.Curve.Line, c.Curve.offset1[1])
+	c.Curve.Add(c.Curve.offset1.P1)
 	// add line cap for start of line
 	c.Curve.AddLineEndCap(simp2[1], simp2[0], c.distance)
 
@@ -192,7 +192,7 @@ func (c *CurveBuilder) computeSingleSidedBufferCurve(pts matrix.LineMatrix, isRi
 
 	if isRightSide {
 		// add original line
-		c.Curve.Line = append(c.Curve.Line, pts...)
+		c.Curve.AddLine(pts)
 
 		//---------- compute points for right side of line
 		// Simplify the appropriate side of the line before generating
@@ -204,13 +204,13 @@ func (c *CurveBuilder) computeSingleSidedBufferCurve(pts matrix.LineMatrix, isRi
 
 		// since we are traversing line in opposite order, offset position is still LEFT
 		c.Curve.initSideSegments(simp2[n2], simp2[n2-1], calc.LEFT)
-		c.Curve.Line = append(c.Curve.Line, c.Curve.offset1[1])
+		c.Curve.Add(c.Curve.offset1.P1)
 		for i := n2 - 2; i >= 0; i-- {
-			c.Curve.Line = append(c.Curve.Line, c.Curve.Line[i])
+			c.Curve.addNextSegment(simp2[i], true)
 		}
 	} else {
 		// add original line
-		c.Curve.Line = append(c.Curve.Line, pts...)
+		c.Curve.AddLine(pts)
 
 		//--------- compute points for left side of line
 		// Simplify the appropriate side of the line before generating
@@ -221,12 +221,12 @@ func (c *CurveBuilder) computeSingleSidedBufferCurve(pts matrix.LineMatrix, isRi
 
 		n1 := len(simp1) - 1
 		c.Curve.initSideSegments(simp1[0], simp1[1], calc.LEFT)
-		c.Curve.Line = append(c.Curve.Line, c.Curve.offset1[1])
+		c.Curve.Add(c.Curve.offset1.P1)
 		for i := 2; i <= n1; i++ {
-			c.Curve.Line = append(c.Curve.Line, c.Curve.Line[i])
+			c.Curve.addNextSegment(simp1[i], true)
 		}
 	}
-	c.Curve.Line = append(c.Curve.Line, c.Curve.offset1[1])
+	c.Curve.Add(c.Curve.offset1.P1)
 	c.Curve.CloseRing()
 }
 
@@ -243,7 +243,8 @@ func (c *CurveBuilder) computeRingBufferCurve(pts matrix.LineMatrix, side int) {
 	n := len(simp1) - 1
 	c.Curve.initSideSegments(simp1[n-1], simp1[0], side)
 	for i := 1; i <= n; i++ {
-		c.Curve.Line = append(c.Curve.Line, simp1[i])
+		addStartPoint := (i != 1)
+		c.Curve.addNextSegment(simp1[i], addStartPoint)
 	}
 	c.Curve.CloseRing()
 }

@@ -35,7 +35,7 @@ func Test_perform(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := Intersection(tt.args.subject, tt.args.clipping); !got.Equals(tt.want) {
+			if got, err := Intersection(tt.args.subject, tt.args.clipping); err != nil || !got.Equals(tt.want) {
 				t.Errorf("perform() = %v, want %v", got, tt.want)
 			}
 		})

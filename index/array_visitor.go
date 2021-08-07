@@ -1,6 +1,9 @@
 package index
 
-import "github.com/spatial-go/geoos/algorithm/matrix"
+import (
+	"github.com/spatial-go/geoos/algorithm/matrix"
+	"github.com/spatial-go/geoos/algorithm/matrix/envelope"
+)
 
 // ArrayVisitor Builds an array of all visited items.
 type ArrayVisitor struct {
@@ -23,7 +26,7 @@ type LineSegmentVisitor struct {
 // VisitItem ...
 func (l *LineSegmentVisitor) VisitItem(item interface{}) {
 	seg := item.(*matrix.LineSegment)
-	if matrix.IsIntersectsTwo(seg.P0, seg.P1, l.QuerySeg.P0, l.QuerySeg.P1) {
+	if envelope.IsIntersectsTwo(seg.P0, seg.P1, l.QuerySeg.P0, l.QuerySeg.P1) {
 		l.Items = append(l.Items, seg)
 	}
 }

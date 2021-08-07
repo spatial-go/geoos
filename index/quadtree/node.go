@@ -3,7 +3,7 @@ package quadtree
 import (
 	"reflect"
 
-	"github.com/spatial-go/geoos/algorithm/matrix"
+	"github.com/spatial-go/geoos/algorithm/matrix/envelope"
 	"github.com/spatial-go/geoos/index"
 )
 
@@ -12,14 +12,14 @@ import (
 type Node struct {
 	Items            []interface{}
 	Subnode          [4]*Node
-	Env              *matrix.Envelope
+	Env              *envelope.Envelope
 	Centrex, Centrey float64
 	Level            int
 }
 
 // SubnodeIndex Gets the index of the subquad that wholly contains the given envelope.
 // If none does, returns -1.
-func SubnodeIndex(env *matrix.Envelope, centrex, centrey float64) int {
+func SubnodeIndex(env *envelope.Envelope, centrex, centrey float64) int {
 
 	subnodeIndex := -1
 	if env.MinX >= centrex {
@@ -42,15 +42,15 @@ func SubnodeIndex(env *matrix.Envelope, centrex, centrey float64) int {
 }
 
 // CreateNode ...
-func CreateNode(env *matrix.Envelope) *Node {
+func CreateNode(env *envelope.Envelope) *Node {
 	key := KeyEnv(env)
 	node := NodeEnv(key.Env, key.Level)
 	return node
 }
 
 // CreateExpanded ...
-func CreateExpanded(node *Node, addEnv *matrix.Envelope) *Node {
-	expandEnv := matrix.EnvelopeEnv(addEnv)
+func CreateExpanded(node *Node, addEnv *envelope.Envelope) *Node {
+	expandEnv := envelope.Env(addEnv)
 	if node != nil {
 		expandEnv.ExpandToIncludeEnv(node.Env)
 	}
@@ -62,7 +62,7 @@ func CreateExpanded(node *Node, addEnv *matrix.Envelope) *Node {
 }
 
 // NodeEnv ...
-func NodeEnv(env *matrix.Envelope, level int) *Node {
+func NodeEnv(env *envelope.Envelope, level int) *Node {
 	n := &Node{}
 	//this.parent = parent;
 	n.Env = env
@@ -88,7 +88,7 @@ func (n *Node) Add(item interface{}) {
 }
 
 // Remove Removes a single item from this subtree.
-func (n *Node) Remove(itemEnv *matrix.Envelope, item interface{}) bool {
+func (n *Node) Remove(itemEnv *envelope.Envelope, item interface{}) bool {
 	// use envelope to restrict nodes scanned
 	if !n.IsSearchMatch(itemEnv) {
 		return false
@@ -143,7 +143,7 @@ func (n *Node) HasChildren() bool {
 }
 
 // Visit ...
-func (n *Node) Visit(searchEnv *matrix.Envelope, visitor index.ItemVisitor) {
+func (n *Node) Visit(searchEnv *envelope.Envelope, visitor index.ItemVisitor) {
 	if !n.IsSearchMatch(searchEnv) {
 		return
 	}
@@ -159,7 +159,7 @@ func (n *Node) Visit(searchEnv *matrix.Envelope, visitor index.ItemVisitor) {
 }
 
 // VisitItems ...
-func (n *Node) VisitItems(searchEnv, nodeEnv *matrix.Envelope, visitor index.ItemVisitor) {
+func (n *Node) VisitItems(searchEnv, nodeEnv *envelope.Envelope, visitor index.ItemVisitor) {
 	// would be nice to filter items based on search envelope, but can't until they contain an envelope
 	for _, v := range n.Items {
 		if searchEnv.IsIntersects(nodeEnv) {
@@ -229,7 +229,7 @@ func (n *Node) IsEmpty() bool {
 }
 
 // IsSearchMatch ...
-func (n *Node) IsSearchMatch(searchEnv *matrix.Envelope) bool {
+func (n *Node) IsSearchMatch(searchEnv *envelope.Envelope) bool {
 	if searchEnv == nil {
 		return false
 	}
@@ -238,7 +238,7 @@ func (n *Node) IsSearchMatch(searchEnv *matrix.Envelope) bool {
 
 // GetNode Returns the subquad containing the envelope searchEnv.
 // Creates the subquad if it does not already exist.
-func (n *Node) GetNode(searchEnv *matrix.Envelope) *Node {
+func (n *Node) GetNode(searchEnv *envelope.Envelope) *Node {
 	subnodeIndex := SubnodeIndex(searchEnv, n.Centrex, n.Centrey)
 	// if subquadIndex is -1 searchEnv is not contained in a subquad
 	if subnodeIndex != -1 {
@@ -251,7 +251,7 @@ func (n *Node) GetNode(searchEnv *matrix.Envelope) *Node {
 }
 
 // Find Returns the smallest existing  node containing the envelope.
-func (n *Node) Find(searchEnv *matrix.Envelope) *Node {
+func (n *Node) Find(searchEnv *envelope.Envelope) *Node {
 	subnodeIndex := SubnodeIndex(searchEnv, n.Centrex, n.Centrey)
 	if subnodeIndex == -1 {
 		return n
@@ -322,7 +322,7 @@ func (n *Node) CreateSubnode(index int) *Node {
 		miny = n.Centrey
 		maxy = n.Env.MaxY
 	}
-	sqEnv := matrix.EnvelopeF(minx, maxx, miny, maxy)
+	sqEnv := envelope.FourFloat(minx, maxx, miny, maxy)
 	node := NodeEnv(sqEnv, n.Level-1)
 	return node
 }

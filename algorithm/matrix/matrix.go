@@ -20,15 +20,15 @@ type Steric interface {
 	// Equals returns true if the Geometry represents the same Geometry or vector.
 	Equals(s Steric) bool
 
+	// EqualsExact Returns true if the two Geometrys are exactly equal,
+	// up to a specified distance tolerance.
+	// Two Geometries are exactly equal within a distance tolerance
+	EqualsExact(g Steric, tolerance float64) bool
+
 	// IsEmpty returns true if the Matrix is empty.
 	IsEmpty() bool
 
 	Bound() []Matrix
-}
-
-// LineSegment is line.
-type LineSegment struct {
-	P0, P1 Matrix
 }
 
 // Matrix is a one-dimensional matrix.
@@ -244,7 +244,7 @@ func (c Collection) Bound() []Matrix {
 	return b
 }
 
-// Equals returns  true if the two MultiPolygonMatrix are equal
+// Equals returns  true if the two Collection are equal
 func (c Collection) Equals(ms Steric) bool {
 	if mm, ok := ms.(Collection); ok {
 		// If one is nil, the other must also be nil.
@@ -258,6 +258,28 @@ func (c Collection) Equals(ms Steric) bool {
 
 		for i := range mm {
 			if !c[i].Equals(mm[i]) {
+				return false
+			}
+		}
+		return true
+	}
+	return false
+}
+
+// EqualsExact returns  true if the two Collection are equalexact
+func (c Collection) EqualsExact(ms Steric, tolerance float64) bool {
+	if mm, ok := ms.(Collection); ok {
+		// If one is nil, the other must also be nil.
+		if (mm == nil) != (c == nil) {
+			return false
+		}
+
+		if len(mm) != len(c) {
+			return false
+		}
+
+		for i := range mm {
+			if !c[i].EqualsExact(mm[i], tolerance) {
 				return false
 			}
 		}
@@ -311,6 +333,27 @@ func (m Matrix) Equals(ms Steric) bool {
 	return false
 }
 
+// EqualsExact returns  true if the two Matrix are equalexact
+func (m Matrix) EqualsExact(ms Steric, tolerance float64) bool {
+	if mm, ok := ms.(Matrix); ok {
+		// If one is nil, the other must also be nil.
+		if (mm == nil) != (m == nil) {
+			return false
+		}
+
+		if len(mm) != len(m) {
+			return false
+		}
+
+		if tolerance == 0 {
+			return m.Equals(ms)
+		}
+
+		return math.Sqrt((m[0]-mm[0])*(m[0]-mm[0])+(m[1]-mm[1])*(m[1]-mm[1])) <= tolerance
+	}
+	return false
+}
+
 // Equals returns  true if the two LineMatrix are equal
 func (l LineMatrix) Equals(ms Steric) bool {
 	if mm, ok := ms.(LineMatrix); ok {
@@ -325,6 +368,28 @@ func (l LineMatrix) Equals(ms Steric) bool {
 
 		for i := range mm {
 			if !Matrix(l[i]).Equals(Matrix(mm[i])) {
+				return false
+			}
+		}
+		return true
+	}
+	return false
+}
+
+// EqualsExact returns  true if the two Matrix are equalexact
+func (l LineMatrix) EqualsExact(ms Steric, tolerance float64) bool {
+	if mm, ok := ms.(LineMatrix); ok {
+		// If one is nil, the other must also be nil.
+		if (mm == nil) != (l == nil) {
+			return false
+		}
+
+		if len(mm) != len(l) {
+			return false
+		}
+
+		for i := range mm {
+			if !Matrix(l[i]).EqualsExact(Matrix(mm[i]), tolerance) {
 				return false
 			}
 		}
@@ -355,6 +420,28 @@ func (p PolygonMatrix) Equals(ms Steric) bool {
 	return false
 }
 
+// EqualsExact returns  true if the two Matrix are equalexact
+func (p PolygonMatrix) EqualsExact(ms Steric, tolerance float64) bool {
+	if mm, ok := ms.(PolygonMatrix); ok {
+		// If one is nil, the other must also be nil.
+		if (mm == nil) != (p == nil) {
+			return false
+		}
+
+		if len(mm) != len(p) {
+			return false
+		}
+
+		for i := range mm {
+			if !LineMatrix(p[i]).EqualsExact(LineMatrix(mm[i]), tolerance) {
+				return false
+			}
+		}
+		return true
+	}
+	return false
+}
+
 // Equals returns  true if the two MultiPolygonMatrix are equal
 func (m MultiPolygonMatrix) Equals(ms Steric) bool {
 	if mm, ok := ms.(MultiPolygonMatrix); ok {
@@ -369,6 +456,27 @@ func (m MultiPolygonMatrix) Equals(ms Steric) bool {
 
 		for i := range mm {
 			if !PolygonMatrix(m[i]).Equals(PolygonMatrix(mm[i])) {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+// EqualsExact returns  true if the two Matrix are equalexact
+func (m MultiPolygonMatrix) EqualsExact(ms Steric, tolerance float64) bool {
+	if mm, ok := ms.(MultiPolygonMatrix); ok {
+		// If one is nil, the other must also be nil.
+		if (mm == nil) != (m == nil) {
+			return false
+		}
+
+		if len(mm) != len(m) {
+			return false
+		}
+
+		for i := range mm {
+			if !PolygonMatrix(m[i]).EqualsExact(PolygonMatrix(mm[i]), tolerance) {
 				return false
 			}
 		}

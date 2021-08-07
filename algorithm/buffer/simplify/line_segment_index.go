@@ -2,6 +2,7 @@ package simplify
 
 import (
 	"github.com/spatial-go/geoos/algorithm/matrix"
+	"github.com/spatial-go/geoos/algorithm/matrix/envelope"
 	"github.com/spatial-go/geoos/index"
 	"github.com/spatial-go/geoos/index/quadtree"
 )
@@ -23,17 +24,17 @@ func (l *LineSegmentIndex) Add(line matrix.LineMatrix) {
 
 // AddSegment add a LineSegment.
 func (l *LineSegmentIndex) AddSegment(seg *matrix.LineSegment) {
-	l.index.Insert(matrix.EnvelopeTwoMatrix(seg.P0, seg.P1), seg)
+	l.index.Insert(envelope.TwoMatrix(seg.P0, seg.P1), seg)
 }
 
 // Remove remove a TaggedLineSegment.
 func (l *LineSegmentIndex) Remove(seg *TaggedLineSegment) {
-	l.index.Remove(matrix.EnvelopeTwoMatrix(seg.P0, seg.P1), seg.LineSegment)
+	l.index.Remove(envelope.TwoMatrix(seg.P0, seg.P1), seg.LineSegment)
 }
 
 // Query query LineSegment returns array TaggedLineSegment.
 func (l *LineSegmentIndex) Query(querySeg *matrix.LineSegment) []*matrix.LineSegment {
-	env := matrix.EnvelopeTwoMatrix(querySeg.P0, querySeg.P1)
+	env := envelope.TwoMatrix(querySeg.P0, querySeg.P1)
 
 	visitor := &index.LineSegmentVisitor{QuerySeg: querySeg}
 	l.index.QueryVisitor(env, visitor)

@@ -28,6 +28,9 @@ var ErrWrongTolerance = fmt.Errorf("Tolerance must be non-negative")
 // ErrWrongExponent ...
 var ErrWrongExponent = fmt.Errorf("Exponent out of bounds")
 
+// ErrComputeOffsetZero ...
+var ErrComputeOffsetZero = fmt.Errorf("Cannot compute offset from zero-length line segment")
+
 // ErrUnknownType ...
 func ErrUnknownType(obj ...interface{}) error {
 	return fmt.Errorf("Unknown Geometry subtype: %v", obj...)

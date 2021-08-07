@@ -1,8 +1,11 @@
 package overlay
 
 import (
+	"sort"
+
 	"github.com/spatial-go/geoos/algorithm/algoerr"
 	"github.com/spatial-go/geoos/algorithm/matrix"
+	"github.com/spatial-go/geoos/algorithm/relate"
 )
 
 // LineOverlay  Computes the overlay of two geometries,either or both of which may be nil.
@@ -82,4 +85,88 @@ func (p *LineOverlay) SymDifference() (matrix.Steric, error) {
 		result = append(result, res)
 	}
 	return result, nil
+}
+
+// IntersectLine returns a array  that represents that part of geometry A intersect with geometry B.
+func IntersectLine(m, m1 matrix.LineMatrix) []IntersectionLineSegment {
+	mark, ips := relate.IntersectionEdge(m, m1)
+	if !mark || len(ips) <= 1 {
+		return nil
+	}
+	ils := []IntersectionLineSegment{}
+	il := IntersectionLineSegment{Ips: relate.IntersectionPointLine{}}
+	for i, line := range m.ToLineArray() {
+		for _, ip := range ips {
+			if relate.InLine(ip.Matrix, line.P0, line.P1) {
+				il.pos = i
+				il.line = *line
+				il.Ips = append(il.Ips, ip)
+			}
+		}
+		if tes, _ := line.P0.Compare(line.P1); tes > 0 {
+			sort.Sort(il.Ips)
+		} else {
+			sort.Sort(sort.Reverse(il.Ips))
+		}
+		if len(il.Ips) > 1 {
+			ils = append(ils, il)
+		}
+		il = IntersectionLineSegment{Ips: relate.IntersectionPointLine{}}
+	}
+
+	return ils
+}
+
+func differenceLine(m, m1 matrix.LineMatrix) (matrix.Steric, error) {
+	mark, ips := relate.IntersectionEdge(m, m1)
+	if !mark || len(ips) <= 1 {
+		return m, nil
+	}
+	ils := []IntersectionLineSegment{}
+	il := IntersectionLineSegment{}
+	for i, line := range m.ToLineArray() {
+		for _, ip := range ips {
+			if relate.InLine(ip.Matrix, line.P0, line.P1) {
+				il.pos = i
+				il.line = *line
+				il.Ips = append(il.Ips, ip)
+			}
+		}
+		sort.Sort(il.Ips)
+		ils = append(ils, il)
+		il = IntersectionLineSegment{}
+	}
+	result := matrix.Collection{}
+	line := matrix.LineMatrix{}
+	startPos := 0
+	for _, v := range ils {
+		if matrix.Matrix(m[v.pos]).Equals(v.Ips[0].Matrix) {
+			line = append(line, m[startPos:v.pos]...)
+		} else {
+			line = append(line, m[startPos:v.pos+1]...)
+			line = append(line, v.Ips[0].Matrix)
+		}
+		if len(line) > 1 {
+			result = append(result, line)
+		}
+		if v.pos < len(m)-1 && matrix.Matrix(m[v.pos+1]).Equals(v.Ips[len(ips)-1].Matrix) {
+			startPos = v.pos + 2
+		} else {
+			startPos = v.pos + 1
+		}
+		line = matrix.LineMatrix{}
+		line = append(line, v.Ips[len(v.Ips)-1].Matrix)
+	}
+	line = append(line, m[startPos:]...)
+	if len(line) > 1 {
+		result = append(result, line)
+	}
+	return result, nil
+}
+
+// IntersectionLineSegment ...
+type IntersectionLineSegment struct {
+	pos  int
+	line matrix.LineSegment
+	Ips  relate.IntersectionPointLine
 }

@@ -2,6 +2,22 @@ package calc
 
 import "math"
 
+const (
+
+	// OffsetSegmentSeparationFactor  Factor which controls how close offset segments can be to
+	//   skip adding a filler or mitre.
+	OffsetSegmentSeparationFactor = 1.0e-3
+
+	// InsideTurnVertexSnapDistanceFactor Factor which controls how close curve vertices on inside turns can be to be snapped
+	InsideTurnVertexSnapDistanceFactor = 1.0e-3
+
+	// CurveVertexSnapDistanceFactor Factor which controls how close curve vertices can be to be snapped
+	CurveVertexSnapDistanceFactor = 1.0e-6
+
+	// MaxClosingSegLenFactor Factor which determines how short closing segs can be for round buffers
+	MaxClosingSegLenFactor = 80
+)
+
 // const ...
 const (
 	// DegreeRad is coefficient to translate from degrees to radians
@@ -34,7 +50,9 @@ const (
 // const default parameters.
 const (
 	// CLOCKWISE ...
-	CLOCKWISE = -1
+	CLOCKWISE        = -1
+	COUNTERCLOCKWISE = 1
+
 	// ANGLE ...
 	ANGLE = 2.0
 

@@ -2,6 +2,7 @@ package quadtree
 
 import (
 	"github.com/spatial-go/geoos/algorithm/matrix"
+	"github.com/spatial-go/geoos/algorithm/matrix/envelope"
 	"github.com/spatial-go/geoos/index"
 )
 
@@ -13,7 +14,7 @@ type Root struct {
 }
 
 // Insert an item into the quadtree this is the root of.
-func (r *Root) Insert(itemEnv *matrix.Envelope, item interface{}) {
+func (r *Root) Insert(itemEnv *envelope.Envelope, item interface{}) {
 
 	index := SubnodeIndex(itemEnv, 0.0, 0.0)
 	// if index is -1, itemEnv must cross the X or Y axis.
@@ -34,7 +35,7 @@ func (r *Root) Insert(itemEnv *matrix.Envelope, item interface{}) {
 
 // InsertContained insert an item which is known to be contained in the tree rooted at
 //  the given QuadNode root.  Lower levels of the tree will be created if necessary to hold the item.
-func (r *Root) InsertContained(tree *Node, itemEnv *matrix.Envelope, item interface{}) {
+func (r *Root) InsertContained(tree *Node, itemEnv *envelope.Envelope, item interface{}) {
 	isZeroX := IsZeroWidth(itemEnv.MinX, itemEnv.MaxX)
 	isZeroY := IsZeroWidth(itemEnv.MinY, itemEnv.MaxY)
 	var node *Node
@@ -47,12 +48,12 @@ func (r *Root) InsertContained(tree *Node, itemEnv *matrix.Envelope, item interf
 }
 
 // IsSearchMatch ...
-func (r *Root) IsSearchMatch(searchEnv *matrix.Envelope) bool {
+func (r *Root) IsSearchMatch(searchEnv *envelope.Envelope) bool {
 	return true
 }
 
 // Remove Removes a single item from this subtree.
-func (r *Root) Remove(itemEnv *matrix.Envelope, item interface{}) bool {
+func (r *Root) Remove(itemEnv *envelope.Envelope, item interface{}) bool {
 	// use envelope to restrict nodes scanned
 	if !r.IsSearchMatch(itemEnv) {
 		return false
@@ -81,7 +82,7 @@ func (r *Root) Remove(itemEnv *matrix.Envelope, item interface{}) bool {
 }
 
 // Visit ...
-func (r *Root) Visit(searchEnv *matrix.Envelope, visitor index.ItemVisitor) {
+func (r *Root) Visit(searchEnv *envelope.Envelope, visitor index.ItemVisitor) {
 	if !r.IsSearchMatch(searchEnv) {
 		return
 	}

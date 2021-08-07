@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/spatial-go/geoos/algorithm/matrix"
+	"github.com/spatial-go/geoos/algorithm/matrix/envelope"
 )
 
 var indexTree *Quadtree
@@ -17,7 +18,7 @@ func TestMain(m *testing.M) {
 	segs := lineMatrix.ToLineArray()
 	for i := 0; i < len(segs); i++ {
 		seg := segs[i]
-		indexTree.Insert(matrix.EnvelopeTwoMatrix(seg.P0, seg.P1), seg)
+		indexTree.Insert(envelope.TwoMatrix(seg.P0, seg.P1), seg)
 	}
 	fmt.Println("test start")
 	code := m.Run()
@@ -28,14 +29,14 @@ func TestQuadtree_Insert(t *testing.T) {
 	line := matrix.LineMatrix{{5, 5}, {10, 8}}
 	seg := line.ToLineArray()[0]
 	type args struct {
-		itemEnv *matrix.Envelope
+		itemEnv *envelope.Envelope
 		item    interface{}
 	}
 	tests := []struct {
 		name string
 		args args
 	}{
-		{name: "quadtree insert", args: args{matrix.EnvelopeTwoMatrix(seg.P0, seg.P1), seg}},
+		{name: "quadtree insert", args: args{envelope.TwoMatrix(seg.P0, seg.P1), seg}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -54,7 +55,7 @@ func TestQuadtree_Insert(t *testing.T) {
 func TestQuadtree_Remove(t *testing.T) {
 	seg := lineMatrix.ToLineArray()[0]
 	type args struct {
-		itemEnv *matrix.Envelope
+		itemEnv *envelope.Envelope
 		item    interface{}
 	}
 	tests := []struct {
@@ -62,7 +63,7 @@ func TestQuadtree_Remove(t *testing.T) {
 		args args
 		want bool
 	}{
-		{name: "quadtree remove", args: args{matrix.EnvelopeTwoMatrix(seg.P0, seg.P1), seg}, want: true},
+		{name: "quadtree remove", args: args{envelope.TwoMatrix(seg.P0, seg.P1), seg}, want: true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -77,14 +78,14 @@ func TestQuadtree_Remove(t *testing.T) {
 func TestQuadtree_Query(t *testing.T) {
 	seg := lineMatrix.ToLineArray()[1]
 	type args struct {
-		searchEnv *matrix.Envelope
+		searchEnv *envelope.Envelope
 	}
 	tests := []struct {
 		name string
 		args args
 		want interface{}
 	}{
-		{name: "quadtree query", args: args{matrix.EnvelopeTwoMatrix(seg.P0, seg.P1)}, want: &matrix.LineSegment{P0: seg.P0, P1: seg.P1}},
+		{name: "quadtree query", args: args{envelope.TwoMatrix(seg.P0, seg.P1)}, want: &matrix.LineSegment{P0: seg.P0, P1: seg.P1}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

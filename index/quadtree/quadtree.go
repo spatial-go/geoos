@@ -1,7 +1,7 @@
 package quadtree
 
 import (
-	"github.com/spatial-go/geoos/algorithm/matrix"
+	"github.com/spatial-go/geoos/algorithm/matrix/envelope"
 	"github.com/spatial-go/geoos/index"
 )
 
@@ -17,7 +17,7 @@ type Quadtree struct {
 
 // EnsureExtent Ensure that the envelope for the inserted item has non-zero extents.
 //  Use the current minExtent to pad the envelope, if necessary
-func EnsureExtent(itemEnv *matrix.Envelope, minExtent float64) *matrix.Envelope {
+func EnsureExtent(itemEnv *envelope.Envelope, minExtent float64) *envelope.Envelope {
 
 	minx := itemEnv.MinX
 	maxx := itemEnv.MaxX
@@ -36,7 +36,7 @@ func EnsureExtent(itemEnv *matrix.Envelope, minExtent float64) *matrix.Envelope 
 		miny = miny - minExtent/2.0
 		maxy = maxy + minExtent/2.0
 	}
-	return matrix.EnvelopeF(minx, maxx, miny, maxy)
+	return envelope.FourFloat(minx, maxx, miny, maxy)
 }
 
 // DefaultQuadtree  Constructs a Quadtree with zero items.
@@ -74,32 +74,32 @@ func (q *Quadtree) Size() int {
 }
 
 // Insert insert a single item to the tree.
-func (q *Quadtree) Insert(itemEnv *matrix.Envelope, item interface{}) {
+func (q *Quadtree) Insert(itemEnv *envelope.Envelope, item interface{}) {
 	q.CollectStats(itemEnv)
 	insertEnv := EnsureExtent(itemEnv, q.MinExtent)
 	q.Root.Insert(insertEnv, item)
 }
 
 // Remove Removes a single item from the tree.
-func (q *Quadtree) Remove(itemEnv *matrix.Envelope, item interface{}) bool {
+func (q *Quadtree) Remove(itemEnv *envelope.Envelope, item interface{}) bool {
 	posEnv := EnsureExtent(itemEnv, q.MinExtent)
 	return q.Root.Remove(posEnv, item)
 }
 
 // Query Queries the tree and returns items which may lie in the given search envelope.
-func (q *Quadtree) Query(searchEnv *matrix.Envelope) []interface{} {
+func (q *Quadtree) Query(searchEnv *envelope.Envelope) []interface{} {
 	visitor := &index.ArrayVisitor{}
 	q.QueryVisitor(searchEnv, visitor)
 	return visitor.Items
 }
 
 // QueryVisitor Queries the tree and visits items which may lie in the given search envelope.
-func (q *Quadtree) QueryVisitor(searchEnv *matrix.Envelope, visitor index.ItemVisitor) {
+func (q *Quadtree) QueryVisitor(searchEnv *envelope.Envelope, visitor index.ItemVisitor) {
 	q.Root.Visit(searchEnv, visitor)
 }
 
 // CollectStats ...
-func (q *Quadtree) CollectStats(itemEnv *matrix.Envelope) {
+func (q *Quadtree) CollectStats(itemEnv *envelope.Envelope) {
 	delX := itemEnv.Width()
 	if delX < q.MinExtent && delX > 0.0 {
 		q.MinExtent = delX

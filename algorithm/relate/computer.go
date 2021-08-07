@@ -9,7 +9,7 @@ import (
 // IntersectionPoint overlay point.
 type IntersectionPoint struct {
 	matrix.Matrix
-	IsIntersectionPoint, IsEntering, IsOriginal bool
+	IsIntersectionPoint, IsEntering, IsOriginal, IsCollinear bool
 }
 
 // X Returns x  .
@@ -87,19 +87,19 @@ func Intersection(aStart, aEnd, bStart, bEnd matrix.Matrix) (mark bool, ips Inte
 			isEnter = false
 		}
 		if InLine(bStart, aStart, aEnd) {
-			ips = append(ips, IntersectionPoint{bStart, true, isEnter, true})
+			ips = append(ips, IntersectionPoint{bStart, true, isEnter, true, true})
 			mark = true
 		}
 		if InLine(bEnd, aStart, aEnd) {
-			ips = append(ips, IntersectionPoint{bEnd, true, isEnter, true})
+			ips = append(ips, IntersectionPoint{bEnd, true, isEnter, true, true})
 			mark = true
 		}
 		if InLine(aStart, bStart, bEnd) && !aStart.Equals(bStart) && !aStart.Equals(bEnd) {
-			ips = append(ips, IntersectionPoint{aStart, true, isEnter, true})
+			ips = append(ips, IntersectionPoint{aStart, true, isEnter, true, true})
 			mark = true
 		}
 		if InLine(aEnd, bStart, bEnd) && !aEnd.Equals(bStart) && !aEnd.Equals(bEnd) {
-			ips = append(ips, IntersectionPoint{aEnd, true, isEnter, true})
+			ips = append(ips, IntersectionPoint{aEnd, true, isEnter, true, true})
 			mark = true
 		}
 	} else {
@@ -108,9 +108,9 @@ func Intersection(aStart, aEnd, bStart, bEnd matrix.Matrix) (mark bool, ips Inte
 		// check if point belongs to segment
 		if InLine(ip, aStart, aEnd) && InLine(ip, bStart, bEnd) {
 			if ip.Equals(aStart) || ip.Equals(aEnd) || ip.Equals(bStart) || ip.Equals(bEnd) {
-				ips = append(ips, IntersectionPoint{ip, true, determinant < 0, true})
+				ips = append(ips, IntersectionPoint{ip, true, determinant < 0, true, false})
 			} else {
-				ips = append(ips, IntersectionPoint{ip, true, determinant < 0, false})
+				ips = append(ips, IntersectionPoint{ip, true, determinant < 0, false, false})
 			}
 			mark = true
 		} else {

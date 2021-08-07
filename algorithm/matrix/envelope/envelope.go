@@ -1,9 +1,11 @@
-package matrix
+package envelope
 
 import (
 	"fmt"
 	"math"
 	"strconv"
+
+	"github.com/spatial-go/geoos/algorithm/matrix"
 )
 
 // Envelope Defines a rectangular region of the 2D coordinate plane.
@@ -40,7 +42,7 @@ func (e *Envelope) hashCode(x float64) int {
 }
 
 // IsIntersects Test the point q to see whether it intersects the Envelope defined by p1-p2
-func IsIntersects(p1, p2, q Matrix) bool {
+func IsIntersects(p1, p2, q matrix.Matrix) bool {
 	//OptimizeIt shows that Math#min and Math#max here are a bottleneck.
 	if q[0] >= math.Min(p1[0], p2[0]) && q[0] <= math.Max(p1[0], p2[0]) &&
 		q[1] >= math.Min(p1[1], p2[1]) && q[1] <= math.Max(p1[1], p2[1]) {
@@ -51,7 +53,7 @@ func IsIntersects(p1, p2, q Matrix) bool {
 
 // IsIntersectsTwo  Tests whether the envelope defined by p1-p2
 // and the envelope defined by q1-q2 intersect.
-func IsIntersectsTwo(p1, p2, q1, q2 Matrix) bool {
+func IsIntersectsTwo(p1, p2, q1, q2 matrix.Matrix) bool {
 	minq := math.Min(q1[0], q2[0])
 	maxq := math.Max(q1[0], q2[0])
 	minp := math.Min(p1[0], p2[0])
@@ -71,36 +73,36 @@ func IsIntersectsTwo(p1, p2, q1, q2 Matrix) bool {
 	return true
 }
 
-// EnvelopeEmpty  Creates a null Envelope.
-func EnvelopeEmpty() *Envelope {
+// Empty  Creates a null Envelope.
+func Empty() *Envelope {
 	el := &Envelope{}
 	el.SetToNil()
 	return el
 }
 
-// EnvelopeF  Creates an Envelope for a region defined by maximum and minimum values.
-func EnvelopeF(x1, x2, y1, y2 float64) *Envelope {
+// FourFloat  Creates an Envelope for a region defined by maximum and minimum values.
+func FourFloat(x1, x2, y1, y2 float64) *Envelope {
 	el := &Envelope{}
 	el.initXY(x1, x2, y1, y2)
 	return el
 }
 
-// EnvelopeTwoMatrix  Creates an Envelope for a region defined by two matrix.
-func EnvelopeTwoMatrix(p1, p2 Matrix) *Envelope {
+// TwoMatrix  Creates an Envelope for a region defined by two matrix.
+func TwoMatrix(p1, p2 matrix.Matrix) *Envelope {
 	el := &Envelope{}
 	el.initXY(p1[0], p2[0], p1[1], p2[1])
 	return el
 }
 
-// EnvelopeMatrix  Creates an Envelope for a region defined by a single matrix.
-func EnvelopeMatrix(p Matrix) *Envelope {
+// Matrix  Creates an Envelope for a region defined by a single matrix.
+func Matrix(p matrix.Matrix) *Envelope {
 	el := &Envelope{}
 	el.initXY(p[0], p[0], p[1], p[1])
 	return el
 }
 
-// EnvelopeEnv  Create an Envelope from an existing Envelope.
-func EnvelopeEnv(env *Envelope) *Envelope {
+// Env  Create an Envelope from an existing Envelope.
+func Env(env *Envelope) *Envelope {
 	el := &Envelope{}
 	el.initEnvelope(env)
 	return el
@@ -126,7 +128,7 @@ func (e *Envelope) initXY(x1, x2, y1, y2 float64) {
 
 // Copy Creates a copy of this envelope object.
 func (e *Envelope) Copy() *Envelope {
-	return EnvelopeEnv(e)
+	return Env(e)
 }
 
 // initEnvelope Initialize an Envelope from an existing Envelope.
@@ -212,7 +214,7 @@ func (e *Envelope) MaxExtent() float64 {
 }
 
 // ExpandToIncludeMatrix Enlarges this Envelope so that it contains
-func (e *Envelope) ExpandToIncludeMatrix(p Matrix) {
+func (e *Envelope) ExpandToIncludeMatrix(p matrix.Matrix) {
 	e.ExpandToInclude(p[0], p[1])
 }
 
@@ -301,11 +303,11 @@ func (e *Envelope) Translate(transX, transY float64) {
 }
 
 // Centre Computes the coordinate of the centre of this envelope (as long as it is non-null
-func (e *Envelope) Centre() Matrix {
+func (e *Envelope) Centre() matrix.Matrix {
 	if e.IsNil() {
 		return nil
 	}
-	return Matrix{
+	return matrix.Matrix{
 		(e.MinX + e.MaxX) / 2.0,
 		(e.MinY + e.MaxY) / 2.0,
 	}
@@ -320,7 +322,7 @@ func (e *Envelope) Intersection(env *Envelope) *Envelope {
 	e.MinY = math.Max(e.MinY, env.MinY)
 	e.MaxX = math.Min(e.MaxX, env.MaxX)
 	e.MaxY = math.Min(e.MaxY, env.MaxY)
-	return EnvelopeF(e.MinX, e.MaxX, e.MinY, e.MaxY)
+	return FourFloat(e.MinX, e.MaxX, e.MinY, e.MaxY)
 }
 
 // IsIntersects Tests if the region defined by other

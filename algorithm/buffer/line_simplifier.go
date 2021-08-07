@@ -40,6 +40,7 @@ func (l *LineSimplifier) Simplify(distanceTol float64) matrix.LineMatrix {
 	}
 
 	// rely on fact that boolean array is filled with false value
+	l.isDeleted = make([]byte, len(l.inputLine))
 
 	for isChanged := false; isChanged; isChanged = l.deleteShallowConcavities() {
 
