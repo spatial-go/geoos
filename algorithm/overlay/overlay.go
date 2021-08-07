@@ -3,6 +3,8 @@ package overlay
 import (
 	"github.com/spatial-go/geoos/algorithm/algoerr"
 	"github.com/spatial-go/geoos/algorithm/matrix"
+	"github.com/spatial-go/geoos/algorithm/matrix/envelope"
+	"github.com/spatial-go/geoos/algorithm/relate"
 )
 
 // Overlay  Computes the overlay of two geometries,either or both of which may be nil.
@@ -47,13 +49,26 @@ func (p *PointOverlay) Intersection() (matrix.Steric, error) {
 	if res, ok := p.intersectionCheck(); !ok {
 		return res, nil
 	}
-	if s, ok := p.subject.(matrix.Matrix); ok {
-		if c, ok := p.clipping.(matrix.Matrix); ok {
-			if s.Equals(c) {
-				return s, nil
-			}
-			return nil, nil
+	if _, ok := p.subject.(matrix.Matrix); !ok {
+		return nil, algoerr.ErrNotMatchType
+	}
+	switch c := p.clipping.(type) {
+	case matrix.Matrix:
+		if p.subject.(matrix.Matrix).Equals(c) {
+			return p.subject.(matrix.Matrix), nil
 		}
+		return nil, nil
+	case matrix.LineMatrix:
+		if mark := relate.InLineMatrix(p.subject.(matrix.Matrix), c); mark {
+			return p.subject.(matrix.Matrix), nil
+		}
+		return nil, nil
+	case matrix.PolygonMatrix:
+		inter := envelope.Bound(c.Bound()).IsIntersects(envelope.Bound(p.subject.Bound()))
+		if mark := relate.IM(c, p.subject.(matrix.Matrix), inter).IsCovers(); mark {
+			return p.subject.(matrix.Matrix), nil
+		}
+		return nil, nil
 	}
 	return nil, algoerr.ErrNotMatchType
 }

@@ -101,6 +101,12 @@ func Matrix(p matrix.Matrix) *Envelope {
 	return el
 }
 
+// Bound  Creates an Envelope for a region defined by a single matrix.
+func Bound(b []matrix.Matrix) *Envelope {
+	el := TwoMatrix(b[0], b[1])
+	return el
+}
+
 // Env  Create an Envelope from an existing Envelope.
 func Env(env *Envelope) *Envelope {
 	el := &Envelope{}

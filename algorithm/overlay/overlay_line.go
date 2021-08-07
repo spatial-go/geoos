@@ -31,14 +31,49 @@ func (p *LineOverlay) Intersection() (matrix.Steric, error) {
 	if res, ok := p.intersectionCheck(); !ok {
 		return res, nil
 	}
-	if s, ok := p.subject.(matrix.LineMatrix); ok {
-		if c, ok := p.clipping.(matrix.LineMatrix); ok {
-			result := matrix.Collection{}
-			for _, il := range IntersectLine(s, c) {
-				result = append(result, matrix.LineMatrix{il.line.P0, il.line.P1})
-			}
-			return LineMerge(result), nil
+	var line matrix.LineMatrix
+	if l, ok := p.subject.(matrix.LineMatrix); ok {
+		line = l
+	} else {
+		return nil, algoerr.ErrNotMatchType
+	}
+	switch c := p.clipping.(type) {
+	case matrix.Matrix:
+		if mark := relate.InLineMatrix(c, line); mark {
+			return c, nil
 		}
+		return nil, nil
+	case matrix.LineMatrix:
+		result := matrix.Collection{}
+		ils := IntersectLine(line, c)
+		for _, il := range ils {
+			if len(il.Ips) > 1 {
+				var ipline matrix.LineMatrix
+				for _, v := range il.Ips {
+					ipline = append(ipline, v.Matrix)
+				}
+				result = append(result, ipline)
+			} else {
+				result = append(result, il.Ips[0].Matrix)
+			}
+		}
+		return LineMerge(result), nil
+	case matrix.PolygonMatrix:
+		result := matrix.Collection{}
+		for _, ring := range c {
+			for _, il := range IntersectLine(line, ring) {
+				if len(il.Ips) > 1 {
+					var ipline matrix.LineMatrix
+					for _, v := range il.Ips {
+						ipline = append(ipline, v.Matrix)
+					}
+					result = append(result, ipline)
+				} else {
+					result = append(result, il.Ips[0].Matrix)
+				}
+			}
+		}
+		return LineMerge(result), nil
 	}
 	return nil, algoerr.ErrNotMatchType
 }
@@ -54,9 +89,6 @@ func (p *LineOverlay) Difference() (matrix.Steric, error) {
 		if c, ok := p.clipping.(matrix.LineMatrix); ok {
 			var err error
 			if result, err := differenceLine(s, c); err == nil {
-				if len(result.(matrix.Collection)) == 1 {
-					return result.(matrix.Collection)[0], nil
-				}
 				return result, nil
 			}
 			return nil, err
@@ -90,7 +122,7 @@ func (p *LineOverlay) SymDifference() (matrix.Steric, error) {
 // IntersectLine returns a array  that represents that part of geometry A intersect with geometry B.
 func IntersectLine(m, m1 matrix.LineMatrix) []IntersectionLineSegment {
 	mark, ips := relate.IntersectionEdge(m, m1)
-	if !mark || len(ips) <= 1 {
+	if !mark || len(ips) < 1 {
 		return nil
 	}
 	ils := []IntersectionLineSegment{}
@@ -108,7 +140,7 @@ func IntersectLine(m, m1 matrix.LineMatrix) []IntersectionLineSegment {
 		} else {
 			sort.Sort(sort.Reverse(il.Ips))
 		}
-		if len(il.Ips) > 1 {
+		if len(il.Ips) > 0 {
 			ils = append(ils, il)
 		}
 		il = IntersectionLineSegment{Ips: relate.IntersectionPointLine{}}

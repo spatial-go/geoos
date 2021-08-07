@@ -624,6 +624,19 @@ func TestAlgorithm_PointOnSurface(t *testing.T) {
 }
 
 func TestAlgorithm_Relate(t *testing.T) {
+
+	type args struct {
+		g1 space.Geometry
+		g2 space.Geometry
+	}
+	type TestStruct struct {
+		name    string
+		args    args
+		want    string
+		wantErr bool
+	}
+	tests := []TestStruct{}
+
 	g0 := space.Point{3, 3}
 
 	g1 := space.LineString{{3, 3}, {3, 4}}
@@ -637,17 +650,6 @@ func TestAlgorithm_Relate(t *testing.T) {
 		{{{5, 5}, {5, 6}, {6, 6}, {6, 5}, {5, 5}}},
 		{{{3, 3}, {3, 4}, {4, 4}, {4, 3}, {3, 3}}},
 	}
-	type args struct {
-		g1 space.Geometry
-		g2 space.Geometry
-	}
-	type TestStruct struct {
-		name    string
-		args    args
-		want    string
-		wantErr bool
-	}
-	tests := []TestStruct{}
 	pts := []space.Point{{3, 3}, {4, 4}}
 	wants1 := []string{"0FFFFFFF2", "FF0FFF0F2"}
 	for i, v := range pts {
@@ -684,6 +686,9 @@ func TestAlgorithm_Relate(t *testing.T) {
 		args{space.Point{1, 1}, space.LineString{{0, 0}, {1, 1}, {0, 2}}}, "0FFFFF102", false})
 	tests = append(tests, TestStruct{fmt.Sprintf("linepoint%v", "01"),
 		args{space.Point{0, 2}, space.LineString{{0, 0}, {1, 1}, {0, 2}}}, "F0FFFF102", false})
+	// tests = append(tests, TestStruct{fmt.Sprintf("polyPoly%v", "0f"),
+	// 	args{space.Polygon{{{100, 100}, {100, 101}, {101, 101}, {101, 100}, {100, 100}}},
+	// 		space.Polygon{{{90, 90}, {90, 101}, {101, 101}, {101, 90}, {90, 90}}}}, "2FF11F212", false})
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

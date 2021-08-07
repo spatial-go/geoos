@@ -56,20 +56,24 @@ func findLinearIntersections(g1 matrix.LineMatrix, g2 matrix.Steric) (forwDir []
 		for _, v := range ml {
 			ils := overlay.IntersectLine(g1, v.(matrix.LineMatrix))
 			for _, il := range ils {
-				if !il.Ips[1].IsEntering {
-					forwDir = append(forwDir, matrix.LineMatrix{il.Ips[0].Matrix, il.Ips[1].Matrix})
-				} else {
-					backDir = append(backDir, matrix.LineMatrix{il.Ips[0].Matrix, il.Ips[1].Matrix})
+				if len(il.Ips) > 1 {
+					if !il.Ips[1].IsEntering {
+						forwDir = append(forwDir, matrix.LineMatrix{il.Ips[0].Matrix, il.Ips[1].Matrix})
+					} else {
+						backDir = append(backDir, matrix.LineMatrix{il.Ips[0].Matrix, il.Ips[1].Matrix})
+					}
 				}
 			}
 		}
 	} else {
 		ils := overlay.IntersectLine(g1, g2.(matrix.LineMatrix))
 		for _, il := range ils {
-			if !il.Ips[1].IsEntering {
-				forwDir = append(forwDir, matrix.LineMatrix{il.Ips[0].Matrix, il.Ips[1].Matrix})
-			} else {
-				backDir = append(backDir, matrix.LineMatrix{il.Ips[0].Matrix, il.Ips[1].Matrix})
+			if len(il.Ips) > 1 {
+				if !il.Ips[1].IsEntering {
+					forwDir = append(forwDir, matrix.LineMatrix{il.Ips[0].Matrix, il.Ips[1].Matrix})
+				} else {
+					backDir = append(backDir, matrix.LineMatrix{il.Ips[0].Matrix, il.Ips[1].Matrix})
+				}
 			}
 		}
 	}

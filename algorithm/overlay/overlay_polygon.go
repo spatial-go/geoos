@@ -5,6 +5,7 @@ import (
 	"github.com/spatial-go/geoos/algorithm/algoerr"
 	"github.com/spatial-go/geoos/algorithm/calc"
 	"github.com/spatial-go/geoos/algorithm/matrix"
+	"github.com/spatial-go/geoos/algorithm/matrix/envelope"
 	"github.com/spatial-go/geoos/algorithm/relate"
 )
 
@@ -37,15 +38,53 @@ func (p *PolygonOverlay) Intersection() (matrix.Steric, error) {
 	if res, ok := p.intersectionCheck(); !ok {
 		return res, nil
 	}
-	if _, ok := p.subject.(matrix.PolygonMatrix); ok {
-		if _, ok := p.clipping.(matrix.PolygonMatrix); ok {
-			cpo := &ComputeClipOverlay{p}
+	var poly matrix.PolygonMatrix
+	if p, ok := p.subject.(matrix.PolygonMatrix); ok {
+		poly = p
+	} else {
+		return nil, algoerr.ErrNotMatchType
+	}
+	switch c := p.clipping.(type) {
+	case matrix.Matrix:
 
-			cpo.prepare()
-			_, exitingPoints := cpo.Weiler()
-			result := ToPolygonMatrix(cpo.ComputePolygon(exitingPoints, cpo))
-			return result, nil
+		inter := envelope.Bound(poly.Bound()).IsIntersects(envelope.Bound(c.Bound()))
+		if mark := relate.IM(poly, c, inter).IsContains(); mark {
+			return c, nil
 		}
+		return nil, nil
+	case matrix.LineMatrix:
+		result := matrix.Collection{}
+		for _, ring := range poly {
+			for _, il := range IntersectLine(c, ring) {
+				if len(il.Ips) > 1 {
+					var ipline matrix.LineMatrix
+					for _, v := range il.Ips {
+						ipline = append(ipline, v.Matrix)
+					}
+					result = append(result, ipline)
+				} else {
+					result = append(result, il.Ips[0].Matrix)
+				}
+			}
+		}
+		return LineMerge(result), nil
+	case matrix.PolygonMatrix:
+
+		inter := envelope.Bound(poly.Bound()).IsIntersects(envelope.Bound(c.Bound()))
+		im := relate.IM(poly, c, inter)
+		if mark := im.IsContains(); mark {
+			return c, nil
+		}
+		if mark := im.IsWithin(); mark {
+			return poly, nil
+		}
+
+		cpo := &ComputeClipOverlay{p}
+
+		cpo.prepare()
+		_, exitingPoints := cpo.Weiler()
+		result := ToPolygonMatrix(cpo.ComputePolygon(exitingPoints, cpo))
+		return result, nil
 	}
 	return nil, algoerr.ErrNotMatchType
 }
@@ -175,7 +214,7 @@ func (p *PolygonOverlay) ComputePolygon(exitingPoints []algorithm.Vertex, cpo Co
 
 // ToPolygonMatrix ...
 func ToPolygonMatrix(poly *algorithm.Plane) matrix.PolygonMatrix {
-	var result matrix.PolygonMatrix
+	result := matrix.PolygonMatrix{}
 	for _, v2 := range poly.Rings {
 		var edge matrix.LineMatrix
 		for _, v1 := range v2.Vertexs {
