@@ -1,4 +1,4 @@
-package algorithm
+package overlay
 
 import (
 	"strconv"
@@ -26,7 +26,7 @@ func (p *Plane) AddPointWhich(point *Vertex, which bool) {
 		p.Rings = append(p.Rings, &newCirCuit)
 		p.Edge.NowStatus = 0
 	} else {
-		if len(p.Edge.Vertexs) >= 1 && p.Edge.Vertexs[len(p.Edge.Vertexs)-1].Equals(Vertex{Matrix: matrix.Matrix{point.X(), point.Y()}}) {
+		if len(p.Edge.Vertexs) >= 1 && p.Edge.Vertexs[len(p.Edge.Vertexs)-1].Matrix.Equals(point.Matrix) {
 			return
 		}
 		p.Edge.Vertexs = append(p.Edge.Vertexs, Vertex{Matrix: matrix.Matrix{point.X(), point.Y()}})

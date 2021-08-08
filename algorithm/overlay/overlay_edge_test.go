@@ -1,4 +1,4 @@
-package algorithm
+package overlay
 
 import (
 	"reflect"

@@ -904,6 +904,16 @@ func TestGEOSAlgorithm_SymDifference(t *testing.T) {
 		wantErr bool
 	}{
 		{name: "symDifference", args: args{g1: line01, g2: line02}, want: expectMultiLines},
+		{name: "difference poly poly1", args: args{g1: space.Polygon{{{100, 100}, {100, 101}, {101, 101}, {101, 100}, {100, 100}}},
+			g2: space.Polygon{{{90, 90}, {90, 101}, {101, 101}, {101, 90}, {90, 90}}}},
+			want:    space.Polygon{{{100, 101}, {100, 100}, {101, 100}, {101, 90}, {90, 90}, {90, 101}, {100, 101}}},
+			wantErr: false,
+		},
+		{name: "difference poly poly2", args: args{g1: space.Polygon{{{90, 90}, {90, 101}, {101, 101}, {101, 90}, {90, 90}}},
+			g2: space.Polygon{{{100, 100}, {100, 101}, {101, 101}, {101, 100}, {100, 100}}}},
+			want:    space.Polygon{{{90, 90}, {90, 101}, {100, 101}, {100, 100}, {101, 100}, {101, 90}, {90, 90}}},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -936,6 +946,16 @@ func TestGEOSAlgorithm_Difference(t *testing.T) {
 		wantErr bool
 	}{
 		{name: "difference", args: args{g1: line01, g2: line02}, want: expectLine},
+		{name: "difference poly poly1", args: args{g1: space.Polygon{{{100, 100}, {100, 101}, {101, 101}, {101, 100}, {100, 100}}},
+			g2: space.Polygon{{{90, 90}, {90, 101}, {101, 101}, {101, 90}, {90, 90}}}},
+			want:    space.Polygon{},
+			wantErr: false,
+		},
+		{name: "difference poly poly2", args: args{g1: space.Polygon{{{90, 90}, {90, 101}, {101, 101}, {101, 90}, {90, 90}}},
+			g2: space.Polygon{{{100, 100}, {100, 101}, {101, 101}, {101, 100}, {100, 100}}}},
+			want:    space.Polygon{{{90, 90}, {90, 101}, {100, 101}, {100, 100}, {101, 100}, {101, 90}, {90, 90}}},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1171,6 +1191,10 @@ func TestGEOSAlgorithm_Intersection(t *testing.T) {
 	}{
 		{name: "intersection", args: args{g1: point02, g2: point02}, want: expectPoint, wantErr: false},
 		{name: "intersection", args: args{g1: point02, g2: line02}, want: expectPoint, wantErr: false},
+		{name: "poly poly1", args: args{space.Polygon{{{100, 100}, {100, 101}, {101, 101}, {101, 100}, {102, 100}, {102, 99}, {100, 99}, {100, 100}}},
+			space.Polygon{{{90, 90}, {90, 101}, {101, 101}, {101, 90}, {90, 90}}},
+		},
+			want: space.Polygon{{{100, 100}, {100, 101}, {101, 101}, {101, 100}, {101, 99}, {100, 99}, {100, 100}}}, wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

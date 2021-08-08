@@ -1,17 +1,17 @@
 package overlay
 
 import (
+	"reflect"
 	"testing"
 
-	"github.com/spatial-go/geoos/algorithm"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 )
 
 func TestPolygonOverlay_Intersection(t *testing.T) {
 	type fields struct {
 		PointOverlay  *PointOverlay
-		subjectPlane  *algorithm.Plane
-		clippingPlane *algorithm.Plane
+		subjectPlane  *Plane
+		clippingPlane *Plane
 	}
 	tests := []struct {
 		name    string
@@ -39,7 +39,7 @@ func TestPolygonOverlay_Intersection(t *testing.T) {
 		{"poly poly1", fields{PointOverlay: &PointOverlay{matrix.PolygonMatrix{{{100, 100}, {100, 101}, {101, 101}, {101, 100}, {100, 100}}},
 			matrix.PolygonMatrix{{{90, 90}, {90, 101}, {101, 101}, {101, 90}, {90, 90}}},
 		}},
-			matrix.PolygonMatrix{{{100, 100}, {100, 101}, {101, 101}, {101, 100}, {100, 100}}}, false},
+			matrix.PolygonMatrix{{{101, 100}, {100, 100}, {100, 101}, {101, 101}, {101, 100}}}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -54,7 +54,144 @@ func TestPolygonOverlay_Intersection(t *testing.T) {
 				return
 			}
 			if !got.Equals(tt.want) {
-				t.Errorf("PolygonOverlay.Intersection()%v = %v, want %v type %T, want %T", tt.name, got, tt.want, got, tt.want)
+				t.Errorf("PolygonOverlay.Intersection()%v = %v, \nwant %v type %T, want %T", tt.name, got, tt.want, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestPolygonOverlay_Union(t *testing.T) {
+	type fields struct {
+		PointOverlay  *PointOverlay
+		subjectPlane  *Plane
+		clippingPlane *Plane
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		want    matrix.Steric
+		wantErr bool
+	}{
+		{"poly poly", fields{PointOverlay: &PointOverlay{matrix.PolygonMatrix{{{0, 0}, {10, 0}, {10, 10}, {0, 10}, {0, 0}}},
+			matrix.PolygonMatrix{{{5, 5}, {15, 5}, {15, 15}, {5, 15}, {5, 5}}},
+		}},
+			matrix.PolygonMatrix{{{5, 10}, {0, 10}, {0, 0}, {10, 0}, {10, 5}, {15, 5}, {15, 15}, {5, 15}, {5, 10}}}, false},
+
+		{"poly poly1", fields{PointOverlay: &PointOverlay{matrix.PolygonMatrix{{{100, 100}, {100, 101}, {101, 101}, {101, 100}, {100, 100}}},
+			matrix.PolygonMatrix{{{90, 90}, {90, 101}, {101, 101}, {101, 90}, {90, 90}}},
+		}},
+			matrix.PolygonMatrix{{{101, 100}, {101, 101}, {100, 101}, {90, 101}, {90, 90}, {101, 90}, {101, 100}}}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			p := &PolygonOverlay{
+				PointOverlay:  tt.fields.PointOverlay,
+				subjectPlane:  tt.fields.subjectPlane,
+				clippingPlane: tt.fields.clippingPlane,
+			}
+			got, err := p.Union()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("PolygonOverlay.Union() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("PolygonOverlay.Union() = %v, \nwant %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestPolygonOverlay_Difference(t *testing.T) {
+	type fields struct {
+		PointOverlay  *PointOverlay
+		subjectPlane  *Plane
+		clippingPlane *Plane
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		want    matrix.Steric
+		wantErr bool
+	}{
+		{"poly poly", fields{PointOverlay: &PointOverlay{matrix.PolygonMatrix{{{0, 0}, {10, 0}, {10, 10}, {0, 10}, {0, 0}}},
+			matrix.PolygonMatrix{{{5, 5}, {15, 5}, {15, 15}, {5, 15}, {5, 5}}},
+		}},
+			matrix.PolygonMatrix{{{5, 10}, {0, 10}, {0, 0}, {10, 0}, {10, 5}, {5, 5}, {5, 10}}}, false},
+
+		{"poly poly1", fields{PointOverlay: &PointOverlay{matrix.PolygonMatrix{{{100, 100}, {100, 101}, {101, 101}, {101, 100}, {100, 100}}},
+			matrix.PolygonMatrix{{{90, 90}, {90, 101}, {101, 101}, {101, 90}, {90, 90}}},
+		}},
+			matrix.PolygonMatrix{}, false},
+		{"poly poly1", fields{PointOverlay: &PointOverlay{
+			matrix.PolygonMatrix{{{90, 90}, {90, 101}, {101, 101}, {101, 90}, {90, 90}}},
+			matrix.PolygonMatrix{{{100, 100}, {100, 101}, {101, 101}, {101, 100}, {100, 100}}},
+		}},
+			matrix.PolygonMatrix{{{100, 101}, {90, 101}, {90, 90}, {101, 90}, {101, 100}, {100, 100}, {100, 101}}}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			p := &PolygonOverlay{
+				PointOverlay:  tt.fields.PointOverlay,
+				subjectPlane:  tt.fields.subjectPlane,
+				clippingPlane: tt.fields.clippingPlane,
+			}
+			got, err := p.Difference()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("PolygonOverlay.Difference() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("PolygonOverlay.Difference() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestPolygonOverlay_SymDifference(t *testing.T) {
+	type fields struct {
+		PointOverlay  *PointOverlay
+		subjectPlane  *Plane
+		clippingPlane *Plane
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		want    matrix.Steric
+		wantErr bool
+	}{
+		{"poly poly", fields{PointOverlay: &PointOverlay{matrix.PolygonMatrix{{{0, 0}, {10, 0}, {10, 10}, {0, 10}, {0, 0}}},
+			matrix.PolygonMatrix{{{5, 5}, {15, 5}, {15, 15}, {5, 15}, {5, 5}}},
+		}},
+			matrix.Collection{matrix.PolygonMatrix{{{5, 10}, {0, 10}, {0, 0}, {10, 0}, {10, 5}, {5, 5}, {5, 10}}},
+				matrix.PolygonMatrix{{{10, 5}, {15, 5}, {15, 15}, {5, 15}, {5, 10}, {10, 10}, {10, 5}}}}, false},
+
+		{"poly poly1", fields{PointOverlay: &PointOverlay{matrix.PolygonMatrix{{{100, 100}, {100, 101}, {101, 101}, {101, 100}, {100, 100}}},
+			matrix.PolygonMatrix{{{90, 90}, {90, 101}, {101, 101}, {101, 90}, {90, 90}}},
+		}},
+			matrix.Collection{
+				matrix.PolygonMatrix{{{100, 101}, {90, 101}, {90, 90}, {101, 90}, {101, 100}, {100, 100}, {100, 101}}}},
+			false},
+		{"poly poly1", fields{PointOverlay: &PointOverlay{
+			matrix.PolygonMatrix{{{90, 90}, {90, 101}, {101, 101}, {101, 90}, {90, 90}}},
+			matrix.PolygonMatrix{{{100, 100}, {100, 101}, {101, 101}, {101, 100}, {100, 100}}},
+		}},
+			matrix.Collection{matrix.PolygonMatrix{{{100, 101}, {90, 101}, {90, 90}, {101, 90}, {101, 100}, {100, 100}, {100, 101}}}},
+			false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			p := &PolygonOverlay{
+				PointOverlay:  tt.fields.PointOverlay,
+				subjectPlane:  tt.fields.subjectPlane,
+				clippingPlane: tt.fields.clippingPlane,
+			}
+			got, err := p.SymDifference()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("PolygonOverlay.SymDifference() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("PolygonOverlay.SymDifference() = %v, \nwant %v", got, tt.want)
 			}
 		})
 	}

@@ -1,7 +1,6 @@
 package overlay
 
 import (
-	"github.com/spatial-go/geoos/algorithm"
 	"github.com/spatial-go/geoos/algorithm/algoerr"
 	"github.com/spatial-go/geoos/algorithm/calc"
 	"github.com/spatial-go/geoos/algorithm/matrix"
@@ -12,7 +11,7 @@ import (
 // PolygonOverlay  Computes the overlay of two geometries,either or both of which may be nil.
 type PolygonOverlay struct {
 	*PointOverlay
-	subjectPlane, clippingPlane *algorithm.Plane
+	subjectPlane, clippingPlane *Plane
 }
 
 // Union  Computes the Union of two geometries,either or both of which may be nil.
@@ -70,14 +69,14 @@ func (p *PolygonOverlay) Intersection() (matrix.Steric, error) {
 		return LineMerge(result), nil
 	case matrix.PolygonMatrix:
 
-		inter := envelope.Bound(poly.Bound()).IsIntersects(envelope.Bound(c.Bound()))
-		im := relate.IM(poly, c, inter)
-		if mark := im.IsContains(); mark {
-			return c, nil
-		}
-		if mark := im.IsWithin(); mark {
-			return poly, nil
-		}
+		// inter := envelope.Bound(poly.Bound()).IsIntersects(envelope.Bound(c.Bound()))
+		// im := relate.IM(poly, c, inter)
+		// if mark := im.IsContains(); mark {
+		// 	return c, nil
+		// }
+		// if mark := im.IsWithin(); mark {
+		// 	return poly, nil
+		// }
 
 		cpo := &ComputeClipOverlay{p}
 
@@ -96,8 +95,15 @@ func (p *PolygonOverlay) Difference() (matrix.Steric, error) {
 	if res, ok := p.differenceCheck(); !ok {
 		return res, nil
 	}
-	if _, ok := p.Subject.(matrix.PolygonMatrix); ok {
-		if _, ok := p.Clipping.(matrix.PolygonMatrix); ok {
+	if poly, ok := p.Subject.(matrix.PolygonMatrix); ok {
+		if c, ok := p.Clipping.(matrix.PolygonMatrix); ok {
+
+			inter := envelope.Bound(poly.Bound()).IsIntersects(envelope.Bound(c.Bound()))
+			im := relate.IM(poly, c, inter)
+			if mark := im.IsWithin(); mark {
+				return matrix.PolygonMatrix{}, nil
+			}
+
 			cpo := &ComputeMainOverlay{p}
 
 			cpo.prepare()
@@ -122,10 +128,10 @@ func (p *PolygonOverlay) DifferenceReverse() (matrix.Steric, error) {
 // One can think of this as Union(geomA,geomB) - Intersection(A,B).
 func (p *PolygonOverlay) SymDifference() (matrix.Steric, error) {
 	result := matrix.Collection{}
-	if res, err := p.Difference(); err == nil {
+	if res, err := p.Difference(); err == nil && !res.IsEmpty() {
 		result = append(result, res)
 	}
-	if res, err := p.DifferenceReverse(); err == nil {
+	if res, err := p.DifferenceReverse(); err == nil && !res.IsEmpty() {
 		result = append(result, res)
 	}
 	return result, nil
@@ -133,21 +139,21 @@ func (p *PolygonOverlay) SymDifference() (matrix.Steric, error) {
 
 // prepare prepare two polygonal geometries.
 func (p *PolygonOverlay) prepare() {
-	p.subjectPlane = &algorithm.Plane{}
+	p.subjectPlane = &Plane{}
 	for _, v2 := range p.Subject.(matrix.PolygonMatrix) {
 		for i, v1 := range v2 {
 			if i < len(v2)-1 {
-				p.subjectPlane.AddPoint(&algorithm.Vertex{Matrix: matrix.Matrix(v1)})
+				p.subjectPlane.AddPoint(&Vertex{Matrix: matrix.Matrix(v1)})
 			}
 		}
 		p.subjectPlane.CloseRing()
 		p.subjectPlane.Rank = calc.MAIN
 	}
-	p.clippingPlane = &algorithm.Plane{}
+	p.clippingPlane = &Plane{}
 	for _, v2 := range p.Clipping.(matrix.PolygonMatrix) {
 		for i, v1 := range v2 {
 			if i < len(v2)-1 {
-				p.clippingPlane.AddPoint(&algorithm.Vertex{Matrix: matrix.Matrix(v1)})
+				p.clippingPlane.AddPoint(&Vertex{Matrix: matrix.Matrix(v1)})
 			}
 		}
 		p.clippingPlane.CloseRing()
@@ -156,7 +162,7 @@ func (p *PolygonOverlay) prepare() {
 }
 
 // Weiler Weiler overlay.
-func (p *PolygonOverlay) Weiler() (enteringPoints, exitingPoints []algorithm.Vertex) {
+func (p *PolygonOverlay) Weiler() (enteringPoints, exitingPoints []Vertex) {
 
 	// TODO overlay ...
 	for _, v := range p.subjectPlane.Lines {
@@ -165,7 +171,15 @@ func (p *PolygonOverlay) Weiler() (enteringPoints, exitingPoints []algorithm.Ver
 			mark, ips :=
 				relate.Intersection(v.Start.Matrix, v.End.Matrix, vClip.Start.Matrix, vClip.End.Matrix)
 			for _, ip := range ips {
-				ipVer := &algorithm.Vertex{}
+				if ip.IsCollinear {
+					continue
+				}
+				inV, _ := relate.InLineVertex(ip.Matrix, matrix.LineMatrix{v.Start.Matrix, v.End.Matrix})
+				inVClip, _ := relate.InLineVertex(ip.Matrix, matrix.LineMatrix{vClip.Start.Matrix, vClip.End.Matrix})
+				if inV && inVClip {
+					continue
+				}
+				ipVer := &Vertex{}
 				ipVer.Matrix = ip.Matrix
 				ipVer.IsIntersectionPoint = ip.IsIntersectionPoint
 				ipVer.IsEntering = ip.IsEntering
@@ -192,20 +206,21 @@ func (p *PolygonOverlay) Weiler() (enteringPoints, exitingPoints []algorithm.Ver
 		filt.Filter(v)
 	}
 	exitingPoints = filt.Ips
+
 	return
 }
 
 // UniqueVertexFilter  A Filter that extracts a unique array.
 type UniqueVertexFilter struct {
-	Ips []algorithm.Vertex
+	Ips []Vertex
 }
 
 // Filter Performs an operation with the provided .
-func (u *UniqueVertexFilter) Filter(ip algorithm.Vertex) {
+func (u *UniqueVertexFilter) Filter(ip Vertex) {
 	u.add(ip)
 }
 
-func (u *UniqueVertexFilter) add(ip algorithm.Vertex) {
+func (u *UniqueVertexFilter) add(ip Vertex) {
 	hasMatrix := false
 	for _, v := range u.Ips {
 		if v.Matrix.Equals(ip.Matrix) {
@@ -219,18 +234,18 @@ func (u *UniqueVertexFilter) add(ip algorithm.Vertex) {
 }
 
 // ComputePolygon compute overlay.
-func (p *PolygonOverlay) ComputePolygon(exitingPoints []algorithm.Vertex, cpo ComputePolyOverlay) *algorithm.Plane {
-	var pol *algorithm.Plane = &algorithm.Plane{}
+func (p *PolygonOverlay) ComputePolygon(exitingPoints []Vertex, cpo ComputePolyOverlay) *Plane {
+	var pol *Plane = &Plane{}
 	for _, iterPoints := range exitingPoints {
 		if iterPoints.IsChecked {
 			continue
 		}
-		edge := &algorithm.Edge{}
+		edge := &Edge{}
 		pol.Edge = edge
 		pol.Rings = append(pol.Rings, edge)
 
 		start := &iterPoints
-		next := &algorithm.Vertex{Matrix: matrix.Matrix{start.X(), start.Y()}}
+		next := &Vertex{Matrix: matrix.Matrix{start.X(), start.Y()}}
 		start.IsChecked = true
 
 		for {
@@ -249,7 +264,7 @@ func (p *PolygonOverlay) ComputePolygon(exitingPoints []algorithm.Vertex, cpo Co
 }
 
 // ToPolygonMatrix ...
-func ToPolygonMatrix(poly *algorithm.Plane) matrix.PolygonMatrix {
+func ToPolygonMatrix(poly *Plane) matrix.PolygonMatrix {
 	result := matrix.PolygonMatrix{}
 	for _, v2 := range poly.Rings {
 		var edge matrix.LineMatrix

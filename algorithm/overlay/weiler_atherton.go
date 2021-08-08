@@ -1,13 +1,12 @@
 package overlay
 
 import (
-	"github.com/spatial-go/geoos/algorithm"
 	"github.com/spatial-go/geoos/algorithm/algoerr"
 	"github.com/spatial-go/geoos/algorithm/measure"
 )
 
 // SliceContains Returns index of slice.
-func SliceContains(list []algorithm.Vertex, p *algorithm.Vertex) (int, error) {
+func SliceContains(list []Vertex, p *Vertex) (int, error) {
 	for i, v := range list {
 		if v.X() == p.X() && v.Y() == p.Y() {
 			return i, nil
@@ -17,7 +16,7 @@ func SliceContains(list []algorithm.Vertex, p *algorithm.Vertex) (int, error) {
 }
 
 // AddPointToVertexSlice add point to vertex slice
-func AddPointToVertexSlice(edges []*algorithm.Edge, pStart, pEnd, ip *algorithm.Vertex) {
+func AddPointToVertexSlice(edges []*Edge, pStart, pEnd, ip *Vertex) {
 	for _, v := range edges {
 
 		if start, err := SliceContains(v.Vertexs, pStart); err == nil {
@@ -35,11 +34,10 @@ func AddPointToVertexSlice(edges []*algorithm.Edge, pStart, pEnd, ip *algorithm.
 			}
 
 			circ := v.Vertexs[it:]
-			v.Vertexs = append([]algorithm.Vertex{}, v.Vertexs[:it]...)
+			v.Vertexs = append([]Vertex{}, v.Vertexs[:it]...)
 			v.Vertexs = append(v.Vertexs, *ip)
 			v.Vertexs = append(v.Vertexs, circ...)
 			break
-
 		}
 	}
 }

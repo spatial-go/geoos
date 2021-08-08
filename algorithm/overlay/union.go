@@ -6,19 +6,22 @@ import (
 
 // UnaryUnion returns a Geometry containing the union.
 //	or an empty atomic geometry, or an empty GEOMETRYCOLLECTION
-func UnaryUnion(matrix4 matrix.MultiPolygonMatrix) matrix.Steric {
-	return UnaryUnionByHalf(matrix4, 0, len(matrix4))
+func UnaryUnion(matrix4 matrix.Steric) matrix.Steric {
+	if c, ok := matrix4.(matrix.Collection); ok {
+		return UnaryUnionByHalf(c, 0, len(c))
+	}
+	return nil
 }
 
 // UnaryUnionByHalf returns Unions a section of a list using a recursive binary union on each half of the section.
-func UnaryUnionByHalf(matrix4 matrix.MultiPolygonMatrix, start, end int) matrix.Steric {
+func UnaryUnionByHalf(matrix4 matrix.Collection, start, end int) matrix.Steric {
 	if matrix4 == nil {
 		return nil
 	}
 	if end-start <= 1 {
-		return Union(matrix4[start], nil)
+		return Union(matrix4[start].(matrix.PolygonMatrix), nil)
 	} else if end-start == 2 {
-		return Union(matrix4[start], matrix4[start+1])
+		return Union(matrix4[start].(matrix.PolygonMatrix), matrix4[start+1].(matrix.PolygonMatrix))
 	} else {
 		mid := (end + start) / 2
 		g0 := UnaryUnionByHalf(matrix4, start, mid)
