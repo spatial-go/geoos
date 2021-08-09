@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/spatial-go/geoos"
+	"github.com/spatial-go/geoos/space"
 )
 
 // ErrInvalidGeometry will be returned if a the json of the geometry is invalid.
@@ -13,25 +13,25 @@ var ErrInvalidGeometry = errors.New("geojson: invalid geometry")
 // A Geometry matches the structure of a GeoJSON Geometry.
 type Geometry struct {
 	Type        string         `json:"type"`
-	Coordinates geoos.Geometry `json:"coordinates,omitempty"`
+	Coordinates space.Geometry `json:"coordinates,omitempty"`
 	Geometries  []*Geometry    `json:"geometries,omitempty"`
 }
 
 // NewGeometry will create a Geometry object but will convert
 // the input into a GoeJSON geometry. For example, it will convert
 // Rings and Bounds into Polygons.
-func NewGeometry(g geoos.Geometry) *Geometry {
+func NewGeometry(g space.Geometry) *Geometry {
 	jg := &Geometry{}
 	switch g := g.(type) {
-	case geoos.Ring:
-		jg.Coordinates = geoos.Polygon{g}
-	case geoos.Bound:
+	case space.Ring:
+		jg.Coordinates = space.Polygon{g}
+	case space.Bound:
 		if g.IsEmpty() {
-			jg.Coordinates = geoos.Polygon{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}}
+			jg.Coordinates = space.Polygon{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}}
 		} else {
 			jg.Coordinates = g.ToPolygon()
 		}
-	case geoos.Collection:
+	case space.Collection:
 		for _, c := range g {
 			jg.Geometries = append(jg.Geometries, NewGeometry(c))
 		}
@@ -46,14 +46,14 @@ func NewGeometry(g geoos.Geometry) *Geometry {
 	return jg
 }
 
-// Geometry returns the geoos.Geometry for the geojson Geometry.
-// This will convert the "Geometries" into a geoos.Collection if applicable.
-func (g Geometry) Geometry() geoos.Geometry {
+// Geometry returns the space.Geometry for the geojson Geometry.
+// This will convert the "Geometries" into a space.Collection if applicable.
+func (g Geometry) Geometry() space.Geometry {
 	if g.Coordinates != nil {
 		return g.Coordinates
 	}
 
-	c := make(geoos.Collection, 0, len(g.Geometries))
+	c := make(space.Collection, 0, len(g.Geometries))
 	for _, geom := range g.Geometries {
 		c = append(c, geom.Geometry())
 	}
@@ -68,15 +68,15 @@ func (g Geometry) MarshalJSON() ([]byte, error) {
 
 	ng := &jsonGeometryMarshall{}
 	switch g := g.Coordinates.(type) {
-	case geoos.Ring:
-		ng.Coordinates = geoos.Polygon{g}
-	case geoos.Bound:
+	case space.Ring:
+		ng.Coordinates = space.Polygon{g}
+	case space.Bound:
 		if g.IsEmpty() {
-			ng.Coordinates = geoos.Polygon{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}}
+			ng.Coordinates = space.Polygon{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}}
 		} else {
 			ng.Coordinates = g.ToPolygon()
 		}
-	case geoos.Collection:
+	case space.Collection:
 		ng.Geometries = make([]*Geometry, 0, len(g))
 		for _, c := range g {
 			ng.Geometries = append(ng.Geometries, NewGeometry(c))
@@ -92,7 +92,7 @@ func (g Geometry) MarshalJSON() ([]byte, error) {
 
 	if len(g.Geometries) > 0 {
 		ng.Geometries = g.Geometries
-		ng.Type = geoos.Collection{}.GeoJSONType()
+		ng.Type = space.Collection{}.GeoJSONType()
 	}
 	return json.Marshal(ng)
 }
@@ -119,27 +119,27 @@ func (g *Geometry) UnmarshalJSON(data []byte) error {
 
 	switch jg.Type {
 	case "Point":
-		p := geoos.Point{}
+		p := space.Point{}
 		err = json.Unmarshal(jg.Coordinates, &p)
 		g.Coordinates = p
 	case "MultiPoint":
-		mp := geoos.MultiPoint{}
+		mp := space.MultiPoint{}
 		err = json.Unmarshal(jg.Coordinates, &mp)
 		g.Coordinates = mp
 	case "LineString":
-		ls := geoos.LineString{}
+		ls := space.LineString{}
 		err = json.Unmarshal(jg.Coordinates, &ls)
 		g.Coordinates = ls
 	case "MultiLineString":
-		mls := geoos.MultiLineString{}
+		mls := space.MultiLineString{}
 		err = json.Unmarshal(jg.Coordinates, &mls)
 		g.Coordinates = mls
 	case "Polygon":
-		p := geoos.Polygon{}
+		p := space.Polygon{}
 		err = json.Unmarshal(jg.Coordinates, &p)
 		g.Coordinates = p
 	case "MultiPolygon":
-		mp := geoos.MultiPolygon{}
+		mp := space.MultiPolygon{}
 		err = json.Unmarshal(jg.Coordinates, &mp)
 		g.Coordinates = mp
 	case "GeometryCollection":
@@ -154,16 +154,16 @@ func (g *Geometry) UnmarshalJSON(data []byte) error {
 }
 
 // A Point is a helper type that will marshal to/from a GeoJSON Point geometry.
-type Point geoos.Point
+type Point space.Point
 
-// Geometry will return the geoos.Geometry version of the data.
-func (p Point) Geometry() geoos.Geometry {
-	return geoos.Point(p)
+// Geometry will return the space.Geometry version of the data.
+func (p Point) Geometry() space.Geometry {
+	return space.Point(p)
 }
 
 // MarshalJSON will convert the Point into a GeoJSON Point geometry.
 func (p Point) MarshalJSON() ([]byte, error) {
-	return json.Marshal(Geometry{Coordinates: geoos.Point(p)})
+	return json.Marshal(Geometry{Coordinates: space.Point(p)})
 }
 
 // UnmarshalJSON will unmarshal the GeoJSON Point geometry.
@@ -174,7 +174,7 @@ func (p *Point) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	point, ok := g.Coordinates.(geoos.Point)
+	point, ok := g.Coordinates.(space.Point)
 	if !ok {
 		return errors.New("geojson: not a Point type")
 	}
@@ -184,16 +184,16 @@ func (p *Point) UnmarshalJSON(data []byte) error {
 }
 
 // A MultiPoint is a helper type that will marshal to/from a GeoJSON MultiPoint geometry.
-type MultiPoint geoos.MultiPoint
+type MultiPoint space.MultiPoint
 
-// Geometry will return the geoos.Geometry version of the data.
-func (mp MultiPoint) Geometry() geoos.Geometry {
-	return geoos.MultiPoint(mp)
+// Geometry will return the space.Geometry version of the data.
+func (mp MultiPoint) Geometry() space.Geometry {
+	return space.MultiPoint(mp)
 }
 
 // MarshalJSON will convert the MultiPoint into a GeoJSON MultiPoint geometry.
 func (mp MultiPoint) MarshalJSON() ([]byte, error) {
-	return json.Marshal(Geometry{Coordinates: geoos.MultiPoint(mp)})
+	return json.Marshal(Geometry{Coordinates: space.MultiPoint(mp)})
 }
 
 // UnmarshalJSON will unmarshal the GeoJSON MultiPoint geometry.
@@ -204,7 +204,7 @@ func (mp *MultiPoint) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	multiPoint, ok := g.Coordinates.(geoos.MultiPoint)
+	multiPoint, ok := g.Coordinates.(space.MultiPoint)
 	if !ok {
 		return errors.New("geojson: not a MultiPoint type")
 	}
@@ -214,16 +214,16 @@ func (mp *MultiPoint) UnmarshalJSON(data []byte) error {
 }
 
 // A LineString is a helper type that will marshal to/from a GeoJSON LineString geometry.
-type LineString geoos.LineString
+type LineString space.LineString
 
 // Geometry will return the Geometry version of the data.
-func (ls LineString) Geometry() geoos.Geometry {
-	return geoos.LineString(ls)
+func (ls LineString) Geometry() space.Geometry {
+	return space.LineString(ls)
 }
 
 // MarshalJSON will convert the LineString into a GeoJSON LineString geometry.
 func (ls LineString) MarshalJSON() ([]byte, error) {
-	return json.Marshal(Geometry{Coordinates: geoos.LineString(ls)})
+	return json.Marshal(Geometry{Coordinates: space.LineString(ls)})
 }
 
 // UnmarshalJSON will unmarshal the GeoJSON MultiPoint geometry.
@@ -234,7 +234,7 @@ func (ls *LineString) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	lineString, ok := g.Coordinates.(geoos.LineString)
+	lineString, ok := g.Coordinates.(space.LineString)
 	if !ok {
 		return errors.New("geojson: not a LineString type")
 	}
@@ -244,16 +244,16 @@ func (ls *LineString) UnmarshalJSON(data []byte) error {
 }
 
 // A MultiLineString is a helper type that will marshal to/from a GeoJSON MultiLineString geometry.
-type MultiLineString geoos.MultiLineString
+type MultiLineString space.MultiLineString
 
-// Geometry will return the geoos.Geometry version of the data.
-func (mls MultiLineString) Geometry() geoos.Geometry {
-	return geoos.MultiLineString(mls)
+// Geometry will return the space.Geometry version of the data.
+func (mls MultiLineString) Geometry() space.Geometry {
+	return space.MultiLineString(mls)
 }
 
 // MarshalJSON will convert the MultiLineString into a GeoJSON MultiLineString geometry.
 func (mls MultiLineString) MarshalJSON() ([]byte, error) {
-	return json.Marshal(Geometry{Coordinates: geoos.MultiLineString(mls)})
+	return json.Marshal(Geometry{Coordinates: space.MultiLineString(mls)})
 }
 
 // UnmarshalJSON will unmarshal the GeoJSON MultiPoint geometry.
@@ -263,7 +263,7 @@ func (mls *MultiLineString) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return err
 	}
-	multilineString, ok := g.Coordinates.(geoos.MultiLineString)
+	multilineString, ok := g.Coordinates.(space.MultiLineString)
 	if !ok {
 		return errors.New("geojson: not a MultiLineString type")
 	}
@@ -273,16 +273,16 @@ func (mls *MultiLineString) UnmarshalJSON(data []byte) error {
 }
 
 // A Polygon is a helper type that will marshal to/from a GeoJSON Polygon geometry.
-type Polygon geoos.Polygon
+type Polygon space.Polygon
 
-// Geometry will return the geoos.Geometry version of the data.
-func (p Polygon) Geometry() geoos.Geometry {
-	return geoos.Polygon(p)
+// Geometry will return the space.Geometry version of the data.
+func (p Polygon) Geometry() space.Geometry {
+	return space.Polygon(p)
 }
 
 // MarshalJSON will convert the Polygon into a GeoJSON Polygon geometry.
 func (p Polygon) MarshalJSON() ([]byte, error) {
-	return json.Marshal(Geometry{Coordinates: geoos.Polygon(p)})
+	return json.Marshal(Geometry{Coordinates: space.Polygon(p)})
 }
 
 // UnmarshalJSON will unmarshal the GeoJSON Polygon geometry.
@@ -292,7 +292,7 @@ func (p *Polygon) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return err
 	}
-	polygon, ok := g.Coordinates.(geoos.Polygon)
+	polygon, ok := g.Coordinates.(space.Polygon)
 	if !ok {
 		return errors.New("geojson: not a Polygon type")
 	}
@@ -302,16 +302,16 @@ func (p *Polygon) UnmarshalJSON(data []byte) error {
 }
 
 // A MultiPolygon is a helper type that will marshal to/from a GeoJSON MultiPolygon geometry.
-type MultiPolygon geoos.MultiPolygon
+type MultiPolygon space.MultiPolygon
 
-// Geometry will return the geoos.Geometry version of the data.
-func (mp MultiPolygon) Geometry() geoos.Geometry {
-	return geoos.MultiPolygon(mp)
+// Geometry will return the space.Geometry version of the data.
+func (mp MultiPolygon) Geometry() space.Geometry {
+	return space.MultiPolygon(mp)
 }
 
 // MarshalJSON will convert the MultiPolygon into a GeoJSON MultiPolygon geometry.
 func (mp MultiPolygon) MarshalJSON() ([]byte, error) {
-	return json.Marshal(Geometry{Coordinates: geoos.MultiPolygon(mp)})
+	return json.Marshal(Geometry{Coordinates: space.MultiPolygon(mp)})
 }
 
 // UnmarshalJSON will unmarshal the GeoJSON MultiPolygon geometry.
@@ -322,7 +322,7 @@ func (mp *MultiPolygon) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	multiPolygon, ok := g.Coordinates.(geoos.MultiPolygon)
+	multiPolygon, ok := g.Coordinates.(space.MultiPolygon)
 	if !ok {
 		return errors.New("geojson: not a MultiPolygon type")
 	}
@@ -339,7 +339,7 @@ type jsonGeometry struct {
 
 type jsonGeometryMarshall struct {
 	Type        string         `json:"type"`
-	Coordinates geoos.Geometry `json:"coordinates,omitempty"`
+	Coordinates space.Geometry `json:"coordinates,omitempty"`
 	Geometries  []*Geometry    `json:"geometries,omitempty"`
 }
 

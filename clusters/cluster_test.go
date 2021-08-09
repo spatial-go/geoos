@@ -3,14 +3,14 @@ package clusters
 import (
 	"testing"
 
-	"github.com/spatial-go/geoos"
+	"github.com/spatial-go/geoos/space"
 )
 
 func TestCenter(t *testing.T) {
 	var o PointList
-	o = append(o, geoos.Point{1, 1})
-	o = append(o, geoos.Point{3, 2})
-	o = append(o, geoos.Point{5, 3})
+	o = append(o, space.Point{1, 1})
+	o = append(o, space.Point{3, 2})
+	o = append(o, space.Point{5, 3})
 
 	m, err := o.Center()
 	if err != nil {
@@ -25,9 +25,9 @@ func TestCenter(t *testing.T) {
 
 func TestAverageDistance(t *testing.T) {
 	var o PointList
-	o = append(o, geoos.Point{1, 1})
-	o = append(o, geoos.Point{4, 5})
-	o = append(o, geoos.Point{6, 13})
+	o = append(o, space.Point{1, 1})
+	o = append(o, space.Point{4, 5})
+	o = append(o, space.Point{6, 13})
 
 	d := AverageDistance(o[0], o[1:])
 	if d != 9 {
@@ -42,9 +42,9 @@ func TestAverageDistance(t *testing.T) {
 
 func TestClusters(t *testing.T) {
 	var o PointList
-	o = append(o, geoos.Point{1, 1})
-	o = append(o, geoos.Point{4, 5})
-	o = append(o, geoos.Point{6, 13})
+	o = append(o, space.Point{1, 1})
+	o = append(o, space.Point{4, 5})
+	o = append(o, space.Point{6, 13})
 
 	c, err := New(2, o)
 	if err != nil {

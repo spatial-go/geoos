@@ -8,8 +8,8 @@ package dbscan
 import (
 	"sort"
 
-	"github.com/spatial-go/geoos"
 	"github.com/spatial-go/geoos/clusters"
+	"github.com/spatial-go/geoos/space"
 )
 
 // KDTree is implementation of K-D Tree, with Points separated from
@@ -36,7 +36,7 @@ type T struct {
 // Insert returns a new K-D tree with the given node inserted.
 // Inserting a node that is already a member of a K-D tree
 // invalidates that tree.
-func (tree *KDTree) Insert(point geoos.Point) {
+func (tree *KDTree) Insert(point space.Point) {
 	tree.Points = append(tree.Points, point)
 	tree.Root = tree.insert(tree.Root, 0, &T{PointID: len(tree.Points) - 1})
 }
@@ -59,14 +59,14 @@ func (tree *KDTree) insert(t *T, depth int, n *T) *T {
 // distance from the given point to the given slice, which may be nil.
 // To  avoid allocation, the slice can be pre-allocated with a larger
 // capacity and re-used across multiple calls to InRange.
-func (tree *KDTree) InRange(pt geoos.Point, dist float64, nodes []int) []int {
+func (tree *KDTree) InRange(pt space.Point, dist float64, nodes []int) []int {
 	if dist < 0 {
 		return nodes
 	}
 	return tree.inRange(tree.Root, pt, dist, nodes)
 }
 
-func (tree *KDTree) inRange(t *T, pt geoos.Point, r float64, nodes []int) []int {
+func (tree *KDTree) inRange(t *T, pt space.Point, r float64, nodes []int) []int {
 	if t == nil {
 		return nodes
 	}
@@ -78,11 +78,11 @@ func (tree *KDTree) inRange(t *T, pt geoos.Point, r float64, nodes []int) []int 
 		thisSide, otherSide = t.left, t.right
 	}
 
-	p1 := geoos.Point{0, 0}
+	p1 := space.Point{0, 0}
 	p1[1-t.split] = (pt[1-t.split] + tree.Points[t.PointID][1-t.split]) / 2
 	p1[t.split] = pt[t.split]
 
-	p2 := geoos.Point{0, 0}
+	p2 := space.Point{0, 0}
 	p2[1-t.split] = (pt[1-t.split] + tree.Points[t.PointID][1-t.split]) / 2
 	p2[t.split] = tree.Points[t.PointID][t.split]
 
@@ -187,7 +187,7 @@ func (p *preSorted) splitMed(dim int) (med int, equal []int, left, right preSort
 	}
 	mh := m
 
-	for mh < len(p.cur[dim])-1 && p.points[p.cur[dim][mh+1]].Equal(p.points[p.cur[dim][m]]) {
+	for mh < len(p.cur[dim])-1 && p.points[p.cur[dim][mh+1]].Equals(p.points[p.cur[dim][m]]) {
 		mh++
 	}
 	med = p.cur[dim][m]

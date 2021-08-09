@@ -6,63 +6,63 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/spatial-go/geoos"
+	"github.com/spatial-go/geoos/space"
 )
 
 func TestGeometryMarshal(t *testing.T) {
 	cases := []struct {
 		name    string
-		geom    geoos.Geometry
+		geom    space.Geometry
 		include string
 	}{
 		{
 			name:    "point",
-			geom:    geoos.Point{},
+			geom:    space.Point{},
 			include: `"type":"Point"`,
 		},
 		{
 			name:    "multi point",
-			geom:    geoos.MultiPoint{},
+			geom:    space.MultiPoint{},
 			include: `"type":"MultiPoint"`,
 		},
 		{
 			name:    "linestring",
-			geom:    geoos.LineString{},
+			geom:    space.LineString{},
 			include: `"type":"LineString"`,
 		},
 		{
 			name:    "multi linestring",
-			geom:    geoos.MultiLineString{},
+			geom:    space.MultiLineString{},
 			include: `"type":"MultiLineString"`,
 		},
 		{
 			name:    "polygon",
-			geom:    geoos.Polygon{},
+			geom:    space.Polygon{},
 			include: `"type":"Polygon"`,
 		},
 		{
 			name:    "multi polygon",
-			geom:    geoos.MultiPolygon{},
+			geom:    space.MultiPolygon{},
 			include: `"type":"MultiPolygon"`,
 		},
 		{
 			name:    "ring",
-			geom:    geoos.Ring{},
+			geom:    space.Ring{},
 			include: `"type":"Polygon"`,
 		},
 		{
 			name:    "bound",
-			geom:    geoos.Bound{},
+			geom:    space.Bound{},
 			include: `"type":"Polygon"`,
 		},
 		{
 			name:    "collection",
-			geom:    geoos.Collection{geoos.LineString{}},
+			geom:    space.Collection{space.LineString{}},
 			include: `"type":"GeometryCollection"`,
 		},
 		{
 			name:    "collection2",
-			geom:    geoos.Collection{geoos.Point{}, geoos.Point{}},
+			geom:    space.Collection{space.Point{}, space.Point{}},
 			include: `"geometries":[`,
 		},
 	}
@@ -96,35 +96,35 @@ func TestGeometryMarshal(t *testing.T) {
 func TestGeometryUnmarshal(t *testing.T) {
 	cases := []struct {
 		name string
-		geom geoos.Geometry
+		geom space.Geometry
 	}{
 		{
 			name: "point",
-			geom: geoos.Point{},
+			geom: space.Point{},
 		},
 		{
 			name: "multi point",
-			geom: geoos.MultiPoint{},
+			geom: space.MultiPoint{},
 		},
 		{
 			name: "linestring",
-			geom: geoos.LineString{},
+			geom: space.LineString{},
 		},
 		{
 			name: "multi linestring",
-			geom: geoos.MultiLineString{},
+			geom: space.MultiLineString{},
 		},
 		{
 			name: "polygon",
-			geom: geoos.Polygon{},
+			geom: space.Polygon{},
 		},
 		{
 			name: "multi polygon",
-			geom: geoos.MultiPolygon{},
+			geom: space.MultiPolygon{},
 		},
 		{
 			name: "collection",
-			geom: geoos.Collection{geoos.LineString{}},
+			geom: space.Collection{space.LineString{}},
 		},
 	}
 
@@ -145,7 +145,7 @@ func TestGeometryUnmarshal(t *testing.T) {
 				t.Errorf("incorrenct type: %v != %v", g.Type, tc.geom.GeoJSONType())
 			}
 
-			if !geoos.Equal(g.Geometry(), tc.geom) {
+			if !g.Geometry().Equals(tc.geom) {
 				t.Errorf("incorrect geometry")
 				t.Logf("%[1]T, %[1]v", g.Geometry())
 				t.Log(tc.geom)
@@ -194,44 +194,44 @@ func TestHelperTypes(t *testing.T) {
 	// The code and types here are complicated to avoid duplicate code.
 	cases := []struct {
 		name   string
-		geom   geoos.Geometry
+		geom   space.Geometry
 		helper interface{}
 		output interface{}
 	}{
 		{
 			name:   "point",
-			geom:   geoos.Point{1, 2},
-			helper: Point(geoos.Point{1, 2}),
+			geom:   space.Point{1, 2},
+			helper: Point(space.Point{1, 2}),
 			output: &Point{},
 		},
 		{
 			name:   "multi point",
-			geom:   geoos.MultiPoint{{1, 2}, {3, 4}},
-			helper: MultiPoint(geoos.MultiPoint{{1, 2}, {3, 4}}),
+			geom:   space.MultiPoint{{1, 2}, {3, 4}},
+			helper: MultiPoint(space.MultiPoint{{1, 2}, {3, 4}}),
 			output: &MultiPoint{},
 		},
 		{
 			name:   "linestring",
-			geom:   geoos.LineString{{1, 2}, {3, 4}},
-			helper: LineString(geoos.LineString{{1, 2}, {3, 4}}),
+			geom:   space.LineString{{1, 2}, {3, 4}},
+			helper: LineString(space.LineString{{1, 2}, {3, 4}}),
 			output: &LineString{},
 		},
 		{
 			name:   "multi linestring",
-			geom:   geoos.MultiLineString{{{1, 2}, {3, 4}}, {{5, 6}, {7, 8}}},
-			helper: MultiLineString(geoos.MultiLineString{{{1, 2}, {3, 4}}, {{5, 6}, {7, 8}}}),
+			geom:   space.MultiLineString{{{1, 2}, {3, 4}}, {{5, 6}, {7, 8}}},
+			helper: MultiLineString(space.MultiLineString{{{1, 2}, {3, 4}}, {{5, 6}, {7, 8}}}),
 			output: &MultiLineString{},
 		},
 		{
 			name:   "polygon",
-			geom:   geoos.Polygon{{{1, 2}, {3, 4}}},
-			helper: Polygon(geoos.Polygon{{{1, 2}, {3, 4}}}),
+			geom:   space.Polygon{{{1, 2}, {3, 4}}},
+			helper: Polygon(space.Polygon{{{1, 2}, {3, 4}}}),
 			output: &Polygon{},
 		},
 		{
 			name:   "multi polygon",
-			geom:   geoos.MultiPolygon{{{{1, 2}, {3, 4}}}, {{{5, 6}, {7, 8}}}},
-			helper: MultiPolygon(geoos.MultiPolygon{{{{1, 2}, {3, 4}}}, {{{5, 6}, {7, 8}}}}),
+			geom:   space.MultiPolygon{{{{1, 2}, {3, 4}}}, {{{5, 6}, {7, 8}}}},
+			helper: MultiPolygon(space.MultiPolygon{{{{1, 2}, {3, 4}}}, {{{5, 6}, {7, 8}}}}),
 			output: &MultiPolygon{},
 		},
 	}
@@ -267,7 +267,7 @@ func TestHelperTypes(t *testing.T) {
 				t.Fatalf("unmarshal error: %v", err)
 			}
 
-			if !geoos.Equal(tc.output.(geom).Geometry(), geo.Coordinates) {
+			if !tc.output.(geom).Geometry().Equals(geo.Coordinates) {
 				t.Errorf("should unmarshal the same")
 				t.Log(tc.output)
 				t.Log(geo.Coordinates)
@@ -281,7 +281,7 @@ func TestHelperTypes(t *testing.T) {
 
 			// not the correct type should return error.
 			// non of they types directly supported are geometry collections.
-			data, err = NewGeometry(geoos.Collection{geoos.Point{}}).MarshalJSON()
+			data, err = NewGeometry(space.Collection{space.Point{}}).MarshalJSON()
 			if err != nil {
 				t.Errorf("unmarshal error: %v", err)
 			}
@@ -295,13 +295,13 @@ func TestHelperTypes(t *testing.T) {
 }
 
 type geom interface {
-	Geometry() geoos.Geometry
+	Geometry() space.Geometry
 }
 
 func BenchmarkGeometryMarshalJSON(b *testing.B) {
-	ls := geoos.LineString{}
+	ls := space.LineString{}
 	for i := 0.0; i < 1000; i++ {
-		ls = append(ls, geoos.Point{i * 3.45, i * -58.4})
+		ls = append(ls, space.Point{i * 3.45, i * -58.4})
 	}
 
 	g := &Geometry{Coordinates: ls}
@@ -314,9 +314,9 @@ func BenchmarkGeometryMarshalJSON(b *testing.B) {
 }
 
 func BenchmarkGeometryUnmarshalJSON(b *testing.B) {
-	ls := geoos.LineString{}
+	ls := space.LineString{}
 	for i := 0.0; i < 1000; i++ {
-		ls = append(ls, geoos.Point{i * 3.45, i * -58.4})
+		ls = append(ls, space.Point{i * 3.45, i * -58.4})
 	}
 
 	g := &Geometry{Coordinates: ls}

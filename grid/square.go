@@ -3,17 +3,18 @@ package grid
 import (
 	"math"
 
-	"github.com/spatial-go/geoos"
-	"github.com/spatial-go/geoos/measure"
+	"github.com/spatial-go/geoos/algorithm/matrix"
+	"github.com/spatial-go/geoos/algorithm/measure"
+	"github.com/spatial-go/geoos/space"
 )
 
 // Grid ...
 type Grid struct {
-	Geometry geoos.Geometry
+	Geometry space.Geometry
 }
 
 // SquareGrid ,Draw a grid according to the distance, including the given area.
-func SquareGrid(bound geoos.Bound, cellSize float64) (gridGeoms [][]Grid) {
+func SquareGrid(bound space.Bound, cellSize float64) (gridGeoms [][]Grid) {
 	var (
 		minPoint = bound.Min
 		maxPoint = bound.Max
@@ -27,8 +28,8 @@ func SquareGrid(bound geoos.Bound, cellSize float64) (gridGeoms [][]Grid) {
 	boundHeight := north - south
 
 	// Calculate the latitude and longitude corresponding to the length cellSize
-	cellWidth := cellSize * (boundWidth / measure.Distance(geoos.Point{west, south}, geoos.Point{east, south}))
-	cellHeight := cellSize * (boundHeight / measure.Distance(geoos.Point{west, north}, geoos.Point{west, south}))
+	cellWidth := cellSize * (boundWidth / measure.SpheroidDistance(matrix.Matrix{west, south}, matrix.Matrix{east, south}))
+	cellHeight := cellSize * (boundHeight / measure.SpheroidDistance(matrix.Matrix{west, north}, matrix.Matrix{west, south}))
 
 	// Round up (including all points)
 	columns := math.Ceil(boundWidth / cellWidth)
@@ -42,12 +43,12 @@ func SquareGrid(bound geoos.Bound, cellSize float64) (gridGeoms [][]Grid) {
 		currentY := south - deltaY
 		geomRows := []Grid{}
 		for row := int64(0); row < int64(rows); row++ {
-			point0 := geoos.Point{currentX, currentY}
-			point1 := geoos.Point{currentX, currentY + cellHeight}
-			point2 := geoos.Point{currentX + cellWidth, currentY + cellHeight}
-			point3 := geoos.Point{currentX + cellWidth, currentY}
-			ring := geoos.Ring{point0, point1, point2, point3, point0}
-			polygon := geoos.Polygon{ring}
+			point0 := space.Point{currentX, currentY}
+			point1 := space.Point{currentX, currentY + cellHeight}
+			point2 := space.Point{currentX + cellWidth, currentY + cellHeight}
+			point3 := space.Point{currentX + cellWidth, currentY}
+			ring := space.Ring{point0, point1, point2, point3, point0}
+			polygon := space.Polygon{ring}
 			geomRows = append(geomRows, Grid{Geometry: polygon})
 			currentY += cellHeight
 		}

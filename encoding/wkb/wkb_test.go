@@ -6,35 +6,35 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/spatial-go/geoos"
+	"github.com/spatial-go/geoos/space"
 )
 
 // AllGeometries lists all possible types and values that a geometry
 // interface can be. It should be used only for testing to verify
 // functions that accept a Geometry will work in all cases.
-var AllGeometries = []geoos.Geometry{
+var AllGeometries = []space.Geometry{
 	nil,
-	geoos.Point{},
-	geoos.MultiPoint{},
-	geoos.LineString{},
-	geoos.MultiLineString{},
-	geoos.Ring{},
-	geoos.Polygon{},
-	geoos.MultiPolygon{},
-	geoos.Bound{},
-	geoos.Collection{},
+	space.Point{},
+	space.MultiPoint{},
+	space.LineString{},
+	space.MultiLineString{},
+	space.Ring{},
+	space.Polygon{},
+	space.MultiPolygon{},
+	space.Bound{},
+	space.Collection{},
 
 	// nil values
-	geoos.MultiPoint(nil),
-	geoos.LineString(nil),
-	geoos.MultiLineString(nil),
-	geoos.Ring(nil),
-	geoos.Polygon(nil),
-	geoos.MultiPolygon(nil),
-	geoos.Collection(nil),
+	space.MultiPoint(nil),
+	space.LineString(nil),
+	space.MultiLineString(nil),
+	space.Ring(nil),
+	space.Polygon(nil),
+	space.MultiPolygon(nil),
+	space.Collection(nil),
 
 	// Collection of Collection
-	geoos.Collection{geoos.Collection{geoos.Point{}}},
+	space.Collection{space.Collection{space.Point{}}},
 }
 
 func TestMarshal(t *testing.T) {
@@ -48,17 +48,8 @@ func TestMustMarshal(t *testing.T) {
 		MustMarshal(g, binary.BigEndian)
 	}
 }
-
-func TestGeoFromWKBHexStr(t *testing.T) {
-	hexStr := `0101000020E61000008EAF3DB324E05C40DC12B9E00C704340`
-	g0 := geoos.Point{115.50224, 38.875393}
-	g1, _ := GeoFromWKBHexStr(hexStr)
-	if !g0.Equal(g1) {
-		t.Errorf("GeoFromWKBHexStr() got = %v, want %v", g0, g1)
-	}
-}
 func BenchmarkEncode_Point(b *testing.B) {
-	g := geoos.Point{1, 2}
+	g := space.Point{1, 2}
 	e := NewEncoder(ioutil.Discard)
 
 	b.ReportAllocs()
@@ -69,7 +60,7 @@ func BenchmarkEncode_Point(b *testing.B) {
 }
 
 func BenchmarkEncode_LineString(b *testing.B) {
-	g := geoos.LineString{
+	g := space.LineString{
 		{1, 1}, {2, 2}, {3, 3}, {4, 4}, {5, 5},
 		{1, 1}, {2, 2}, {3, 3}, {4, 4}, {5, 5},
 	}
@@ -82,7 +73,7 @@ func BenchmarkEncode_LineString(b *testing.B) {
 	}
 }
 
-func compare(t testing.TB, e geoos.Geometry, b []byte) {
+func compare(t testing.TB, e space.Geometry, b []byte) {
 	t.Helper()
 
 	// Decoder
@@ -91,7 +82,7 @@ func compare(t testing.TB, e geoos.Geometry, b []byte) {
 		t.Fatalf("decoder: read error: %v", err)
 	}
 
-	if !geoos.Equal(g, e) {
+	if !g.Equals(e) {
 		t.Errorf("decoder: incorrect geometry: %v != %v", g, e)
 	}
 
@@ -100,7 +91,7 @@ func compare(t testing.TB, e geoos.Geometry, b []byte) {
 		t.Fatalf("unmarshal: read error: %v", err)
 	}
 
-	if !geoos.Equal(g, e) {
+	if !g.Equals(e) {
 		t.Errorf("unmarshal: incorrect geometry: %v != %v", g, e)
 	}
 
@@ -126,35 +117,35 @@ func compare(t testing.TB, e geoos.Geometry, b []byte) {
 	}
 
 	// Scanner
-	var sg geoos.Geometry
+	var sg space.Geometry
 
 	switch e.(type) {
-	case geoos.Point:
-		var p geoos.Point
+	case space.Point:
+		var p space.Point
 		err = Scanner(&p).Scan(b)
 		sg = p
-	case geoos.MultiPoint:
-		var mp geoos.MultiPoint
+	case space.MultiPoint:
+		var mp space.MultiPoint
 		err = Scanner(&mp).Scan(b)
 		sg = mp
-	case geoos.LineString:
-		var ls geoos.LineString
+	case space.LineString:
+		var ls space.LineString
 		err = Scanner(&ls).Scan(b)
 		sg = ls
-	case geoos.MultiLineString:
-		var mls geoos.MultiLineString
+	case space.MultiLineString:
+		var mls space.MultiLineString
 		err = Scanner(&mls).Scan(b)
 		sg = mls
-	case geoos.Polygon:
-		var p geoos.Polygon
+	case space.Polygon:
+		var p space.Polygon
 		err = Scanner(&p).Scan(b)
 		sg = p
-	case geoos.MultiPolygon:
-		var mp geoos.MultiPolygon
+	case space.MultiPolygon:
+		var mp space.MultiPolygon
 		err = Scanner(&mp).Scan(b)
 		sg = mp
-	case geoos.Collection:
-		var c geoos.Collection
+	case space.Collection:
+		var c space.Collection
 		err = Scanner(&c).Scan(b)
 		sg = c
 	default:
@@ -169,7 +160,7 @@ func compare(t testing.TB, e geoos.Geometry, b []byte) {
 		t.Errorf("scanning to wrong type: %v != %v", sg.GeoJSONType(), e.GeoJSONType())
 	}
 
-	if !geoos.Equal(sg, e) {
+	if !sg.Equals(e) {
 		t.Errorf("scan: incorrect geometry: %v != %v", sg, e)
 	}
 }
