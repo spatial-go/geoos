@@ -36,7 +36,7 @@ type LineSimplifier struct {
 func (l *LineSimplifier) Simplify(distanceTol float64) matrix.LineMatrix {
 	l.distanceTol = math.Abs(distanceTol)
 	if distanceTol < 0 {
-		l.angleOrientation = calc.CLOCKWISE
+		l.angleOrientation = calc.ClockWise
 	}
 
 	// rely on fact that boolean array is filled with false value

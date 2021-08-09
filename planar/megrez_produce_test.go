@@ -24,8 +24,8 @@ func TestAlgorithm_Boundary(t *testing.T) {
 	// const expectMultiPolygon = `MULTILINESTRING((10 130,50 190,110 190,140 150,150 80,100 10,20 40,10 130),
 	// (70 40,100 50,120 80,80 110,50 90,70 40))`
 
-	smultiPolygon, _ := wkt.UnmarshalString(sourceLine)
-	emultiPolygon, _ := wkt.UnmarshalString(expectLine)
+	sMultiPolygon, _ := wkt.UnmarshalString(sourceLine)
+	eMultiPolygon, _ := wkt.UnmarshalString(expectLine)
 
 	type args struct {
 		g space.Geometry
@@ -38,7 +38,7 @@ func TestAlgorithm_Boundary(t *testing.T) {
 	}{
 		{name: "line", args: args{g: sLine}, want: eLine, wantErr: false},
 		{name: "polygon", args: args{g: sPolygon}, want: ePolygon, wantErr: false},
-		{name: "multiPolygon", args: args{g: smultiPolygon}, want: emultiPolygon, wantErr: false},
+		{name: "multiPolygon", args: args{g: sMultiPolygon}, want: eMultiPolygon, wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -300,13 +300,6 @@ func TestAlgorithm_SimplifyP(t *testing.T) {
 }
 
 func TestAlgorithm_Snap(t *testing.T) {
-	const input = `POINT(0.05 0.05)`
-	const refernce = `POINT(0 0)`
-	const expect = `POINT(0 0)`
-
-	inputGeom, _ := wkt.UnmarshalString(input)
-	referenceGeom, _ := wkt.UnmarshalString(refernce)
-
 	type args struct {
 		input     space.Geometry
 		reference space.Geometry
@@ -315,27 +308,24 @@ func TestAlgorithm_Snap(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    string
+		want    space.Geometry
 		wantErr bool
 	}{
 		{name: "snap", args: args{
-			input:     inputGeom,
-			reference: referenceGeom,
+			input:     space.Point{0.05, 0.05},
+			reference: space.Point{0, 0},
 			tolerance: 0.1,
-		}, want: expect, wantErr: false},
+		}, want: space.Point{0, 0}, wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			G := NormalStrategy()
 			got, err := G.Snap(tt.args.input, tt.args.reference, tt.args.tolerance)
-
-			s := wkt.MarshalString(got)
-			t.Log(s)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Snap() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(s, tt.want) {
+			if !got.Equals(tt.want) {
 				t.Errorf("Snap() got = %v, want %v", got, tt.want)
 			}
 		})

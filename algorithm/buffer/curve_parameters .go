@@ -13,11 +13,11 @@ type CurveParameters struct {
 // DefaultCurveParameters Creates a default set of parameters.
 func DefaultCurveParameters() *CurveParameters {
 	return &CurveParameters{
-		calc.QUADRANTSEGMENTS,
-		calc.CAPROUND,
-		calc.JOINROUND,
-		calc.MITRELIMIT,
-		calc.SIMPLIFYFACTOR,
+		calc.QuadrantSegments,
+		calc.CapRound,
+		calc.JoinRound,
+		calc.MitreLimit,
+		calc.SimplifyFactor,
 		false,
 	}
 }

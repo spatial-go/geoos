@@ -133,9 +133,9 @@ func (c *CurveBuilder) isRingCurveInverted(pts matrix.LineMatrix, distance float
 
 func (c *CurveBuilder) computePointCurve(pt matrix.Matrix) {
 	switch c.parameters.EndCapStyle {
-	case calc.CAPROUND:
+	case calc.CapRound:
 		c.Curve.CreateCircle(pt, c.distance)
-	case calc.CAPSQUARE:
+	case calc.CapSquare:
 		c.Curve.CreateSquare(pt, c.distance)
 		// otherwise curve is empty (e.g. for a butt cap);
 	}

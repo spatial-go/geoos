@@ -49,9 +49,9 @@ const (
 
 // const default parameters.
 const (
-	// CLOCKWISE ...
-	CLOCKWISE        = -1
-	COUNTERCLOCKWISE = 1
+	// ClockWise ...
+	ClockWise        = -1
+	CounterClockWise = 1
 
 	// ANGLE ...
 	ANGLE = 2.0
@@ -66,35 +66,35 @@ const (
 	// NearnessFactor ...
 	NearnessFactor = 0.99
 
-	// CAPROUND Specifies a round line buffer end cap style.
-	CAPROUND = 1
-	// CAPFLAT Specifies a flat line buffer end cap style.
-	CAPFLAT = 2
-	// CAPSQUARE Specifies a square line buffer end cap style.
-	CAPSQUARE = 3
+	// CapRound Specifies a round line buffer end cap style.
+	CapRound = 1
+	// CapFlat Specifies a flat line buffer end cap style.
+	CapFlat = 2
+	// CapSquare Specifies a square line buffer end cap style.
+	CapSquare = 3
 
-	//JOINROUND Specifies a round join style.
-	JOINROUND = 1
-	// JOINMITRE Specifies a mitre join style.
-	JOINMITRE = 2
-	// JOINBEVEL Specifies a bevel join style.
-	JOINBEVEL = 3
+	//JoinRound Specifies a round join style.
+	JoinRound = 1
+	// JoinMitre Specifies a mitre join style.
+	JoinMitre = 2
+	// JoinBevel Specifies a bevel join style.
+	JoinBevel = 3
 
-	// QUADRANTSEGMENTS The default number of facets into which to divide a fillet of 90 degrees.
+	// QuadrantSegments The default number of facets into which to divide a fillet of 90 degrees.
 	// A value of 8 gives less than 2% max error in the buffer distance.
 	// For a max error of &lt; 1%, use QS = 12.
 	// For a max error of &lt; 0.1%, use QS = 18.
-	QUADRANTSEGMENTS = 8
+	QuadrantSegments = 8
 
-	// MITRELIMIT
+	// MitreLimit
 	// The default mitre limit
 	// Allows fairly pointy mitres.
-	MITRELIMIT = 5.0
+	MitreLimit = 5.0
 
-	// SIMPLIFYFACTOR
+	// SimplifyFactor
 	// The default simplify factor
 	// Provides an accuracy of about 1%, which matches the accuracy of the default Quadrant Segments parameter.
-	SIMPLIFYFACTOR = 0.01
+	SimplifyFactor = 0.01
 )
 
 // const default DE-9IM  and Dimension parameters.
@@ -107,10 +107,10 @@ const (
 
 	// FALSE Dimension value of the empty geometry (-1).
 	// TRUE Dimension value of non-empty geometries (= {P, L, A}).
-	// DONTCARE Dimension value for any dimension (= {FALSE, TRUE}).
-	FALSE    = -1
-	TRUE     = -2
-	DONTCARE = -3
+	// DONOTCARE Dimension value for any dimension (= {FALSE, TRUE}).
+	FALSE     = -1
+	TRUE      = -2
+	DONOTCARE = -3
 
 	P           = 0
 	L           = 1
@@ -129,10 +129,10 @@ const (
 	EPS   = 1.23259516440783e-32 // = 2^-106
 	SPLIT = 134217729.0          // 2^27+1, for IEEE
 
-	MAXPRINTDIGITS = 32
+	MaxPrintDigits = 32
 
-	SCINOTEXPONENTCHAR = "E"
-	SCINOTZERO         = "0.0E0"
+	ScinotExponentChar = "E"
+	ScinotZero         = "0.0E0"
 )
 
 var (

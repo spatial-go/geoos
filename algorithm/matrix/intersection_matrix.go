@@ -261,7 +261,7 @@ func toDimensionSymbol(dimensionValue int) (byte, error) {
 		return calc.SYMFALSE, nil
 	case calc.TRUE:
 		return calc.SYMTRUE, nil
-	case calc.DONTCARE:
+	case calc.DONOTCARE:
 		return calc.SYMDONTCARE, nil
 	case calc.P:
 		return calc.SYMP, nil
@@ -282,7 +282,7 @@ func toDimensionValue(dimensionSymbol byte) (int, error) {
 	case calc.SYMTRUE:
 		return calc.TRUE, nil
 	case calc.SYMDONTCARE:
-		return calc.DONTCARE, nil
+		return calc.DONOTCARE, nil
 	case calc.SYMP:
 		return calc.P, nil
 	case calc.SYML:
