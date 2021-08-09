@@ -3,13 +3,13 @@ package geocsv
 import (
 	"testing"
 
-	"github.com/spatial-go/geoos"
+	"github.com/spatial-go/geoos/space"
 )
 
 func TestGeoCSV_Test1(t *testing.T) {
 	type args struct {
 		filePath string
-		options  GeoCSVOptions
+		options  Options
 	}
 	tests := []struct {
 		name    string
@@ -20,7 +20,7 @@ func TestGeoCSV_Test1(t *testing.T) {
 			name: "test1",
 			args: args{
 				filePath: "./test1.csv",
-				options: GeoCSVOptions{
+				options: Options{
 					XField: "x",
 					YField: "y",
 				},
@@ -43,7 +43,7 @@ func TestGeoCSV_Test1(t *testing.T) {
 				if len(features.Features) != 4 {
 					t.Error("length of features is wrong")
 				}
-				point := features.Features[0].Geometry.Coordinates.(geoos.Point)
+				point := features.Features[0].Geometry.Coordinates.(space.Point)
 				if point[0] != 2 || point[1] != 49 {
 					t.Error("Coordinates is wrong")
 				}
@@ -55,7 +55,7 @@ func TestGeoCSV_Test1(t *testing.T) {
 func TestGeoCSV_Test2(t *testing.T) {
 	type args struct {
 		filePath string
-		options  GeoCSVOptions
+		options  Options
 	}
 	tests := []struct {
 		name    string
@@ -66,7 +66,7 @@ func TestGeoCSV_Test2(t *testing.T) {
 			name: "test2",
 			args: args{
 				filePath: "./test2.csv",
-				options: GeoCSVOptions{
+				options: Options{
 					WKTField: "wkt",
 				},
 			},
@@ -88,7 +88,7 @@ func TestGeoCSV_Test2(t *testing.T) {
 				if len(features.Features) != 4 {
 					t.Error("length of features is wrong")
 				}
-				point := features.Features[1].Geometry.Coordinates.(geoos.Point)
+				point := features.Features[1].Geometry.Coordinates.(space.Point)
 				if point[0] != 3 || point[1] != 50 {
 					t.Error("Coordinates is wrong")
 				}

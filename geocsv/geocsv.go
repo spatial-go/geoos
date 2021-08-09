@@ -1,6 +1,4 @@
-/*
-Package geocsv is a library for read csv file with geospatial data.
-*/
+//Package geocsv is a library for read csv file with geospatial data.
 package geocsv
 
 import (
@@ -11,9 +9,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/spatial-go/geoos"
 	"github.com/spatial-go/geoos/encoding/wkt"
 	"github.com/spatial-go/geoos/geojson"
+	"github.com/spatial-go/geoos/space"
 	"github.com/spatial-go/geoos/utils"
 	"golang.org/x/text/encoding/simplifiedchinese"
 )
@@ -26,18 +24,18 @@ type GeoCSV struct {
 	file    *os.File
 	headers []string
 	rows    [][]string
-	options GeoCSVOptions
+	options Options
 }
 
-// GeoCSVOptions an options of GeoCSV
-type GeoCSVOptions struct {
+// Options an options of GeoCSV
+type Options struct {
 	Fields   []string
 	XField   string
 	YField   string
 	WKTField string
 }
 
-// NewGeoCSV
+// NewGeoCSV ...
 func NewGeoCSV() (gc *GeoCSV) {
 	gc = &GeoCSV{}
 	return
@@ -95,7 +93,7 @@ func (gc *GeoCSV) readRecords() (err error) {
 }
 
 // Read read csv file with options
-func Read(filePath string, options GeoCSVOptions) (gc *GeoCSV, err error) {
+func Read(filePath string, options Options) (gc *GeoCSV, err error) {
 	gc = NewGeoCSV()
 	gc.options = options
 	if gc.file, err = os.Open(filePath); err != nil {
@@ -133,7 +131,7 @@ func (gc *GeoCSV) ToGeoJSON() (features *geojson.FeatureCollection) {
 			properties[fieldName] = cell
 		}
 		if geometry == nil && lng != defaultCoordValue && lat != defaultCoordValue {
-			geometry = geojson.NewGeometry(geoos.Point{lng, lat})
+			geometry = geojson.NewGeometry(space.Point{lng, lat})
 		}
 		if geometry != nil {
 			feature := geojson.NewFeature(*geometry)

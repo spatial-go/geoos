@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/spatial-go/geoos"
+	"github.com/spatial-go/geoos/space"
 )
 
 var (
@@ -47,24 +47,24 @@ var (
 //	}
 type GeometryScanner struct {
 	g        interface{}
-	Geometry geoos.Geometry
+	Geometry space.Geometry
 	Valid    bool // Valid is true if the geometry is not NULL
 }
 
 // Scanner will return a GeometryScanner that can scan sql query results.
 // The geometryScanner.Geometry attribute will be set to the value.
-// If g is non-nil, it MUST be a pointer to an geoos.Geometry
+// If g is non-nil, it MUST be a pointer to an space.Geometry
 // type like a Point or LineString. In that case the value will be written to
 // g and the Geometry attribute.
 //
-//	var p geoos.Point
+//	var p space.Point
 //	err := db.QueryRow("SELECT latlon FROM foo WHERE id=?", id).Scan(wkb.Scanner(&p))
 //	...
 //	// use p
 //
 // If the value may be null check Valid first:
 //
-//	var point geoos.Point
+//	var point space.Point
 //	s := wkb.Scanner(&point)
 //	err := db.QueryRow("SELECT latlon FROM foo WHERE id=?", id).Scan(&s)
 //	...
@@ -83,7 +83,7 @@ func Scanner(g interface{}) *GeometryScanner {
 }
 
 // Scan will scan the input []byte data into a geometry.
-// This could be into the geoos geometry type pointer or, if nil,
+// This could be into the space geometry type pointer or, if nil,
 // the scanner.Geometry attribute.
 func (s *GeometryScanner) Scan(d interface{}) error {
 	s.Geometry = nil
@@ -123,7 +123,7 @@ func (s *GeometryScanner) Scan(d interface{}) error {
 		s.Geometry = m
 		s.Valid = true
 		return nil
-	case *geoos.Point:
+	case *space.Point:
 		p, err := scanPoint(data)
 		if err != nil {
 			return err
@@ -133,7 +133,7 @@ func (s *GeometryScanner) Scan(d interface{}) error {
 		s.Geometry = p
 		s.Valid = true
 		return nil
-	case *geoos.MultiPoint:
+	case *space.MultiPoint:
 		p, err := scanMultiPoint(data)
 		if err != nil {
 			return err
@@ -143,7 +143,7 @@ func (s *GeometryScanner) Scan(d interface{}) error {
 		s.Geometry = p
 		s.Valid = true
 		return nil
-	case *geoos.LineString:
+	case *space.LineString:
 		p, err := scanLineString(data)
 		if err != nil {
 			return err
@@ -153,7 +153,7 @@ func (s *GeometryScanner) Scan(d interface{}) error {
 		s.Geometry = p
 		s.Valid = true
 		return nil
-	case *geoos.MultiLineString:
+	case *space.MultiLineString:
 		p, err := scanMultiLineString(data)
 		if err != nil {
 			return err
@@ -163,21 +163,21 @@ func (s *GeometryScanner) Scan(d interface{}) error {
 		s.Geometry = p
 		s.Valid = true
 		return nil
-	case *geoos.Ring:
+	case *space.Ring:
 		m, err := Unmarshal(data)
 		if err != nil {
 			return err
 		}
 
-		if p, ok := m.(geoos.Polygon); ok && len(p) == 1 {
-			*g = p[0]
-			s.Geometry = p[0]
+		if p, ok := m.(space.Polygon); ok && len(p) == 1 {
+			*g = p.ToRingArray()[0]
+			s.Geometry = p.ToRingArray()[0]
 			s.Valid = true
 			return nil
 		}
 
 		return ErrIncorrectGeometry
-	case *geoos.Polygon:
+	case *space.Polygon:
 		m, err := scanPolygon(data)
 		if err != nil {
 			return err
@@ -187,7 +187,7 @@ func (s *GeometryScanner) Scan(d interface{}) error {
 		s.Geometry = m
 		s.Valid = true
 		return nil
-	case *geoos.MultiPolygon:
+	case *space.MultiPolygon:
 		m, err := scanMultiPolygon(data)
 		if err != nil {
 			return err
@@ -197,7 +197,7 @@ func (s *GeometryScanner) Scan(d interface{}) error {
 		s.Geometry = m
 		s.Valid = true
 		return nil
-	case *geoos.Collection:
+	case *space.Collection:
 		m, err := scanCollection(data)
 		if err != nil {
 			return err
@@ -207,7 +207,7 @@ func (s *GeometryScanner) Scan(d interface{}) error {
 		s.Geometry = m
 		s.Valid = true
 		return nil
-	case *geoos.Bound:
+	case *space.Bound:
 		m, err := Unmarshal(data)
 		if err != nil {
 			return err
@@ -223,10 +223,10 @@ func (s *GeometryScanner) Scan(d interface{}) error {
 	return ErrIncorrectGeometry
 }
 
-func scanPoint(data []byte) (geoos.Point, error) {
+func scanPoint(data []byte) (space.Point, error) {
 	order, typ, data, err := unmarshalByteOrderType(data)
 	if err != nil {
-		return geoos.Point{}, err
+		return nil, err
 	}
 
 	switch typ {
@@ -235,33 +235,33 @@ func scanPoint(data []byte) (geoos.Point, error) {
 	case multiPointType:
 		mp, err := unmarshalMultiPoint(order, data[5:])
 		if err != nil {
-			return geoos.Point{}, err
+			return nil, err
 		}
 		if len(mp) == 1 {
 			return mp[0], nil
 		}
 	}
 
-	return geoos.Point{}, ErrIncorrectGeometry
+	return nil, ErrIncorrectGeometry
 }
 
-func scanMultiPoint(data []byte) (geoos.MultiPoint, error) {
+func scanMultiPoint(data []byte) (space.MultiPoint, error) {
 	m, err := Unmarshal(data)
 	if err != nil {
 		return nil, err
 	}
 
 	switch p := m.(type) {
-	case geoos.Point:
-		return geoos.MultiPoint{p}, nil
-	case geoos.MultiPoint:
+	case space.Point:
+		return space.MultiPoint{p}, nil
+	case space.MultiPoint:
 		return p, nil
 	}
 
 	return nil, ErrIncorrectGeometry
 }
 
-func scanLineString(data []byte) (geoos.LineString, error) {
+func scanLineString(data []byte) (space.LineString, error) {
 	order, typ, data, err := unmarshalByteOrderType(data)
 	if err != nil {
 		return nil, err
@@ -283,7 +283,7 @@ func scanLineString(data []byte) (geoos.LineString, error) {
 	return nil, ErrIncorrectGeometry
 }
 
-func scanMultiLineString(data []byte) (geoos.MultiLineString, error) {
+func scanMultiLineString(data []byte) (space.MultiLineString, error) {
 	order, typ, data, err := unmarshalByteOrderType(data)
 	if err != nil {
 		return nil, err
@@ -296,7 +296,7 @@ func scanMultiLineString(data []byte) (geoos.MultiLineString, error) {
 			return nil, err
 		}
 
-		return geoos.MultiLineString{ls}, nil
+		return space.MultiLineString{ls}, nil
 	case multiLineStringType:
 		return unmarshalMultiLineString(order, data[5:])
 	}
@@ -304,7 +304,7 @@ func scanMultiLineString(data []byte) (geoos.MultiLineString, error) {
 	return nil, ErrIncorrectGeometry
 }
 
-func scanPolygon(data []byte) (geoos.Polygon, error) {
+func scanPolygon(data []byte) (space.Polygon, error) {
 	order, typ, data, err := unmarshalByteOrderType(data)
 	if err != nil {
 		return nil, err
@@ -326,7 +326,7 @@ func scanPolygon(data []byte) (geoos.Polygon, error) {
 	return nil, ErrIncorrectGeometry
 }
 
-func scanMultiPolygon(data []byte) (geoos.MultiPolygon, error) {
+func scanMultiPolygon(data []byte) (space.MultiPolygon, error) {
 	order, typ, data, err := unmarshalByteOrderType(data)
 	if err != nil {
 		return nil, err
@@ -338,7 +338,7 @@ func scanMultiPolygon(data []byte) (geoos.MultiPolygon, error) {
 		if err != nil {
 			return nil, err
 		}
-		return geoos.MultiPolygon{p}, nil
+		return space.MultiPolygon{p}, nil
 	case multiPolygonType:
 		return unmarshalMultiPolygon(order, data[5:])
 	}
@@ -346,7 +346,7 @@ func scanMultiPolygon(data []byte) (geoos.MultiPolygon, error) {
 	return nil, ErrIncorrectGeometry
 }
 
-func scanCollection(data []byte) (geoos.Collection, error) {
+func scanCollection(data []byte) (space.Collection, error) {
 	m, err := NewDecoder(bytes.NewReader(data)).Decode()
 	if err == io.EOF || err == io.ErrUnexpectedEOF {
 		return nil, ErrNotWKB
@@ -357,7 +357,7 @@ func scanCollection(data []byte) (geoos.Collection, error) {
 	}
 
 	switch p := m.(type) {
-	case geoos.Collection:
+	case space.Collection:
 		return p, nil
 	}
 
@@ -365,12 +365,12 @@ func scanCollection(data []byte) (geoos.Collection, error) {
 }
 
 type value struct {
-	v geoos.Geometry
+	v space.Geometry
 }
 
 // Value will create a driver.Valuer that will WKB the geometry
 // into the database query.
-func Value(g geoos.Geometry) driver.Valuer {
+func Value(g space.Geometry) driver.Valuer {
 	return value{v: g}
 
 }
