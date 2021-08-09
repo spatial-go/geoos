@@ -53,7 +53,7 @@ func (c *Curve) AddLine(line matrix.LineMatrix) {
 	}
 }
 
-// Add add a Ptcontinue.
+// Add add a Pts.
 func (c *Curve) Add(pts ...matrix.Matrix) {
 	for _, pt := range pts {
 		if len(c.Line) > 0 && measure.PlanarDistance(c.Line[len(c.Line)-1], pt) <= c.minimimVertexDistance {

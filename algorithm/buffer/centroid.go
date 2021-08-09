@@ -53,7 +53,7 @@ func (c *CentroidComputer) GetCentroid() matrix.Matrix {
 		// Input contains lineal matrix.Steric
 		cent = append(cent, c.LineCentSum[0]/c.TotalLength, c.LineCentSum[1]/c.TotalLength)
 	} else if c.PtCount > 0 {
-		//Input contains puntal matrix.Steric only
+		//Input contains matrix.Steric only
 		cent = append(cent, c.PtCentSum[0]/float64(c.PtCount), c.PtCentSum[1]/float64(c.PtCount))
 	} else {
 		return nil
@@ -102,10 +102,10 @@ func (c *CentroidComputer) AddLineSegments(lines matrix.LineMatrix) {
 			continue
 		}
 		linelen += segmentLen
-		midx := (lines[i][0] + lines[i+1][0]) / 2
-		midy := (lines[i][1] + lines[i+1][1]) / 2
-		c.LineCentSum[0] += segmentLen * midx
-		c.LineCentSum[1] += segmentLen * midy
+		midX := (lines[i][0] + lines[i+1][0]) / 2
+		midY := (lines[i][1] + lines[i+1][1]) / 2
+		c.LineCentSum[0] += segmentLen * midX
+		c.LineCentSum[1] += segmentLen * midY
 	}
 	c.TotalLength += linelen
 	if linelen == 0.0 && len(lines) > 0 {

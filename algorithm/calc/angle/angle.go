@@ -73,10 +73,9 @@ func isObtuse(p0, p1, p2 matrix.Matrix) bool {
 	return dotprod < 0
 }
 
-// Returns the unoriented smallest angle between two vectors.
+// Between Returns the smallest angle between two vectors.
 // The computed angle will be in the range [0, Pi).
-
-func ngleBetween(tip1, tail, tip2 matrix.Matrix) float64 {
+func Between(tip1, tail, tip2 matrix.Matrix) float64 {
 	a1 := Angle(tail, tip1)
 	a2 := Angle(tail, tip2)
 
@@ -160,7 +159,7 @@ func NormalizePositive(angle float64) float64 {
 	return angle
 }
 
-// Diff Computes the unoriented smallest difference between two angles.
+// Diff Computes the smallest difference between two angles.
 // The angles are assumed to be normalized to the range [-Pi, Pi].
 // The result will be in the range [0, Pi].
 func Diff(ang1, ang2 float64) float64 {

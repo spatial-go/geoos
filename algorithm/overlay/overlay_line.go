@@ -48,11 +48,11 @@ func (p *LineOverlay) Intersection() (matrix.Steric, error) {
 		ils := IntersectLine(line, c)
 		for _, il := range ils {
 			if len(il.Ips) > 1 {
-				var ipline matrix.LineMatrix
+				var ipLine matrix.LineMatrix
 				for _, v := range il.Ips {
-					ipline = append(ipline, v.Matrix)
+					ipLine = append(ipLine, v.Matrix)
 				}
-				result = append(result, ipline)
+				result = append(result, ipLine)
 			} else {
 				result = append(result, il.Ips[0].Matrix)
 			}
@@ -63,11 +63,11 @@ func (p *LineOverlay) Intersection() (matrix.Steric, error) {
 		for _, ring := range c {
 			for _, il := range IntersectLine(line, ring) {
 				if len(il.Ips) > 1 {
-					var ipline matrix.LineMatrix
+					var ipLine matrix.LineMatrix
 					for _, v := range il.Ips {
-						ipline = append(ipline, v.Matrix)
+						ipLine = append(ipLine, v.Matrix)
 					}
-					result = append(result, ipline)
+					result = append(result, ipLine)
 				} else {
 					result = append(result, il.Ips[0].Matrix)
 				}

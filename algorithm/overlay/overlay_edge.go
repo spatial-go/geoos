@@ -7,7 +7,7 @@ import (
 
 // Edge ...
 type Edge struct {
-	Vertexs     []Vertex
+	Vertexes    []Vertex
 	IsClockwise bool
 	NowStatus   int
 }
@@ -15,7 +15,7 @@ type Edge struct {
 // AreaDirection Returns area  <0 if direction is true, area > 0 else.
 func (e *Edge) AreaDirection() float64 {
 	var ring matrix.LineMatrix
-	for _, v := range e.Vertexs {
+	for _, v := range e.Vertexes {
 		ring = append(ring, v.Matrix)
 	}
 	return measure.AreaDirection(ring)

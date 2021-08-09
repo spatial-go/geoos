@@ -12,7 +12,7 @@ const (
 
 	// R radius of earth.
 	R = 6371000.0 //6378137.0
-	// E is excentricity.
+	// E is eccentricity.
 	E = 0.006694379990141317
 )
 

@@ -35,14 +35,14 @@ func Area(ring matrix.LineMatrix) float64 {
 
 // AreaDirection returns the area (direction) of a Ring geometry.
 func AreaDirection(ring matrix.LineMatrix) float64 {
-	rlen := len(ring)
-	if rlen < 3 {
+	rLen := len(ring)
+	if rLen < 3 {
 		return 0.0
 	}
 	sum := 0.0
 
 	x0 := ring[0][0]
-	for i := 1; i < rlen-1; i++ {
+	for i := 1; i < rLen-1; i++ {
 		x := ring[i][0] - x0
 		y1 := ring[i+1][1]
 		y2 := ring[i-1][1]

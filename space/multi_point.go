@@ -9,7 +9,7 @@ import (
 	"github.com/spatial-go/geoos/space/spaceerr"
 )
 
-// A MultiPoint represents a set of points in the 2D Eucledian or Cartesian plane.
+// A MultiPoint represents a set of points .
 type MultiPoint []Point
 
 // GeoJSONType returns the GeoJSON type for the object.
@@ -77,7 +77,7 @@ func (mp MultiPoint) Equals(g Geometry) bool {
 	return mp.EqualsMultiPoint(g.(MultiPoint))
 }
 
-// EqualsExact Returns true if the two Geometrys are exactly equal,
+// EqualsExact Returns true if the two Geometries are exactly equal,
 // up to a specified distance tolerance.
 // Two Geometries are exactly equal within a distance tolerance
 func (mp MultiPoint) EqualsExact(g Geometry, tolerance float64) bool {

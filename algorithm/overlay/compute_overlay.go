@@ -26,9 +26,9 @@ func (c *ComputeMergeOverlay) Compute(pol *Plane, start *Vertex, which bool) *Ve
 		walkings = c.clippingPlane.Rings
 	}
 	for _, w := range walkings {
-		if iter, err := SliceContains(w.Vertexs, start); err == nil {
+		if iter, err := SliceContains(w.Vertexes, start); err == nil {
 			for {
-				pol.AddPointWhich(&w.Vertexs[iter], which)
+				pol.AddPointWhich(&w.Vertexes[iter], which)
 
 				if w.IsClockwise {
 					iter--
@@ -37,18 +37,18 @@ func (c *ComputeMergeOverlay) Compute(pol *Plane, start *Vertex, which bool) *Ve
 				}
 
 				// 循环列表
-				if iter == len(w.Vertexs) {
+				if iter == len(w.Vertexes) {
 					iter = 0
 				}
 				if iter == -1 {
-					iter = len(w.Vertexs) - 1
+					iter = len(w.Vertexes) - 1
 				}
 
-				if w.Vertexs[iter].IsIntersectionPoint {
+				if w.Vertexes[iter].IsIntersectionPoint {
 					break
 				}
 			}
-			return &w.Vertexs[iter]
+			return &w.Vertexes[iter]
 		}
 	}
 	// should not happend
@@ -75,27 +75,27 @@ func (c *ComputeClipOverlay) Compute(pol *Plane, start *Vertex, which bool) *Ver
 		walkings = c.clippingPlane.Rings
 	}
 	for _, w := range walkings {
-		if iter, err := SliceContains(w.Vertexs, start); err == nil {
+		if iter, err := SliceContains(w.Vertexes, start); err == nil {
 			for {
-				pol.AddPointWhich(&w.Vertexs[iter], which)
+				pol.AddPointWhich(&w.Vertexes[iter], which)
 				if w.IsClockwise {
 					iter++
 				} else {
 					iter--
 				}
 				// 循环列表
-				if iter == len(w.Vertexs) {
+				if iter == len(w.Vertexes) {
 					iter = 0
 				}
 				if iter == -1 {
-					iter = len(w.Vertexs) - 1
+					iter = len(w.Vertexes) - 1
 				}
 
-				if w.Vertexs[iter].IsIntersectionPoint {
+				if w.Vertexes[iter].IsIntersectionPoint {
 					break
 				}
 			}
-			return &w.Vertexs[iter]
+			return &w.Vertexes[iter]
 		}
 	}
 	// should not happend
@@ -122,9 +122,9 @@ func (c *ComputeMainOverlay) Compute(pol *Plane, start *Vertex, which bool) *Ver
 		walkings = c.clippingPlane.Rings
 	}
 	for _, w := range walkings {
-		if iter, err := SliceContains(w.Vertexs, start); err == nil {
+		if iter, err := SliceContains(w.Vertexes, start); err == nil {
 			for {
-				pol.AddPointWhich(&w.Vertexs[iter], which)
+				pol.AddPointWhich(&w.Vertexes[iter], which)
 
 				if which {
 					if w.IsClockwise {
@@ -141,18 +141,18 @@ func (c *ComputeMainOverlay) Compute(pol *Plane, start *Vertex, which bool) *Ver
 				}
 
 				// 循环列表
-				if iter == len(w.Vertexs) {
+				if iter == len(w.Vertexes) {
 					iter = 0
 				}
 				if iter == -1 {
-					iter = len(w.Vertexs) - 1
+					iter = len(w.Vertexes) - 1
 				}
 
-				if w.Vertexs[iter].IsIntersectionPoint {
+				if w.Vertexes[iter].IsIntersectionPoint {
 					break
 				}
 			}
-			return &w.Vertexs[iter]
+			return &w.Vertexes[iter]
 		}
 	}
 	// should not happend

@@ -19,24 +19,24 @@ func SliceContains(list []Vertex, p *Vertex) (int, error) {
 func AddPointToVertexSlice(edges []*Edge, pStart, pEnd, ip *Vertex) {
 	for _, v := range edges {
 
-		if start, err := SliceContains(v.Vertexs, pStart); err == nil {
-			end, _ := SliceContains(v.Vertexs, pEnd)
+		if start, err := SliceContains(v.Vertexes, pStart); err == nil {
+			end, _ := SliceContains(v.Vertexes, pEnd)
 
 			it := start
-			distFromStart := measure.PlanarDistance(ip.Matrix, v.Vertexs[it].Matrix)
+			distFromStart := measure.PlanarDistance(ip.Matrix, v.Vertexes[it].Matrix)
 
 			// 处理多个交点
-			for it != end && it != len(v.Vertexs) {
-				if measure.PlanarDistance(v.Vertexs[it].Matrix, v.Vertexs[start].Matrix) >= distFromStart {
+			for it != end && it != len(v.Vertexes) {
+				if measure.PlanarDistance(v.Vertexes[it].Matrix, v.Vertexes[start].Matrix) >= distFromStart {
 					break
 				}
 				it++
 			}
 
-			circ := v.Vertexs[it:]
-			v.Vertexs = append([]Vertex{}, v.Vertexs[:it]...)
-			v.Vertexs = append(v.Vertexs, *ip)
-			v.Vertexs = append(v.Vertexs, circ...)
+			circ := v.Vertexes[it:]
+			v.Vertexes = append([]Vertex{}, v.Vertexes[:it]...)
+			v.Vertexes = append(v.Vertexes, *ip)
+			v.Vertexes = append(v.Vertexes, circ...)
 			break
 		}
 	}

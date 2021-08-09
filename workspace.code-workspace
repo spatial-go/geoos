@@ -13,6 +13,9 @@
 			"stdlib.h": "c",
 			"geos_c.h": "c"
 		},
-		"go.lintTool": "golint"
+		"go.lintTool": "golint",
+		"cSpell.words": [
+			"DONTCARE"
+		]
 	}
 }

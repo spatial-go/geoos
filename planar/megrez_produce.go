@@ -32,7 +32,7 @@ func (g *MegrezAlgorithm) Buffer(geom space.Geometry, width float64, quadsegs in
 // For [MULTI]POLYGONs, "weight" is thought in terms of area.
 // If an empty geometry is supplied, an empty GEOMETRYCOLLECTION is returned.
 // If NULL is supplied, NULL is returned.
-// If CIRCULARSTRING or COMPOUNDCURVE are supplied, they are converted to linestring wtih CurveToLine first,
+// If CIRCULARSTRING or COMPOUNDCURVE are supplied, they are converted to linestring with CurveToLine first,
 // then same than for LINESTRING
 func (g *MegrezAlgorithm) Centroid(geom space.Geometry) (space.Geometry, error) {
 	if geom == nil || geom.IsEmpty() {

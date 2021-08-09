@@ -65,7 +65,7 @@ type Geometry interface {
 	// Equals returns true if the Geometry represents the same Geometry or vector.
 	Equals(g Geometry) bool
 
-	// EqualsExact Returns true if the two Geometrys are exactly equal,
+	// EqualsExact Returns true if the two Geometries are exactly equal,
 	// up to a specified distance tolerance.
 	// Two Geometries are exactly equal within a distance tolerance
 	EqualsExact(g Geometry, tolerance float64) bool

@@ -18,7 +18,7 @@ type TaggedLineStringSimplifier struct {
 // Simplify Simplifies the given TaggedLineString  using the distance tolerance specified.
 func (t *TaggedLineStringSimplifier) Simplify(line *TaggedLineString) {
 	t.line = line
-	t.linePts = line.GetParentMatrixs()
+	t.linePts = line.GetParentMatrixes()
 	t.simplifySection(0, len(t.linePts)-1, 0)
 }
 

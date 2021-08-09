@@ -53,20 +53,20 @@ func IsIntersects(p1, p2, q matrix.Matrix) bool {
 // IsIntersectsTwo  Tests whether the envelope defined by p1-p2
 // and the envelope defined by q1-q2 intersect.
 func IsIntersectsTwo(p1, p2, q1, q2 matrix.Matrix) bool {
-	minq := math.Min(q1[0], q2[0])
-	maxq := math.Max(q1[0], q2[0])
-	minp := math.Min(p1[0], p2[0])
-	maxp := math.Max(p1[0], p2[0])
+	minQ := math.Min(q1[0], q2[0])
+	maxQ := math.Max(q1[0], q2[0])
+	minP := math.Min(p1[0], p2[0])
+	maxP := math.Max(p1[0], p2[0])
 
-	if minp > maxq || maxp < minq {
+	if minP > maxQ || maxP < minQ {
 		return false
 	}
 
-	minq = math.Min(q1[1], q2[1])
-	maxq = math.Max(q1[1], q2[1])
-	minp = math.Min(p1[1], p2[1])
-	maxp = math.Max(p1[1], p2[1])
-	if minp > maxq || maxp < minq {
+	minQ = math.Min(q1[1], q2[1])
+	maxQ = math.Max(q1[1], q2[1])
+	minP = math.Min(p1[1], p2[1])
+	maxP = math.Max(p1[1], p2[1])
+	if minP > maxQ || maxP < minQ {
 		return false
 	}
 	return true
@@ -177,7 +177,7 @@ func (e *Envelope) Height() float64 {
 	return e.MaxY - e.MinY
 }
 
-// Diameter  Gets the length of the diameter (diagonal) of the envelopAreae.
+// Diameter  Gets the length of the diameter (diagonal) of the envelopArea.
 func (e *Envelope) Diameter() float64 {
 	if e.IsNil() {
 		return 0

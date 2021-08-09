@@ -91,7 +91,7 @@ func (mls MultiLineString) Equals(g Geometry) bool {
 	return mls.EqualsMultiLineString(g.(MultiLineString))
 }
 
-// EqualsExact Returns true if the two Geometrys are exactly equal,
+// EqualsExact Returns true if the two Geometries are exactly equal,
 // up to a specified distance tolerance.
 // Two Geometries are exactly equal within a distance tolerance
 func (mls MultiLineString) EqualsExact(g Geometry, tolerance float64) bool {

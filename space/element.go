@@ -80,7 +80,7 @@ func Distance(from, to Geometry, f measure.Distance) (float64, error) {
 }
 
 // Relate Computes the  Intersection Matrix for the spatial relationship
-// between two Sterics, using the default (OGC SFS) Boundary Node Rule
+// between two geometries, using the default (OGC SFS) Boundary Node Rule
 func Relate(a, b Geometry) (string, error) {
 	if a.IsCollection() || b.IsCollection() {
 		return "", spaceerr.ErrNotSupportCollection

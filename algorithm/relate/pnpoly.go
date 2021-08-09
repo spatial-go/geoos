@@ -31,7 +31,7 @@ func InPolygon(point matrix.Matrix, poly matrix.LineMatrix) bool {
 // Segment intersect expression from
 // https://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
 //
-// Currently the compiler inlines the function by default.
+// Currently the compiler in lines the function by default.
 func rayIntersectsSegment(p, a, b matrix.Matrix) bool {
 	return (a[1] > p[1]) != (b[1] > p[1]) &&
 		p[0] < (b[0]-a[0])*(p[1]-a[1])/(b[1]-a[1])+a[0]

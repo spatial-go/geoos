@@ -22,19 +22,19 @@ func (p *Plane) AddPointWhich(point *Vertex, which bool) {
 	if p.Edge == nil || p.Edge.NowStatus == calc.CLOSED {
 		newCirCuit := Edge{IsClockwise: false}
 		p.Edge = &newCirCuit
-		p.Edge.Vertexs = append(p.Edge.Vertexs, Vertex{Matrix: matrix.Matrix{point.X(), point.Y()}})
+		p.Edge.Vertexes = append(p.Edge.Vertexes, Vertex{Matrix: matrix.Matrix{point.X(), point.Y()}})
 		p.Rings = append(p.Rings, &newCirCuit)
 		p.Edge.NowStatus = 0
 	} else {
-		if len(p.Edge.Vertexs) >= 1 && p.Edge.Vertexs[len(p.Edge.Vertexs)-1].Matrix.Equals(point.Matrix) {
+		if len(p.Edge.Vertexes) >= 1 && p.Edge.Vertexes[len(p.Edge.Vertexes)-1].Matrix.Equals(point.Matrix) {
 			return
 		}
-		p.Edge.Vertexs = append(p.Edge.Vertexs, Vertex{Matrix: matrix.Matrix{point.X(), point.Y()}})
+		p.Edge.Vertexes = append(p.Edge.Vertexes, Vertex{Matrix: matrix.Matrix{point.X(), point.Y()}})
 		// add line
-		if len(p.Edge.Vertexs) > 1 {
+		if len(p.Edge.Vertexes) > 1 {
 			line := Line{IsMain: which}
-			line.Start = &p.Edge.Vertexs[len(p.Edge.Vertexs)-2]
-			line.End = &p.Edge.Vertexs[len(p.Edge.Vertexs)-1]
+			line.Start = &p.Edge.Vertexes[len(p.Edge.Vertexes)-2]
+			line.End = &p.Edge.Vertexes[len(p.Edge.Vertexes)-1]
 			p.Lines = append(p.Lines, line)
 		}
 	}
@@ -53,8 +53,8 @@ func (p *Plane) CloseRing() {
 
 		// add line
 		line := Line{}
-		line.Start = &p.Edge.Vertexs[len(p.Edge.Vertexs)-1]
-		line.End = &p.Edge.Vertexs[0]
+		line.Start = &p.Edge.Vertexes[len(p.Edge.Vertexes)-1]
+		line.End = &p.Edge.Vertexes[0]
 		p.Lines = append(p.Lines, line)
 		// if !p.edge.points[len(p.edge.points)-1].Equal(&p.edge.points[0]) {
 		// 	p.edge.points = append(p.edge.points, p.edge.points[0])
@@ -65,8 +65,8 @@ func (p *Plane) CloseRing() {
 // Equal Returns p == pol  .
 func (p *Plane) Equal(pol *Plane) bool {
 	for i, v2 := range p.Rings {
-		for j, v1 := range v2.Vertexs {
-			if !v1.Equal(&pol.Rings[i].Vertexs[j]) {
+		for j, v1 := range v2.Vertexes {
+			if !v1.Equal(&pol.Rings[i].Vertexes[j]) {
 				return false
 			}
 		}
@@ -88,7 +88,7 @@ func (p *Plane) ToString() string {
 	var ss string
 	for _, c := range p.Rings {
 		ss = ss + "{"
-		for _, v := range c.Vertexs {
+		for _, v := range c.Vertexes {
 			ss += "{"
 			ss += strconv.FormatFloat(v.X(), 'f', 2, 64)
 			ss += ","

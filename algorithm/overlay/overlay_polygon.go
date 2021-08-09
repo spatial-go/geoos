@@ -56,11 +56,11 @@ func (p *PolygonOverlay) Intersection() (matrix.Steric, error) {
 		for _, ring := range poly {
 			for _, il := range IntersectLine(c, ring) {
 				if len(il.Ips) > 1 {
-					var ipline matrix.LineMatrix
+					var ipLine matrix.LineMatrix
 					for _, v := range il.Ips {
-						ipline = append(ipline, v.Matrix)
+						ipLine = append(ipLine, v.Matrix)
 					}
-					result = append(result, ipline)
+					result = append(result, ipLine)
 				} else {
 					result = append(result, il.Ips[0].Matrix)
 				}
@@ -268,7 +268,7 @@ func ToPolygonMatrix(poly *Plane) matrix.PolygonMatrix {
 	result := matrix.PolygonMatrix{}
 	for _, v2 := range poly.Rings {
 		var edge matrix.LineMatrix
-		for _, v1 := range v2.Vertexs {
+		for _, v1 := range v2.Vertexes {
 			edge = append(edge, v1.Matrix)
 		}
 		if !matrix.Matrix(edge[len(edge)-1]).Equals(matrix.Matrix(edge[0])) {

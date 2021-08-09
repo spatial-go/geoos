@@ -11,13 +11,13 @@ type TaggedLineString struct {
 	MinimumSize int
 }
 
-// GetParentMatrixs ...
-func (t *TaggedLineString) GetParentMatrixs() []matrix.Matrix {
-	return matrix.TransMatrixs(t.ParentLine)
+// GetParentMatrixes ...
+func (t *TaggedLineString) GetParentMatrixes() []matrix.Matrix {
+	return matrix.TransMatrixes(t.ParentLine)
 }
 
-// GetResultMatrixs ...
-func (t *TaggedLineString) GetResultMatrixs() []matrix.Matrix {
+// GetResultMatrixes ...
+func (t *TaggedLineString) GetResultMatrixes() []matrix.Matrix {
 	return extractCoordinates(t.resultSegs)
 }
 
@@ -39,7 +39,7 @@ func (t *TaggedLineString) GetSegment(i int) *TaggedLineSegment {
 }
 
 func (t *TaggedLineString) initTaggedLine() {
-	pts := matrix.TransMatrixs(t.ParentLine)
+	pts := matrix.TransMatrixes(t.ParentLine)
 	t.Segs = make([]*TaggedLineSegment, len(pts)-1)
 	for i := range pts[:len(pts)-1] {
 		seg := TaggedLineSegmentFour(pts[i], pts[i+1], t.ParentLine, i)

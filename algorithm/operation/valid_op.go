@@ -64,7 +64,7 @@ func (el *ValidOP) isSimplePolygon(matr matrix.PolygonMatrix) bool {
 
 // isSimpleCollection Computes simplicity for collection geometries.
 //  geometries are simple if and only if
-//  all geometrie are simple.
+//  all geometries are simple.
 func (el *ValidOP) isSimpleCollection(matr matrix.Collection) bool {
 	el.isSimpleMultiSteric(matr)
 	for _, g := range matr {

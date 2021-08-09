@@ -72,7 +72,7 @@ func (p Point) Equals(g Geometry) bool {
 	return p.EqualsPoint(g.(Point))
 }
 
-// EqualsExact Returns true if the two Geometrys are exactly equal,
+// EqualsExact Returns true if the two Geometries are exactly equal,
 // up to a specified distance tolerance.
 // Two Geometries are exactly equal within a distance tolerance
 func (p Point) EqualsExact(g Geometry, tolerance float64) bool {

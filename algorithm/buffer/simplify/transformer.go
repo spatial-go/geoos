@@ -49,12 +49,12 @@ func (t *Transformer) transformCoordinates(pts []matrix.Matrix, parent matrix.St
 }
 
 func (t *Transformer) transformPoint(geom matrix.Matrix, parent matrix.Steric) matrix.Steric {
-	pts := t.transformCoordinates(matrix.TransMatrixs(geom), parent)
+	pts := t.transformCoordinates(matrix.TransMatrixes(geom), parent)
 	return pts[0]
 }
 
 func (t *Transformer) transformLine(geom matrix.LineMatrix, parent matrix.Steric) matrix.Steric {
-	pts := t.transformCoordinates(matrix.TransMatrixs(geom), parent)
+	pts := t.transformCoordinates(matrix.TransMatrixes(geom), parent)
 	ml := matrix.LineMatrix{}
 	for _, v := range pts {
 		ml = append(ml, v)
@@ -67,7 +67,7 @@ func (t *Transformer) transformLine(geom matrix.LineMatrix, parent matrix.Steric
 // which does not form a structurally valid ring (i.e. a degenerate ring of 3 or fewer points).
 // In this case a LineString is returned.
 func (t *Transformer) transformRing(geom matrix.LineMatrix, parent matrix.Steric) matrix.Steric {
-	pts := t.transformCoordinates(matrix.TransMatrixs(geom), geom)
+	pts := t.transformCoordinates(matrix.TransMatrixes(geom), geom)
 	if pts == nil || len(pts) <= 0 {
 		return nil
 	}
@@ -141,7 +141,7 @@ func (l *LineStringTransformer) Transform(inputGeom matrix.Steric) (matrix.Steri
 }
 
 func (l *LineStringTransformer) transformLine(geom matrix.LineMatrix, parent matrix.Steric) matrix.Steric {
-	pts := l.transformCoordinates(matrix.TransMatrixs(geom), parent)
+	pts := l.transformCoordinates(matrix.TransMatrixes(geom), parent)
 	ml := matrix.LineMatrix{}
 	for _, v := range pts {
 		ml = append(ml, v)
@@ -165,7 +165,7 @@ func (l *LineStringTransformer) transformCoordinates(pts []matrix.Matrix, parent
 	// for linear components (including rings), simplify the linestring
 	if pl, ok := parent.(matrix.LineMatrix); ok {
 		if taggedLine, err := l.findLineString(pl); err == nil {
-			return taggedLine.GetResultMatrixs()
+			return taggedLine.GetResultMatrixes()
 		}
 		return pts
 	}
@@ -202,7 +202,7 @@ func (d *DPTransformer) transformLine(line matrix.LineMatrix, parent matrix.Ster
 	if len(line) == 0 {
 		newPts = matrix.LineMatrix{matrix.Matrix{0, 0}}
 	} else {
-		pts := (&DouglasPeuckerLineSimplifier{pts: matrix.TransMatrixs(line), distanceTolerance: d.distanceTolerance}).
+		pts := (&DouglasPeuckerLineSimplifier{pts: matrix.TransMatrixes(line), distanceTolerance: d.distanceTolerance}).
 			Simplify()
 		for _, v := range pts {
 			newPts = append(newPts, v)

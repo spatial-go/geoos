@@ -16,10 +16,10 @@ type ComputerBuffer struct {
 // Buffer Computes the set of raw offset curves for the buffer.
 // Each offset curve has an attached  indicating
 // its left and right location.
-func Buffer(geom matrix.Steric, distance float64, quadsegs int) matrix.Steric {
+func Buffer(geom matrix.Steric, distance float64, quadrantSegments int) matrix.Steric {
 	eb := ComputerBuffer{}
 	eb.param = DefaultCurveParameters()
-	eb.param.QuadrantSegments = quadsegs
+	eb.param.QuadrantSegments = quadrantSegments
 	eb.distance = distance
 	eb.CurveBuilder = &CurveBuilder{
 		Curve: CurveWithParameters(eb.param, eb.distance),

@@ -35,7 +35,7 @@ const (
 const (
 	// POINTS ...
 	POINTS = iota
-	// CLOSED egde is closed.
+	// CLOSED edge is closed.
 	CLOSED
 	// MAIN overlay main polygon.
 	MAIN

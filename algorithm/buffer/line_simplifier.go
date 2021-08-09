@@ -130,7 +130,7 @@ func (l *LineSimplifier) isShallowConcavity(p0, p1, p2 matrix.Matrix, distanceTo
 // This helps prevents the simplification from incrementally
 // "skipping" over points which are in fact non-shallow.
 func (l *LineSimplifier) isShallowSampled(p0, p2 matrix.Matrix, i0, i2 int, distanceTol float64) bool {
-	// check every n'th point to see if it is within tolerance
+	// check every point to see if it is within tolerance
 	inc := (i2 - i0) / NUMPTSTOCHECK
 	if inc <= 0 {
 		inc = 1
@@ -177,27 +177,27 @@ func (l *LineSimplifier) orientationIndex(p1x, p1y,
 // orientationIndexFilter A filter for computing the orientation index of three coordinates.
 func (l *LineSimplifier) orientationIndexFilter(pax, pay,
 	pbx, pby, pcx, pcy float64) int {
-	detsum := 0.0
+	detSum := 0.0
 
-	detleft := (pax - pcx) * (pby - pcy)
-	detright := (pay - pcy) * (pbx - pcx)
-	det := detleft - detright
+	detLeft := (pax - pcx) * (pby - pcy)
+	detRight := (pay - pcy) * (pbx - pcx)
+	det := detLeft - detRight
 
-	if detleft > 0.0 {
-		if detright <= 0.0 {
+	if detLeft > 0.0 {
+		if detRight <= 0.0 {
 			return calc.Signum(det)
 		}
-		detsum = detleft + detright
-	} else if detleft < 0.0 {
-		if detright >= 0.0 {
+		detSum = detLeft + detRight
+	} else if detLeft < 0.0 {
+		if detRight >= 0.0 {
 			return calc.Signum(det)
 		}
-		detsum = -detleft - detright
+		detSum = -detLeft - detRight
 	} else {
 		return calc.Signum(det)
 	}
 
-	errbound := DPSAFEEPSILON * detsum
+	errbound := DPSAFEEPSILON * detSum
 	if (det >= errbound) || (-det >= errbound) {
 		return calc.Signum(det)
 	}

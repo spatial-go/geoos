@@ -15,18 +15,18 @@ type Filter interface {
 	// Filter  Performs an operation with the provided .
 	Filter(matrix matrix.Matrix)
 
-	// Matrixs ...
-	Matrixs() []matrix.Matrix
+	// Matrixes ...
+	Matrixes() []matrix.Matrix
 }
 
 // UniqueArrayFilter  A Filter that extracts a unique array.
 type UniqueArrayFilter struct {
-	matrixs []matrix.Matrix
+	matrixes []matrix.Matrix
 }
 
-// Matrixs  Returns the gathered Coordinates.
-func (u *UniqueArrayFilter) Matrixs() []matrix.Matrix {
-	return u.matrixs
+// Matrixes  Returns the gathered Coordinates.
+func (u *UniqueArrayFilter) Matrixes() []matrix.Matrix {
+	return u.matrixes
 }
 
 // Filter Performs an operation with the provided .
@@ -56,13 +56,13 @@ func (u *UniqueArrayFilter) FilterSteric(matr matrix.Steric) {
 
 func (u *UniqueArrayFilter) add(matrix matrix.Matrix) {
 	hasMatrix := false
-	for _, v := range u.matrixs {
+	for _, v := range u.matrixes {
 		if v.Equals(matrix) {
 			hasMatrix = true
 			break
 		}
 	}
 	if !hasMatrix {
-		u.matrixs = append(u.matrixs, matrix)
+		u.matrixes = append(u.matrixes, matrix)
 	}
 }

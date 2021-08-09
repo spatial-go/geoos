@@ -49,7 +49,7 @@ func (s *Snapper) transformMatrix(srcPt matrix.Matrix, parent matrix.Steric) mat
 	newPts := s.snapLine(matrix.LineMatrix{srcPt}, s.snapGeom)
 	return newPts
 }
-func (s *Snapper) transformMatrixs(srcPts matrix.LineMatrix, parent matrix.Steric) matrix.Steric {
+func (s *Snapper) transformMatrixes(srcPts matrix.LineMatrix, parent matrix.Steric) matrix.Steric {
 	newPts := s.snapLine(srcPts, s.snapGeom)
 	return newPts
 }
@@ -68,7 +68,7 @@ func (s *Snapper) transformPoint(pt matrix.Matrix, parent matrix.Steric) matrix.
 // which does not form a structurally valid ring (i.e. a degenerate ring of 3 or fewer points).
 // In this case a LineString is returned.
 func (s *Snapper) transformLine(geom matrix.LineMatrix, parent matrix.Steric) matrix.Steric {
-	seq := s.transformMatrixs(geom, geom)
+	seq := s.transformMatrixes(geom, geom)
 	return seq
 }
 

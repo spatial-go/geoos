@@ -20,7 +20,7 @@ type Steric interface {
 	// Equals returns true if the Geometry represents the same Geometry or vector.
 	Equals(s Steric) bool
 
-	// EqualsExact Returns true if the two Geometrys are exactly equal,
+	// EqualsExact Returns true if the two Geometries are exactly equal,
 	// up to a specified distance tolerance.
 	// Two Geometries are exactly equal within a distance tolerance
 	EqualsExact(g Steric, tolerance float64) bool
@@ -191,7 +191,7 @@ func (m MultiPolygonMatrix) Bound() []Matrix {
 	return b
 }
 
-// A Collection is a collection of Sterics that is also a Steric.
+// A Collection is a collection of sterices that is also a Steric.
 type Collection []Steric
 
 // Dimensions returns the max of the dimensions of the collection.
@@ -484,8 +484,8 @@ func (m MultiPolygonMatrix) EqualsExact(ms Steric, tolerance float64) bool {
 	return true
 }
 
-// TransMatrixs trans steric to array matrixs.
-func TransMatrixs(inputGeom Steric) []Matrix {
+// TransMatrixes trans steric to array matrixes.
+func TransMatrixes(inputGeom Steric) []Matrix {
 
 	switch m := inputGeom.(type) {
 	case Matrix:
@@ -507,7 +507,7 @@ func TransMatrixs(inputGeom Steric) []Matrix {
 	case Collection:
 		tm := []Matrix{}
 		for _, v := range m {
-			p := TransMatrixs(v)
+			p := TransMatrixes(v)
 			tm = append(tm, p...)
 		}
 		return tm

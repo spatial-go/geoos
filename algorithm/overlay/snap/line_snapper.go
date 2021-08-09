@@ -47,7 +47,7 @@ func (l *LineSnapper) snapVertices() {
 }
 
 func (l *LineSnapper) findSnapForVertex(pt matrix.Matrix) matrix.Matrix {
-	for _, v := range matrix.TransMatrixs(l.snapPts) {
+	for _, v := range matrix.TransMatrixes(l.snapPts) {
 		spt := matrix.Matrix(v)
 		// if point is already equal to a src pt, don't snap
 		if pt.Equals(spt) {
@@ -70,7 +70,7 @@ func (l *LineSnapper) findSnapForVertex(pt matrix.Matrix) matrix.Matrix {
 // at the same point, which would likely cause
 // topology collapse when being used on polygonal linework.
 func (l *LineSnapper) snapSegments() {
-	sPts := matrix.TransMatrixs(l.snapPts)
+	sPts := matrix.TransMatrixes(l.snapPts)
 	// guard against empty input
 	if len(sPts) == 0 {
 		return
@@ -79,7 +79,6 @@ func (l *LineSnapper) snapSegments() {
 	distinctPtCount := len(sPts)
 
 	// check for duplicate snap pts when they are sourced from a linear ring.
-	// TODO: Need to do this better - need to check *all* snap points for dups (using a Set?)
 	if sPts[0].Equals(sPts[distinctPtCount-1]) {
 		distinctPtCount--
 	}

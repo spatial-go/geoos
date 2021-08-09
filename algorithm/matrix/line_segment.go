@@ -35,8 +35,8 @@ func (l *LineSegment) PointAlong(segmentLengthFraction float64) Matrix {
 // positive, to the right if negative.
 func (l *LineSegment) PointAlongOffset(segmentLengthFraction, offsetDistance float64) (Matrix, error) {
 	// the point on the segment line
-	segx := l.P0[0] + segmentLengthFraction*(l.P1[0]-l.P0[0])
-	segy := l.P0[1] + segmentLengthFraction*(l.P1[1]-l.P0[1])
+	segX := l.P0[0] + segmentLengthFraction*(l.P1[0]-l.P0[0])
+	segY := l.P0[1] + segmentLengthFraction*(l.P1[1]-l.P0[1])
 
 	dx := l.P1[0] - l.P0[0]
 	dy := l.P1[1] - l.P0[1]
@@ -54,11 +54,11 @@ func (l *LineSegment) PointAlongOffset(segmentLengthFraction, offsetDistance flo
 	}
 
 	// the offset point is the seg point plus the offset vector rotated 90 degrees CCW
-	offsetx := segx - uy
-	offsety := segy + ux
+	offsetX := segX - uy
+	offsetY := segY + ux
 
 	coord := Matrix{0, 0}
-	coord[0] = offsetx
-	coord[1] = offsety
+	coord[0] = offsetX
+	coord[1] = offsetY
 	return coord, nil
 }

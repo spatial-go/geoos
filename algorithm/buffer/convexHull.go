@@ -26,14 +26,14 @@ type ConvexHull struct {
 // ConvexHullWithGeom Create a new convex hull construction for the input geometry.
 func ConvexHullWithGeom(geom matrix.Steric) *ConvexHull {
 	ch := &ConvexHull{}
-	ch.inputPts = extractMatrixs(geom)
+	ch.inputPts = extractMatrixes(geom)
 	return ch
 }
 
-func extractMatrixs(geom matrix.Steric) []matrix.Matrix {
+func extractMatrixes(geom matrix.Steric) []matrix.Matrix {
 	filter := filter.UniqueArrayFilter{}
 	filter.FilterSteric(geom)
-	return filter.Matrixs()
+	return filter.Matrixes()
 }
 
 // ConvexHull Returns a geometry that represents the convex hull of the input geometry.
@@ -119,7 +119,7 @@ func (c *ConvexHull) preSort(pts []matrix.Matrix) []matrix.Matrix {
 	t := matrix.Matrix{}
 
 	// find the lowest point in the set. If two or more points have
-	// the same minimum y matrix choose the one with the minimu x.
+	// the same minimum y matrix choose the one with the minimum x.
 	// This focal point is put in array location pts[0].
 	for i := 1; i < len(pts); i++ {
 		if (pts[i][1] < pts[0][1]) || ((pts[i][1] == pts[0][1]) && (pts[i][0] < pts[0][0])) {
@@ -161,7 +161,7 @@ func (c *ConvexHull) grahamScan(ms []matrix.Matrix) *list.List {
 	return ps
 }
 
-// isBetween returns  whether the three matrixs are collinear and c2 lies between c1 and c3 inclusive
+// isBetween returns  whether the three matrixes are collinear and c2 lies between c1 and c3 inclusive
 func (c *ConvexHull) isBetween(c1, c2, c3 matrix.Matrix) bool {
 	if OrientationIndex(c1, c2, c3) != 0 {
 		return false
@@ -269,7 +269,7 @@ func (c *ConvexHull) cleanRing(ms []matrix.Matrix) []matrix.Matrix {
 	return cleanedRing
 }
 
-// RadialComparator Compares  Matrixs for their angle and distance relative to an origin.
+// RadialComparator Compares  Matrixes for their angle and distance relative to an origin.
 type RadialComparator struct {
 	origin matrix.Matrix
 	pts    []matrix.Matrix
@@ -328,7 +328,7 @@ func OrientationIndex(p1, p2, q matrix.Matrix) int {
 	if index <= 1 {
 		return index
 	}
-	// normalize matrixs
+	// normalize matrixes
 	dx1 := calc.ValueOf(p2[0]).SelfAddOne(-p1[0])
 	dy1 := calc.ValueOf(p2[1]).SelfAddOne(-p1[1])
 	dx2 := calc.ValueOf(q[0]).SelfAddOne(-p2[0])
@@ -339,30 +339,30 @@ func OrientationIndex(p1, p2, q matrix.Matrix) int {
 	return dx1.SelfMultiplyPair(dy2).SelfSubtract(dyx.Hi, dyx.Lo).Signum()
 }
 
-// orientationIndexFilter A filter for computing the orientation index of three matrixs.
+// orientationIndexFilter A filter for computing the orientation index of three matrixes.
 func orientationIndexFilter(pax, pay,
 	pbx, pby, pcx, pcy float64) int {
-	detsum := 0.0
+	detSum := 0.0
 
-	detleft := (pax - pcx) * (pby - pcy)
-	detright := (pay - pcy) * (pbx - pcx)
-	det := detleft - detright
+	detLeft := (pax - pcx) * (pby - pcy)
+	detRight := (pay - pcy) * (pbx - pcx)
+	det := detLeft - detRight
 
-	if detleft > 0.0 {
-		if detright <= 0.0 {
+	if detLeft > 0.0 {
+		if detRight <= 0.0 {
 			return signum(det)
 		}
-		detsum = detleft + detright
-	} else if detleft < 0.0 {
-		if detright >= 0.0 {
+		detSum = detLeft + detRight
+	} else if detLeft < 0.0 {
+		if detRight >= 0.0 {
 			return signum(det)
 		}
-		detsum = -detleft - detright
+		detSum = -detLeft - detRight
 	} else {
 		return signum(det)
 	}
 
-	errbound := DPSAFEEPSILON * detsum
+	errbound := DPSAFEEPSILON * detSum
 	if (det >= errbound) || (-det >= errbound) {
 		return signum(det)
 	}

@@ -17,7 +17,7 @@ func TestAngle(t *testing.T) {
 		args args
 		want float64
 	}{
-		{"anglr", args{matrix.Matrix{100, 100}, matrix.Matrix{100, 200}}, math.Pi / 2.0},
+		{"angle", args{matrix.Matrix{100, 100}, matrix.Matrix{100, 200}}, math.Pi / 2.0},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
