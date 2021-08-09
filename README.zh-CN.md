@@ -4,39 +4,17 @@
 
 ## 内容列表
 
-- [安装](#安装)
+- [目录结构](#目录结构)
 - [使用说明](#使用说明)
 - [维护者](#维护者)
 - [如何贡献](#如何贡献)
 - [使用许可](#使用许可)
 
 
-## 安装
-
-项目依赖 [GEOS](https://github.com/libgeos/geos)（GEOS 是 JTS 的C++版本实现) ,需要首先完成`GEOS`的安装。`GEOS`安装方法如下：
-
-1、OS X系统安装(brew 方式)
-```sh
-$ brew install geos
-```
-2、Ubuntu
-```sh
-$ apt-get install libgeos-dev
-```
-3、源码安装
-```sh
-$ wget http://download.osgeo.org/geos/geos-3.9.0.tar.bz2
-$ tar xvfj geos-3.9.0.tar.bz2
-$ cd geos-3.9.0
-$ ./configure
-$ make
-$ sudo make install
-```
 
 ## 目录结构
-1. `geo` 包下是对`GEOS C`库的引用和调用，以此来实现空间运算。
-2. `algorithm` 是对外暴露的空间运算方法定义。
-3. `strategy.go` 定义了空间运算底层算法的选择实现。
+1. `algorithm` 是对外暴露的空间运算方法定义。
+2. `strategy.go` 定义了空间运算底层算法的选择实现。
 
 ## 使用说明
 以计算面积`Area`为例。
@@ -44,64 +22,63 @@ $ sudo make install
 package main
 
 import (
-	"encoding/json"
-	"fmt"
-	"github.com/spatial-go/geoos"
-	"github.com/spatial-go/geoos/encoding/wkt"
-	"github.com/spatial-go/geoos/geojson"
-	"github.com/spatial-go/geoos/planar"
+  "encoding/json"
+  "fmt"
+  "github.com/spatial-go/geoos"
+  "github.com/spatial-go/geoos/encoding/wkt"
+  "github.com/spatial-go/geoos/geojson"
+  "github.com/spatial-go/geoos/planar"
 )
 
 func main() {
-	// First, choose the default algorithm.
-	strategy := planar.NormalStrategy()
-	// Secondly, manufacturing test data and convert it to geometry
-	const polygon = `POLYGON((-1 -1, 1 -1, 1 1, -1 1, -1 -1))`
-	geometry, _ := wkt.UnmarshalString(polygon)
-	// Last， call the Area () method and get result.
-	area, e := strategy.Area(geometry)
-	if e != nil {
-		fmt.Printf(e.Error())
-	}
-	fmt.Printf("%f", area)
-	// get result 4.0
+  // First, choose the default algorithm.
+  strategy := planar.NormalStrategy()
+  // Secondly, manufacturing test data and convert it to geometry
+  const polygon = `POLYGON((-1 -1, 1 -1, 1 1, -1 1, -1 -1))`
+  geometry, _ := wkt.UnmarshalString(polygon)
+  // Last， call the Area () method and get result.
+  area, e := strategy.Area(geometry)
+  if e != nil {
+    fmt.Printf(e.Error())
+  }
+  fmt.Printf("%f", area)
+  // get result 4.0
 
-	rawJSON := []byte(`
+  rawJSON := []byte(`
   { "type": "FeatureCollection",
-	"features": [
-	  { "type": "Feature",
-		"geometry": {"type": "Point", "coordinates": [102.0, 0.5]},
-		"properties": {"prop0": "value0"}
-	  }
-	]
+  "features": [
+    { "type": "Feature",
+    "geometry": {"type": "Point", "coordinates": [102.0, 0.5]},
+    "properties": {"prop0": "value0"}
+    }
+  ]
   }`)
 
-	fc := geojson.NewFeatureCollection()
-	_ = json.Unmarshal(rawJSON, &fc)
-	println("%p", fc)
+  fc := geojson.NewFeatureCollection()
+  _ = json.Unmarshal(rawJSON, &fc)
+  println("%p", fc)
 
-	// Geometry will be unmarshalled into the correct geo.Geometry type.
-	point := fc.Features[0].Geometry.(geoos.Point)
-	println("%p", &point)
+  // Geometry will be unmarshalled into the correct geo.Geometry type.
+  point := fc.Features[0].Geometry.(geoos.Point)
+  println("%p", &point)
 
 }
 
 ```
 
-## 维护者 
+## 维护者
 
 [@spatial-go](https://github.com/spatial-go)。
 
 
 ## 如何贡献
 
-感谢 [OSGeo](https://www.osgeo.org/)，我们也将秉承“开放、共创、共赢”的目标理念在空间计算领域贡献自己的一份力量。
+我们也将秉承“开放、共创、共赢”的目标理念在空间计算领域贡献自己的一份力量。
 
-非常欢迎你的加入！[提一个 Issue](https://github.com/spatial-go/geos/issues/new) 
+非常欢迎你的加入！[提一个 Issue](https://github.com/spatial-go/geos/issues/new)
 
 联系邮箱： [geoos@changjing.ai](geoos@changjing.ai)
 
 ## 使用许可
 
 [LGPL-2.1 ](LICENSE)
-
