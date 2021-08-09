@@ -1,12 +1,12 @@
-// Package geo provides support for creating and manipulating spatial data.
+// Package geoc provides support for creating and manipulating spatial data.
 // At its core, it relies on the GEOS C library for the implementation of
 // spatial operations and geometric algorithms.
-package geo
+package geoc
 
-/*
-#cgo LDFLAGS: -lgeos_c
-#include "geos.h"
-*/
+//
+// #cgo LDFLAGS: -lgeos_c
+// #include "geos.h"
+//
 import "C"
 
 import (

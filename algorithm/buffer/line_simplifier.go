@@ -48,17 +48,13 @@ func (l *LineSimplifier) Simplify(distanceTol float64) matrix.LineMatrix {
 	return l.collapseLine()
 }
 
-/**
-* Uses a sliding window containing 3 vertices to detect shallow angles
-* in which the middle vertex can be deleted, since it does not
-* affect the shape of the resulting buffer in a significant way.
-* @return
- */
+// Uses a sliding window containing 3 vertices to detect shallow angles
+// in which the middle vertex can be deleted, since it does not
+// affect the shape of the resulting buffer in a significant way.
 func (l *LineSimplifier) deleteShallowConcavities() bool {
-	/**
-	 * Do not simplify end line segments of the line string.
-	 * This ensures that end caps are generated consistently.
-	 */
+
+	// Do not simplify end line segments of the line string.
+	// This ensures that end caps are generated consistently.
 	index := 1
 
 	midIndex := l.findNextNonDeletedIndex(index)
@@ -86,12 +82,7 @@ func (l *LineSimplifier) deleteShallowConcavities() bool {
 	return isChanged
 }
 
-/**
-* Finds the next non-deleted index, or the end of the point array if none
-* @param index
-* @return the next non-deleted index, if any
-* or inputLine.length if there are no more non-deleted indices
- */
+// Finds the next non-deleted index, or the end of the point array if none
 func (l *LineSimplifier) findNextNonDeletedIndex(index int) int {
 	next := index + 1
 	for next < len(l.inputLine) && l.isDeleted[next] == DELETE {
@@ -135,18 +126,9 @@ func (l *LineSimplifier) isShallowConcavity(p0, p1, p2 matrix.Matrix, distanceTo
 	return dist < distanceTol
 }
 
-/**
-* Checks for shallowness over a sample of points in the given section.
-* This helps prevents the simplification from incrementally
-* "skipping" over points which are in fact non-shallow.
-*
-* @param p0 start coordinate of section
-* @param p2 end coordinate of section
-* @param i0 start index of section
-* @param i2 end index of section
-* @param distanceTol distance tolerance
-* @return
- */
+// Checks for shallowness over a sample of points in the given section.
+// This helps prevents the simplification from incrementally
+// "skipping" over points which are in fact non-shallow.
 func (l *LineSimplifier) isShallowSampled(p0, p2 matrix.Matrix, i0, i2 int, distanceTol float64) bool {
 	// check every n'th point to see if it is within tolerance
 	inc := (i2 - i0) / NUMPTSTOCHECK

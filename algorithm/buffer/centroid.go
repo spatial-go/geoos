@@ -26,7 +26,7 @@ func Centroid(geom matrix.Steric) matrix.Matrix {
 type CentroidComputer struct {
 	AreaBasePt    matrix.Matrix // the point all triangles are based at
 	TriangleCent3 matrix.Matrix // temporary variable to hold centroid of triangle
-	Areasum2      float64       /* Partial area sum */
+	Areasum2      float64       // Partial area sum
 	Cg3           matrix.Matrix // partial centroid sum
 
 	// data for linear centroid computation, if needed
@@ -40,27 +40,20 @@ type CentroidComputer struct {
 // GetCentroid Gets the computed centroid.
 // returns he computed centroid, or nil if the input is empty
 func (c *CentroidComputer) GetCentroid() matrix.Matrix {
-	/**
-	 * The centroid is computed from the highest dimension components present in the input.
-	 * I.e. areas dominate lineal matrix.Steric, which dominates points.
-	 * Degenerate matrix.Steric are computed using their effective dimension
-	 * (e.g. areas may degenerate to lines or points)
-	 */
+
+	//  The centroid is computed from the highest dimension components present in the input.
+	//  I.e. areas dominate lineal matrix.Steric, which dominates points.
+	//  Degenerate matrix.Steric are computed using their effective dimension
+	//  (e.g. areas may degenerate to lines or points)
 	cent := matrix.Matrix{}
 	if math.Abs(c.Areasum2) > 0.0 {
-		/**
-		* Input contains areal matrix.Steric
-		 */
+		// Input contains areal matrix.Steric
 		cent = append(cent, c.Cg3[0]/3/c.Areasum2, c.Cg3[1]/3/c.Areasum2)
 	} else if c.TotalLength > 0.0 {
-		/**
-		* Input contains lineal matrix.Steric
-		 */
+		// Input contains lineal matrix.Steric
 		cent = append(cent, c.LineCentSum[0]/c.TotalLength, c.LineCentSum[1]/c.TotalLength)
 	} else if c.PtCount > 0 {
-		/**
-		* Input contains puntal matrix.Steric only
-		 */
+		//Input contains puntal matrix.Steric only
 		cent = append(cent, c.PtCentSum[0]/float64(c.PtCount), c.PtCentSum[1]/float64(c.PtCount))
 	} else {
 		return nil
@@ -86,6 +79,9 @@ func (c *CentroidComputer) Add(pt matrix.Steric) {
 
 // AddPoint Adds a point to the point centroid accumulator.
 func (c *CentroidComputer) AddPoint(pt matrix.Matrix) {
+	if pt.IsEmpty() {
+		return
+	}
 	c.PtCount++
 	if c.PtCentSum == nil {
 		c.PtCentSum = make(matrix.Matrix, 2)

@@ -7,10 +7,8 @@ func Snap(g0, g1 matrix.Steric, snapTolerance float64) (snapGeom matrix.Collecti
 	snapper0 := &Snapper{g0, g1, snapTolerance}
 	snapGeom = append(snapGeom, snapper0.SnapTo(g1, snapTolerance))
 
-	/**
-	 * Snap the second geometry to the snapped first geometry
-	 * (this strategy minimizes the number of possible different points in the result)
-	 */
+	// Snap the second geometry to the snapped first geometry
+	// (this strategy minimizes the number of possible different points in the result)
 	snapper1 := &Snapper{g1, g0, snapTolerance}
 	snapGeom = append(snapGeom, snapper1.SnapTo(snapGeom[0], snapTolerance))
 
@@ -24,7 +22,7 @@ type Snapper struct {
 	snapTolerance     float64
 }
 
-// SnapTo Snaps the vertices in the component {@link LineString}s
+// SnapTo Snaps the vertices in the component LineStrings
 // of the source geometry
 // to the vertices of the given snap geometry.
 func (s *Snapper) SnapTo(snapGeom matrix.Steric, snapTolerance float64) matrix.Steric {

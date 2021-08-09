@@ -9,8 +9,7 @@ import (
 )
 
 // Envelope Defines a rectangular region of the 2D coordinate plane.
-//  It is often used to represent the bounding box of a {@link Geometry},
-//  e.g. the minimum and maximum x and y values of the {@link Coordinate}s.
+//  It is often used to represent the bounding box of a  Geometry,
 //  <p>
 //  Envelopes support infinite or half-infinite regions, by using the values of
 //  Double.POSITIVE_INFINITY and Double.NEGATIVE_INFINITY.

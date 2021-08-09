@@ -50,7 +50,7 @@ func (p *PointPairDistance) ToString() string {
 	return fmt.Sprintf("PointPairDistance %v %v", p.Pt[0], p.Pt[1])
 }
 
-// DistanceToPoint Computes the Euclidean distance (L2 metric) from a {@link Coordinate} to a {@link Geometry}.
+// DistanceToPoint Computes the Euclidean distance (L2 metric) from a point to a point.
 // Also computes two points on the geometry which are separated by the distance found.
 type DistanceToPoint struct {
 }

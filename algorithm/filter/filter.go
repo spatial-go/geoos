@@ -24,7 +24,7 @@ type UniqueArrayFilter struct {
 	matrixs []matrix.Matrix
 }
 
-// Matrixs  Returns the gathered <code>Coordinate</code>s.
+// Matrixs  Returns the gathered Coordinates.
 func (u *UniqueArrayFilter) Matrixs() []matrix.Matrix {
 	return u.matrixs
 }

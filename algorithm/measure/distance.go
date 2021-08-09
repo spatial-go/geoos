@@ -53,18 +53,17 @@ func DistanceSegmentToPoint(p, a, b matrix.Matrix, f Distance) float64 {
 		return f(p, a)
 	}
 	// otherwise use comp.graphics.algorithms Frequently Asked Questions method
-	/*
-	 * (1) r = AC dot AB
-	 *         ---------
-	 *         ||AB||^2
-	 *
-	 * r has the following meaning:
-	 *   r=0 P = A
-	 *   r=1 P = B
-	 *   r<0 P is on the backward extension of AB
-	 *   r>1 P is on the forward extension of AB
-	 *   0<r<1 P is interior to AB
-	 */
+	//
+	// (1) r = AC dot AB
+	//         ---------
+	//         ||AB||^2
+	//
+	// r has the following meaning:
+	//   r=0 P = A
+	//   r=1 P = B
+	//   r<0 P is on the backward extension of AB
+	//   r>1 P is on the forward extension of AB
+	//   0<r<1 P is interior to AB
 
 	len2 := (b[0]-a[0])*(b[0]-a[0]) + (b[1]-a[1])*(b[1]-a[1])
 	r := ((p[0]-a[0])*(b[0]-a[0]) + (p[1]-a[1])*(b[1]-a[1])) / len2
@@ -76,16 +75,16 @@ func DistanceSegmentToPoint(p, a, b matrix.Matrix, f Distance) float64 {
 		return f(p, b)
 	}
 
-	/*
-	 * (2) s = (Ay-Cy)(Bx-Ax)-(Ax-Cx)(By-Ay)
-	 *         -----------------------------
-	 *                    L^2
-	 *
-	 * Then the distance from C to P = |s|*L.
-	 *
-	 * This is the same calculation as {@link #distancePointLinePerpendicular}.
-	 * Unrolled here for performance.
-	 */
+	//
+	// (2) s = (Ay-Cy)(Bx-Ax)-(Ax-Cx)(By-Ay)
+	//         -----------------------------
+	//                    L^2
+	//
+	// Then the distance from C to P = |s|*L.
+	//
+	// This is the same calculation .
+	// Unrolled here for performance.
+	//
 	s := ((a[1]-p[1])*(b[0]-a[0]) - (a[0]-p[0])*(b[1]-a[1])) / len2
 	return math.Abs(s) * math.Sqrt(len2)
 }

@@ -220,8 +220,6 @@ func (c *Curve) computeOffsetSegment(seg *matrix.LineSegment, side int, distance
 	offset.P1[1] = seg.P1[1] + ux
 }
 
-//private static double MAX_CLOSING_SEG_LEN = 3.0;
-
 func (c *Curve) addNextSegment(p matrix.Matrix, addStartPoint bool) {
 	// s0-s1-s2 are the coordinates of the previous segment and the current one
 	c.s0 = c.s1
@@ -252,21 +250,18 @@ func (c *Curve) addNextSegment(p matrix.Matrix, addStartPoint bool) {
 func (c *Curve) addCollinear(addStartPoint bool) {
 
 	mark, ips := relate.Intersection(c.s0, c.s1, c.s1, c.s2)
-	/**
-	 * if numInt is < 2, the lines are parallel and in the same direction. In
-	 * this case the point can be ignored, since the offset lines will also be
-	 * parallel.
-	 */
+
+	// if numInt is < 2, the lines are parallel and in the same direction. In
+	// this case the point can be ignored, since the offset lines will also be
+	// parallel.
 	if mark && ips[0].IsCollinear {
-		/**
-		 * segments are collinear but reversing.
-		 * Add an "end-cap" fillet
-		 * all the way around to other direction This case should ONLY happen
-		 * for LineStrings, so the orientation is always CW. (Polygons can never
-		 * have two consecutive segments which are parallel but reversed,
-		 * because that would be a self intersection.
-		 *
-		 */
+
+		// segments are collinear but reversing.
+		// Add an "end-cap" fillet
+		// all the way around to other direction This case should ONLY happen
+		// for LineStrings, so the orientation is always CW. (Polygons can never
+		// have two consecutive segments which are parallel but reversed,
+		// because that would be a self intersection.
 		if c.parameters.JoinStyle == calc.JOINBEVEL || c.parameters.JoinStyle == calc.JOINMITRE {
 			if addStartPoint {
 				c.Add(c.offset0.P1)
@@ -278,16 +273,8 @@ func (c *Curve) addCollinear(addStartPoint bool) {
 	}
 }
 
-/**
- * Add points for a circular fillet around a reflex corner.
- * Adds the start and end points
- *
- * @param p base point of curve
- * @param p0 start point of fillet curve
- * @param p1 endpoint of fillet curve
- * @param direction the orientation of the fillet
- * @param radius the radius of the fillet
- */
+// Add points for a circular fillet around a reflex corner.
+// Adds the start and end points
 func (c *Curve) addCornerFillet(p, p0, p1 matrix.Matrix, direction int, radius float64) {
 	dx0 := p0[0] - p[0]
 	dy0 := p0[1] - p[1]
@@ -310,20 +297,14 @@ func (c *Curve) addCornerFillet(p, p0, p1 matrix.Matrix, direction int, radius f
 	c.Add(p1)
 }
 
-/**
- * Adds the offset points for an outside (convex) turn
- *
- * @param orientation
- * @param addStartPoint
- */
+// Adds the offset points for an outside (convex) turn
 func (c *Curve) addOutsideTurn(orientation int, addStartPoint bool) {
-	/**
-	 * Heuristic: If offset endpoints are very close together,
-	 * just use one of them as the corner vertex.
-	 * This avoids problems with computing mitre corners in the case
-	 * where the two segments are almost parallel
-	 * (which is hard to compute a robust intersection for).
-	 */
+
+	// Heuristic: If offset endpoints are very close together,
+	// just use one of them as the corner vertex.
+	// This avoids problems with computing mitre corners in the case
+	// where the two segments are almost parallel
+	// (which is hard to compute a robust intersection for).
 	if measure.PlanarDistance(c.offset0.P1, c.offset1.P0) < c.distance*calc.OffsetSegmentSeparationFactor {
 		c.Add(c.offset0.P1)
 		return
@@ -344,49 +325,41 @@ func (c *Curve) addOutsideTurn(orientation int, addStartPoint bool) {
 	}
 }
 
-/**
- * Adds the offset points for an inside (concave) turn.
- *
- * @param orientation
- * @param addStartPoint
- */
+// Adds the offset points for an inside (concave) turn.
+
 func (c *Curve) addInsideTurn(orientation int, addStartPoint bool) {
-	/**
-	 * add intersection point of offset segments (if any)
-	 */
+
+	// add intersection point of offset segments (if any)
 	mark, ips := relate.Intersection(c.offset0.P0, c.offset0.P1, c.offset1.P0, c.offset1.P1)
 
 	if mark {
 		c.Add(ips[0].Matrix)
 	} else {
-		/**
-		 * If no intersection is detected,
-		 * it means the angle is so small and/or the offset so
-		 * large that the offsets segments don't intersect.
-		 * In this case we must
-		 * add a "closing segment" to make sure the buffer curve is continuous,
-		 * fairly smooth (e.g. no sharp reversals in direction)
-		 * and tracks the buffer correctly around the corner. The curve connects
-		 * the endpoints of the segment offsets to points
-		 * which lie toward the centre point of the corner.
-		 * The joining curve will not appear in the final buffer outline, since it
-		 * is completely internal to the buffer polygon.
-		 *
-		 * In complex buffer cases the closing segment may cut across many other
-		 * segments in the generated offset curve.  In order to improve the
-		 * performance of the noding, the closing segment should be kept as short as possible.
-		 * (But not too short, since that would defeat its purpose).
-		 * This is the purpose of the closingSegFactor heuristic value.
-		 */
 
-		/**
-		 * The intersection test above is vulnerable to robustness errors; i.e. it
-		 * may be that the offsets should intersect very close to their endpoints,
-		 * but aren't reported as such due to rounding. To handle this situation
-		 * appropriately, we use the following test: If the offset points are very
-		 * close, don't add closing segments but simply use one of the offset
-		 * points
-		 */
+		// If no intersection is detected,
+		// it means the angle is so small and/or the offset so
+		// large that the offsets segments don't intersect.
+		// In this case we must
+		// add a "closing segment" to make sure the buffer curve is continuous,
+		// fairly smooth (e.g. no sharp reversals in direction)
+		// and tracks the buffer correctly around the corner. The curve connects
+		// the endpoints of the segment offsets to points
+		// which lie toward the centre point of the corner.
+		// The joining curve will not appear in the final buffer outline, since it
+		// is completely internal to the buffer polygon.
+		//
+		// In complex buffer cases the closing segment may cut across many other
+		// segments in the generated offset curve.  In order to improve the
+		// performance of the noding, the closing segment should be kept as short as possible.
+		// (But not too short, since that would defeat its purpose).
+		// This is the purpose of the closingSegFactor heuristic value.
+
+		// The intersection test above is vulnerable to robustness errors; i.e. it
+		// may be that the offsets should intersect very close to their endpoints,
+		// but aren't reported as such due to rounding. To handle this situation
+		// appropriately, we use the following test: If the offset points are very
+		// close, don't add closing segments but simply use one of the offset
+		// points
 		c.hasNarrowConcaveAngle = true
 		//System.out.println("NARROW ANGLE - distance = " + distance);
 		if measure.PlanarDistance(c.offset0.P1, c.offset1.P0) < c.distance*calc.InsideTurnVertexSnapDistanceFactor {
@@ -395,9 +368,7 @@ func (c *Curve) addInsideTurn(orientation int, addStartPoint bool) {
 			// add endpoint of this segment offset
 			c.Add(c.offset0.P1)
 
-			/**
-			 * Add "closing segment" of required length.
-			 */
+			// Add "closing segment" of required length.
 			if c.closingSegLengthFactor > 0 {
 				mid0 := matrix.Matrix{(c.closingSegLengthFactor*c.offset0.P1[0] + c.s1[0]) / (c.closingSegLengthFactor + 1),
 					(c.closingSegLengthFactor*c.offset0.P1[1] + c.s1[1]) / (c.closingSegLengthFactor + 1)}
@@ -407,37 +378,28 @@ func (c *Curve) addInsideTurn(orientation int, addStartPoint bool) {
 					(c.closingSegLengthFactor*c.offset1.P0[1] + c.s1[1]) / (c.closingSegLengthFactor + 1)}
 				c.Add(mid1)
 			} else {
-				/**
-				 * This branch is not expected to be used except for testing purposes.
-				 * It is equivalent to the JTS 1.9 logic for closing segments
-				 * (which results in very poor performance for large buffer distances)
-				 */
+
+				// This branch is not expected to be used except for testing purposes.
+				// It is equivalent to the JTS 1.9 logic for closing segments
+				// (which results in very poor performance for large buffer distances)
 				c.Add(c.s1)
 			}
 
-			//*/
 			// add start point of next segment offset
 			c.Add(c.offset1.P0)
 		}
 	}
 }
 
-/**
- * Adds a mitre join connecting the two reflex offset segments.
- * The mitre will be beveled if it exceeds the mitre ratio limit.
- *
- * @param offset0 the first offset segment
- * @param offset1 the second offset segment
- * @param distance the offset distance
- */
+// Adds a mitre join connecting the two reflex offset segments.
+// The mitre will be beveled if it exceeds the mitre ratio limit.
 func (c *Curve) addMitreJoin(p matrix.Matrix,
 	offset0, offset1 *matrix.LineSegment,
 	distance float64) {
-	/**
-	 * This computation is unstable if the offset segments are nearly collinear.
-	 * However, this situation should have been eliminated earlier by the check
-	 * for whether the offset segment endpoints are almost coincident
-	 */
+
+	// This computation is unstable if the offset segments are nearly collinear.
+	// However, this situation should have been eliminated earlier by the check
+	// for whether the offset segment endpoints are almost coincident
 	_, intPt := relate.Intersection(c.offset0.P0, c.offset0.P1, offset1.P0, offset1.P1)
 	if intPt != nil {
 		mitreRatio := 1.0
@@ -454,16 +416,9 @@ func (c *Curve) addMitreJoin(p matrix.Matrix,
 	//      addBevelJoin(offset0, offset1);
 }
 
-/**
- * Adds a limited mitre join connecting the two reflex offset segments.
- * A limited mitre is a mitre which is beveled at the distance
- * determined by the mitre ratio limit.
- *
- * @param offset0 the first offset segment
- * @param offset1 the second offset segment
- * @param distance the offset distance
- * @param mitreLimit the mitre limit ratio
- */
+// Adds a limited mitre join connecting the two reflex offset segments.
+// A limited mitre is a mitre which is beveled at the distance
+// determined by the mitre ratio limit.
 func (c *Curve) addLimitedMitreJoin(
 	offset0, offset1 *matrix.LineSegment,
 	distance, mitreLimit float64) {
@@ -510,13 +465,9 @@ func (c *Curve) addLimitedMitreJoin(
 	}
 }
 
-/**
- * Adds a bevel join connecting the two offset segments
- * around a reflex corner.
- *
- * @param offset0 the first offset segment
- * @param offset1 the second offset segment
- */
+// Adds a bevel join connecting the two offset segments
+// around a reflex corner.
+
 func (c *Curve) addBevelJoin(
 	offset0, offset1 *matrix.LineSegment) {
 	c.Add(offset0.P1)

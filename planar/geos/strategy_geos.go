@@ -5,7 +5,7 @@ import (
 
 	"github.com/spatial-go/geoos/encoding/wkt"
 	"github.com/spatial-go/geoos/planar"
-	"github.com/spatial-go/geoos/planar/geos/geo"
+	"github.com/spatial-go/geoos/planar/geos/geoc"
 	"github.com/spatial-go/geoos/space"
 )
 
@@ -24,13 +24,13 @@ type GEOAlgorithm struct{}
 
 // Area returns the area of a polygonal geometry.
 func (g *GEOAlgorithm) Area(geom space.Geometry) (float64, error) {
-	return geo.Area(wkt.MarshalString(geom))
+	return geoc.Area(wkt.MarshalString(geom))
 }
 
 // Boundary returns the closure of the combinatorial boundary of this space.Geometry.
 func (g *GEOAlgorithm) Boundary(geom space.Geometry) (space.Geometry, error) {
 	aa := wkt.MarshalString(geom)
-	boundary, err := geo.Boundary(aa)
+	boundary, err := geoc.Boundary(aa)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +44,7 @@ func (g *GEOAlgorithm) Boundary(geom space.Geometry) (space.Geometry, error) {
 // Buffer sReturns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
 func (g *GEOAlgorithm) Buffer(geom space.Geometry, width float64, quadsegs int) (geometry space.Geometry) {
-	result, err := geo.Buffer(wkt.MarshalString(geom), width, int32(quadsegs))
+	result, err := geoc.Buffer(wkt.MarshalString(geom), width, int32(quadsegs))
 	if err != nil {
 		return
 	}
@@ -61,7 +61,7 @@ func (g *GEOAlgorithm) Buffer(geom space.Geometry, width float64, quadsegs int) 
 // If CIRCULARSTRING or COMPOUNDCURVE are supplied, they are converted to linestring wtih CurveToLine first,
 // then same than for LINESTRING
 func (g *GEOAlgorithm) Centroid(geom space.Geometry) (space.Geometry, error) {
-	result, err := geo.Centroid(wkt.MarshalString(geom))
+	result, err := geoc.Centroid(wkt.MarshalString(geom))
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func (g *GEOAlgorithm) Centroid(geom space.Geometry) (space.Geometry, error) {
 // having the same SRID.
 func (g *GEOAlgorithm) Contains(geom1, geom2 space.Geometry) (bool, error) {
 	ms1, ms2 := convertGeomToWKT(geom1, geom2)
-	return geo.Contains(ms1, ms2)
+	return geoc.Contains(ms1, ms2)
 }
 
 // ConvexHull computes the convex hull of a geometry. The convex hull is the smallest convex geometry
@@ -89,7 +89,7 @@ func (g *GEOAlgorithm) Contains(geom1, geom2 space.Geometry) (bool, error) {
 // The convex hull of two or more collinear points is a two-point LineString.
 // The convex hull of one or more identical points is a Point.
 func (g *GEOAlgorithm) ConvexHull(geom space.Geometry) (space.Geometry, error) {
-	result, err := geo.ConvexHull(wkt.MarshalString(geom))
+	result, err := geoc.ConvexHull(wkt.MarshalString(geom))
 	if err != nil {
 		return nil, err
 	}
@@ -99,13 +99,13 @@ func (g *GEOAlgorithm) ConvexHull(geom space.Geometry) (space.Geometry, error) {
 // CoveredBy returns TRUE if no point in space.Geometry A is outside space.Geometry B
 func (g *GEOAlgorithm) CoveredBy(geom1, geom2 space.Geometry) (bool, error) {
 	ms1, ms2 := convertGeomToWKT(geom1, geom2)
-	return geo.CoversBy(ms1, ms2)
+	return geoc.CoversBy(ms1, ms2)
 }
 
 // Covers returns TRUE if no point in space.Geometry B is outside space.Geometry A
 func (g *GEOAlgorithm) Covers(geom1, geom2 space.Geometry) (bool, error) {
 	ms1, ms2 := convertGeomToWKT(geom1, geom2)
-	return geo.Covers(ms1, ms2)
+	return geoc.Covers(ms1, ms2)
 }
 
 // Crosses takes two geometry objects and returns TRUE if their intersection "spatially cross",
@@ -116,7 +116,7 @@ func (g *GEOAlgorithm) Covers(geom1, geom2 space.Geometry) (bool, error) {
 // Otherwise, it returns FALSE.
 func (g *GEOAlgorithm) Crosses(geom1, geom2 space.Geometry) (bool, error) {
 	ms1, ms2 := convertGeomToWKT(geom1, geom2)
-	return geo.Crosses(ms1, ms2)
+	return geoc.Crosses(ms1, ms2)
 }
 
 // Difference returns a geometry that represents that part of geometry A that does not intersect with geometry B.
@@ -124,7 +124,7 @@ func (g *GEOAlgorithm) Crosses(geom1, geom2 space.Geometry) (bool, error) {
 // If A is completely contained in B then an empty geometry collection is returned.
 func (g *GEOAlgorithm) Difference(geom1, geom2 space.Geometry) (space.Geometry, error) {
 	ms1, ms2 := convertGeomToWKT(geom1, geom2)
-	result, err := geo.Difference(ms1, ms2)
+	result, err := geoc.Difference(ms1, ms2)
 	if err != nil {
 		return nil, err
 	}
@@ -140,13 +140,13 @@ func (g *GEOAlgorithm) Difference(geom1, geom2 space.Geometry) (space.Geometry, 
 // Disjoint implies false for spatial intersection.
 func (g *GEOAlgorithm) Disjoint(geom1, geom2 space.Geometry) (bool, error) {
 	ms1, ms2 := convertGeomToWKT(geom1, geom2)
-	return geo.Disjoint(ms1, ms2)
+	return geoc.Disjoint(ms1, ms2)
 }
 
 // Distance returns the minimum 2D Cartesian (planar) distance between two geometries, in projected units (spatial ref units).
 func (g *GEOAlgorithm) Distance(geom1, geom2 space.Geometry) (float64, error) {
 	ms1, ms2 := convertGeomToWKT(geom1, geom2)
-	return geo.Distance(ms1, ms2)
+	return geoc.Distance(ms1, ms2)
 }
 
 // SphericalDistance calculates spherical distance
@@ -159,7 +159,7 @@ func (g *GEOAlgorithm) SphericalDistance(geom1, geom2 space.Geometry) (float64, 
 // The polygon is defined by the corner points of the bounding box
 // ((MINX, MINY), (MINX, MAXY), (MAXX, MAXY), (MAXX, MINY), (MINX, MINY)).
 func (g *GEOAlgorithm) Envelope(geom space.Geometry) (space.Geometry, error) {
-	result, err := geo.Envelope(wkt.MarshalString(geom))
+	result, err := geoc.Envelope(wkt.MarshalString(geom))
 	if err != nil {
 		return nil, err
 	}
@@ -169,14 +169,14 @@ func (g *GEOAlgorithm) Envelope(geom space.Geometry) (space.Geometry, error) {
 // Equals returns TRUE if the given Geometries are "spatially equal".
 func (g *GEOAlgorithm) Equals(geom1, geom2 space.Geometry) (bool, error) {
 	ms1, ms2 := convertGeomToWKT(geom1, geom2)
-	return geo.Equals(ms1, ms2)
+	return geoc.Equals(ms1, ms2)
 }
 
 // EqualsExact returns true if both geometries are Equal, as evaluated by their
 // points being within the given tolerance.
 func (g *GEOAlgorithm) EqualsExact(geom1, geom2 space.Geometry, tolerance float64) (bool, error) {
 	ms1, ms2 := convertGeomToWKT(geom1, geom2)
-	return geo.EqualsExact(ms1, ms2, tolerance)
+	return geoc.EqualsExact(ms1, ms2, tolerance)
 }
 
 // HausdorffDistance returns the Hausdorff distance between two geometries, a measure of how similar
@@ -185,19 +185,19 @@ func (g *GEOAlgorithm) EqualsExact(geom1, geom2 space.Geometry, tolerance float6
 // to discrete points for one of the geometries
 func (g *GEOAlgorithm) HausdorffDistance(geom1, geom2 space.Geometry) (float64, error) {
 	ms1, ms2 := convertGeomToWKT(geom1, geom2)
-	return geo.HausdorffDistance(ms1, ms2)
+	return geoc.HausdorffDistance(ms1, ms2)
 }
 
 // HausdorffDistanceDensify computes the Hausdorff distance with an additional densification fraction amount
 func (g *GEOAlgorithm) HausdorffDistanceDensify(s, d space.Geometry, densifyFrac float64) (float64, error) {
 	ms1, ms2 := convertGeomToWKT(s, d)
-	return geo.HausdorffDistanceDensify(ms1, ms2, densifyFrac)
+	return geoc.HausdorffDistanceDensify(ms1, ms2, densifyFrac)
 }
 
 // Intersection returns a geometry that represents the point set intersection of the Geometries.
 func (g *GEOAlgorithm) Intersection(geom1, geom2 space.Geometry) (space.Geometry, error) {
 	ms1, ms2 := convertGeomToWKT(geom1, geom2)
-	result, err := geo.Intersection(ms1, ms2)
+	result, err := geoc.Intersection(ms1, ms2)
 	if err != nil {
 		return nil, err
 	}
@@ -211,40 +211,40 @@ func (g *GEOAlgorithm) Intersection(geom1, geom2 space.Geometry) (space.Geometry
 // Intersects If a geometry  shares any portion of space then they intersect
 func (g *GEOAlgorithm) Intersects(geom1, geom2 space.Geometry) (bool, error) {
 	ms1, ms2 := convertGeomToWKT(geom1, geom2)
-	return geo.Intersects(ms1, ms2)
+	return geoc.Intersects(ms1, ms2)
 }
 
 // IsClosed Returns TRUE if the LINESTRING's start and end points are coincident.
 // For Polyhedral Surfaces, reports if the surface is areal (open) or volumetric (closed).
 func (g *GEOAlgorithm) IsClosed(geom space.Geometry) (bool, error) {
-	return geo.IsClosed(wkt.MarshalString(geom))
+	return geoc.IsClosed(wkt.MarshalString(geom))
 }
 
 // IsEmpty returns true if this space.Geometry is an empty geometry.
 // If true, then this space.Geometry represents an empty geometry collection, polygon, point etc.
 func (g *GEOAlgorithm) IsEmpty(geom space.Geometry) (bool, error) {
-	return geo.IsEmpty(wkt.MarshalString(geom))
+	return geoc.IsEmpty(wkt.MarshalString(geom))
 }
 
 // IsRing returns true if the lineal geometry has the ring property.
 func (g *GEOAlgorithm) IsRing(geom space.Geometry) (bool, error) {
-	return geo.IsRing(wkt.MarshalString(geom))
+	return geoc.IsRing(wkt.MarshalString(geom))
 
 }
 
 // IsSimple returns true if this space.Geometry has no anomalous geometric points, such as self intersection or self tangency.
 func (g *GEOAlgorithm) IsSimple(geom space.Geometry) (bool, error) {
-	return geo.IsSimple(wkt.MarshalString(geom))
+	return geoc.IsSimple(wkt.MarshalString(geom))
 }
 
 // Length returns the 2D Cartesian length of the geometry if it is a LineString, MultiLineString
 func (g *GEOAlgorithm) Length(geom space.Geometry) (float64, error) {
-	return geo.Length(wkt.MarshalString(geom))
+	return geoc.Length(wkt.MarshalString(geom))
 }
 
 // LineMerge returns a (set of) LineString(s) formed by sewing together the constituent line work of a MULTILINESTRING.
 func (g *GEOAlgorithm) LineMerge(geom space.Geometry) (space.Geometry, error) {
-	result, err := geo.LineMerge(wkt.MarshalString(geom))
+	result, err := geoc.LineMerge(wkt.MarshalString(geom))
 	if err != nil {
 		return nil, err
 	}
@@ -253,19 +253,19 @@ func (g *GEOAlgorithm) LineMerge(geom space.Geometry) (space.Geometry, error) {
 
 // NGeometry returns the number of component geometries.
 func (g *GEOAlgorithm) NGeometry(geom space.Geometry) (int, error) {
-	return geo.NGeometry(wkt.MarshalString(geom))
+	return geoc.NGeometry(wkt.MarshalString(geom))
 }
 
 // Overlaps returns TRUE if the Geometries "spatially overlap".
 // By that we mean they intersect, but one does not completely contain another.
 func (g *GEOAlgorithm) Overlaps(geom1, geom2 space.Geometry) (bool, error) {
 	ms1, ms2 := convertGeomToWKT(geom1, geom2)
-	return geo.Overlaps(ms1, ms2)
+	return geoc.Overlaps(ms1, ms2)
 }
 
 // PointOnSurface Returns a POINT guaranteed to intersect a surface.
 func (g *GEOAlgorithm) PointOnSurface(geom space.Geometry) (space.Geometry, error) {
-	result, err := geo.PointOnSurface(wkt.MarshalString(geom))
+	result, err := geoc.PointOnSurface(wkt.MarshalString(geom))
 	if err != nil {
 		return nil, err
 	}
@@ -277,7 +277,7 @@ func (g *GEOAlgorithm) PointOnSurface(geom space.Geometry) (space.Geometry, erro
 // the two geometries.
 func (g *GEOAlgorithm) Relate(s, d space.Geometry) (string, error) {
 	ms1, ms2 := convertGeomToWKT(s, d)
-	return geo.Relate(ms1, ms2)
+	return geoc.Relate(ms1, ms2)
 }
 
 // SharedPaths returns a collection containing paths shared by the two input geometries.
@@ -286,7 +286,7 @@ func (g *GEOAlgorithm) Relate(s, d space.Geometry) (string, error) {
 // The paths themselves are given in the direction of the first geometry.
 func (g *GEOAlgorithm) SharedPaths(geom1, geom2 space.Geometry) (string, error) {
 	ms1, ms2 := convertGeomToWKT(geom1, geom2)
-	result, err := geo.SharedPaths(ms1, ms2)
+	result, err := geoc.SharedPaths(ms1, ms2)
 	if err != nil {
 		return "", err
 	}
@@ -296,7 +296,7 @@ func (g *GEOAlgorithm) SharedPaths(geom1, geom2 space.Geometry) (string, error) 
 // Simplify returns a "simplified" version of the given geometry using the Douglas-Peucker algorithm,
 // May not preserve topology
 func (g *GEOAlgorithm) Simplify(geom space.Geometry, tolerance float64) (space.Geometry, error) {
-	result, err := geo.Simplify(wkt.MarshalString(geom), tolerance)
+	result, err := geoc.Simplify(wkt.MarshalString(geom), tolerance)
 	if err != nil {
 		return nil, err
 	}
@@ -306,7 +306,7 @@ func (g *GEOAlgorithm) Simplify(geom space.Geometry, tolerance float64) (space.G
 // SimplifyP returns a geometry simplified by amount given by tolerance.
 // Unlike Simplify, SimplifyP guarantees it will preserve topology.
 func (g *GEOAlgorithm) SimplifyP(geom space.Geometry, tolerance float64) (space.Geometry, error) {
-	result, err := geo.SimplifyP(wkt.MarshalString(geom), tolerance)
+	result, err := geoc.SimplifyP(wkt.MarshalString(geom), tolerance)
 	if err != nil {
 		return nil, err
 	}
@@ -320,7 +320,7 @@ func (g *GEOAlgorithm) SimplifyP(geom space.Geometry, tolerance float64) (space.
 func (g *GEOAlgorithm) Snap(input, reference space.Geometry, tolerance float64) (space.Geometry, error) {
 	inGeom := wkt.MarshalString(input)
 	refGeom := wkt.MarshalString(reference)
-	result, err := geo.Snap(inGeom, refGeom, tolerance)
+	result, err := geoc.Snap(inGeom, refGeom, tolerance)
 	if err != nil {
 		return nil, err
 	}
@@ -336,7 +336,7 @@ func (g *GEOAlgorithm) Snap(input, reference space.Geometry, tolerance float64) 
 // One can think of this as Union(geomA,geomB) - Intersection(A,B).
 func (g *GEOAlgorithm) SymDifference(geom1, geom2 space.Geometry) (space.Geometry, error) {
 	ms1, ms2 := convertGeomToWKT(geom1, geom2)
-	result, err := geo.SymDifference(ms1, ms2)
+	result, err := geoc.SymDifference(ms1, ms2)
 	if err != nil {
 		return nil, err
 	}
@@ -352,13 +352,13 @@ func (g *GEOAlgorithm) SymDifference(geom1, geom2 space.Geometry) (space.Geometr
 // but not to the Point/Point pair.
 func (g *GEOAlgorithm) Touches(geom1, geom2 space.Geometry) (bool, error) {
 	ms1, ms2 := convertGeomToWKT(geom1, geom2)
-	return geo.Touches(ms1, ms2)
+	return geoc.Touches(ms1, ms2)
 }
 
 // UnaryUnion does dissolve boundaries between components of a multipolygon (invalid) and does perform union
 // between the components of a geometrycollection
 func (g *GEOAlgorithm) UnaryUnion(geom space.Geometry) (space.Geometry, error) {
-	result, err := geo.UnaryUnion(wkt.MarshalString(geom))
+	result, err := geoc.UnaryUnion(wkt.MarshalString(geom))
 	if err != nil {
 		return nil, err
 	}
@@ -368,7 +368,7 @@ func (g *GEOAlgorithm) UnaryUnion(geom space.Geometry) (space.Geometry, error) {
 // Union returns a new geometry representing all points in this geometry and the other.
 func (g *GEOAlgorithm) Union(geom1, geom2 space.Geometry) (space.Geometry, error) {
 	ms1, ms2 := convertGeomToWKT(geom1, geom2)
-	result, err := geo.Union(ms1, ms2)
+	result, err := geoc.Union(ms1, ms2)
 	if err != nil {
 		return nil, err
 	}
@@ -381,7 +381,7 @@ func (g *GEOAlgorithm) Union(geom1, geom2 space.Geometry) (space.Geometry, error
 
 // UniquePoints return all distinct vertices of input geometry as a MultiPoint.
 func (g *GEOAlgorithm) UniquePoints(geom space.Geometry) (space.Geometry, error) {
-	result, err := geo.UniquePoints(wkt.MarshalString(geom))
+	result, err := geoc.UniquePoints(wkt.MarshalString(geom))
 	if err != nil {
 		return nil, err
 	}
@@ -398,7 +398,7 @@ func (g *GEOAlgorithm) UniquePoints(geom space.Geometry) (space.Geometry, error)
 // having the same SRID.
 func (g *GEOAlgorithm) Within(geom1, geom2 space.Geometry) (bool, error) {
 	ms1, ms2 := convertGeomToWKT(geom1, geom2)
-	return geo.Within(ms1, ms2)
+	return geoc.Within(ms1, ms2)
 }
 
 // convertGeomToWKT help to convert geoos.Geometry to WKT string

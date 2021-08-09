@@ -15,10 +15,10 @@ func Test_Centroid(t *testing.T) {
 				return
 			}
 			if got == nil {
-				t.Errorf("Centroid() got = %v, want %v", got, tt.want)
+				t.Errorf("Centroid() got%v = %v, want %v", tt.name, got, tt.want)
 			}
 			if !got.Equals(tt.want) {
-				t.Errorf("Centroid() got = %v, want %v", got, tt.want)
+				t.Errorf("Centroid() got %v = %v, want %v; type %T want %T", tt.name, got, tt.want, got, tt.want)
 			}
 		})
 	}

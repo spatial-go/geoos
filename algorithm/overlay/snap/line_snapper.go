@@ -60,20 +60,15 @@ func (l *LineSnapper) findSnapForVertex(pt matrix.Matrix) matrix.Matrix {
 	return nil
 }
 
-/**
- * Snap segments of the source to nearby snap vertices.
- * Source segments are "cracked" at a snap vertex.
- * A single input segment may be snapped several times
- * to different snap vertices.
- * <p>
- * For each distinct snap vertex, at most one source segment
- * is snapped to.  This prevents "cracking" multiple segments
- * at the same point, which would likely cause
- * topology collapse when being used on polygonal linework.
- *
- * @param srcCoords the coordinates of the source linestring to be snapped
- * @param snapPts the target snap vertices
- */
+// Snap segments of the source to nearby snap vertices.
+// Source segments are "cracked" at a snap vertex.
+// A single input segment may be snapped several times
+// to different snap vertices.
+// <p>
+// For each distinct snap vertex, at most one source segment
+// is snapped to.  This prevents "cracking" multiple segments
+// at the same point, which would likely cause
+// topology collapse when being used on polygonal linework.
 func (l *LineSnapper) snapSegments() {
 	sPts := matrix.TransMatrixs(l.snapPts)
 	// guard against empty input
@@ -92,12 +87,11 @@ func (l *LineSnapper) snapSegments() {
 	for i := 0; i < distinctPtCount; i++ {
 		snapPt := sPts[i]
 		index := l.findSegmentIndexToSnap(snapPt)
-		/**
-		 * If a segment to snap to was found, "crack" it at the snap pt.
-		 * The new pt is inserted immediately into the src segment list,
-		 * so that subsequent snapping will take place on the modified segments.
-		 * Duplicate points are not added.
-		 */
+
+		// If a segment to snap to was found, "crack" it at the snap pt.
+		// The new pt is inserted immediately into the src segment list,
+		// so that subsequent snapping will take place on the modified segments.
+		// Duplicate points are not added.
 		if index >= 0 {
 			l.srcPts = append(l.srcPts, l.srcPts[:index]...)
 			l.srcPts = append(l.srcPts, snapPt)
@@ -106,25 +100,18 @@ func (l *LineSnapper) snapSegments() {
 	}
 }
 
-/**
- * Finds a src segment which snaps to (is close to) the given snap point.
- * <p>
- * Only a single segment is selected for snapping.
- * This prevents multiple segments snapping to the same snap vertex,
- * which would almost certainly cause invalid geometry
- * to be created.
- * (The heuristic approach to snapping used here
- * is really only appropriate when
- * snap pts snap to a unique spot on the src geometry.)
- * <p>
- * Also, if the snap vertex occurs as a vertex in the src coordinate list,
- * no snapping is performed.
- *
- * @param snapPt the point to snap to
- * @param srcCoords the source segment coordinates
- * @return the index of the snapped segment
- * or -1 if no segment snaps to the snap point
- */
+// Finds a src segment which snaps to (is close to) the given snap point.
+// <p>
+// Only a single segment is selected for snapping.
+// This prevents multiple segments snapping to the same snap vertex,
+// which would almost certainly cause invalid geometry
+// to be created.
+// (The heuristic approach to snapping used here
+// is really only appropriate when
+// snap pts snap to a unique spot on the src geometry.)
+// <p>
+// Also, if the snap vertex occurs as a vertex in the src coordinate list,
+// no snapping is performed.
 func (l *LineSnapper) findSegmentIndexToSnap(snapPt matrix.Matrix) int {
 	minDist := math.MaxFloat64
 	snapIndex := -1
@@ -132,11 +119,8 @@ func (l *LineSnapper) findSegmentIndexToSnap(snapPt matrix.Matrix) int {
 		p0 := matrix.Matrix(l.srcPts[i])
 		p1 := matrix.Matrix(l.srcPts[i+1])
 
-		/**
-		 * Check if the snap pt is equal to one of the segment endpoints.
-		 *
-		 * If the snap pt is already in the src list, don't snap at all.
-		 */
+		// Check if the snap pt is equal to one of the segment endpoints.
+		// If the snap pt is already in the src list, don't snap at all.
 		if p0.Equals(snapPt) || p1.Equals(snapPt) {
 			return -1
 		}

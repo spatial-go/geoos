@@ -11,10 +11,10 @@ type LineSegment struct {
 	P0, P1 Matrix
 }
 
-// PointAlong Computes the {@link Coordinate} that lies a given
+// PointAlong Computes  point  that lies a given
 // fraction along the line defined by this segment.
-// A fraction of <code>0.0</code> returns the start point of the segment;
-// a fraction of <code>1.0</code> returns the end point of the segment.
+// A fraction of 0.0 returns the start point of the segment;
+// a fraction of 1.0 returns the end point of the segment.
 // If the fraction is &lt; 0.0 or &gt; 1.0 the point returned
 // will lie before the start or beyond the end of the segment.
 func (l *LineSegment) PointAlong(segmentLengthFraction float64) Matrix {
@@ -26,11 +26,11 @@ func (l *LineSegment) PointAlong(segmentLengthFraction float64) Matrix {
 	return coord
 }
 
-// PointAlongOffset Computes the {@link Coordinate} that lies a given
+// PointAlongOffset Computes point that lies a given
 // fraction along the line defined by this segment and offset from
 // the segment by a given distance.
-// A fraction of <code>0.0</code> offsets from the start point of the segment;
-// a fraction of <code>1.0</code> offsets from the end point of the segment.
+// A fraction of 0.0 offsets from the start point of the segment;
+// a fraction of 1.0 offsets from the end point of the segment.
 // The computed point is offset to the left of the line if the offset distance is
 // positive, to the right if negative.
 func (l *LineSegment) PointAlongOffset(segmentLengthFraction, offsetDistance float64) (Matrix, error) {

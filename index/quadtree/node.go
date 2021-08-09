@@ -7,7 +7,7 @@ import (
 	"github.com/spatial-go/geoos/index"
 )
 
-// Node Represents a node of a {@link Quadtree}.  Nodes contain
+// Node Represents a node of a  Quadtree.  Nodes contain
 //  items which have a spatial extent corresponding to the node's position in the quadtree.
 type Node struct {
 	Items            []interface{}

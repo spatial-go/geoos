@@ -14,7 +14,7 @@ type ComputerBuffer struct {
 }
 
 // Buffer Computes the set of raw offset curves for the buffer.
-// Each offset curve has an attached {@link Label} indicating
+// Each offset curve has an attached  indicating
 // its left and right location.
 func Buffer(geom matrix.Steric, distance float64, quadsegs int) matrix.Steric {
 	eb := ComputerBuffer{}
@@ -151,8 +151,7 @@ func (eb *ComputerBuffer) addRingBothSides(ring matrix.LineMatrix, distance floa
 	eb.addRingSide(ring, distance,
 		calc.LEFT,
 		calc.EXTERIOR, calc.INTERIOR)
-	/* Add the opposite side of the ring
-	 */
+	// Add the opposite side of the ring
 	eb.addRingSide(ring, distance,
 		calc.RIGHT,
 		calc.INTERIOR, calc.EXTERIOR)

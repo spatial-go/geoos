@@ -42,7 +42,7 @@ func (im *IntersectionMatrix) SetAll(dimensionValue int) {
 	}
 }
 
-// IsDisjoint Tests if this matrix matches <code>[FF*FF****]</code>.
+// IsDisjoint Tests if this matrix matches [FF*FF****].
 func (im *IntersectionMatrix) IsDisjoint() bool {
 	return im.matrix[calc.INTERIOR][calc.INTERIOR] == calc.FALSE &&
 		im.matrix[calc.INTERIOR][calc.BOUNDARY] == calc.FALSE &&
@@ -56,7 +56,7 @@ func (im *IntersectionMatrix) IsIntersects() bool {
 }
 
 // IsTouches Tests if this matrix matches
-// <code>[FT*******]</code>, <code>[F**T*****]</code> or <code>[F***T****]</code>.
+// [FT*******], [F**T*****] or [F***T****].
 func (im *IntersectionMatrix) IsTouches(dimensionOfGeometryA, dimensionOfGeometryB int) bool {
 	if dimensionOfGeometryA > dimensionOfGeometryB {
 		//no need to get transpose because pattern matrix is symmetrical
@@ -95,7 +95,7 @@ func (im *IntersectionMatrix) IsCrosses(dimensionOfGeometryA, dimensionOfGeometr
 	return false
 }
 
-// IsWithin  Tests whether this matrix matches <code>[T*F**F***]</code>.
+// IsWithin  Tests whether this matrix matches [T*F**F***].
 func (im *IntersectionMatrix) IsWithin() bool {
 	return isTrue(im.matrix[calc.INTERIOR][calc.INTERIOR]) &&
 		im.matrix[calc.INTERIOR][calc.EXTERIOR] == calc.FALSE &&
@@ -110,10 +110,10 @@ func (im *IntersectionMatrix) IsContains() bool {
 }
 
 // IsCovers Tests if this matrix matches
-//    <code>[T*****FF*]</code>
-// or <code>[*T****FF*]</code>
-// or <code>[***T**FF*]</code>
-// or <code>[****T*FF*]</code>
+//    [T*****FF*]
+// or [*T****FF*]
+// or [***T**FF*]
+// or [****T*FF*]
 func (im *IntersectionMatrix) IsCovers() bool {
 	hasPointInCommon :=
 		isTrue(im.matrix[calc.INTERIOR][calc.INTERIOR]) ||
@@ -127,10 +127,10 @@ func (im *IntersectionMatrix) IsCovers() bool {
 }
 
 // IsCoveredBy Tests if this matrix matches
-//  <code>[T*F**F***]</code>
-// or <code>[*TF**F***]</code>
-// or <code>[**FT*F***]</code>
-// or <code>[**F*TF***]</code>
+//  [T*F**F***]
+// or [*TF**F***]
+// or [**FT*F***]
+// or [**F*TF***]
 func (im *IntersectionMatrix) IsCoveredBy() bool {
 	hasPointInCommon := isTrue(im.matrix[calc.INTERIOR][calc.INTERIOR]) ||
 		isTrue(im.matrix[calc.INTERIOR][calc.BOUNDARY]) ||
@@ -215,7 +215,7 @@ func (im *IntersectionMatrix) SetString(dimensionSymbols string) {
 	}
 }
 
-// SetAtLeast  Changes the specified element to <code>minimumDimensionValue</code> if the element is less.
+// SetAtLeast  Changes the specified element to minimumDimensionValue if the element is less.
 func (im *IntersectionMatrix) SetAtLeast(row, column, minimumDimensionValue int) {
 	if im.matrix[row][column] < minimumDimensionValue {
 		im.matrix[row][column] = minimumDimensionValue
@@ -230,7 +230,7 @@ func (im *IntersectionMatrix) SetAtLeastIfValid(row, column, minimumDimensionVal
 	}
 }
 
-// SetAtLeastString  For each element in this <code>IntersectionMatrix</code>, changes the
+// SetAtLeastString  For each element in this IntersectionMatrix, changes the
 //  element to the corresponding minimum dimension symbol if the element is less.
 func (im *IntersectionMatrix) SetAtLeastString(minimumDimensionSymbols string) {
 	for i := 0; i < len(minimumDimensionSymbols); i++ {

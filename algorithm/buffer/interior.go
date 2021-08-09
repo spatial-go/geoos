@@ -218,15 +218,11 @@ func (ip *InteriorPointArea) Width() float64 {
 
 // process Compute the interior point.
 func (ip *InteriorPointArea) process(polygon matrix.PolygonMatrix) {
-	/**
-	 * This results in returning a null Coordinate
-	 */
+	// This results in returning a null Coordinate
 	if polygon.IsEmpty() {
 		return
 	}
-	/**
-	 * set default interior point in case polygon has zero area
-	 */
+	// set default interior point in case polygon has zero area
 	crossings := []float64{}
 	for _, v := range polygon {
 		crossings = ip.scanRing(v, crossings)
@@ -268,8 +264,6 @@ func (ip *InteriorPointArea) addEdgeCrossing(p0, p1 matrix.Matrix, scanY float64
 }
 
 // findBestMidpoint Finds the midpoint of the widest interior section.
-// Sets the {@link #interiorPoint} location
-// and the {@link #interiorSectionWidth}
 func (ip *InteriorPointArea) findBestMidpoint(crossings []float64) {
 	// zero-area polygons will have no crossings
 	if len(crossings) == 0 {
@@ -277,10 +271,9 @@ func (ip *InteriorPointArea) findBestMidpoint(crossings []float64) {
 	}
 
 	sort.Sort(sort.Float64Slice(crossings))
-	/*
-	 * Entries in crossings list are expected to occur in pairs representing a
-	 * section of the scan line interior to the polygon (which may be zero-length)
-	 */
+
+	// Entries in crossings list are expected to occur in pairs representing a
+	// section of the scan line interior to the polygon (which may be zero-length)
 	for i := 0; i < len(crossings); i += 2 {
 		x1 := crossings[i]
 		// crossings count must be even so this should be safe

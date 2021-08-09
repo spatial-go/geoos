@@ -126,7 +126,7 @@ const (
 // const calc parameter
 const (
 	// The smallest representable relative difference between two  values.
-	EPS   = 1.23259516440783e-32 /* = 2^-106 */
+	EPS   = 1.23259516440783e-32 // = 2^-106
 	SPLIT = 134217729.0          // 2^27+1, for IEEE
 
 	MAXPRINTDIGITS = 32

@@ -71,9 +71,7 @@ func (r *Computer) computeProperIntersectionIM(im *matrix.IntersectionMatrix) {
 
 	// For Geometry's of dim 0 there can never be proper intersections.
 
-	/**
-	 * If edge segments of Areas properly intersect, the areas must properly overlap.
-	 */
+	// If edge segments of Areas properly intersect, the areas must properly overlap.
 	if dimA == 2 && dimB == 2 {
 		im.SetAtLeastString("212101212")
 	} else if dimA == 2 && dimB == 1 {

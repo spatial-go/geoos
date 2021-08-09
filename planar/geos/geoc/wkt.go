@@ -1,9 +1,9 @@
-package geo
+package geoc
 
-/*
-#cgo LDFLAGS: -lgeos_c
-#include "geos.h"
-*/
+//
+// #cgo LDFLAGS: -lgeos_c
+// #include "geos.h"
+//
 import "C"
 import (
 	"errors"

@@ -70,15 +70,9 @@ func isObtuse(p0, p1, p2 matrix.Matrix) bool {
 	return dotprod < 0
 }
 
-/**
- * Returns the unoriented smallest angle between two vectors.
- * The computed angle will be in the range [0, Pi).
- *
- * @param tip1 the tip of one vector
- * @param tail the tail of each vector
- * @param tip2 the tip of the other vector
- * @return the angle between tail-tip1 and tail-tip2
- */
+// Returns the unoriented smallest angle between two vectors.
+// The computed angle will be in the range [0, Pi).
+
 func ngleBetween(tip1, tail, tip2 matrix.Matrix) float64 {
 	a1 := Angle(tail, tip1)
 	a2 := Angle(tail, tip2)

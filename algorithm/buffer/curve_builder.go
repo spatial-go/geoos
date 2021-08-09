@@ -98,33 +98,25 @@ func (c *CurveBuilder) isRingCurveInverted(pts matrix.LineMatrix, distance float
 	if distance == 0.0 {
 		return false
 	}
-	/**
-	 * Only proper rings can invert.
-	 */
+	// Only proper rings can invert.
 	if len(pts) <= 3 {
 		return false
 	}
-	/**
-	 * Heuristic based on low chance that a ring with many vertices will invert.
-	 * This low limit ensures this test is fairly efficient.
-	 */
+	// Heuristic based on low chance that a ring with many vertices will invert.
+	// This low limit ensures this test is fairly efficient.
 	if len(pts) >= calc.MaxRingSize {
 		return false
 	}
 
-	/**
-	 * An inverted curve has no more points than the input ring.
-	 * This also eliminates concave inputs (which will produce fillet arcs)
-	 */
+	// An inverted curve has no more points than the input ring.
+	// This also eliminates concave inputs (which will produce fillet arcs)
 	if len(c.Curves) > len(pts) {
 		return false
 	}
 
-	/**
-	 * Check if the curve vertices are all closer to the input ring
-	 * than the buffer distance.
-	 * If so, the curve is NOT a valid buffer curve.
-	 */
+	// Check if the curve vertices are all closer to the input ring
+	// than the buffer distance.
+	// If so, the curve is NOT a valid buffer curve.
 	distTol := calc.NearnessFactor * math.Abs(distance)
 
 	maxDist := 0.0
@@ -216,9 +208,9 @@ func (c *CurveBuilder) computeSingleSidedBufferCurve(pts matrix.LineMatrix, isRi
 		// Simplify the appropriate side of the line before generating
 		simp := &LineSimplifier{inputLine: pts}
 		simp1 := simp.Simplify(distTol)
+
 		// MD - used for testing only (to eliminate simplification)
 		//      Coordinate[] simp1 = inputPts;
-
 		n1 := len(simp1) - 1
 		c.Curve.initSideSegments(simp1[0], simp1[1], calc.LEFT)
 		c.Curve.Add(c.Curve.offset1.P1)

@@ -1,6 +1,4 @@
-/*
-Package geocsv is a library for read csv file with geospatial data.
-*/
+//Package geocsv is a library for read csv file with geospatial data.
 package geocsv
 
 import (

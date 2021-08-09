@@ -23,7 +23,7 @@ type ConvexHull struct {
 	inputPts []matrix.Matrix
 }
 
-// ConvexHullWithGeom Create a new convex hull construction for the input {@link Geometry}.
+// ConvexHullWithGeom Create a new convex hull construction for the input geometry.
 func ConvexHullWithGeom(geom matrix.Steric) *ConvexHull {
 	ch := &ConvexHull{}
 	ch.inputPts = extractMatrixs(geom)
@@ -36,7 +36,7 @@ func extractMatrixs(geom matrix.Steric) []matrix.Matrix {
 	return filter.Matrixs()
 }
 
-// ConvexHull Returns a {@link Geometry} that represents the convex hull of the input geometry.
+// ConvexHull Returns a geometry that represents the convex hull of the input geometry.
 // The returned geometry contains the minimal number of points needed to
 // represent the convex hull.  In particular, no more than two consecutive
 // points will be collinear.
@@ -269,7 +269,7 @@ func (c *ConvexHull) cleanRing(ms []matrix.Matrix) []matrix.Matrix {
 	return cleanedRing
 }
 
-// RadialComparator Compares {@link Matrix}s for their angle and distance relative to an origin.
+// RadialComparator Compares  Matrixs for their angle and distance relative to an origin.
 type RadialComparator struct {
 	origin matrix.Matrix
 	pts    []matrix.Matrix
@@ -318,8 +318,8 @@ func (r *RadialComparator) polarCompare(o, p, q matrix.Matrix) bool {
 	return true
 }
 
-// OrientationIndex Returns the index of the direction of the point <code>q</code> relative to
-// a vector specified by <code>p1-p2</code>.
+// OrientationIndex Returns the index of the direction of the point q relative to
+// a vector specified by p1-p2.
 func OrientationIndex(p1, p2, q matrix.Matrix) int {
 
 	// fast filter for orientation index
