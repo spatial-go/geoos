@@ -79,9 +79,9 @@ func main() {
 
 We will also uphold the concept of "openness, co-creation, and win-win" to contribute in the field of space computing.
 
-Welcome to join us ！[please report an issue](https://github.com/spatial-go/geos/issues/new)
+Welcome to join us ！[please report an issue](https://github.com/spatial-go/geoos/issues/new)
 
-Email Address： [geoos@changjing.ai](geoos@changjing.ai)
+Email Address： [geoos@changjing.ai](mailto:geoos@changjing.ai)
 
 ## License
 `Geoos` is licensed under the:
