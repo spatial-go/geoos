@@ -8,26 +8,29 @@ import (
 )
 
 const (
-	// PITIMES2 The value of 2*Pi
-	PITIMES2 = 2.0 * math.Pi
-	// PIOVER2 The value of Pi/2
-	PIOVER2 = math.Pi / 2.0
+	// PiTimes2 The value of 2*Pi
+	PiTimes2 = 2.0 * math.Pi
+	// PiOver2 The value of Pi/2
+	PiOver2 = math.Pi / 2.0
 
-	// PIOVER4 PI_OVER_4The value of Pi/4
-	PIOVER4 = math.Pi / 4.0
+	// PiOver4 PI_OVER_4The value of Pi/4
+	PiOver4 = math.Pi / 4.0
 
-	// NONE Constant representing no orientation
-	NONE = 0
+	// None Constant representing no orientation
+	None = 0
+
+	// PiDegrees ...
+	PiDegrees = 180.0
 )
 
 // ToDegrees Converts from radians to degrees.
 func ToDegrees(radians float64) float64 {
-	return (radians * 180) / (math.Pi)
+	return (radians * PiDegrees) / (math.Pi)
 }
 
 // ToRadians  Converts from degrees to radians.
 func ToRadians(angleDegrees float64) float64 {
-	return (angleDegrees * math.Pi) / 180.0
+	return (angleDegrees * math.Pi) / PiDegrees
 }
 
 // Angle Returns the angle of the vector from p0 to p1,
@@ -91,10 +94,10 @@ func BetweenOriented(tip1, tail, tip2 matrix.Matrix) float64 {
 
 	// normalize, maintaining orientation
 	if angDel <= -math.Pi {
-		return angDel + PITIMES2
+		return angDel + PiTimes2
 	}
 	if angDel > math.Pi {
-		return angDel - PITIMES2
+		return angDel - PiTimes2
 	}
 	return angDel
 }
@@ -119,17 +122,17 @@ func Turn(ang1, ang2 float64) int {
 	if crossproduct < 0 {
 		return calc.CLOCKWISE
 	}
-	return NONE
+	return None
 }
 
 // Normalize Computes the normalized value of an angle, which is the
 // equivalent angle in the range ( -Pi, Pi ].
 func Normalize(angle float64) float64 {
 	for angle > math.Pi {
-		angle -= PITIMES2
+		angle -= PiTimes2
 	}
 	for angle <= -math.Pi {
-		angle += PITIMES2
+		angle += PiTimes2
 	}
 	return angle
 }
@@ -139,15 +142,15 @@ func Normalize(angle float64) float64 {
 func NormalizePositive(angle float64) float64 {
 	if angle < 0.0 {
 		for angle < 0.0 {
-			angle += PITIMES2
+			angle += PiTimes2
 		}
 		// in case round-off error bumps the value over
-		if angle >= PITIMES2 {
+		if angle >= PiTimes2 {
 			angle = 0.0
 		}
 	} else {
-		for angle >= PITIMES2 {
-			angle -= PITIMES2
+		for angle >= PiTimes2 {
+			angle -= PiTimes2
 		}
 		// in case round-off error bumps the value under
 		if angle < 0.0 {
