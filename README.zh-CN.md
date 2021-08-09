@@ -73,7 +73,7 @@ func main() {
 
 ## 如何贡献
 
-感谢 [OSGeo](https://www.osgeo.org/)，我们也将秉承“开放、共创、共赢”的目标理念在空间计算领域贡献自己的一份力量。
+我们也将秉承“开放、共创、共赢”的目标理念在空间计算领域贡献自己的一份力量。
 
 非常欢迎你的加入！[提一个 Issue](https://github.com/spatial-go/geos/issues/new)
 
