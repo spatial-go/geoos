@@ -23,8 +23,8 @@ type Trans interface {
 // Transformer  A framework for processes which transform an input  Geometry into
 //  an output  Geometry, possibly changing its structure and type(s).
 type Transformer struct {
-	InputGeom                                                                             matrix.Steric
-	pruneEmptyGeometry, preserveGeometryCollectionType, preserveCollections, preserveType bool
+	InputGeom                        matrix.Steric
+	pruneEmptyGeometry, preserveType bool
 }
 
 // Transform ...

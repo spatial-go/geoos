@@ -270,7 +270,7 @@ func (ip *InteriorPointArea) findBestMidpoint(crossings []float64) {
 		return
 	}
 
-	sort.Sort(sort.Float64Slice(crossings))
+	sort.Float64sAreSorted(sort.Float64Slice(crossings))
 
 	// Entries in crossings list are expected to occur in pairs representing a
 	// section of the scan line interior to the polygon (which may be zero-length)

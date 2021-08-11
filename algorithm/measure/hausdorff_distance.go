@@ -33,7 +33,8 @@ func (h *HausdorffDistance) distance() float64 {
 	return h.ptDist.Distance
 }
 
-func (h *HausdorffDistance) orientedDistance() float64 {
+// OrientedDistance ...
+func (h *HausdorffDistance) OrientedDistance() float64 {
 	h.computeOrientedDistance(h.g0, h.g1, h.ptDist)
 	return h.ptDist.Distance
 }

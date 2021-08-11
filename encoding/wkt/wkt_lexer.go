@@ -80,7 +80,8 @@ func (l *Lexer) unread() {
 	_ = l.reader.UnreadRune()
 }
 
-func (l *Lexer) peek() rune {
+// Peek ...
+func (l *Lexer) Peek() rune {
 	ch, _, err := l.reader.ReadRune()
 	if err != nil {
 		ch = eof

@@ -118,14 +118,13 @@ func (c *ConvexHullComputer) padArray3(pts []matrix.Matrix) []matrix.Matrix {
 }
 
 func (c *ConvexHullComputer) preSort(pts []matrix.Matrix) []matrix.Matrix {
-	t := matrix.Matrix{}
 
 	// find the lowest point in the set. If two or more points have
 	// the same minimum y matrix choose the one with the minimum x.
 	// This focal point is put in array location pts[0].
 	for i := 1; i < len(pts); i++ {
 		if (pts[i][1] < pts[0][1]) || ((pts[i][1] == pts[0][1]) && (pts[i][0] < pts[0][0])) {
-			t = pts[0]
+			t := pts[0]
 			pts[0] = pts[i]
 			pts[i] = t
 		}
@@ -141,14 +140,14 @@ func (c *ConvexHullComputer) preSort(pts []matrix.Matrix) []matrix.Matrix {
 
 // grahamScan Uses the Graham Scan algorithm to compute the convex hull vertices.
 func (c *ConvexHullComputer) grahamScan(ms []matrix.Matrix) *list.List {
-	p := matrix.Matrix{}
+
 	ps := list.New()
 	ps.PushBack(ms[0])
 	ps.PushBack(ms[1])
 	ps.PushBack(ms[2])
 	for i := 3; i < len(ms); i++ {
 		el := ps.Back()
-		p = el.Value.(matrix.Matrix)
+		p := el.Value.(matrix.Matrix)
 		ps.Remove(el)
 		// check for empty stack to guard against robustness problems
 		for ps.Len() != 0 && OrientationIndex(ps.Back().Value.(matrix.Matrix), p, ms[i]) > 0 {

@@ -147,10 +147,7 @@ func (ls LineString) Boundary() (Geometry, error) {
 // IsClosed Returns TRUE if the LINESTRING's start and end points are coincident.
 // For Polyhedral Surfaces, reports if the surface is areal (open) or IsC (closed).
 func (ls LineString) IsClosed() bool {
-	if Point(ls[0]).Equals(Point(ls[len(ls)-1])) {
-		return true
-	}
-	return false
+	return Point(ls[0]).Equals(Point(ls[len(ls)-1]))
 }
 
 // Length Returns the length of this LineString
@@ -240,8 +237,5 @@ func (ls LineString) IsRing() bool {
 
 // IsValid returns true if the  geometry is valid.
 func (ls LineString) IsValid() bool {
-	if len(ls) >= 1 {
-		return true
-	}
-	return false
+	return len(ls) >= 1 
 }

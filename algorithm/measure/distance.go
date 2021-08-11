@@ -123,10 +123,10 @@ type ElementDistance struct {
 
 // Distance returns distance Between the two Geometry.
 func (el *ElementDistance) Distance() (float64, error) {
-	if el.From.IsEmpty() && el.From.IsEmpty() {
+	if el.From.IsEmpty() && el.To.IsEmpty() {
 		return 0, nil
 	}
-	if el.From.IsEmpty() != el.From.IsEmpty() {
+	if el.From.IsEmpty() != el.To.IsEmpty() {
 		return 0, spaceerr.ErrNilGeometry
 	}
 	switch to := el.To.(type) {

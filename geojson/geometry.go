@@ -120,27 +120,27 @@ func (g *Geometry) UnmarshalJSON(data []byte) error {
 	switch jg.Type {
 	case "Point":
 		p := space.Point{}
-		err = json.Unmarshal(jg.Coordinates, &p)
+		_ = json.Unmarshal(jg.Coordinates, &p)
 		g.Coordinates = p
 	case "MultiPoint":
 		mp := space.MultiPoint{}
-		err = json.Unmarshal(jg.Coordinates, &mp)
+		_ = json.Unmarshal(jg.Coordinates, &mp)
 		g.Coordinates = mp
 	case "LineString":
 		ls := space.LineString{}
-		err = json.Unmarshal(jg.Coordinates, &ls)
+		_ = json.Unmarshal(jg.Coordinates, &ls)
 		g.Coordinates = ls
 	case "MultiLineString":
 		mls := space.MultiLineString{}
-		err = json.Unmarshal(jg.Coordinates, &mls)
+		_ = json.Unmarshal(jg.Coordinates, &mls)
 		g.Coordinates = mls
 	case "Polygon":
 		p := space.Polygon{}
-		err = json.Unmarshal(jg.Coordinates, &p)
+		_ = json.Unmarshal(jg.Coordinates, &p)
 		g.Coordinates = p
 	case "MultiPolygon":
 		mp := space.MultiPolygon{}
-		err = json.Unmarshal(jg.Coordinates, &mp)
+		_ = json.Unmarshal(jg.Coordinates, &mp)
 		g.Coordinates = mp
 	case "GeometryCollection":
 		g.Geometries = jg.Geometries

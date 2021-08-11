@@ -95,14 +95,13 @@ func Relate(a, b Geometry) (string, error) {
 // For this function to make sense, the source geometries must both be of the same coordinate projection,
 // having the same SRID.
 func Within(A, B Geometry) (bool, error) {
-	intersectBound := true
 	if inter, ret := aInB(A, B); !ret {
-		intersectBound = inter
+		im := relate.IM(A.ToMatrix(), B.ToMatrix(), inter)
+		return im.IsWithin(), nil
 	} else {
 		return inter, nil
 	}
-	im := relate.IM(A.ToMatrix(), B.ToMatrix(), intersectBound)
-	return im.IsWithin(), nil
+
 }
 
 // Contains space.Geometry A contains space.Geometry B if and only if no points of B lie in the exterior of A,
@@ -112,38 +111,34 @@ func Within(A, B Geometry) (bool, error) {
 // For this function to make sense, the source geometries must both be of the same coordinate projection,
 // having the same SRID.
 func Contains(A, B Geometry) (bool, error) {
-	intersectBound := true
 	if inter, ret := aInB(B, A); !ret {
-		intersectBound = inter
+		im := relate.IM(A.ToMatrix(), B.ToMatrix(), inter)
+		return im.IsContains(), nil
 	} else {
 		return inter, nil
 	}
-	im := relate.IM(A.ToMatrix(), B.ToMatrix(), intersectBound)
-	return im.IsContains(), nil
 }
 
 // Covers returns TRUE if no point in space.Geometry B is outside space.Geometry A
 func Covers(A, B Geometry) (bool, error) {
-	intersectBound := true
 	if inter, ret := aInB(B, A); !ret {
-		intersectBound = inter
+		im := relate.IM(A.ToMatrix(), B.ToMatrix(), inter)
+		return im.IsCovers(), nil
 	} else {
 		return inter, nil
 	}
-	im := relate.IM(A.ToMatrix(), B.ToMatrix(), intersectBound)
-	return im.IsCovers(), nil
+
 }
 
 // CoveredBy returns TRUE if no point in space.Geometry A is outside space.Geometry B
 func CoveredBy(A, B Geometry) (bool, error) {
-	intersectBound := true
 	if inter, ret := aInB(A, B); !ret {
-		intersectBound = inter
+		im := relate.IM(A.ToMatrix(), B.ToMatrix(), inter)
+		return im.IsCoveredBy(), nil
 	} else {
 		return inter, nil
 	}
-	im := relate.IM(A.ToMatrix(), B.ToMatrix(), intersectBound)
-	return im.IsCoveredBy(), nil
+
 }
 
 // Crosses takes two geometry objects and returns TRUE if their intersection "spatially cross",
@@ -154,7 +149,7 @@ func CoveredBy(A, B Geometry) (bool, error) {
 // Otherwise, it returns FALSE.
 func Crosses(A, B Geometry) (bool, error) {
 	intersectBound := B.Bound().IntersectsBound(A.Bound())
-	if B.Bound().ContainsBound(A.Bound()) || B.Bound().ContainsBound(A.Bound()) {
+	if B.Bound().ContainsBound(A.Bound()) || A.Bound().ContainsBound(B.Bound()) {
 		intersectBound = true
 	}
 	if !intersectBound {
@@ -176,7 +171,7 @@ func Disjoint(A, B Geometry) (bool, error) {
 // Intersects If a geometry  shares any portion of space then they intersect
 func Intersects(A, B Geometry) (bool, error) {
 	intersectBound := B.Bound().IntersectsBound(A.Bound())
-	if B.Bound().ContainsBound(A.Bound()) || B.Bound().ContainsBound(A.Bound()) {
+	if B.Bound().ContainsBound(A.Bound()) || A.Bound().ContainsBound(B.Bound()) {
 		intersectBound = true
 	}
 	if !intersectBound {
@@ -191,7 +186,7 @@ func Intersects(A, B Geometry) (bool, error) {
 // but not to the Point/Point pair.
 func Touches(A, B Geometry) (bool, error) {
 	intersectBound := B.Bound().IntersectsBound(A.Bound())
-	if B.Bound().ContainsBound(A.Bound()) || B.Bound().ContainsBound(A.Bound()) {
+	if B.Bound().ContainsBound(A.Bound()) || A.Bound().ContainsBound(B.Bound()) {
 		intersectBound = true
 	}
 	im := relate.IM(A.ToMatrix(), B.ToMatrix(), intersectBound)
@@ -202,7 +197,7 @@ func Touches(A, B Geometry) (bool, error) {
 // By that we mean they intersect, but one does not completely contain another.
 func Overlaps(A, B Geometry) (bool, error) {
 	intersectBound := A.Bound().IntersectsBound(B.Bound())
-	if A.Bound().ContainsBound(B.Bound()) || A.Bound().ContainsBound(B.Bound()) {
+	if A.Bound().ContainsBound(B.Bound()) || B.Bound().ContainsBound(A.Bound()) {
 		intersectBound = true
 	}
 	im := relate.IM(A.ToMatrix(), B.ToMatrix(), intersectBound)
@@ -231,7 +226,7 @@ func aInB(A, B Geometry) (bool, bool) {
 	}
 
 	intersectBound := B.Bound().IntersectsBound(A.Bound())
-	if B.Bound().ContainsBound(A.Bound()) || B.Bound().ContainsBound(A.Bound()) {
+	if B.Bound().ContainsBound(A.Bound()) || A.Bound().ContainsBound(B.Bound()) {
 		intersectBound = true
 	}
 	return intersectBound, false

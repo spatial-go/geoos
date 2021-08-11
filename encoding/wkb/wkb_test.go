@@ -39,7 +39,7 @@ var AllGeometries = []space.Geometry{
 
 func TestMarshal(t *testing.T) {
 	for _, g := range AllGeometries {
-		Marshal(g, binary.BigEndian)
+		_, _ = Marshal(g, binary.BigEndian)
 	}
 }
 
@@ -55,7 +55,7 @@ func BenchmarkEncode_Point(b *testing.B) {
 	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		e.Encode(g)
+		_ = e.Encode(g)
 	}
 }
 
@@ -69,7 +69,7 @@ func BenchmarkEncode_LineString(b *testing.B) {
 	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		e.Encode(g)
+		_ = e.Encode(g)
 	}
 }
 
@@ -108,12 +108,12 @@ func compare(t testing.TB, e space.Geometry, b []byte) {
 	if !bytes.Equal(data, b) {
 		t.Logf("%v", data)
 		t.Logf("%v", b)
-		t.Errorf("marshal: incorrent encoding")
+		t.Errorf("marshal: incorrect encoding")
 	}
 
 	// preallocation
 	if len(data) != geomLength(e) {
-		t.Errorf("prealloc length: %v != %v", len(data), geomLength(e))
+		t.Errorf("preallot length: %v != %v", len(data), geomLength(e))
 	}
 
 	// Scanner

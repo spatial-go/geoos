@@ -18,8 +18,7 @@ const (
 	UNKNOWN string = "UNKNOWN"
 )
 
-// GetStringEncoding
-// determine string encoding, UTF8 or GBK or UNKNOWN
+// GetStringEncoding determine string encoding, UTF8 or GBK or UNKNOWN
 func GetStringEncoding(dataStr string) string {
 	// filter special characters
 	dataStr = strings.ReplaceAll(dataStr, "·", "")

@@ -12,6 +12,7 @@ import (
 )
 
 // Point describes a geographic point
+
 type Point matrix.Matrix
 
 // GeoJSONType returns GeoJSON type for the point
@@ -214,8 +215,5 @@ func (p Point) IsRing() bool {
 
 // IsValid returns true if the  geometry is valid.
 func (p Point) IsValid() bool {
-	if len(p) >= 2 {
-		return true
-	}
-	return false
+	return len(p) >= 2
 }

@@ -24,8 +24,7 @@ func TestValidOP_IsSimple(t *testing.T) {
 		}},
 			want: false},
 	}
-	const polygon = `POLYGON((1 2, 3 4, 5 6, 5 3, 1 2))`
-	const linestring = `LINESTRING(1 1,2 2,2 3.5,1 3,1 2,2 1)`
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			el := &ValidOP{

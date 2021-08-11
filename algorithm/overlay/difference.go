@@ -13,18 +13,14 @@ func SymDifference(m0, m1 matrix.Steric) (matrix.Steric, error) {
 	result := matrix.Collection{}
 	if res, err := Difference(m0, m1); err == nil {
 		if r, ok := res.(matrix.Collection); ok {
-			for _, v := range r {
-				result = append(result, v)
-			}
+			result = append(result, r...)
 		} else {
 			result = append(result, res)
 		}
 	}
 	if res, err := Difference(m1, m0); err == nil {
 		if r, ok := res.(matrix.Collection); ok {
-			for _, v := range r {
-				result = append(result, v)
-			}
+			result = append(result, r...)
 		} else {
 			result = append(result, res)
 		}

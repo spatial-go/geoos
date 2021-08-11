@@ -89,8 +89,8 @@ func TestAlgorithm_Equals(t *testing.T) {
 		want    bool
 		wantErr bool
 	}{
-		{name: "equals exact", args: args{g1: geometry1, g2: geometry3}, want: true, wantErr: false},
-		{name: "not equals exact", args: args{g1: geometry1, g2: geometry2}, want: false, wantErr: false},
+		{name: "equals exact", args: args{g1: geometry1, g2: geometry3, tolerance: 0.001}, want: true, wantErr: false},
+		{name: "not equals exact", args: args{g1: geometry1, g2: geometry2, tolerance: 0.001}, want: false, wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

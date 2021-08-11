@@ -13,21 +13,18 @@ type EpsFunction func(pt space.Point) float64
 // DBScan clusters incoming points into clusters with params (eps, minPoints)
 //
 // eps is clustering radius in km
-// minPoints in minimum number of points in eps-neighbourhood (density)
-func DBScan(points clusters.PointList, eps float64, minPoints int) (clusterArry []clusters.Cluster, noise []int) {
+// minPoints in minimum number of points in eps-neighborhood (density)
+func DBScan(points clusters.PointList, eps float64, minPoints int) (clusterArray []clusters.Cluster, noise []int) {
 	visited := make([]bool, len(points))
 	members := make([]bool, len(points))
-	clusterArry = []clusters.Cluster{}
+	clusterArray = []clusters.Cluster{}
 	noise = []int{}
 	C := 0
 	kdTree := NewKDTree(points)
 
-	// Our SphericalDistanceFast returns distance which is not mutiplied
+	// Our SphericalDistanceFast returns distance which is not multiplied
 	// by EarthR * DegreeRad, adjust eps accordingly
 	eps = eps / EarthR / DegreeRad
-
-	// neighborUnique := bitset.New(uint(len(points)))
-	neighborUnique := make(map[int]int)
 
 	for i := 0; i < len(points); i++ {
 		if visited[i] {
@@ -43,7 +40,7 @@ func DBScan(points clusters.PointList, eps float64, minPoints int) (clusterArry 
 			members[i] = true
 			C++
 			// expandCluster goes here inline
-			neighborUnique = make(map[int]int)
+			neighborUnique := make(map[int]int)
 			for j := 0; j < len(neighborPts); j++ {
 				neighborUnique[neighborPts[j]] = neighborPts[j]
 			}
@@ -68,13 +65,13 @@ func DBScan(points clusters.PointList, eps float64, minPoints int) (clusterArry 
 					members[k] = true
 				}
 			}
-			clusterArry = append(clusterArry, cluster)
+			clusterArray = append(clusterArray, cluster)
 		}
 	}
 	return
 }
 
-// RegionQuery is simple way O(N) to find points in neighbourhood
+// RegionQuery is simple way O(N) to find points in neighborhood
 //
 // It is roughly equivalent to kdTree.InRange(points[i], eps, nil)
 func RegionQuery(points clusters.PointList, P space.Point, eps float64) []int {

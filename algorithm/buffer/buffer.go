@@ -147,7 +147,9 @@ func (eb *ComputerBuffer) addPolygon(p matrix.PolygonMatrix) {
 			calc.ImExterior)
 	}
 }
-func (eb *ComputerBuffer) addRingBothSides(ring matrix.LineMatrix, distance float64) {
+
+// AddRingBothSides ...
+func (eb *ComputerBuffer) AddRingBothSides(ring matrix.LineMatrix, distance float64) {
 	eb.addRingSide(ring, distance,
 		calc.SideLeft,
 		calc.ImExterior, calc.ImInterior)
