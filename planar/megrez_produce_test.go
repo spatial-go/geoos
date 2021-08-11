@@ -365,3 +365,27 @@ func TestAlgorithm_UniquePoints(t *testing.T) {
 		})
 	}
 }
+
+func TestMegrezAlgorithm_Buffer(t *testing.T) {
+	type args struct {
+		geom     space.Geometry
+		width    float64
+		quadsegs int
+	}
+	tests := []struct {
+		name         string
+		g            *MegrezAlgorithm
+		args         args
+		wantGeometry space.Geometry
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			g := &MegrezAlgorithm{}
+			if gotGeometry := g.Buffer(tt.args.geom, tt.args.width, tt.args.quadsegs); !reflect.DeepEqual(gotGeometry, tt.wantGeometry) {
+				t.Errorf("MegrezAlgorithm.Buffer() = %v, want %v", gotGeometry, tt.wantGeometry)
+			}
+		})
+	}
+}
