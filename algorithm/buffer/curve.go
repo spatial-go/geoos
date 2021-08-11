@@ -86,7 +86,7 @@ func (c *Curve) CreateCircle(p matrix.Matrix, distance float64) matrix.LineMatri
 	// add start point
 	c.Add(matrix.Matrix{p[0] + distance, p[1]})
 
-	startAngle, endAngle := 0.0, calc.ANGLE*math.Pi
+	startAngle, endAngle := 0.0, angle.PiTimes2
 	directionFactor := calc.ClockWise
 	totalAngle := math.Abs(startAngle - endAngle)
 	nSegs := int(totalAngle/(math.Pi/2.0/float64(c.parameters.QuadrantSegments)) + 0.5)
@@ -128,8 +128,8 @@ func (c *Curve) AddLineEndCap(p0, p1 matrix.Matrix, distance float64) {
 
 	offsetL := &matrix.LineSegment{P0: matrix.Matrix{0, 0}, P1: matrix.Matrix{0, 0}}
 	offsetR := &matrix.LineSegment{P0: matrix.Matrix{0, 0}, P1: matrix.Matrix{0, 0}}
-	c.computeOffsetSegment(seg, calc.LEFT, distance, offsetL)
-	c.computeOffsetSegment(seg, calc.RIGHT, distance, offsetR)
+	c.computeOffsetSegment(seg, calc.SideLeft, distance, offsetL)
+	c.computeOffsetSegment(seg, calc.SideRight, distance, offsetR)
 
 	dx := p1[0] - p0[0]
 	dy := p1[1] - p0[1]
@@ -205,7 +205,7 @@ func (c *Curve) initSideSegments(s1, s2 matrix.Matrix, side int) {
 // The offset points are computed in full double precision, for accuracy.
 func (c *Curve) computeOffsetSegment(seg *matrix.LineSegment, side int, distance float64, offset *matrix.LineSegment) {
 	sideSign := -1.0
-	if side == calc.LEFT {
+	if side == calc.SideLeft {
 		sideSign = 1.0
 	}
 	dx := seg.P1[0] - seg.P0[0]
@@ -236,7 +236,7 @@ func (c *Curve) addNextSegment(p matrix.Matrix, addStartPoint bool) {
 	}
 	orientation := OrientationIndex(c.s0, c.s1, c.s2)
 	outsideTurn :=
-		(orientation == calc.ClockWise && c.side == calc.LEFT) || (orientation == calc.CounterClockWise && c.side == calc.RIGHT)
+		(orientation == calc.ClockWise && c.side == calc.SideLeft) || (orientation == calc.CounterClockWise && c.side == calc.SideRight)
 
 	if orientation == 0 { // lines are collinear
 		c.addCollinear(addStartPoint)
@@ -456,7 +456,7 @@ func (c *Curve) addLimitedMitreJoin(
 	bevelEndLeft, _ := mitreMidLine.PointAlongOffset(1.0, bevelHalfLen)
 	bevelEndRight, _ := mitreMidLine.PointAlongOffset(1.0, -bevelHalfLen)
 
-	if c.side == calc.LEFT {
+	if c.side == calc.SideLeft {
 		c.Add(bevelEndLeft)
 		c.Add(bevelEndRight)
 	} else {

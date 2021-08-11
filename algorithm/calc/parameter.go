@@ -1,7 +1,6 @@
 package calc
 
-import "math"
-
+// Defined constant variable
 const (
 
 	// OffsetSegmentSeparationFactor  Factor which controls how close offset segments can be to
@@ -18,46 +17,30 @@ const (
 	MaxClosingSegLenFactor = 80
 )
 
-// const ...
+// const  Defined constant variable overlay parameters.
 const (
-	// DegreeRad is coefficient to translate from degrees to radians
-	DegreeRad = math.Pi / 180.0
-	// EarthR is earth radius in km
-	EarthR = 6371.0
-	// radius := 6371000.0 //6378137.0
-
-	// Angle of sin 60 = 0.866025403785
-	Sin60 = 0.866025403785
-	Cos60 = 0.5
+	// OverlayPoints ...
+	OverlayPoints = iota
+	// OverlayClosed edge is closed.
+	OverlayClosed
+	// OverlayMain overlay main polygon.
+	OverlayMain
+	// OverlayCut overlay cut polygon.
+	OverlayCut
+	// OverlayClip overlay clip.
+	OverlayClip
+	// OverlayMerge overlay merge.
+	OverlayMerge
 )
 
-// const overlay parameters.
-const (
-	// POINTS ...
-	POINTS = iota
-	// CLOSED edge is closed.
-	CLOSED
-	// MAIN overlay main polygon.
-	MAIN
-	// CUT overlay cut polygon.
-	CUT
-	// CLIP overlay clip.
-	CLIP
-	// MERGE overlay merge.
-	MERGE
-)
-
-// const default parameters.
+// const Defined constant variable  parameters.
 const (
 	// ClockWise ...
 	ClockWise        = -1
 	CounterClockWise = 1
 
-	// ANGLE ...
-	ANGLE = 2.0
-
-	LEFT  = 1
-	RIGHT = 2
+	SideLeft  = 1
+	SideRight = 2
 
 	// MinRingSize ...
 	MinRingSize = 3
@@ -101,54 +84,24 @@ const (
 const (
 	// The location value for the exterior of a geometry.
 	// Also, DE-9IM row index of the exterior of the first geometry and column index
-	INTERIOR = 0
-	BOUNDARY = 1
-	EXTERIOR = 2
+	ImInterior = 0
+	ImBoundary = 1
+	ImExterior = 2
 
-	// FALSE Dimension value of the empty geometry (-1).
-	// TRUE Dimension value of non-empty geometries (= {P, L, A}).
-	// DONOTCARE Dimension value for any dimension (= {FALSE, TRUE}).
-	FALSE     = -1
-	TRUE      = -2
-	DONOTCARE = -3
+	// ImFalse Dimension value of the empty geometry (-1).
+	// ImTrue Dimension value of non-empty geometries (= {P, L, A}).
+	// ImNotCare Dimension value for any dimension (= {ImFalse, TRUE}).
+	ImFalse   = -1
+	ImTrue    = -2
+	ImNotCare = -3
 
-	P           = 0
-	L           = 1
-	A           = 2
-	SYMFALSE    = 'F'
-	SYMTRUE     = 'T'
-	SYMDONTCARE = '*'
-	SYMP        = '0'
-	SYML        = '1'
-	SYMA        = '2'
-)
-
-// const calc parameter
-const (
-	// The smallest representable relative difference between two  values.
-	EPS   = 1.23259516440783e-32 // = 2^-106
-	SPLIT = 134217729.0          // 2^27+1, for IEEE
-
-	MaxPrintDigits = 32
-
-	ScinotExponentChar = "E"
-	ScinotZero         = "0.0E0"
-)
-
-var (
-	// PI The value nearest to the constant Pi.
-	PI = &PairFloat{3.141592653589793116e+00,
-		1.224646799147353207e-16}
-	// TWOPI The value nearest to the constant 2 * Pi.
-	TWOPI = &PairFloat{
-		6.283185307179586232e+00,
-		2.449293598294706414e-16}
-	// PI2 The value nearest to the constant Pi / 2.
-	PI2 = &PairFloat{
-		1.570796326794896558e+00,
-		6.123233995736766036e-17}
-	//E  The value nearest to the constant e (the natural logarithm base).
-	E = &PairFloat{
-		2.718281828459045091e+00,
-		1.445646891729250158e-16}
+	ImP          = 0
+	ImL          = 1
+	ImA          = 2
+	ImSymFalse   = 'F'
+	ImSymTrue    = 'T'
+	ImSymNotCare = '*'
+	ImSymP       = '0'
+	ImSymL       = '1'
+	ImSymA       = '2'
 )

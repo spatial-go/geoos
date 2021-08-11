@@ -10,12 +10,6 @@ import (
 	"github.com/spatial-go/geoos/algorithm/relate"
 )
 
-// const ...
-const (
-	COUNTERCLOCKWISE = 1
-	CLOCKWISE        = -1
-)
-
 // ConvexHullComputer Computes the convex hull of a Geometry.
 // The convex hull is the smallest convex Geometry that contains all the
 //  points in the input Geometry.
@@ -308,10 +302,10 @@ func (r *RadialComparator) polarCompare(o, p, q matrix.Matrix) bool {
 
 	orient := OrientationIndex(o, p, q)
 
-	if orient == COUNTERCLOCKWISE {
+	if orient == calc.CounterClockWise {
 		return false
 	}
-	if orient == CLOCKWISE {
+	if orient == calc.ClockWise {
 		return true
 	}
 	// points are collinear - check distance
@@ -370,7 +364,7 @@ func orientationIndexFilter(pax, pay,
 		return signum(det)
 	}
 
-	errbound := DPSAFEEPSILON * detSum
+	errbound := SafeEpsilon * detSum
 	if (det >= errbound) || (-det >= errbound) {
 		return signum(det)
 	}

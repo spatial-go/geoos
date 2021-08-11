@@ -16,7 +16,7 @@ func (r *Computer) computeIM(arg []matrix.Steric, intersectBound bool) *matrix.I
 	r.IntersectBound = intersectBound
 	im := matrix.IntersectionMatrixDefault()
 	// since Geometries are finite and embedded in a 2-D space, the EE element must always be 2
-	im.Set(calc.EXTERIOR, calc.EXTERIOR, 2)
+	im.Set(calc.ImExterior, calc.ImExterior, 2)
 	// if the Geometries don't overlap there is nothing to do
 	if !intersectBound {
 		r.computeDisjointIM(im)
@@ -54,13 +54,13 @@ func (r *Computer) computeIM(arg []matrix.Steric, intersectBound bool) *matrix.I
 func (r *Computer) computeDisjointIM(im *matrix.IntersectionMatrix) {
 	ga := r.Arg[0]
 	if !ga.IsEmpty() {
-		im.Set(calc.INTERIOR, calc.EXTERIOR, ga.Dimensions())
-		im.Set(calc.BOUNDARY, calc.EXTERIOR, ga.BoundaryDimensions())
+		im.Set(calc.ImInterior, calc.ImExterior, ga.Dimensions())
+		im.Set(calc.ImBoundary, calc.ImExterior, ga.BoundaryDimensions())
 	}
 	gb := r.Arg[1]
 	if !gb.IsEmpty() {
-		im.Set(calc.EXTERIOR, calc.INTERIOR, gb.Dimensions())
-		im.Set(calc.EXTERIOR, calc.BOUNDARY, gb.BoundaryDimensions())
+		im.Set(calc.ImExterior, calc.ImInterior, gb.Dimensions())
+		im.Set(calc.ImExterior, calc.ImBoundary, gb.BoundaryDimensions())
 	}
 }
 

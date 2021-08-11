@@ -147,7 +147,7 @@ func (p *PolygonOverlay) prepare() {
 			}
 		}
 		p.subjectPlane.CloseRing()
-		p.subjectPlane.Rank = calc.MAIN
+		p.subjectPlane.Rank = calc.OverlayMain
 	}
 	p.clippingPlane = &Plane{}
 	for _, v2 := range p.Clipping.(matrix.PolygonMatrix) {
@@ -157,7 +157,7 @@ func (p *PolygonOverlay) prepare() {
 			}
 		}
 		p.clippingPlane.CloseRing()
-		p.clippingPlane.Rank = calc.CUT
+		p.clippingPlane.Rank = calc.OverlayCut
 	}
 }
 
