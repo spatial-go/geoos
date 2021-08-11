@@ -10,22 +10,24 @@ import (
 	"github.com/spatial-go/geoos/algorithm/relate"
 )
 
-// const ...
-const (
-	COUNTERCLOCKWISE = 1
-	CLOCKWISE        = -1
-)
-
-// ConvexHull Computes the convex hull of a Geometry.
+// ConvexHullComputer Computes the convex hull of a Geometry.
 // The convex hull is the smallest convex Geometry that contains all the
 //  points in the input Geometry.
-type ConvexHull struct {
+type ConvexHullComputer struct {
 	inputPts []matrix.Matrix
 }
 
+// ConvexHull Returns a geometry that represents the convex hull of the input geometry.
+// The returned geometry contains the minimal number of points needed to
+// represent the convex hull.  In particular, no more than two consecutive
+// points will be collinear.
+func ConvexHull(geom matrix.Steric) matrix.Steric {
+	return ConvexHullWithGeom(geom).ConvexHull()
+}
+
 // ConvexHullWithGeom Create a new convex hull construction for the input geometry.
-func ConvexHullWithGeom(geom matrix.Steric) *ConvexHull {
-	ch := &ConvexHull{}
+func ConvexHullWithGeom(geom matrix.Steric) *ConvexHullComputer {
+	ch := &ConvexHullComputer{}
 	ch.inputPts = extractMatrixes(geom)
 	return ch
 }
@@ -40,7 +42,7 @@ func extractMatrixes(geom matrix.Steric) []matrix.Matrix {
 // The returned geometry contains the minimal number of points needed to
 // represent the convex hull.  In particular, no more than two consecutive
 // points will be collinear.
-func (c *ConvexHull) ConvexHull() matrix.Steric {
+func (c *ConvexHullComputer) ConvexHull() matrix.Steric {
 	reducedPts := c.inputPts
 	switch length := len(c.inputPts); {
 	case length == 0:
@@ -66,7 +68,7 @@ func (c *ConvexHull) ConvexHull() matrix.Steric {
 }
 
 // toMatrixArray An alternative to Stack.toArray, which is not present.
-func (c *ConvexHull) toMatrixArray(stack *list.List) []matrix.Matrix {
+func (c *ConvexHullComputer) toMatrixArray(stack *list.List) []matrix.Matrix {
 	ms := make([]matrix.Matrix, stack.Len())
 	for i := 0; i < len(ms); i++ {
 		el := stack.Front()
@@ -77,7 +79,7 @@ func (c *ConvexHull) toMatrixArray(stack *list.List) []matrix.Matrix {
 }
 
 // reduce Uses a heuristic to reduce the number of points scanned to compute the hull.
-func (c *ConvexHull) reduce() []matrix.Matrix {
+func (c *ConvexHullComputer) reduce() []matrix.Matrix {
 	polyPts := c.computeOctRing()
 
 	// unable to compute interior polygon for some reason
@@ -103,7 +105,7 @@ func (c *ConvexHull) reduce() []matrix.Matrix {
 	return reducedPts
 }
 
-func (c *ConvexHull) padArray3(pts []matrix.Matrix) []matrix.Matrix {
+func (c *ConvexHullComputer) padArray3(pts []matrix.Matrix) []matrix.Matrix {
 	pad := make([]matrix.Matrix, 3)
 	for i := 0; i < len(pad); i++ {
 		if i < len(pad) {
@@ -115,7 +117,7 @@ func (c *ConvexHull) padArray3(pts []matrix.Matrix) []matrix.Matrix {
 	return pad
 }
 
-func (c *ConvexHull) preSort(pts []matrix.Matrix) []matrix.Matrix {
+func (c *ConvexHullComputer) preSort(pts []matrix.Matrix) []matrix.Matrix {
 	t := matrix.Matrix{}
 
 	// find the lowest point in the set. If two or more points have
@@ -138,7 +140,7 @@ func (c *ConvexHull) preSort(pts []matrix.Matrix) []matrix.Matrix {
 }
 
 // grahamScan Uses the Graham Scan algorithm to compute the convex hull vertices.
-func (c *ConvexHull) grahamScan(ms []matrix.Matrix) *list.List {
+func (c *ConvexHullComputer) grahamScan(ms []matrix.Matrix) *list.List {
 	p := matrix.Matrix{}
 	ps := list.New()
 	ps.PushBack(ms[0])
@@ -162,7 +164,7 @@ func (c *ConvexHull) grahamScan(ms []matrix.Matrix) *list.List {
 }
 
 // isBetween returns  whether the three matrixes are collinear and c2 lies between c1 and c3 inclusive
-func (c *ConvexHull) isBetween(c1, c2, c3 matrix.Matrix) bool {
+func (c *ConvexHullComputer) isBetween(c1, c2, c3 matrix.Matrix) bool {
 	if OrientationIndex(c1, c2, c3) != 0 {
 		return false
 	}
@@ -185,7 +187,7 @@ func (c *ConvexHull) isBetween(c1, c2, c3 matrix.Matrix) bool {
 	return false
 }
 
-func (c *ConvexHull) computeOctRing() []matrix.Matrix {
+func (c *ConvexHullComputer) computeOctRing() []matrix.Matrix {
 	octPts := c.computeOctPts()
 	// points must all lie in a line
 	if len(octPts) < 3 {
@@ -197,7 +199,7 @@ func (c *ConvexHull) computeOctRing() []matrix.Matrix {
 	return octPts
 }
 
-func (c *ConvexHull) computeOctPts() []matrix.Matrix {
+func (c *ConvexHullComputer) computeOctPts() []matrix.Matrix {
 	pts := make([]matrix.Matrix, 8)
 	for j := 0; j < 8; j++ {
 		pts[j] = c.inputPts[0]
@@ -232,7 +234,7 @@ func (c *ConvexHull) computeOctPts() []matrix.Matrix {
 
 }
 
-func (c *ConvexHull) lineOrPolygon(ms []matrix.Matrix) matrix.Steric {
+func (c *ConvexHullComputer) lineOrPolygon(ms []matrix.Matrix) matrix.Steric {
 
 	cms := c.cleanRing(ms)
 	if len(cms) == 3 {
@@ -249,7 +251,7 @@ func (c *ConvexHull) lineOrPolygon(ms []matrix.Matrix) matrix.Steric {
 	return matrix.PolygonMatrix{ls}
 }
 
-func (c *ConvexHull) cleanRing(ms []matrix.Matrix) []matrix.Matrix {
+func (c *ConvexHullComputer) cleanRing(ms []matrix.Matrix) []matrix.Matrix {
 	cleanedRing := []matrix.Matrix{}
 	previousDistinctMatrix := matrix.Matrix{}
 	for i := 0; i <= len(ms)-2; i++ {
@@ -300,10 +302,10 @@ func (r *RadialComparator) polarCompare(o, p, q matrix.Matrix) bool {
 
 	orient := OrientationIndex(o, p, q)
 
-	if orient == COUNTERCLOCKWISE {
+	if orient == calc.CounterClockWise {
 		return false
 	}
-	if orient == CLOCKWISE {
+	if orient == calc.ClockWise {
 		return true
 	}
 	// points are collinear - check distance
@@ -362,7 +364,7 @@ func orientationIndexFilter(pax, pay,
 		return signum(det)
 	}
 
-	errbound := DPSAFEEPSILON * detSum
+	errbound := SafeEpsilon * detSum
 	if (det >= errbound) || (-det >= errbound) {
 		return signum(det)
 	}

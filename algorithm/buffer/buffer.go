@@ -71,7 +71,7 @@ func (eb *ComputerBuffer) addPoint(p matrix.Matrix) {
 	if eb.distance <= 0.0 {
 		return
 	}
-	eb.LineCurve(matrix.LineMatrix{matrix.Matrix(p)}, eb.distance, calc.EXTERIOR, calc.INTERIOR)
+	eb.LineCurve(matrix.LineMatrix{matrix.Matrix(p)}, eb.distance, calc.ImExterior, calc.ImInterior)
 }
 
 // addLineString Add a LineString to the graph.
@@ -81,9 +81,9 @@ func (eb *ComputerBuffer) addLineString(line matrix.LineMatrix) {
 	}
 
 	if matrix.Matrix(line[0]).Equals(matrix.Matrix((line[len(line)-1]))) && eb.param.IsSingleSided {
-		eb.LineCurve(matrix.LineMatrix(line), eb.distance, calc.EXTERIOR, calc.INTERIOR)
+		eb.LineCurve(matrix.LineMatrix(line), eb.distance, calc.ImExterior, calc.ImInterior)
 	} else {
-		eb.LineCurve(matrix.LineMatrix(line), eb.distance, calc.EXTERIOR, calc.INTERIOR)
+		eb.LineCurve(matrix.LineMatrix(line), eb.distance, calc.ImExterior, calc.ImInterior)
 	}
 
 }
@@ -107,10 +107,10 @@ func (eb *ComputerBuffer) isLineOffsetEmpty(distance float64) bool {
 }
 func (eb *ComputerBuffer) addPolygon(p matrix.PolygonMatrix) {
 	offsetDistance := eb.distance
-	offsetSide := calc.LEFT
+	offsetSide := calc.SideLeft
 	if eb.distance < 0.0 {
 		offsetDistance = -eb.distance
-		offsetSide = calc.RIGHT
+		offsetSide = calc.SideRight
 	}
 
 	shell := p[0]
@@ -122,14 +122,14 @@ func (eb *ComputerBuffer) addPolygon(p matrix.PolygonMatrix) {
 		shell,
 		offsetDistance,
 		offsetSide,
-		calc.EXTERIOR,
-		calc.INTERIOR)
+		calc.ImExterior,
+		calc.ImInterior)
 
-	if offsetSide == calc.LEFT {
-		offsetSide = calc.RIGHT
+	if offsetSide == calc.SideLeft {
+		offsetSide = calc.SideRight
 	}
-	if offsetSide == calc.RIGHT {
-		offsetSide = calc.LEFT
+	if offsetSide == calc.SideRight {
+		offsetSide = calc.SideLeft
 	}
 
 	for i := 1; i < len(p); i++ {
@@ -143,18 +143,18 @@ func (eb *ComputerBuffer) addPolygon(p matrix.PolygonMatrix) {
 			hole,
 			offsetDistance,
 			offsetSide,
-			calc.INTERIOR,
-			calc.EXTERIOR)
+			calc.ImInterior,
+			calc.ImExterior)
 	}
 }
 func (eb *ComputerBuffer) addRingBothSides(ring matrix.LineMatrix, distance float64) {
 	eb.addRingSide(ring, distance,
-		calc.LEFT,
-		calc.EXTERIOR, calc.INTERIOR)
+		calc.SideLeft,
+		calc.ImExterior, calc.ImInterior)
 	// Add the opposite side of the ring
 	eb.addRingSide(ring, distance,
-		calc.RIGHT,
-		calc.INTERIOR, calc.EXTERIOR)
+		calc.SideRight,
+		calc.ImInterior, calc.ImExterior)
 }
 
 // addRingSide Adds an offset curve for one side of a ring.
@@ -175,11 +175,11 @@ func (eb *ComputerBuffer) addRingSide(ring matrix.LineMatrix, offsetDistance flo
 	if len(ring) >= calc.MinRingSize && isCCW {
 		leftLoc = cwRightLoc
 		rightLoc = cwLeftLoc
-		if side == calc.LEFT {
-			side = calc.RIGHT
+		if side == calc.SideLeft {
+			side = calc.SideRight
 		}
-		if side == calc.RIGHT {
-			side = calc.LEFT
+		if side == calc.SideRight {
+			side = calc.SideLeft
 		}
 
 	}

@@ -116,10 +116,10 @@ func Turn(ang1, ang2 float64) int {
 	crossproduct := math.Sin(ang2 - ang1)
 
 	if crossproduct > 0 {
-		return calc.COUNTERCLOCKWISE
+		return calc.CounterClockWise
 	}
 	if crossproduct < 0 {
-		return calc.CLOCKWISE
+		return calc.ClockWise
 	}
 	return None
 }

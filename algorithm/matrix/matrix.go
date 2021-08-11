@@ -51,7 +51,7 @@ func (m Matrix) Dimensions() int {
 // BoundaryDimensions Compute the IM entry for the intersection of the boundary
 // of a geometry with the Exterior.
 func (m Matrix) BoundaryDimensions() int {
-	return calc.FALSE
+	return calc.ImFalse
 }
 
 // Nums num of matrix
@@ -78,7 +78,7 @@ func (l LineMatrix) Dimensions() int {
 // of a geometry with the Exterior.
 func (l LineMatrix) BoundaryDimensions() int {
 	if l.IsClosed() {
-		return calc.FALSE
+		return calc.ImFalse
 	}
 	return 0
 }
@@ -208,7 +208,7 @@ func (c Collection) Dimensions() int {
 // BoundaryDimensions Compute the IM entry for the intersection of the boundary
 // of a geometry with the Exterior.
 func (c Collection) BoundaryDimensions() int {
-	dimension := calc.FALSE
+	dimension := calc.ImFalse
 	for _, g := range c {
 		if g.BoundaryDimensions() > dimension {
 			dimension = g.BoundaryDimensions()

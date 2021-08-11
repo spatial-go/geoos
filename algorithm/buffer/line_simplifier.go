@@ -8,13 +8,11 @@ import (
 	"github.com/spatial-go/geoos/algorithm/measure"
 )
 
-// const ...
+// const Defined constant variable
 const (
-	INIT          = 0
-	DELETE        = 1
-	KEEP          = 1
-	NUMPTSTOCHECK = 10
-	DPSAFEEPSILON = 1e-15
+	Deleted     = 1
+	NumPtsCheck = 10
+	SafeEpsilon = 1e-15
 )
 
 // LineSimplifier  Simplifies a buffer input line to
@@ -36,7 +34,7 @@ type LineSimplifier struct {
 func (l *LineSimplifier) Simplify(distanceTol float64) matrix.LineMatrix {
 	l.distanceTol = math.Abs(distanceTol)
 	if distanceTol < 0 {
-		l.angleOrientation = calc.CLOCKWISE
+		l.angleOrientation = calc.ClockWise
 	}
 
 	// rely on fact that boolean array is filled with false value
@@ -66,7 +64,7 @@ func (l *LineSimplifier) deleteShallowConcavities() bool {
 		isMiddleVertexDeleted := false
 		if l.isDeletable(index, midIndex, lastIndex,
 			l.distanceTol) {
-			l.isDeleted[midIndex] = DELETE
+			l.isDeleted[midIndex] = Deleted
 			isMiddleVertexDeleted = true
 			isChanged = true
 		}
@@ -85,7 +83,7 @@ func (l *LineSimplifier) deleteShallowConcavities() bool {
 // Finds the next non-deleted index, or the end of the point array if none
 func (l *LineSimplifier) findNextNonDeletedIndex(index int) int {
 	next := index + 1
-	for next < len(l.inputLine) && l.isDeleted[next] == DELETE {
+	for next < len(l.inputLine) && l.isDeleted[next] == Deleted {
 		next++
 	}
 	return next
@@ -94,7 +92,7 @@ func (l *LineSimplifier) findNextNonDeletedIndex(index int) int {
 func (l *LineSimplifier) collapseLine() matrix.LineMatrix {
 	coordList := matrix.LineMatrix{}
 	for i := 0; i < len(l.inputLine); i++ {
-		if l.isDeleted[i] != DELETE {
+		if l.isDeleted[i] != Deleted {
 			coordList = append(coordList, l.inputLine[i])
 		}
 	}
@@ -131,7 +129,7 @@ func (l *LineSimplifier) isShallowConcavity(p0, p1, p2 matrix.Matrix, distanceTo
 // "skipping" over points which are in fact non-shallow.
 func (l *LineSimplifier) isShallowSampled(p0, p2 matrix.Matrix, i0, i2 int, distanceTol float64) bool {
 	// check every point to see if it is within tolerance
-	inc := (i2 - i0) / NUMPTSTOCHECK
+	inc := (i2 - i0) / NumPtsCheck
 	if inc <= 0 {
 		inc = 1
 	}
@@ -197,7 +195,7 @@ func (l *LineSimplifier) orientationIndexFilter(pax, pay,
 		return calc.Signum(det)
 	}
 
-	errbound := DPSAFEEPSILON * detSum
+	errbound := SafeEpsilon * detSum
 	if (det >= errbound) || (-det >= errbound) {
 		return calc.Signum(det)
 	}

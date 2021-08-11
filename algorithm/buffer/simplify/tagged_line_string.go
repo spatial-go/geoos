@@ -3,7 +3,7 @@ package simplify
 import "github.com/spatial-go/geoos/algorithm/matrix"
 
 // TaggedLineString Represents a LineString which can be modified to a simplified shape.
-//  This class provides an attribute which specifies the minimum allowable length for the modified result.const
+//  This class provides an attribute which specifies the minimum allowable length for the modified result.
 type TaggedLineString struct {
 	ParentLine  matrix.LineMatrix
 	Segs        []*TaggedLineSegment

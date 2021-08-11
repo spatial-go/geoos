@@ -28,7 +28,7 @@ func DistanceSpherical(p1, p2 space.Point) float64 {
 	return EarthR * math.Sqrt(v1+v2)
 }
 
-// FastSine caclulates sinus approximated to parabola
+// FastSine calculates sinus approximated to parabola
 //
 // Taken from: http://forum.devmaster.net/t/fast-and-accurate-sine-cosine/9648
 func FastSine(x float64) float64 {
@@ -46,7 +46,7 @@ func FastSine(x float64) float64 {
 	return P*(y*math.Abs(y)-y) + y
 }
 
-// FastCos calculates cosinus from sinus
+// FastCos calculates cosines from sinus
 func FastCos(x float64) float64 {
 	x += math.Pi / 2.0
 	for x > math.Pi {

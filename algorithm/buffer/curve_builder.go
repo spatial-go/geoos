@@ -133,9 +133,9 @@ func (c *CurveBuilder) isRingCurveInverted(pts matrix.LineMatrix, distance float
 
 func (c *CurveBuilder) computePointCurve(pt matrix.Matrix) {
 	switch c.parameters.EndCapStyle {
-	case calc.CAPROUND:
+	case calc.CapRound:
 		c.Curve.CreateCircle(pt, c.distance)
-	case calc.CAPSQUARE:
+	case calc.CapSquare:
 		c.Curve.CreateSquare(pt, c.distance)
 		// otherwise curve is empty (e.g. for a butt cap);
 	}
@@ -152,7 +152,7 @@ func (c *CurveBuilder) computeLineBufferCurve(pts matrix.LineMatrix) {
 	//    Coordinate[] simp1 = inputPts;
 
 	n1 := len(simp1) - 1
-	c.Curve.initSideSegments(simp1[0], simp1[1], calc.LEFT)
+	c.Curve.initSideSegments(simp1[0], simp1[1], calc.SideLeft)
 	for i := 2; i <= n1; i++ {
 		c.Curve.addNextSegment(simp1[i], true)
 	}
@@ -168,7 +168,7 @@ func (c *CurveBuilder) computeLineBufferCurve(pts matrix.LineMatrix) {
 	n2 := len(simp2) - 1
 
 	// since we are traversing line in opposite order, offset position is still LEFT
-	c.Curve.initSideSegments(simp2[n2], simp2[n2-1], calc.LEFT)
+	c.Curve.initSideSegments(simp2[n2], simp2[n2-1], calc.SideLeft)
 	for i := n2 - 2; i >= 0; i-- {
 		c.Curve.addNextSegment(simp2[i], true)
 	}
@@ -195,7 +195,7 @@ func (c *CurveBuilder) computeSingleSidedBufferCurve(pts matrix.LineMatrix, isRi
 		n2 := len(simp2) - 1
 
 		// since we are traversing line in opposite order, offset position is still LEFT
-		c.Curve.initSideSegments(simp2[n2], simp2[n2-1], calc.LEFT)
+		c.Curve.initSideSegments(simp2[n2], simp2[n2-1], calc.SideLeft)
 		c.Curve.Add(c.Curve.offset1.P1)
 		for i := n2 - 2; i >= 0; i-- {
 			c.Curve.addNextSegment(simp2[i], true)
@@ -212,7 +212,7 @@ func (c *CurveBuilder) computeSingleSidedBufferCurve(pts matrix.LineMatrix, isRi
 		// MD - used for testing only (to eliminate simplification)
 		//      Coordinate[] simp1 = inputPts;
 		n1 := len(simp1) - 1
-		c.Curve.initSideSegments(simp1[0], simp1[1], calc.LEFT)
+		c.Curve.initSideSegments(simp1[0], simp1[1], calc.SideLeft)
 		c.Curve.Add(c.Curve.offset1.P1)
 		for i := 2; i <= n1; i++ {
 			c.Curve.addNextSegment(simp1[i], true)
@@ -226,7 +226,7 @@ func (c *CurveBuilder) computeRingBufferCurve(pts matrix.LineMatrix, side int) {
 	// simplify input line to improve performance
 	distTol := c.distance * c.parameters.SimplifyFactor
 	// ensure that correct side is simplified
-	if side == calc.RIGHT {
+	if side == calc.SideRight {
 		distTol = -distTol
 	}
 	simp := &LineSimplifier{inputLine: pts}
