@@ -1,7 +1,7 @@
 package overlay
 
 import (
-	"github.com/spatial-go/geoos/algorithm/algoerr"
+	"github.com/spatial-go/geoos/algorithm"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/matrix/envelope"
 	"github.com/spatial-go/geoos/algorithm/relate"
@@ -41,7 +41,7 @@ func (p *PointOverlay) Union() (matrix.Steric, error) {
 			return matrix.Collection{s, c}, nil
 		}
 	}
-	return nil, algoerr.ErrNotMatchType
+	return nil, algorithm.ErrNotMatchType
 }
 
 // Intersection  Computes the Intersection of two geometries,either or both of which may be nil.
@@ -50,7 +50,7 @@ func (p *PointOverlay) Intersection() (matrix.Steric, error) {
 		return res, nil
 	}
 	if _, ok := p.Subject.(matrix.Matrix); !ok {
-		return nil, algoerr.ErrNotMatchType
+		return nil, algorithm.ErrNotMatchType
 	}
 	switch c := p.Clipping.(type) {
 	case matrix.Matrix:
@@ -70,7 +70,7 @@ func (p *PointOverlay) Intersection() (matrix.Steric, error) {
 		}
 		return nil, nil
 	}
-	return nil, algoerr.ErrNotMatchType
+	return nil, algorithm.ErrNotMatchType
 }
 
 // Difference returns a geometry that represents that part of geometry A that does not intersect with geometry B.
@@ -88,7 +88,7 @@ func (p *PointOverlay) Difference() (matrix.Steric, error) {
 			return s, nil
 		}
 	}
-	return nil, algoerr.ErrNotMatchType
+	return nil, algorithm.ErrNotMatchType
 }
 
 // DifferenceReverse returns a geometry that represents reverse that part of geometry A that does not intersect with geometry B .

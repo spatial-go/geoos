@@ -3,7 +3,7 @@ package overlay
 import (
 	"sort"
 
-	"github.com/spatial-go/geoos/algorithm/algoerr"
+	"github.com/spatial-go/geoos/algorithm"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/relate"
 )
@@ -23,7 +23,7 @@ func (p *LineOverlay) Union() (matrix.Steric, error) {
 			return LineMerge(matrix.Collection{s, c}), nil
 		}
 	}
-	return nil, algoerr.ErrNotMatchType
+	return nil, algorithm.ErrNotMatchType
 }
 
 // Intersection  Computes the Intersection of two geometries,either or both of which may be nil.
@@ -35,7 +35,7 @@ func (p *LineOverlay) Intersection() (matrix.Steric, error) {
 	if l, ok := p.Subject.(matrix.LineMatrix); ok {
 		line = l
 	} else {
-		return nil, algoerr.ErrNotMatchType
+		return nil, algorithm.ErrNotMatchType
 	}
 	switch c := p.Clipping.(type) {
 	case matrix.Matrix:
@@ -75,7 +75,7 @@ func (p *LineOverlay) Intersection() (matrix.Steric, error) {
 		}
 		return LineMerge(result), nil
 	}
-	return nil, algoerr.ErrNotMatchType
+	return nil, algorithm.ErrNotMatchType
 }
 
 // Difference returns a geometry that represents that part of geometry A that does not intersect with geometry B.
@@ -94,7 +94,7 @@ func (p *LineOverlay) Difference() (matrix.Steric, error) {
 			return nil, err
 		}
 	}
-	return nil, algoerr.ErrNotMatchType
+	return nil, algorithm.ErrNotMatchType
 }
 
 // DifferenceReverse returns a geometry that represents reverse that part of geometry A that does not intersect with geometry B .

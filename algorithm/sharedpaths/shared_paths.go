@@ -1,7 +1,7 @@
 package sharedpaths
 
 import (
-	"github.com/spatial-go/geoos/algorithm/algoerr"
+	"github.com/spatial-go/geoos/algorithm"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/overlay"
 )
@@ -23,7 +23,7 @@ func SharedPaths(g1, g2 matrix.Steric) (forwDir matrix.Collection, backDir matri
 // SharedPaths get SharedPaths returns forwDir,backDir.
 func (s *Computer) SharedPaths() (forwDir matrix.Collection, backDir matrix.Collection, err error) {
 	if !s.checkLinealInput() {
-		return nil, nil, algoerr.ErrNotMatchType
+		return nil, nil, algorithm.ErrNotMatchType
 	}
 	r1, r2 := s.findLinearIntersections()
 	for _, v := range r1 {

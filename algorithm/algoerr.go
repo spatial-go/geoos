@@ -1,4 +1,6 @@
-package algoerr
+// Package algorithm defines Specifies Computational Geometric and algorithm err.
+// Specifies and implements various fundamental Computational Geometric algorithms.
+package algorithm
 
 import (
 	"fmt"

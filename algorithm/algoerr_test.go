@@ -1,4 +1,4 @@
-package algoerr
+package algorithm
 
 import (
 	"testing"

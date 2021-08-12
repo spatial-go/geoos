@@ -1,7 +1,8 @@
+// Package measure Define spatial measurement function.
 package measure
 
 import (
-	"github.com/spatial-go/geoos/algorithm/algoerr"
+	"github.com/spatial-go/geoos/algorithm"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 )
 
@@ -22,7 +23,7 @@ func (h *HausdorffDistance) Distance(g0, g1 matrix.Steric) float64 {
 // DistanceDensifyFrac ...
 func (h *HausdorffDistance) DistanceDensifyFrac(g0, g1 matrix.Steric, densifyFrac float64) (float64, error) {
 	if densifyFrac > 1.0 || densifyFrac <= 0.0 {
-		return 0, algoerr.ErrWrongFractionRange
+		return 0, algorithm.ErrWrongFractionRange
 	}
 	dist := &HausdorffDistance{g0: g0, g1: g1, densifyFrac: densifyFrac, ptDist: &PointPairDistance{}}
 	return dist.distance(), nil

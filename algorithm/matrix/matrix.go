@@ -1,9 +1,10 @@
+// Package matrix Define spatial matrix base.
 package matrix
 
 import (
 	"math"
 
-	"github.com/spatial-go/geoos/algorithm/algoerr"
+	"github.com/spatial-go/geoos/algorithm"
 	"github.com/spatial-go/geoos/algorithm/calc"
 )
 
@@ -293,7 +294,7 @@ func (c Collection) EqualsExact(ms Steric, tolerance float64) bool {
 func (m Matrix) Compare(m1 Matrix) (int, error) {
 	// If one is nil, the other must also be nil.
 	if (m1 == nil) != (m == nil) {
-		return -2, algoerr.ErrNilSteric
+		return -2, algorithm.ErrNilSteric
 	}
 
 	if m1[0] < m[0] {

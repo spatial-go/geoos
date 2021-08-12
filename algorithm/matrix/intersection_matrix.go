@@ -3,7 +3,7 @@ package matrix
 import (
 	"bytes"
 
-	"github.com/spatial-go/geoos/algorithm/algoerr"
+	"github.com/spatial-go/geoos/algorithm"
 	"github.com/spatial-go/geoos/algorithm/calc"
 )
 
@@ -178,7 +178,7 @@ func (im *IntersectionMatrix) IsOverlaps(dimensionOfGeometryA, dimensionOfGeomet
 // Matches Tests whether this matrix matches the given matrix pattern.
 func (im *IntersectionMatrix) Matches(pattern string) (bool, error) {
 	if len(pattern) != 9 {
-		return false, algoerr.ErrorShouldBeLength9(pattern)
+		return false, algorithm.ErrorShouldBeLength9(pattern)
 	}
 	for ai := 0; ai < 3; ai++ {
 		for bi := 0; bi < 3; bi++ {
@@ -270,7 +270,7 @@ func toDimensionSymbol(dimensionValue int) (byte, error) {
 	case calc.ImA:
 		return calc.ImSymA, nil
 	default:
-		return byte('_'), algoerr.ErrorUnknownDimension(dimensionValue)
+		return byte('_'), algorithm.ErrorUnknownDimension(dimensionValue)
 	}
 }
 
@@ -290,7 +290,7 @@ func toDimensionValue(dimensionSymbol byte) (int, error) {
 	case calc.ImSymA:
 		return calc.ImA, nil
 	default:
-		return -1, algoerr.ErrorUnknownDimension(dimensionSymbol)
+		return -1, algorithm.ErrorUnknownDimension(dimensionSymbol)
 	}
 }
 
