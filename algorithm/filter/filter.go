@@ -1,3 +1,4 @@
+// Package filter Define matrix data filter function.
 package filter
 
 import (

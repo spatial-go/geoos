@@ -1,3 +1,4 @@
+// Package angle define angel calculation function.
 package angle
 
 import (
