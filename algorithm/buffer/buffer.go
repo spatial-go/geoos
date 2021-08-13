@@ -1,3 +1,4 @@
+// Package buffer define geomtry matrix conversion.
 package buffer
 
 import (
@@ -107,6 +108,7 @@ func (eb *ComputerBuffer) isLineOffsetEmpty(distance float64) bool {
 }
 func (eb *ComputerBuffer) addPolygon(p matrix.PolygonMatrix) {
 	offsetDistance := eb.distance
+
 	offsetSide := calc.SideLeft
 	if eb.distance < 0.0 {
 		offsetDistance = -eb.distance
@@ -162,8 +164,7 @@ func (eb *ComputerBuffer) AddRingBothSides(ring matrix.LineMatrix, distance floa
 // addRingSide Adds an offset curve for one side of a ring.
 // The side and left and right topological location arguments
 // are provided as if the ring is oriented CW.
-// (If the ring is in the opposite orientation,
-// this is detected and
+// (If the ring is in the opposite orientation,this is detected and
 // the left and right locations are interchanged and the side is flipped.)
 func (eb *ComputerBuffer) addRingSide(ring matrix.LineMatrix, offsetDistance float64, side, cwLeftLoc, cwRightLoc int) {
 	// don't bother adding ring if it is "flat" and will disappear in the output
@@ -173,17 +174,17 @@ func (eb *ComputerBuffer) addRingSide(ring matrix.LineMatrix, offsetDistance flo
 
 	leftLoc := cwLeftLoc
 	rightLoc := cwRightLoc
+
+	// add test ccw
 	isCCW := measure.IsCCW(matrix.LineMatrix(ring))
-	if len(ring) >= calc.MinRingSize && isCCW {
+	if len(ring) >= calc.MinRingSize && !isCCW {
 		leftLoc = cwRightLoc
 		rightLoc = cwLeftLoc
 		if side == calc.SideLeft {
 			side = calc.SideRight
-		}
-		if side == calc.SideRight {
+		} else if side == calc.SideRight {
 			side = calc.SideLeft
 		}
-
 	}
 	eb.RingCurve(matrix.LineMatrix(ring), offsetDistance, side, leftLoc, rightLoc)
 
