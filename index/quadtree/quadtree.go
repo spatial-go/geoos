@@ -1,3 +1,5 @@
+// Package quadtree A Quadtree is a spatial index structure for efficient range querying
+//  of items bounded by 2D rectangles.
 package quadtree
 
 import (

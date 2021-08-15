@@ -1,3 +1,4 @@
+// Package index define spatial index interface.
 package index
 
 import "github.com/spatial-go/geoos/algorithm/matrix/envelope"

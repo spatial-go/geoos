@@ -54,29 +54,20 @@ func (p *PolygonOverlay) Intersection() (matrix.Steric, error) {
 	case matrix.LineMatrix:
 		result := matrix.Collection{}
 		for _, ring := range poly {
-			for _, il := range IntersectLine(c, ring) {
-				if len(il.Ips) > 1 {
-					var ipLine matrix.LineMatrix
-					for _, v := range il.Ips {
-						ipLine = append(ipLine, v.Matrix)
-					}
-					result = append(result, ipLine)
-				} else {
-					result = append(result, il.Ips[0].Matrix)
-				}
-			}
+			res := intersectLine(ring, c)
+			result = append(result, res...)
 		}
 		return LineMerge(result), nil
 	case matrix.PolygonMatrix:
 
-		// inter := envelope.Bound(poly.Bound()).IsIntersects(envelope.Bound(c.Bound()))
-		// im := relate.IM(poly, c, inter)
-		// if mark := im.IsContains(); mark {
-		// 	return c, nil
-		// }
-		// if mark := im.IsWithin(); mark {
-		// 	return poly, nil
-		// }
+		inter := envelope.Bound(poly.Bound()).IsIntersects(envelope.Bound(c.Bound()))
+		im := relate.IM(poly, c, inter)
+		if mark := im.IsContains(); mark {
+			return c, nil
+		}
+		if mark := im.IsWithin(); mark {
+			return poly, nil
+		}
 
 		cpo := &ComputeClipOverlay{p}
 
