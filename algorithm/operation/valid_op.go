@@ -1,3 +1,4 @@
+// Package operation define valid func for geometries.
 package operation
 
 import (
