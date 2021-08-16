@@ -19,16 +19,16 @@ type MonotoneChain struct {
 	Start, End int
 	Env        *envelope.Envelope
 	Context    interface{}
-	Id         int // useful for optimizing chain comparisons
+	ID         int // useful for optimizing chain comparisons
 }
 
-// Gets the envelope of the chain.
+// Envelope Gets the envelope of the chain.
 func (m *MonotoneChain) Envelope() *envelope.Envelope {
-	return m.GetEnvelope(0.0)
+	return m.EnvelopeExpansion(0.0)
 }
 
-// Gets the envelope for this chain,expanded by a given distance.
-func (m *MonotoneChain) GetEnvelope(expansionDistance float64) *envelope.Envelope {
+// EnvelopeExpansion Gets the envelope for this chain,expanded by a given distance.
+func (m *MonotoneChain) EnvelopeExpansion(expansionDistance float64) *envelope.Envelope {
 	if m.Env == nil {
 		/**
 		 * The monotonicity property allows fast envelope determination
@@ -43,14 +43,14 @@ func (m *MonotoneChain) GetEnvelope(expansionDistance float64) *envelope.Envelop
 	return m.Env
 }
 
-// Gets the line segment starting at <code>index</code>
-func (m *MonotoneChain) GetLineSegment(index int, ls *matrix.LineSegment) *matrix.LineSegment {
+// LineSegment Gets the line segment starting at <code>index</code>
+func (m *MonotoneChain) LineSegment(index int, ls *matrix.LineSegment) *matrix.LineSegment {
 	ls.P0 = m.Edge[index]
 	ls.P1 = m.Edge[index+1]
 	return ls
 }
 
-// Determine all the line segments in the chain whose envelopes overlap the searchEnvelope, and process them.
+// Select Determine all the line segments in the chain whose envelopes overlap the searchEnvelope, and process them.
 func (m *MonotoneChain) Select(searchEnv *envelope.Envelope, mcs *MonotoneChainSelectAction) {
 	m.computeSelect(searchEnv, m.Start, m.End, mcs)
 }
@@ -83,13 +83,13 @@ func (m *MonotoneChain) computeSelect(
 	}
 }
 
-// Determines the line segments in two chains which may overlap,
+// ComputeOverlaps Determines the line segments in two chains which may overlap,
 // and passes them to an overlap action.
 func (m *MonotoneChain) ComputeOverlaps(mc *MonotoneChain, mco overlapAction) {
 	m.computeOverlapsTwo(m.Start, m.End, mc, mc.Start, mc.End, 0.0, mco)
 }
 
-// Determines the line segments in two chains which may overlap,
+// ComputeOverlapsTolerance Determines the line segments in two chains which may overlap,
 //  using an overlap distance tolerance, and passes them to an overlap action.
 func (m *MonotoneChain) ComputeOverlapsTolerance(mc *MonotoneChain, overlapTolerance float64, mco overlapAction) {
 	m.computeOverlapsTwo(m.Start, m.End, mc, mc.Start, mc.End, overlapTolerance, mco)
@@ -135,7 +135,7 @@ func (m *MonotoneChain) computeOverlapsTwo(
 	}
 }
 
-// Tests whether the envelope of a section of the chain overlaps (intersects) the envelope of a section of another target chain.
+// OverlapsMonotoneChain Tests whether the envelope of a section of the chain overlaps (intersects) the envelope of a section of another target chain.
 // This test is efficient due to the monotonicity property of the sections (i.e. the envelopes can be are determined
 // from the section endpoints rather than a full scan).
 func (m *MonotoneChain) OverlapsMonotoneChain(
@@ -149,7 +149,7 @@ func (m *MonotoneChain) OverlapsMonotoneChain(
 	return envelope.IsIntersectsTwo(m.Edge[start0], m.Edge[end0], mc.Edge[start1], mc.Edge[end1])
 }
 
-// Tests whether the envelope of a section of the chain overlaps (intersects) the envelope of a section of another target chain.
+// Overlaps Tests whether the envelope of a section of the chain overlaps (intersects) the envelope of a section of another target chain.
 // This test is efficient due to the monotonicity property of the sections (i.e. the envelopes can be are determined
 // from the section endpoints rather than a full scan).
 func Overlaps(p1, p2, q1, q2 matrix.Matrix, overlapTolerance float64) bool {

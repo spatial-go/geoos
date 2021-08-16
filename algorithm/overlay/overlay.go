@@ -9,16 +9,21 @@ import (
 
 // Overlay  Computes the overlay of two geometries,either or both of which may be nil.
 type Overlay interface {
+
 	// Union  Computes the Union of two geometries,either or both of which may be nil.
 	Union() (matrix.Steric, error)
+
 	// Intersection  Computes the Intersection of two geometries,either or both of which may be nil.
 	Intersection() (matrix.Steric, error)
+
 	// Difference returns a geometry that represents that part of geometry A that does not intersect with geometry B.
 	// One can think of this as GeometryA - Intersection(A,B).
 	// If A is completely contained in B then an empty geometry collection is returned.
 	Difference() (matrix.Steric, error)
+
 	// SymDifference returns a geometry that represents the portions of A and B that do not intersect.
 	// It is called a symmetric difference because SymDifference(A,B) = SymDifference(B,A).
+	//
 	// One can think of this as Union(geomA,geomB) - Intersection(A,B).
 	SymDifference() (matrix.Steric, error)
 }

@@ -5,6 +5,7 @@ import (
 	"github.com/spatial-go/geoos/algorithm/matrix"
 )
 
+// Quadrant four const
 const (
 	NE = iota + 1
 	NW = 1
@@ -23,12 +24,11 @@ func QuadrantFloat(dx, dy float64) (int, error) {
 		}
 
 		return SE, nil
-	} else {
-		if dy >= 0.0 {
-			return NW, nil
-		}
-		return SW, nil
 	}
+	if dy >= 0.0 {
+		return NW, nil
+	}
+	return SW, nil
 }
 
 // Quadrant Returns the quadrant of a directed line segment from p0 to p1.
@@ -41,10 +41,9 @@ func Quadrant(p0, p1 matrix.Matrix) (int, error) {
 			return NE, nil
 		}
 		return SE, nil
-	} else {
-		if p1[1] >= p0[1] {
-			return NW, nil
-		}
-		return SW, nil
 	}
+	if p1[1] >= p0[1] {
+		return NW, nil
+	}
+	return SW, nil
 }

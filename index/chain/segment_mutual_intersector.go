@@ -2,12 +2,12 @@ package chain
 
 import "github.com/spatial-go/geoos/algorithm/matrix"
 
-// Intersects two sets of SegmentString.
+// SegmentMutualIntersector Intersects two sets of SegmentString.
 type SegmentMutualIntersector struct {
 	SegmentMutual matrix.LineMatrix
 }
 
-//the given collection of SegmentStrings and the set of indexed segments.
+// Process the given collection of SegmentStrings and the set of indexed segments.
 func (s *SegmentMutualIntersector) Process(segStrings []*matrix.LineSegment, segInt Intersector) {
 	monoChains, testChains := []*MonotoneChain{}, []*MonotoneChain{}
 	for _, v := range s.SegmentMutual.ToLineArray() {
@@ -19,6 +19,7 @@ func (s *SegmentMutualIntersector) Process(segStrings []*matrix.LineSegment, seg
 	s.IntersectChains(monoChains, testChains, segInt)
 }
 
+// AddToMonoChains ...
 func (s *SegmentMutualIntersector) AddToMonoChains(segStr *matrix.LineSegment, monoChains []*MonotoneChain) []*MonotoneChain {
 	pts := matrix.LineMatrix{segStr.P0, segStr.P1}
 	segChains := ChainsContext(pts, segStr)
@@ -27,6 +28,7 @@ func (s *SegmentMutualIntersector) AddToMonoChains(segStr *matrix.LineSegment, m
 	return monoChains
 }
 
+// IntersectChains ...
 func (s *SegmentMutualIntersector) IntersectChains(monoChains []*MonotoneChain, testChains []*MonotoneChain, segInt Intersector) {
 	overlapAction := &SegmentOverlapAction{MonotoneChainOverlapAction: &MonotoneChainOverlapAction{}, si: segInt}
 
@@ -40,15 +42,13 @@ func (s *SegmentMutualIntersector) IntersectChains(monoChains []*MonotoneChain, 
 	}
 }
 
+// SegmentOverlapAction implement OverlapAction.
 type SegmentOverlapAction struct {
 	*MonotoneChainOverlapAction
 	si Intersector
 }
 
-func (s *SegmentOverlapAction) SegmentOverlapAction(si Intersector) {
-	s.si = si
-}
-
+// Overlap This function can be overridden if the original chains are needed.
 func (s *SegmentOverlapAction) Overlap(mc1 *MonotoneChain, start1 int, mc2 *MonotoneChain, start2 int) {
 	ss1 := mc1.Edge
 	ss2 := mc2.Edge

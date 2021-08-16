@@ -2,7 +2,7 @@ package chain
 
 import "github.com/spatial-go/geoos/algorithm/matrix"
 
-// Processes possible intersections detected.
+// Intersector Processes possible intersections detected.
 // detects that two SegmentStrings <i>might</i> intersect.
 type Intersector interface {
 	// This func is called by clients of interface to process

@@ -226,7 +226,7 @@ func (u *UniqueVertexFilter) add(ip Vertex) {
 
 // ComputePolygon compute overlay.
 func (p *PolygonOverlay) ComputePolygon(exitingPoints []Vertex, cpo ComputePolyOverlay) *Plane {
-	var pol *Plane = &Plane{}
+	var pol = &Plane{}
 	for _, iterPoints := range exitingPoints {
 		if iterPoints.IsChecked {
 			continue

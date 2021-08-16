@@ -19,7 +19,7 @@ func LineMerge(ml matrix.Collection) matrix.Collection {
 	return ml
 }
 
-// MergeLine  Computes the Merge of two geometries,either or both of which may be null.
+// MergeLine  Computes the Merge of two geometries.
 func MergeLine(ml matrix.Collection, i, j int) (matrix.Collection, bool) {
 
 	if ml[i] == nil && ml[j] == nil {
@@ -32,6 +32,7 @@ func MergeLine(ml matrix.Collection, i, j int) (matrix.Collection, bool) {
 	if ml[j] == nil {
 		return ml, false
 	}
+
 	var result matrix.Collection
 
 	if _, ok := ml[i].(matrix.Matrix); ok {
@@ -121,6 +122,7 @@ func MergeLine(ml matrix.Collection, i, j int) (matrix.Collection, bool) {
 	return ml, false
 }
 
+// MergeMatrix  Computes the Merge of two geometries,either or both of which may be matrix.
 func MergeMatrix(ml matrix.Collection, i, j int, result matrix.Collection) (matrix.Collection, bool) {
 	if m0, ok := ml[i].(matrix.Matrix); ok {
 		if m1, ok := ml[j].(matrix.Matrix); ok {

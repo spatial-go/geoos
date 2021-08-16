@@ -12,7 +12,6 @@ import (
 )
 
 // Point describes a geographic point
-
 type Point matrix.Matrix
 
 // GeoJSONType returns GeoJSON type for the point

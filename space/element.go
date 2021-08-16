@@ -95,13 +95,13 @@ func Relate(a, b Geometry) (string, error) {
 // For this function to make sense, the source geometries must both be of the same coordinate projection,
 // having the same SRID.
 func Within(A, B Geometry) (bool, error) {
-	if inter, ret := aInB(A, B); !ret {
-		im := relate.IM(A.ToMatrix(), B.ToMatrix(), inter)
-		return im.IsWithin(), nil
-	} else {
+	result := false
+	if inter, ret := aInB(A, B); ret {
+		result = inter
 		return inter, nil
 	}
-
+	im := relate.IM(A.ToMatrix(), B.ToMatrix(), result)
+	return im.IsWithin(), nil
 }
 
 // Contains space.Geometry A contains space.Geometry B if and only if no points of B lie in the exterior of A,
@@ -111,34 +111,35 @@ func Within(A, B Geometry) (bool, error) {
 // For this function to make sense, the source geometries must both be of the same coordinate projection,
 // having the same SRID.
 func Contains(A, B Geometry) (bool, error) {
-	if inter, ret := aInB(B, A); !ret {
-		im := relate.IM(A.ToMatrix(), B.ToMatrix(), inter)
-		return im.IsContains(), nil
-	} else {
+	result := false
+	if inter, ret := aInB(B, A); ret {
+		result = inter
 		return inter, nil
 	}
+	im := relate.IM(A.ToMatrix(), B.ToMatrix(), result)
+	return im.IsContains(), nil
 }
 
 // Covers returns TRUE if no point in space.Geometry B is outside space.Geometry A
 func Covers(A, B Geometry) (bool, error) {
-	if inter, ret := aInB(B, A); !ret {
-		im := relate.IM(A.ToMatrix(), B.ToMatrix(), inter)
-		return im.IsCovers(), nil
-	} else {
+	result := false
+	if inter, ret := aInB(B, A); ret {
+		result = inter
 		return inter, nil
 	}
-
+	im := relate.IM(A.ToMatrix(), B.ToMatrix(), result)
+	return im.IsCovers(), nil
 }
 
 // CoveredBy returns TRUE if no point in space.Geometry A is outside space.Geometry B
 func CoveredBy(A, B Geometry) (bool, error) {
-	if inter, ret := aInB(A, B); !ret {
-		im := relate.IM(A.ToMatrix(), B.ToMatrix(), inter)
-		return im.IsCoveredBy(), nil
-	} else {
+	result := false
+	if inter, ret := aInB(A, B); ret {
+		result = inter
 		return inter, nil
 	}
-
+	im := relate.IM(A.ToMatrix(), B.ToMatrix(), result)
+	return im.IsCoveredBy(), nil
 }
 
 // Crosses takes two geometry objects and returns TRUE if their intersection "spatially cross",

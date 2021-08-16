@@ -5,12 +5,12 @@ import (
 	"github.com/spatial-go/geoos/algorithm/matrix"
 )
 
-// Computes a list of the {@link MonotoneChain}s for a list of coordinates.
+// Chains Computes a list of the {@link MonotoneChain}s for a list of coordinates.
 func Chains(edge matrix.LineMatrix) []*MonotoneChain {
 	return ChainsContext(edge, nil)
 }
 
-// Computes a list of the {@link MonotoneChain}s for a list of coordinates,attaching a context data object to each.
+// ChainsContext Computes a list of the {@link MonotoneChain}s for a list of coordinates,attaching a context data object to each.
 func ChainsContext(edge matrix.LineMatrix, context interface{}) []*MonotoneChain {
 	mcList := []*MonotoneChain{}
 	chainStart := 0

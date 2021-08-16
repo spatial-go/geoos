@@ -7,7 +7,7 @@ import (
 	"github.com/spatial-go/geoos/algorithm/relate"
 )
 
-// Finds interior intersections between line segments , and adds them.
+// IntersectionCollinearDifference Finds interior intersections between line segments , and adds them.
 type IntersectionCollinearDifference struct {
 	Intersections relate.IntersectionPointLine
 	startPos      int
@@ -15,8 +15,8 @@ type IntersectionCollinearDifference struct {
 	line          matrix.LineMatrix
 }
 
-// This method is called by clients  to process intersections for two segments being intersected.
-// Note that some clients (such as <code>MonotoneChain</code>s) may optimize away
+// ProcessIntersections This method is called by clients  to process intersections for two segments being intersected.
+// Note that some clients (such as <codeProcessIntersections>MonotoneChain</code>s) may optimize away
 // this call for segment pairs which they have determined do not intersect
 func (ii *IntersectionCollinearDifference) ProcessIntersections(
 	e0 matrix.LineMatrix, segIndex0 int,
@@ -59,12 +59,12 @@ func (ii *IntersectionCollinearDifference) ProcessIntersections(
 	}
 }
 
-// Always process all intersections
+// IsDone Always process all intersections
 func (ii *IntersectionCollinearDifference) IsDone() bool {
 	return false
 }
 
-// Always process all intersections
+// Result returns result.
 func (ii *IntersectionCollinearDifference) Result() interface{} {
 	return ii.result
 }

@@ -7,7 +7,7 @@ import (
 )
 
 // ErrQuadrant ...
-var ErrQuadrant = fmt.Errorf("Cannot compute the quadrant for point.")
+var ErrQuadrant = fmt.Errorf("Cannot compute the quadrant for point")
 
 // ErrNilSteric ...
 var ErrNilSteric = fmt.Errorf("Steric is nil")
