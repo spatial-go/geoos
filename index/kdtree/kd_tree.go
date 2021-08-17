@@ -5,6 +5,8 @@ import (
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/matrix/envelope"
 	"github.com/spatial-go/geoos/algorithm/measure"
+	"github.com/spatial-go/geoos/index"
+	"github.com/spatial-go/geoos/index/quadtree"
 )
 
 // KdTree An implementation of a 2-D KD-Tree. KD-trees provide fast range searching and fast lookup for point data.
@@ -55,11 +57,11 @@ func (k *KdTree) IsEmpty() bool {
 
 // InsertNoData Inserts a new point in the kd-tree, with no data.
 func (k *KdTree) InsertNoData(p matrix.Matrix) *KdNode {
-	return k.Insert(p, nil)
+	return k.InsertMatrix(p, nil)
 }
 
-//Insert Inserts a new point into the kd-tree.
-func (k *KdTree) Insert(p matrix.Matrix, data interface{}) *KdNode {
+//InsertMatrix Inserts a new point into the kd-tree.
+func (k *KdTree) InsertMatrix(p matrix.Matrix, data interface{}) *KdNode {
 	if k.root == nil {
 		k.root = &KdNode{Matrix: p, Data: data}
 		return k.root
@@ -79,6 +81,13 @@ func (k *KdTree) Insert(p matrix.Matrix, data interface{}) *KdNode {
 	}
 
 	return k.insertExact(p, data)
+}
+
+//Insert Inserts a new point into the kd-tree.
+func (k *KdTree) Insert(env *envelope.Envelope, data interface{}) {
+	if m, ok := data.(matrix.Matrix); ok {
+		k.InsertNoData(m)
+	}
 }
 
 // FindBestMatchNode Finds the node in the tree which is the best match for a point
@@ -146,7 +155,7 @@ func (k *KdTree) insertExact(p matrix.Matrix, data interface{}) *KdNode {
 
 // QueryNode Performs a range search of the points in the index and visits all nodes found.
 func (k *KdTree) QueryNode(currentNode *KdNode,
-	queryEnv *envelope.Envelope, odd bool, visitor *BestMatchVisitor) {
+	queryEnv *envelope.Envelope, odd bool, visitor index.ItemVisitor) {
 	if currentNode == nil {
 		return
 	}
@@ -202,19 +211,20 @@ func (k *KdTree) QueryNodePoint(currentNode *KdNode,
 }
 
 // QueryVisitor Performs a range search of the points in the index and visits all nodes found.
-func (k *KdTree) QueryVisitor(queryEnv *envelope.Envelope, visitor *BestMatchVisitor) {
+func (k *KdTree) QueryVisitor(queryEnv *envelope.Envelope, visitor index.ItemVisitor) {
 	k.QueryNode(k.root, queryEnv, true, visitor)
 }
 
-// QueryEnv  Performs a range search of the points in the index.
-func (k *KdTree) QueryEnv(qEnv *envelope.Envelope) *BestMatchVisitor {
-	result := &BestMatchVisitor{}
-	k.QueryVisitor(qEnv, result)
-	return result
+// Query  Performs a range search of the points in the index.
+func (k *KdTree) Query(qEnv *envelope.Envelope) interface{} {
+	bmv := &BestMatchVisitor{}
+	k.QueryVisitor(qEnv, bmv)
+
+	return bmv.MatchNode
 }
 
-// Query Searches for a given point in the index and returns its node if found.
-func (k *KdTree) Query(queryPt matrix.Matrix) *KdNode {
+// QueryMatrix Searches for a given point in the index and returns its node if found.
+func (k *KdTree) QueryMatrix(queryPt matrix.Matrix) *KdNode {
 	return k.QueryNodePoint(k.root, queryPt, true)
 }
 
@@ -251,6 +261,11 @@ func (k *KdTree) SizeNode(currentNode *KdNode) int {
 	return 1 + sizeL + sizeR
 }
 
+// Remove Removes a single item from the tree.
+func (k *KdTree) Remove(itemEnv *envelope.Envelope, item interface{}) bool {
+	return false
+}
+
 // BestMatchVisitor A visitor for items in a SpatialIndex.
 type BestMatchVisitor struct {
 	tolerance float64
@@ -267,7 +282,8 @@ func (b *BestMatchVisitor) QueryEnvelope() *envelope.Envelope {
 }
 
 // VisitItem Visits an item in the index.
-func (b *BestMatchVisitor) VisitItem(node *KdNode) {
+func (b *BestMatchVisitor) VisitItem(item interface{}) {
+	node := item.(*KdNode)
 	dist := measure.PlanarDistance(b.Matrix, node.Matrix)
 	isInTolerance := dist <= b.tolerance
 	if !isInTolerance {
@@ -291,3 +307,8 @@ func (b *BestMatchVisitor) VisitItem(node *KdNode) {
 		b.matchDist = dist
 	}
 }
+
+var (
+	_ index.SpatialIndex = &quadtree.Quadtree{}
+	_ index.SpatialIndex = &KdTree{}
+)

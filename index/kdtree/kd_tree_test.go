@@ -61,7 +61,7 @@ func TestKdTree_Insert(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			k := indexTree
-			if got := k.Insert(tt.args.p, tt.args.data); got == nil {
+			if got := k.InsertMatrix(tt.args.p, tt.args.data); got == nil {
 				t.Errorf("KdTree.Insert() = %v, want %v", got, "not nil")
 			}
 		})
@@ -104,7 +104,7 @@ func TestKdTree_Query(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			k := indexTree
-			if got := k.Query(tt.args.queryPt); got == nil {
+			if got := k.QueryMatrix(tt.args.queryPt); got == nil {
 				t.Errorf("KdTree.Query() = %v, want %v", got, "not nil")
 			}
 		})
@@ -120,8 +120,8 @@ func TestKdTree_Depth(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			k := indexTree
-			if got := k.Depth(); got != tt.want && got != tt.want+2 {
+			k := buildTree()
+			if got := k.Depth(); got != tt.want {
 				t.Errorf("KdTree.Depth() = %v, want %v", got, tt.want)
 			}
 		})
@@ -137,8 +137,8 @@ func TestKdTree_Size(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			k := indexTree
-			if got := k.Size(); got != tt.want && got != tt.want+2 {
+			k := buildTree()
+			if got := k.Size(); got != tt.want {
 				t.Errorf("KdTree.Size() = %v, want %v", got, tt.want)
 			}
 		})
@@ -148,6 +148,15 @@ func TestKdTree_Size(t *testing.T) {
 var indexTree *KdTree
 
 func TestMain(m *testing.M) {
+
+	fmt.Println("test start")
+	buildTree()
+	code := m.Run()
+	os.Exit(code)
+	fmt.Println("test end")
+}
+
+func buildTree() *KdTree {
 	indexTree = &KdTree{}
 	var ms matrix.Collection = matrix.Collection{
 		matrix.Matrix{1, 1},
@@ -158,10 +167,7 @@ func TestMain(m *testing.M) {
 		matrix.Matrix{3, 2},
 	}
 	for i := 0; i < len(ms); i++ {
-		indexTree.Insert(ms[i].(matrix.Matrix), nil)
+		indexTree.InsertMatrix(ms[i].(matrix.Matrix), nil)
 	}
-	fmt.Println("test start")
-	code := m.Run()
-	os.Exit(code)
-	fmt.Println("test end")
+	return indexTree
 }

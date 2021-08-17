@@ -90,7 +90,7 @@ func (q *Quadtree) Remove(itemEnv *envelope.Envelope, item interface{}) bool {
 }
 
 // Query Queries the tree and returns items which may lie in the given search envelope.
-func (q *Quadtree) Query(searchEnv *envelope.Envelope) []interface{} {
+func (q *Quadtree) Query(searchEnv *envelope.Envelope) interface{} {
 	visitor := &index.ArrayVisitor{}
 	q.QueryVisitor(searchEnv, visitor)
 	return visitor.Items
