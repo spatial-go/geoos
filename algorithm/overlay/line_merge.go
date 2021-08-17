@@ -7,11 +7,13 @@ import (
 
 // LineMerge returns a Geometry containing the LineMerges.
 //	or an empty atomic geometry, or an empty GEOMETRYCOLLECTION
+// todo Rewrite with monotone chain
 func LineMerge(ml matrix.Collection) matrix.Collection {
 	for i := 0; i < len(ml)-1; i++ {
 		for j := i + 1; j < len(ml); j++ {
 			if mlMerge, ok := MergeLine(ml, i, j); ok {
 				ml = mlMerge
+				i--
 				return LineMerge(ml)
 			}
 		}

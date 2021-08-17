@@ -8,9 +8,9 @@ import (
 // Quadrant four const
 const (
 	NE = iota + 1
-	NW = 1
-	SW = 2
-	SE = 3
+	NW
+	SW
+	SE
 )
 
 // QuadrantFloat Returns the quadrant of a directed line segment (specified as x and y displacements, which cannot both be 0).
