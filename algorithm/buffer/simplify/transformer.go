@@ -1,7 +1,7 @@
 package simplify
 
 import (
-	"github.com/spatial-go/geoos/algorithm/algoerr"
+	"github.com/spatial-go/geoos/algorithm"
 	"github.com/spatial-go/geoos/algorithm/buffer"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 )
@@ -23,8 +23,8 @@ type Trans interface {
 // Transformer  A framework for processes which transform an input  Geometry into
 //  an output  Geometry, possibly changing its structure and type(s).
 type Transformer struct {
-	InputGeom                                                                             matrix.Steric
-	pruneEmptyGeometry, preserveGeometryCollectionType, preserveCollections, preserveType bool
+	InputGeom                        matrix.Steric
+	pruneEmptyGeometry, preserveType bool
 }
 
 // Transform ...
@@ -40,7 +40,7 @@ func (t *Transformer) Transform(inputGeom matrix.Steric) (matrix.Steric, error) 
 	case matrix.Collection:
 		return t.transformCollection(m, nil), nil
 	default:
-		return nil, algoerr.ErrUnknownType(m)
+		return nil, algorithm.ErrUnknownType(m)
 	}
 }
 
@@ -136,7 +136,7 @@ func (l *LineStringTransformer) Transform(inputGeom matrix.Steric) (matrix.Steri
 	case matrix.Collection:
 		return l.transformCollection(m, inputGeom), nil
 	default:
-		return nil, algoerr.ErrUnknownType(m)
+		return nil, algorithm.ErrUnknownType(m)
 	}
 }
 
@@ -155,7 +155,7 @@ func (l *LineStringTransformer) findLineString(parent matrix.LineMatrix) (*Tagge
 			return v, nil
 		}
 	}
-	return nil, algoerr.ErrNotInSlice
+	return nil, algorithm.ErrNotInSlice
 }
 
 func (l *LineStringTransformer) transformCoordinates(pts []matrix.Matrix, parent matrix.Steric) []matrix.Matrix {
@@ -193,7 +193,7 @@ func (d *DPTransformer) Transform(inputGeom matrix.Steric) (matrix.Steric, error
 	case matrix.Collection:
 		return d.transformCollection(m, nil), nil
 	default:
-		return nil, algoerr.ErrUnknownType(m)
+		return nil, algorithm.ErrUnknownType(m)
 	}
 }
 

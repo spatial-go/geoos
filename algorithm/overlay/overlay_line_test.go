@@ -51,3 +51,33 @@ func TestLineOverlay_Intersection(t *testing.T) {
 		})
 	}
 }
+
+func TestLineOverlay_Difference(t *testing.T) {
+	type fields struct {
+		PointOverlay *PointOverlay
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		want    matrix.Steric
+		wantErr bool
+	}{
+		{"line line0", fields{&PointOverlay{matrix.LineMatrix{{50, 100}, {50, 200}}, matrix.LineMatrix{{50, 50}, {50, 150}}}},
+			matrix.Collection{matrix.LineMatrix{{50, 150}, {50, 200}}}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			p := &LineOverlay{
+				PointOverlay: tt.fields.PointOverlay,
+			}
+			got, err := p.Difference()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("LineOverlay.Difference() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("LineOverlay.Difference() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

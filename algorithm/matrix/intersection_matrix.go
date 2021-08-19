@@ -3,13 +3,13 @@ package matrix
 import (
 	"bytes"
 
-	"github.com/spatial-go/geoos/algorithm/algoerr"
+	"github.com/spatial-go/geoos/algorithm"
 	"github.com/spatial-go/geoos/algorithm/calc"
 )
 
 // IntersectionMatrix  a Dimensionally Extended Nine-Intersection Model (DE-9IM) matrix.
 // DE-9IM matrix values (such as "212FF1FF2")
-// specify the topological relationship between two Geometrys.
+// specify the topological relationship between two Geometries.
 // DE-9IM matrices are 3x3 matrices with integer entries.
 // The matrix indices {0,1,2} represent the topological locations
 // that occur in a geometry (Interior, Boundary, Exterior).
@@ -29,7 +29,7 @@ func IntersectionMatrixDefault() *IntersectionMatrix {
 	for i := range im.matrix {
 		im.matrix[i] = make([]int, 3)
 	}
-	im.SetAll(calc.FALSE)
+	im.SetAll(calc.ImFalse)
 	return im
 }
 
@@ -44,10 +44,10 @@ func (im *IntersectionMatrix) SetAll(dimensionValue int) {
 
 // IsDisjoint Tests if this matrix matches [FF*FF****].
 func (im *IntersectionMatrix) IsDisjoint() bool {
-	return im.matrix[calc.INTERIOR][calc.INTERIOR] == calc.FALSE &&
-		im.matrix[calc.INTERIOR][calc.BOUNDARY] == calc.FALSE &&
-		im.matrix[calc.BOUNDARY][calc.INTERIOR] == calc.FALSE &&
-		im.matrix[calc.BOUNDARY][calc.BOUNDARY] == calc.FALSE
+	return im.matrix[calc.ImInterior][calc.ImInterior] == calc.ImFalse &&
+		im.matrix[calc.ImInterior][calc.ImBoundary] == calc.ImFalse &&
+		im.matrix[calc.ImBoundary][calc.ImInterior] == calc.ImFalse &&
+		im.matrix[calc.ImBoundary][calc.ImBoundary] == calc.ImFalse
 }
 
 // IsIntersects Tests if isDisjoint returns false.
@@ -62,51 +62,51 @@ func (im *IntersectionMatrix) IsTouches(dimensionOfGeometryA, dimensionOfGeometr
 		//no need to get transpose because pattern matrix is symmetrical
 		return im.IsTouches(dimensionOfGeometryB, dimensionOfGeometryA)
 	}
-	if (dimensionOfGeometryA == calc.A && dimensionOfGeometryB == calc.A) ||
-		(dimensionOfGeometryA == calc.L && dimensionOfGeometryB == calc.L) ||
-		(dimensionOfGeometryA == calc.L && dimensionOfGeometryB == calc.A) ||
-		(dimensionOfGeometryA == calc.P && dimensionOfGeometryB == calc.A) ||
-		(dimensionOfGeometryA == calc.P && dimensionOfGeometryB == calc.L) {
-		return im.matrix[calc.INTERIOR][calc.INTERIOR] == calc.FALSE &&
-			(isTrue(im.matrix[calc.INTERIOR][calc.BOUNDARY]) ||
-				isTrue(im.matrix[calc.BOUNDARY][calc.INTERIOR]) ||
-				isTrue(im.matrix[calc.BOUNDARY][calc.BOUNDARY]))
+	if (dimensionOfGeometryA == calc.ImA && dimensionOfGeometryB == calc.ImA) ||
+		(dimensionOfGeometryA == calc.ImL && dimensionOfGeometryB == calc.ImL) ||
+		(dimensionOfGeometryA == calc.ImL && dimensionOfGeometryB == calc.ImA) ||
+		(dimensionOfGeometryA == calc.ImP && dimensionOfGeometryB == calc.ImA) ||
+		(dimensionOfGeometryA == calc.ImP && dimensionOfGeometryB == calc.ImL) {
+		return im.matrix[calc.ImInterior][calc.ImInterior] == calc.ImFalse &&
+			(isTrue(im.matrix[calc.ImInterior][calc.ImBoundary]) ||
+				isTrue(im.matrix[calc.ImBoundary][calc.ImInterior]) ||
+				isTrue(im.matrix[calc.ImBoundary][calc.ImBoundary]))
 	}
 	return false
 }
 
 // IsCrosses Tests whether this geometry crosses the specified geometry.
 func (im *IntersectionMatrix) IsCrosses(dimensionOfGeometryA, dimensionOfGeometryB int) bool {
-	if (dimensionOfGeometryA == calc.P && dimensionOfGeometryB == calc.L) ||
-		(dimensionOfGeometryA == calc.P && dimensionOfGeometryB == calc.A) ||
-		(dimensionOfGeometryA == calc.L && dimensionOfGeometryB == calc.A) {
-		return isTrue(im.matrix[calc.INTERIOR][calc.INTERIOR]) &&
-			isTrue(im.matrix[calc.INTERIOR][calc.EXTERIOR])
+	if (dimensionOfGeometryA == calc.ImP && dimensionOfGeometryB == calc.ImL) ||
+		(dimensionOfGeometryA == calc.ImP && dimensionOfGeometryB == calc.ImA) ||
+		(dimensionOfGeometryA == calc.ImL && dimensionOfGeometryB == calc.ImA) {
+		return isTrue(im.matrix[calc.ImInterior][calc.ImInterior]) &&
+			isTrue(im.matrix[calc.ImInterior][calc.ImExterior])
 	}
-	if (dimensionOfGeometryA == calc.L && dimensionOfGeometryB == calc.P) ||
-		(dimensionOfGeometryA == calc.A && dimensionOfGeometryB == calc.P) ||
-		(dimensionOfGeometryA == calc.A && dimensionOfGeometryB == calc.L) {
-		return isTrue(im.matrix[calc.INTERIOR][calc.INTERIOR]) &&
-			isTrue(im.matrix[calc.EXTERIOR][calc.INTERIOR])
+	if (dimensionOfGeometryA == calc.ImL && dimensionOfGeometryB == calc.ImP) ||
+		(dimensionOfGeometryA == calc.ImA && dimensionOfGeometryB == calc.ImP) ||
+		(dimensionOfGeometryA == calc.ImA && dimensionOfGeometryB == calc.ImL) {
+		return isTrue(im.matrix[calc.ImInterior][calc.ImInterior]) &&
+			isTrue(im.matrix[calc.ImExterior][calc.ImInterior])
 	}
-	if dimensionOfGeometryA == calc.L && dimensionOfGeometryB == calc.L {
-		return im.matrix[calc.INTERIOR][calc.INTERIOR] == 0
+	if dimensionOfGeometryA == calc.ImL && dimensionOfGeometryB == calc.ImL {
+		return im.matrix[calc.ImInterior][calc.ImInterior] == 0
 	}
 	return false
 }
 
 // IsWithin  Tests whether this matrix matches [T*F**F***].
 func (im *IntersectionMatrix) IsWithin() bool {
-	return isTrue(im.matrix[calc.INTERIOR][calc.INTERIOR]) &&
-		im.matrix[calc.INTERIOR][calc.EXTERIOR] == calc.FALSE &&
-		im.matrix[calc.BOUNDARY][calc.EXTERIOR] == calc.FALSE
+	return isTrue(im.matrix[calc.ImInterior][calc.ImInterior]) &&
+		im.matrix[calc.ImInterior][calc.ImExterior] == calc.ImFalse &&
+		im.matrix[calc.ImBoundary][calc.ImExterior] == calc.ImFalse
 }
 
 // IsContains  Tests whether this matrix matches [T*****FF*[.
 func (im *IntersectionMatrix) IsContains() bool {
-	return isTrue(im.matrix[calc.INTERIOR][calc.INTERIOR]) &&
-		im.matrix[calc.EXTERIOR][calc.INTERIOR] == calc.FALSE &&
-		im.matrix[calc.EXTERIOR][calc.BOUNDARY] == calc.FALSE
+	return isTrue(im.matrix[calc.ImInterior][calc.ImInterior]) &&
+		im.matrix[calc.ImExterior][calc.ImInterior] == calc.ImFalse &&
+		im.matrix[calc.ImExterior][calc.ImBoundary] == calc.ImFalse
 }
 
 // IsCovers Tests if this matrix matches
@@ -116,14 +116,14 @@ func (im *IntersectionMatrix) IsContains() bool {
 // or [****T*FF*]
 func (im *IntersectionMatrix) IsCovers() bool {
 	hasPointInCommon :=
-		isTrue(im.matrix[calc.INTERIOR][calc.INTERIOR]) ||
-			isTrue(im.matrix[calc.INTERIOR][calc.BOUNDARY]) ||
-			isTrue(im.matrix[calc.BOUNDARY][calc.INTERIOR]) ||
-			isTrue(im.matrix[calc.BOUNDARY][calc.BOUNDARY])
+		isTrue(im.matrix[calc.ImInterior][calc.ImInterior]) ||
+			isTrue(im.matrix[calc.ImInterior][calc.ImBoundary]) ||
+			isTrue(im.matrix[calc.ImBoundary][calc.ImInterior]) ||
+			isTrue(im.matrix[calc.ImBoundary][calc.ImBoundary])
 
 	return hasPointInCommon &&
-		im.matrix[calc.EXTERIOR][calc.INTERIOR] == calc.FALSE &&
-		im.matrix[calc.EXTERIOR][calc.BOUNDARY] == calc.FALSE
+		im.matrix[calc.ImExterior][calc.ImInterior] == calc.ImFalse &&
+		im.matrix[calc.ImExterior][calc.ImBoundary] == calc.ImFalse
 }
 
 // IsCoveredBy Tests if this matrix matches
@@ -132,14 +132,14 @@ func (im *IntersectionMatrix) IsCovers() bool {
 // or [**FT*F***]
 // or [**F*TF***]
 func (im *IntersectionMatrix) IsCoveredBy() bool {
-	hasPointInCommon := isTrue(im.matrix[calc.INTERIOR][calc.INTERIOR]) ||
-		isTrue(im.matrix[calc.INTERIOR][calc.BOUNDARY]) ||
-		isTrue(im.matrix[calc.BOUNDARY][calc.INTERIOR]) ||
-		isTrue(im.matrix[calc.BOUNDARY][calc.BOUNDARY])
+	hasPointInCommon := isTrue(im.matrix[calc.ImInterior][calc.ImInterior]) ||
+		isTrue(im.matrix[calc.ImInterior][calc.ImBoundary]) ||
+		isTrue(im.matrix[calc.ImBoundary][calc.ImInterior]) ||
+		isTrue(im.matrix[calc.ImBoundary][calc.ImBoundary])
 
 	return hasPointInCommon &&
-		im.matrix[calc.INTERIOR][calc.EXTERIOR] == calc.FALSE &&
-		im.matrix[calc.BOUNDARY][calc.EXTERIOR] == calc.FALSE
+		im.matrix[calc.ImInterior][calc.ImExterior] == calc.ImFalse &&
+		im.matrix[calc.ImBoundary][calc.ImExterior] == calc.ImFalse
 }
 
 // IsEquals Tests whether the argument dimensions are equal and
@@ -148,11 +148,11 @@ func (im *IntersectionMatrix) IsEquals(dimensionOfGeometryA, dimensionOfGeometry
 	if dimensionOfGeometryA != dimensionOfGeometryB {
 		return false
 	}
-	return isTrue(im.matrix[calc.INTERIOR][calc.INTERIOR]) &&
-		im.matrix[calc.INTERIOR][calc.EXTERIOR] == calc.FALSE &&
-		im.matrix[calc.BOUNDARY][calc.EXTERIOR] == calc.FALSE &&
-		im.matrix[calc.EXTERIOR][calc.INTERIOR] == calc.FALSE &&
-		im.matrix[calc.EXTERIOR][calc.BOUNDARY] == calc.FALSE
+	return isTrue(im.matrix[calc.ImInterior][calc.ImInterior]) &&
+		im.matrix[calc.ImInterior][calc.ImExterior] == calc.ImFalse &&
+		im.matrix[calc.ImBoundary][calc.ImExterior] == calc.ImFalse &&
+		im.matrix[calc.ImExterior][calc.ImInterior] == calc.ImFalse &&
+		im.matrix[calc.ImExterior][calc.ImBoundary] == calc.ImFalse
 }
 
 // IsOverlaps Tests if this matrix matches
@@ -161,16 +161,16 @@ func (im *IntersectionMatrix) IsEquals(dimensionOfGeometryA, dimensionOfGeometry
 //    <LI><tt>[1*T***T**]</tt> (for two curves)
 // </UL>.
 func (im *IntersectionMatrix) IsOverlaps(dimensionOfGeometryA, dimensionOfGeometryB int) bool {
-	if (dimensionOfGeometryA == calc.P && dimensionOfGeometryB == calc.P) ||
-		(dimensionOfGeometryA == calc.A && dimensionOfGeometryB == calc.A) {
-		return isTrue(im.matrix[calc.INTERIOR][calc.INTERIOR]) &&
-			isTrue(im.matrix[calc.INTERIOR][calc.EXTERIOR]) &&
-			isTrue(im.matrix[calc.EXTERIOR][calc.INTERIOR])
+	if (dimensionOfGeometryA == calc.ImP && dimensionOfGeometryB == calc.ImP) ||
+		(dimensionOfGeometryA == calc.ImA && dimensionOfGeometryB == calc.ImA) {
+		return isTrue(im.matrix[calc.ImInterior][calc.ImInterior]) &&
+			isTrue(im.matrix[calc.ImInterior][calc.ImExterior]) &&
+			isTrue(im.matrix[calc.ImExterior][calc.ImInterior])
 	}
-	if dimensionOfGeometryA == calc.L && dimensionOfGeometryB == calc.L {
-		return im.matrix[calc.INTERIOR][calc.INTERIOR] == 1 &&
-			isTrue(im.matrix[calc.INTERIOR][calc.EXTERIOR]) &&
-			isTrue(im.matrix[calc.EXTERIOR][calc.INTERIOR])
+	if dimensionOfGeometryA == calc.ImL && dimensionOfGeometryB == calc.ImL {
+		return im.matrix[calc.ImInterior][calc.ImInterior] == 1 &&
+			isTrue(im.matrix[calc.ImInterior][calc.ImExterior]) &&
+			isTrue(im.matrix[calc.ImExterior][calc.ImInterior])
 	}
 	return false
 }
@@ -178,7 +178,7 @@ func (im *IntersectionMatrix) IsOverlaps(dimensionOfGeometryA, dimensionOfGeomet
 // Matches Tests whether this matrix matches the given matrix pattern.
 func (im *IntersectionMatrix) Matches(pattern string) (bool, error) {
 	if len(pattern) != 9 {
-		return false, algoerr.ErrorShouldBeLength9(pattern)
+		return false, algorithm.ErrorShouldBeLength9(pattern)
 	}
 	for ai := 0; ai < 3; ai++ {
 		for bi := 0; bi < 3; bi++ {
@@ -201,7 +201,7 @@ func (im *IntersectionMatrix) ToString() string {
 	return string(strByte)
 }
 
-// Set Changes the value of one of this IntersectionMatrixs  elements.
+// Set Changes the value of one of this IntersectionMatrixes  elements.
 func (im *IntersectionMatrix) Set(row, column, dimensionValue int) {
 	im.matrix[row][column] = dimensionValue
 }
@@ -257,68 +257,68 @@ func (im *IntersectionMatrix) Transpose() *IntersectionMatrix {
 //  toDimensionSymbol Converts the dimension value to a dimension symbol, for example, TRUE = 'T'
 func toDimensionSymbol(dimensionValue int) (byte, error) {
 	switch dimensionValue {
-	case calc.FALSE:
-		return calc.SYMFALSE, nil
-	case calc.TRUE:
-		return calc.SYMTRUE, nil
-	case calc.DONTCARE:
-		return calc.SYMDONTCARE, nil
-	case calc.P:
-		return calc.SYMP, nil
-	case calc.L:
-		return calc.SYML, nil
-	case calc.A:
-		return calc.SYMA, nil
+	case calc.ImFalse:
+		return calc.ImSymFalse, nil
+	case calc.ImTrue:
+		return calc.ImSymTrue, nil
+	case calc.ImNotCare:
+		return calc.ImSymNotCare, nil
+	case calc.ImP:
+		return calc.ImSymP, nil
+	case calc.ImL:
+		return calc.ImSymL, nil
+	case calc.ImA:
+		return calc.ImSymA, nil
 	default:
-		return byte('_'), algoerr.ErrorUnknownDimension(dimensionValue)
+		return byte('_'), algorithm.ErrorUnknownDimension(dimensionValue)
 	}
 }
 
-// toDimensionValue Converts the dimension symbol to a dimension value, for example, '*' = DONTCARE
+// toDimensionValue Converts the dimension symbol to a dimension value, for example, '*' = NotCare
 func toDimensionValue(dimensionSymbol byte) (int, error) {
 	switch []byte(bytes.ToUpper([]byte{dimensionSymbol}))[0] {
-	case calc.SYMFALSE:
-		return calc.FALSE, nil
-	case calc.SYMTRUE:
-		return calc.TRUE, nil
-	case calc.SYMDONTCARE:
-		return calc.DONTCARE, nil
-	case calc.SYMP:
-		return calc.P, nil
-	case calc.SYML:
-		return calc.L, nil
-	case calc.SYMA:
-		return calc.A, nil
+	case calc.ImSymFalse:
+		return calc.ImFalse, nil
+	case calc.ImSymTrue:
+		return calc.ImTrue, nil
+	case calc.ImSymNotCare:
+		return calc.ImNotCare, nil
+	case calc.ImSymP:
+		return calc.ImP, nil
+	case calc.ImSymL:
+		return calc.ImL, nil
+	case calc.ImSymA:
+		return calc.ImA, nil
 	default:
-		return -1, algoerr.ErrorUnknownDimension(dimensionSymbol)
+		return -1, algorithm.ErrorUnknownDimension(dimensionSymbol)
 	}
 }
 
 // matches Tests if the dimension value satisfies the dimension symbol.
 func matches(actualDimensionValue int, requiredDimensionSymbol byte) bool {
-	if requiredDimensionSymbol == calc.SYMDONTCARE {
+	if requiredDimensionSymbol == calc.ImSymNotCare {
 		return true
 	}
-	if requiredDimensionSymbol == calc.SYMTRUE && (actualDimensionValue >= 0 || actualDimensionValue == calc.TRUE) {
+	if requiredDimensionSymbol == calc.ImSymTrue && (actualDimensionValue >= 0 || actualDimensionValue == calc.ImTrue) {
 		return true
 	}
-	if requiredDimensionSymbol == calc.SYMFALSE && actualDimensionValue == calc.FALSE {
+	if requiredDimensionSymbol == calc.ImSymFalse && actualDimensionValue == calc.ImFalse {
 		return true
 	}
-	if requiredDimensionSymbol == calc.SYMP && actualDimensionValue == calc.P {
+	if requiredDimensionSymbol == calc.ImSymP && actualDimensionValue == calc.ImP {
 		return true
 	}
-	if requiredDimensionSymbol == calc.SYML && actualDimensionValue == calc.L {
+	if requiredDimensionSymbol == calc.ImSymL && actualDimensionValue == calc.ImL {
 		return true
 	}
-	if requiredDimensionSymbol == calc.SYMA && actualDimensionValue == calc.A {
+	if requiredDimensionSymbol == calc.ImSymA && actualDimensionValue == calc.ImA {
 		return true
 	}
 	return false
 }
 
 func isTrue(actualDimensionValue int) bool {
-	if actualDimensionValue >= 0 || actualDimensionValue == calc.TRUE {
+	if actualDimensionValue >= 0 || actualDimensionValue == calc.ImTrue {
 		return true
 	}
 	return false

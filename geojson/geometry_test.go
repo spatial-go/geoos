@@ -142,7 +142,7 @@ func TestGeometryUnmarshal(t *testing.T) {
 			}
 
 			if g.Type != tc.geom.GeoJSONType() {
-				t.Errorf("incorrenct type: %v != %v", g.Type, tc.geom.GeoJSONType())
+				t.Errorf("incorrect type: %v != %v", g.Type, tc.geom.GeoJSONType())
 			}
 
 			if !g.Geometry().Equals(tc.geom) {
@@ -255,7 +255,7 @@ func TestHelperTypes(t *testing.T) {
 				t.Log(string(geoData))
 			}
 
-			// check unmarshalling
+			// check unmarshal
 			err = tc.output.(json.Unmarshaler).UnmarshalJSON(data)
 			if err != nil {
 				t.Fatalf("unmarshal error: %v", err)
@@ -309,7 +309,7 @@ func BenchmarkGeometryMarshalJSON(b *testing.B) {
 	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		g.MarshalJSON()
+		_, _ = g.MarshalJSON()
 	}
 }
 
@@ -328,6 +328,6 @@ func BenchmarkGeometryUnmarshalJSON(b *testing.B) {
 	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		g.UnmarshalJSON(data)
+		_ = g.UnmarshalJSON(data)
 	}
 }

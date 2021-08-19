@@ -1,7 +1,7 @@
 package planar
 
 import (
-	"github.com/spatial-go/geoos/algorithm/algoerr"
+	"github.com/spatial-go/geoos/algorithm"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/overlay"
 	"github.com/spatial-go/geoos/algorithm/sharedpaths"
@@ -14,8 +14,8 @@ import (
 // One can think of this as GeometryA - Intersection(A,B).
 // If A is completely contained in B then an empty geometry collection is returned.
 func (g *MegrezAlgorithm) Difference(geom1, geom2 space.Geometry) (space.Geometry, error) {
-	if geom1.GeoJSONType() != geom1.GeoJSONType() {
-		return nil, algoerr.ErrNotMatchType
+	if (geom1.GeoJSONType()) != (geom2.GeoJSONType()) {
+		return nil, algorithm.ErrNotMatchType
 	}
 	var err error
 	if result, err := overlay.Difference(geom1.ToMatrix(), geom2.ToMatrix()); err == nil {
@@ -49,7 +49,7 @@ func (g *MegrezAlgorithm) Intersection(geom1, geom2 space.Geometry) (intersectGe
 			intersectErr = err
 		}
 	default:
-		intersectErr = algoerr.ErrNotMatchType
+		intersectErr = algorithm.ErrNotMatchType
 	}
 	return
 }
@@ -94,8 +94,8 @@ func (g *MegrezAlgorithm) SharedPaths(geom1, geom2 space.Geometry) (string, erro
 // It is called a symmetric difference because SymDifference(A,B) = SymDifference(B,A).
 // One can think of this as Union(geomA,geomB) - Intersection(A,B).
 func (g *MegrezAlgorithm) SymDifference(geom1, geom2 space.Geometry) (space.Geometry, error) {
-	if geom1.GeoJSONType() != geom1.GeoJSONType() {
-		return nil, algoerr.ErrNotMatchType
+	if geom1.GeoJSONType() != geom2.GeoJSONType() {
+		return nil, algorithm.ErrNotMatchType
 	}
 	var err error
 	if result, err := overlay.SymDifference(geom1.ToMatrix(), geom2.ToMatrix()); err == nil {

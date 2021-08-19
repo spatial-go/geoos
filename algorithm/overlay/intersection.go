@@ -1,7 +1,7 @@
 package overlay
 
 import (
-	"github.com/spatial-go/geoos/algorithm/algoerr"
+	"github.com/spatial-go/geoos/algorithm"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 )
 
@@ -25,7 +25,7 @@ func Intersection(m0, m1 matrix.Steric) (matrix.Steric, error) {
 		polyOver := &PolygonOverlay{PointOverlay: &PointOverlay{Subject: m, Clipping: m1}}
 		return polyOver.Intersection()
 	default:
-		return nil, algoerr.ErrNotSupportCollection
+		return nil, algorithm.ErrNotSupportCollection
 
 	}
 }

@@ -54,8 +54,5 @@ func AreaDirection(ring matrix.LineMatrix) float64 {
 // IsCCW * Tests if a ring is
 // oriented counter-clockwise
 func IsCCW(ring matrix.LineMatrix) bool {
-	if AreaDirection(ring) > 0 {
-		return true
-	}
-	return false
+	return AreaDirection(ring) > 0
 }

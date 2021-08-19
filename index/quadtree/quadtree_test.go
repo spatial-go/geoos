@@ -92,13 +92,13 @@ func TestQuadtree_Query(t *testing.T) {
 			q := indexTree
 			got := q.Query(tt.args.searchEnv)
 			has := false
-			for _, v := range got {
+			for _, v := range got.([]interface{}) {
 				if reflect.DeepEqual(v, tt.want) {
 					has = true
 				}
 			}
 			if !has {
-				t.Errorf("Quadtree.Query() = %v, %v,%v,%v", got...)
+				t.Errorf("Quadtree.Query() = %v", got)
 				t.Errorf("Quadtree.Query  want %v", tt.want)
 			}
 		})

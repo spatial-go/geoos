@@ -1,13 +1,16 @@
+// Package quadtree A Quadtree is a spatial index structure for efficient range querying
+//  of items bounded by 2D rectangles.
 package quadtree
 
 import (
+	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/matrix/envelope"
 	"github.com/spatial-go/geoos/index"
 )
 
 // Quadtree A Quadtree is a spatial index structure for efficient range querying
 //  of items bounded by 2D rectangles.
-//  Geometrys can be indexed by using their Envelopes.
+//  Geometries can be indexed by using their Envelopes.
 //  Any type of Object can also be indexed as
 //  long as it has an extent that can be represented by an  Envelope.
 type Quadtree struct {
@@ -42,7 +45,7 @@ func EnsureExtent(itemEnv *envelope.Envelope, minExtent float64) *envelope.Envel
 // DefaultQuadtree  Constructs a Quadtree with zero items.
 func DefaultQuadtree() *Quadtree {
 	qt := &Quadtree{}
-	qt.Root = &Root{Node: &Node{}}
+	qt.Root = &Root{Node: &Node{}, origin: matrix.Matrix{0, 0}}
 	return qt
 }
 
@@ -87,7 +90,7 @@ func (q *Quadtree) Remove(itemEnv *envelope.Envelope, item interface{}) bool {
 }
 
 // Query Queries the tree and returns items which may lie in the given search envelope.
-func (q *Quadtree) Query(searchEnv *envelope.Envelope) []interface{} {
+func (q *Quadtree) Query(searchEnv *envelope.Envelope) interface{} {
 	visitor := &index.ArrayVisitor{}
 	q.QueryVisitor(searchEnv, visitor)
 	return visitor.Items

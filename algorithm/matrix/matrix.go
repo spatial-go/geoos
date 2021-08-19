@@ -1,9 +1,10 @@
+// Package matrix Define spatial matrix base.
 package matrix
 
 import (
 	"math"
 
-	"github.com/spatial-go/geoos/algorithm/algoerr"
+	"github.com/spatial-go/geoos/algorithm"
 	"github.com/spatial-go/geoos/algorithm/calc"
 )
 
@@ -51,7 +52,7 @@ func (m Matrix) Dimensions() int {
 // BoundaryDimensions Compute the IM entry for the intersection of the boundary
 // of a geometry with the Exterior.
 func (m Matrix) BoundaryDimensions() int {
-	return calc.FALSE
+	return calc.ImFalse
 }
 
 // Nums num of matrix
@@ -78,7 +79,7 @@ func (l LineMatrix) Dimensions() int {
 // of a geometry with the Exterior.
 func (l LineMatrix) BoundaryDimensions() int {
 	if l.IsClosed() {
-		return calc.FALSE
+		return calc.ImFalse
 	}
 	return 0
 }
@@ -208,7 +209,7 @@ func (c Collection) Dimensions() int {
 // BoundaryDimensions Compute the IM entry for the intersection of the boundary
 // of a geometry with the Exterior.
 func (c Collection) BoundaryDimensions() int {
-	dimension := calc.FALSE
+	dimension := calc.ImFalse
 	for _, g := range c {
 		if g.BoundaryDimensions() > dimension {
 			dimension = g.BoundaryDimensions()
@@ -293,7 +294,7 @@ func (c Collection) EqualsExact(ms Steric, tolerance float64) bool {
 func (m Matrix) Compare(m1 Matrix) (int, error) {
 	// If one is nil, the other must also be nil.
 	if (m1 == nil) != (m == nil) {
-		return -2, algoerr.ErrNilSteric
+		return -2, algorithm.ErrNilSteric
 	}
 
 	if m1[0] < m[0] {

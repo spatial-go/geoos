@@ -1,8 +1,13 @@
-package algoerr
+// Package algorithm defines Specifies Computational Geometric and algorithm err.
+// Specifies and implements various fundamental Computational Geometric algorithms.
+package algorithm
 
 import (
 	"fmt"
 )
+
+// ErrQuadrant ...
+var ErrQuadrant = fmt.Errorf("Cannot compute the quadrant for point")
 
 // ErrNilSteric ...
 var ErrNilSteric = fmt.Errorf("Steric is nil")

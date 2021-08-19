@@ -79,9 +79,8 @@ func TestAlgorithm_Equals(t *testing.T) {
 	geometry2, _ := wkt.UnmarshalString("POINT(116.309878725564 40.0427783827455)")
 	geometry3, _ := wkt.UnmarshalString("POINT(116.309878625564 40.0427783817455)")
 	type args struct {
-		g1        space.Geometry
-		g2        space.Geometry
-		tolerance float64
+		g1 space.Geometry
+		g2 space.Geometry
 	}
 	tests := []struct {
 		name    string

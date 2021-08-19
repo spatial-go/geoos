@@ -19,7 +19,7 @@ type Plane struct {
 
 // AddPointWhich add a point in polyon with which.
 func (p *Plane) AddPointWhich(point *Vertex, which bool) {
-	if p.Edge == nil || p.Edge.NowStatus == calc.CLOSED {
+	if p.Edge == nil || p.Edge.NowStatus == calc.OverlayClosed {
 		newCirCuit := Edge{IsClockwise: false}
 		p.Edge = &newCirCuit
 		p.Edge.Vertexes = append(p.Edge.Vertexes, Vertex{Matrix: matrix.Matrix{point.X(), point.Y()}})
@@ -48,7 +48,7 @@ func (p *Plane) AddPoint(point *Vertex) {
 // CloseRing close edge to ring.
 func (p *Plane) CloseRing() {
 	if p.Edge != nil {
-		p.Edge.NowStatus = calc.CLOSED
+		p.Edge.NowStatus = calc.OverlayClosed
 		p.Edge.SetClockwise()
 
 		// add line
@@ -76,10 +76,10 @@ func (p *Plane) Equal(pol *Plane) bool {
 
 // ChangeRank change rank .
 func (p *Plane) ChangeRank() {
-	if p.Rank == calc.MAIN {
-		p.Rank = calc.CUT
+	if p.Rank == calc.OverlayMain {
+		p.Rank = calc.OverlayCut
 	} else {
-		p.Rank = calc.MAIN
+		p.Rank = calc.OverlayMain
 	}
 }
 

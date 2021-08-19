@@ -1,5 +1,11 @@
 package calc
 
+// const Defined constant variable  calc parameter
+const (
+	// Split The value to split a double-precision value on during multiplication
+	Split = 134217729.0 // 2^27+1, for IEEE
+)
+
 // PairFloat A DoubleDouble uses a representation containing two double-precision values.
 // A number x is represented as a pair of doubles, x.hi and x.lo
 type PairFloat struct {
@@ -78,9 +84,9 @@ func (d *PairFloat) SelfMultiplyPair(y *PairFloat) *PairFloat {
 // be newly created.
 func (d *PairFloat) SelfMultiply(yhi, ylo float64) *PairFloat {
 	var hx, tx, hy, ty, C, c float64
-	C = SPLIT * d.Hi
+	C = Split * d.Hi
 	hx = C - d.Hi
-	c = SPLIT * yhi
+	c = Split * yhi
 	hx = C - hx
 	tx = d.Hi - hx
 	hy = c - yhi
@@ -103,9 +109,9 @@ func (d *PairFloat) SelfMultiply(yhi, ylo float64) *PairFloat {
 func (d *PairFloat) SelfDivide(yhi, ylo float64) *PairFloat {
 	var hc, tc, hy, ty, C, c, U, u float64
 	C = d.Hi / yhi
-	c = SPLIT * C
+	c = Split * C
 	hc = c - C
-	u = SPLIT * yhi
+	u = Split * yhi
 	hc = c - hc
 	tc = C - hc
 	hy = u - yhi

@@ -1,3 +1,4 @@
+// Package angle define angel calculation function.
 package angle
 
 import (
@@ -61,9 +62,9 @@ func IsAcute(p0, p1, p2 matrix.Matrix) bool {
 	return dotprod > 0
 }
 
-// isObtuse Tests whether the angle between p0-p1-p2 is obtuse.
+// IsObtuse Tests whether the angle between p0-p1-p2 is obtuse.
 // An angle is obtuse if it is greater than 90 degrees.
-func isObtuse(p0, p1, p2 matrix.Matrix) bool {
+func IsObtuse(p0, p1, p2 matrix.Matrix) bool {
 	// relies on fact that A dot B is negative if A ang B is obtuse
 	dx0 := p0[0] - p1[0]
 	dy0 := p0[1] - p1[1]
@@ -116,10 +117,10 @@ func Turn(ang1, ang2 float64) int {
 	crossproduct := math.Sin(ang2 - ang1)
 
 	if crossproduct > 0 {
-		return calc.COUNTERCLOCKWISE
+		return calc.CounterClockWise
 	}
 	if crossproduct < 0 {
-		return calc.CLOCKWISE
+		return calc.ClockWise
 	}
 	return None
 }

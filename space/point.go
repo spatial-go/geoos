@@ -214,8 +214,5 @@ func (p Point) IsRing() bool {
 
 // IsValid returns true if the  geometry is valid.
 func (p Point) IsValid() bool {
-	if len(p) >= 2 {
-		return true
-	}
-	return false
+	return len(p) >= 2
 }

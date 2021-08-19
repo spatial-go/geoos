@@ -2,8 +2,8 @@ package quadtree
 
 import "math"
 
-// MINBINARYEXPONENT ...
-const MINBINARYEXPONENT = -50
+// MinBinaryExponent ...
+const MinBinaryExponent = -50
 
 // IntervalSize Provides a test for whether an interval is
 //  so small it should be considered as zero for the purposes of
@@ -24,5 +24,5 @@ func IsZeroWidth(min, max float64) bool {
 	scaledInterval := width / maxAbs
 	level, _ := math.Frexp(scaledInterval)
 	level--
-	return level <= MINBINARYEXPONENT
+	return level <= MinBinaryExponent
 }

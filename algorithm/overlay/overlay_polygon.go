@@ -1,7 +1,7 @@
 package overlay
 
 import (
-	"github.com/spatial-go/geoos/algorithm/algoerr"
+	"github.com/spatial-go/geoos/algorithm"
 	"github.com/spatial-go/geoos/algorithm/calc"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/matrix/envelope"
@@ -29,7 +29,7 @@ func (p *PolygonOverlay) Union() (matrix.Steric, error) {
 			return result, nil
 		}
 	}
-	return nil, algoerr.ErrNotMatchType
+	return nil, algorithm.ErrNotMatchType
 }
 
 // Intersection  Computes the Intersection of two geometries,either or both of which may be nil.
@@ -41,7 +41,7 @@ func (p *PolygonOverlay) Intersection() (matrix.Steric, error) {
 	if p, ok := p.Subject.(matrix.PolygonMatrix); ok {
 		poly = p
 	} else {
-		return nil, algoerr.ErrNotMatchType
+		return nil, algorithm.ErrNotMatchType
 	}
 	switch c := p.Clipping.(type) {
 	case matrix.Matrix:
@@ -54,29 +54,20 @@ func (p *PolygonOverlay) Intersection() (matrix.Steric, error) {
 	case matrix.LineMatrix:
 		result := matrix.Collection{}
 		for _, ring := range poly {
-			for _, il := range IntersectLine(c, ring) {
-				if len(il.Ips) > 1 {
-					var ipLine matrix.LineMatrix
-					for _, v := range il.Ips {
-						ipLine = append(ipLine, v.Matrix)
-					}
-					result = append(result, ipLine)
-				} else {
-					result = append(result, il.Ips[0].Matrix)
-				}
-			}
+			res := intersectLine(ring, c)
+			result = append(result, res...)
 		}
 		return LineMerge(result), nil
 	case matrix.PolygonMatrix:
 
-		// inter := envelope.Bound(poly.Bound()).IsIntersects(envelope.Bound(c.Bound()))
-		// im := relate.IM(poly, c, inter)
-		// if mark := im.IsContains(); mark {
-		// 	return c, nil
-		// }
-		// if mark := im.IsWithin(); mark {
-		// 	return poly, nil
-		// }
+		inter := envelope.Bound(poly.Bound()).IsIntersects(envelope.Bound(c.Bound()))
+		im := relate.IM(poly, c, inter)
+		if mark := im.IsContains(); mark {
+			return c, nil
+		}
+		if mark := im.IsWithin(); mark {
+			return poly, nil
+		}
 
 		cpo := &ComputeClipOverlay{p}
 
@@ -85,7 +76,7 @@ func (p *PolygonOverlay) Intersection() (matrix.Steric, error) {
 		result := ToPolygonMatrix(cpo.ComputePolygon(exitingPoints, cpo))
 		return result, nil
 	}
-	return nil, algoerr.ErrNotMatchType
+	return nil, algorithm.ErrNotMatchType
 }
 
 // Difference returns a geometry that represents that part of geometry A that does not intersect with geometry B.
@@ -112,7 +103,7 @@ func (p *PolygonOverlay) Difference() (matrix.Steric, error) {
 			return result, nil
 		}
 	}
-	return nil, algoerr.ErrNotMatchType
+	return nil, algorithm.ErrNotMatchType
 }
 
 // DifferenceReverse returns a geometry that represents reverse that part of geometry A that does not intersect with geometry B .
@@ -147,7 +138,7 @@ func (p *PolygonOverlay) prepare() {
 			}
 		}
 		p.subjectPlane.CloseRing()
-		p.subjectPlane.Rank = calc.MAIN
+		p.subjectPlane.Rank = calc.OverlayMain
 	}
 	p.clippingPlane = &Plane{}
 	for _, v2 := range p.Clipping.(matrix.PolygonMatrix) {
@@ -157,7 +148,7 @@ func (p *PolygonOverlay) prepare() {
 			}
 		}
 		p.clippingPlane.CloseRing()
-		p.clippingPlane.Rank = calc.CUT
+		p.clippingPlane.Rank = calc.OverlayCut
 	}
 }
 
@@ -235,7 +226,7 @@ func (u *UniqueVertexFilter) add(ip Vertex) {
 
 // ComputePolygon compute overlay.
 func (p *PolygonOverlay) ComputePolygon(exitingPoints []Vertex, cpo ComputePolyOverlay) *Plane {
-	var pol *Plane = &Plane{}
+	var pol = &Plane{}
 	for _, iterPoints := range exitingPoints {
 		if iterPoints.IsChecked {
 			continue

@@ -1,6 +1,9 @@
+// Package index define spatial index interface.
 package index
 
-import "github.com/spatial-go/geoos/algorithm/matrix/envelope"
+import (
+	"github.com/spatial-go/geoos/algorithm/matrix/envelope"
+)
 
 // SpatialIndex The basic operations supported
 // implementing spatial index algorithms.
@@ -15,13 +18,13 @@ type SpatialIndex interface {
 	// Query Queries the index for all items whose extents intersect the given search  Envelope
 	// Note that some kinds of indexes may also return objects which do not in fact
 	//  intersect the query envelope.
-	Query(searchEnv *envelope.Envelope) []interface{}
+	Query(searchEnv *envelope.Envelope) interface{}
 	// QueryVisitor Queries the index for all items whose extents intersect the given search Envelope,
 	// and applies an  ItemVisitor to them.
 	// Note that some kinds of indexes may also return objects which do not in fact
 	// intersect the query envelope.
-	QueryVisitor(searchEnv *envelope.Envelope, visitor *ItemVisitor)
+	QueryVisitor(searchEnv *envelope.Envelope, visitor ItemVisitor)
 
 	// Remove Removes a single item from the tree.
-	Remove(itemEnv *envelope.Envelope, item interface{})
+	Remove(itemEnv *envelope.Envelope, item interface{}) bool
 }

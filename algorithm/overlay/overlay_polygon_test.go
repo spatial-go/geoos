@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/spatial-go/geoos/algorithm/matrix"
+	"github.com/spatial-go/geoos/algorithm/measure"
 )
 
 func TestPolygonOverlay_Intersection(t *testing.T) {
@@ -54,6 +55,13 @@ func TestPolygonOverlay_Intersection(t *testing.T) {
 				return
 			}
 			if !got.Equals(tt.want) {
+				if gotPoly, ok := got.(matrix.PolygonMatrix); ok {
+					if wantPoly, ok := tt.want.(matrix.PolygonMatrix); ok {
+						if measure.AreaOfPolygon(gotPoly) == measure.AreaOfPolygon(wantPoly) {
+							return
+						}
+					}
+				}
 				t.Errorf("PolygonOverlay.Intersection()%v = %v, \nwant %v type %T, want %T", tt.name, got, tt.want, got, tt.want)
 			}
 		})
