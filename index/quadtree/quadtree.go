@@ -93,7 +93,7 @@ func (q *Quadtree) Remove(itemEnv *envelope.Envelope, item interface{}) bool {
 func (q *Quadtree) Query(searchEnv *envelope.Envelope) interface{} {
 	visitor := &index.ArrayVisitor{}
 	q.QueryVisitor(searchEnv, visitor)
-	return visitor.Items
+	return visitor.Items()
 }
 
 // QueryVisitor Queries the tree and visits items which may lie in the given search envelope.

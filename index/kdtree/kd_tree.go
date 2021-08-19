@@ -308,7 +308,13 @@ func (b *BestMatchVisitor) VisitItem(item interface{}) {
 	}
 }
 
+// Items returns items.
+func (b *BestMatchVisitor) Items() interface{} {
+	return b.MatchNode
+}
+
 var (
+	_ index.ItemVisitor  = &BestMatchVisitor{}
 	_ index.SpatialIndex = &quadtree.Quadtree{}
 	_ index.SpatialIndex = &KdTree{}
 )

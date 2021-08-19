@@ -28,19 +28,19 @@ func TestLineSegmentVisitor_VisitItem(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			l := &LineSegmentVisitor{
-				QuerySeg: tt.fields.QuerySeg,
-				Items:    tt.fields.Items,
+				QuerySeg:          tt.fields.QuerySeg,
+				ItemsArrayLineSeg: tt.fields.Items,
 			}
 			l.VisitItem(tt.args.item)
 			has := false
-			for _, v := range l.Items {
+			for _, v := range l.ItemsArrayLineSeg {
 				if v.P0.Equals(l.QuerySeg.P0) && v.P1.Equals(l.QuerySeg.P1) {
 					has = true
 
 				}
 			}
 			if has != tt.want {
-				t.Errorf("%v : %v ,want:%s", tt.name, l.Items, tt.args)
+				t.Errorf("%v : %v ,want:%s", tt.name, l.Items(), tt.args)
 			}
 		})
 	}
