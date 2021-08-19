@@ -1,3 +1,4 @@
+// Package simplify define Douglas Peucker and Topology Preserving simplify.
 package simplify
 
 import (

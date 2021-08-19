@@ -1,7 +1,7 @@
 package overlay
 
 import (
-	"github.com/spatial-go/geoos/algorithm/algoerr"
+	"github.com/spatial-go/geoos/algorithm"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 )
 
@@ -13,18 +13,14 @@ func SymDifference(m0, m1 matrix.Steric) (matrix.Steric, error) {
 	result := matrix.Collection{}
 	if res, err := Difference(m0, m1); err == nil {
 		if r, ok := res.(matrix.Collection); ok {
-			for _, v := range r {
-				result = append(result, v)
-			}
+			result = append(result, r...)
 		} else {
 			result = append(result, res)
 		}
 	}
 	if res, err := Difference(m1, m0); err == nil {
 		if r, ok := res.(matrix.Collection); ok {
-			for _, v := range r {
-				result = append(result, v)
-			}
+			result = append(result, r...)
 		} else {
 			result = append(result, res)
 		}
@@ -53,7 +49,7 @@ func Difference(m0, m1 matrix.Steric) (matrix.Steric, error) {
 		newPoly := &PolygonOverlay{PointOverlay: &PointOverlay{Subject: m, Clipping: m1}}
 		return newPoly.Difference()
 	default:
-		return nil, algoerr.ErrNotSupportCollection
+		return nil, algorithm.ErrNotSupportCollection
 
 	}
 }

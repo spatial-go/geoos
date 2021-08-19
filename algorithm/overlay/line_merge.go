@@ -7,11 +7,13 @@ import (
 
 // LineMerge returns a Geometry containing the LineMerges.
 //	or an empty atomic geometry, or an empty GEOMETRYCOLLECTION
+// todo Rewrite with monotone chain
 func LineMerge(ml matrix.Collection) matrix.Collection {
 	for i := 0; i < len(ml)-1; i++ {
-		for j := 1; j < len(ml); j++ {
+		for j := i + 1; j < len(ml); j++ {
 			if mlMerge, ok := MergeLine(ml, i, j); ok {
 				ml = mlMerge
+				i--
 				return LineMerge(ml)
 			}
 		}
@@ -19,7 +21,7 @@ func LineMerge(ml matrix.Collection) matrix.Collection {
 	return ml
 }
 
-// MergeLine  Computes the Merge of two geometries,either or both of which may be null.
+// MergeLine  Computes the Merge of two geometries.
 func MergeLine(ml matrix.Collection, i, j int) (matrix.Collection, bool) {
 
 	if ml[i] == nil && ml[j] == nil {
@@ -32,7 +34,24 @@ func MergeLine(ml matrix.Collection, i, j int) (matrix.Collection, bool) {
 	if ml[j] == nil {
 		return ml, false
 	}
+
 	var result matrix.Collection
+
+	if _, ok := ml[i].(matrix.Matrix); ok {
+		if res, isMerge := MergeMatrix(ml, i, j, result); isMerge {
+			result = append(result, res...)
+			return result, true
+		}
+		return ml, false
+	}
+	if _, ok := ml[j].(matrix.Matrix); ok {
+		if res, isMerge := MergeMatrix(ml, j, i, result); isMerge {
+			result = append(result, res...)
+			return result, true
+		}
+		return ml, false
+	}
+
 	mark, ips := relate.IntersectionEdge(ml[i].(matrix.LineMatrix), ml[j].(matrix.LineMatrix))
 	if mark {
 		for _, v := range ips {
@@ -101,6 +120,29 @@ func MergeLine(ml matrix.Collection, i, j int) (matrix.Collection, bool) {
 				}
 			}
 		}
+	}
+	return ml, false
+}
+
+// MergeMatrix  Computes the Merge of two geometries,either or both of which may be matrix.
+func MergeMatrix(ml matrix.Collection, i, j int, result matrix.Collection) (matrix.Collection, bool) {
+	if m0, ok := ml[i].(matrix.Matrix); ok {
+		if m1, ok := ml[j].(matrix.Matrix); ok {
+			if m0.Equals(m1) {
+				result = append(result, ml[:i]...)
+				result = append(result, ml[i+1:]...)
+				return result, true
+			}
+			return ml, false
+		}
+		for _, v := range ml[j].(matrix.LineMatrix).ToLineArray() {
+			if relate.InLine(m0, v.P0, v.P1) {
+				result = append(result, ml[:i]...)
+				result = append(result, ml[i+1:]...)
+				return result, true
+			}
+		}
+		return ml, false
 	}
 	return ml, false
 }

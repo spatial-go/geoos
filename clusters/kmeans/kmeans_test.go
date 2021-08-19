@@ -86,7 +86,7 @@ func benchmarkPartition(size, partitions int, b *testing.B) {
 
 	for j := 0; j < b.N; j++ {
 		km := New()
-		km.Partition(d, partitions)
+		_, _ = km.Partition(d, partitions)
 	}
 }
 

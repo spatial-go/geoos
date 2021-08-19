@@ -1,7 +1,7 @@
 package overlay
 
 import (
-	"github.com/spatial-go/geoos/algorithm/algoerr"
+	"github.com/spatial-go/geoos/algorithm"
 	"github.com/spatial-go/geoos/algorithm/measure"
 )
 
@@ -12,7 +12,7 @@ func SliceContains(list []Vertex, p *Vertex) (int, error) {
 			return i, nil
 		}
 	}
-	return len(list), algoerr.ErrNotInSlice
+	return len(list), algorithm.ErrNotInSlice
 }
 
 // AddPointToVertexSlice add point to vertex slice

@@ -18,12 +18,10 @@ const (
 // LineSimplifier  Simplifies a buffer input line to
 // remove concavities with shallow depth.
 type LineSimplifier struct {
-	inputLine         matrix.LineMatrix
-	distanceTol       float64
-	isDeleted         []byte
-	angleOrientation  int
-	leftLoc, rightLoc int
-	parameters        *CurveParameters
+	inputLine        matrix.LineMatrix
+	distanceTol      float64
+	isDeleted        []byte
+	angleOrientation int
 }
 
 // Simplify the input coordinate list.
@@ -114,7 +112,8 @@ func (l *LineSimplifier) isDeletable(i0, i1, i2 int, distanceTol float64) bool {
 	return l.isShallowSampled(p0, p1, i0, i2, distanceTol)
 }
 
-func (l *LineSimplifier) isShallowConcavity(p0, p1, p2 matrix.Matrix, distanceTol float64) bool {
+// IsShallowConcavity ...
+func (l *LineSimplifier) IsShallowConcavity(p0, p1, p2 matrix.Matrix, distanceTol float64) bool {
 	orientation := l.orientationIndex(p0[0], p0[1], p1[0], p1[1], p2[0], p2[1])
 	isAngleToSimplify := (orientation == l.angleOrientation)
 	if !isAngleToSimplify {

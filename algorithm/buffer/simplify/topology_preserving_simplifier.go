@@ -45,8 +45,8 @@ func (t *TopologyPreservingSimplifier) getResultGeometry() matrix.Steric {
 	(&LineStringMapBuilderFilter{t}).filter(t.InputGeom)
 
 	t.lineSimplifier.Simplify(t.linestrings)
-	var tr Trans
-	tr = &LineStringTransformer{linestrings: t.linestrings}
+
+	tr := &LineStringTransformer{linestrings: t.linestrings}
 	result, _ := tr.Transform(t.InputGeom)
 	return result
 }

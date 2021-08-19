@@ -3,7 +3,7 @@ package matrix
 import (
 	"math"
 
-	"github.com/spatial-go/geoos/algorithm/algoerr"
+	"github.com/spatial-go/geoos/algorithm"
 )
 
 // LineSegment is line.
@@ -45,7 +45,7 @@ func (l *LineSegment) PointAlongOffset(segmentLengthFraction, offsetDistance flo
 	uy := 0.0
 	if offsetDistance != 0.0 {
 		if lenXY <= 0.0 {
-			return nil, algoerr.ErrComputeOffsetZero
+			return nil, algorithm.ErrComputeOffsetZero
 		}
 
 		// u is the vector that is the length of the offset, in the direction of the segment

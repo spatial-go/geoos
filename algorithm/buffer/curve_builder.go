@@ -81,7 +81,7 @@ func (c *CurveBuilder) AddCurve(pts matrix.LineMatrix, leftLoc, rightLoc int) {
 	c.Curves = append(c.Curves, *curve)
 }
 
-// isRingCurveInverted Tests whether the offset curve for a ring is fully inverted.
+// IsRingCurveInverted Tests whether the offset curve for a ring is fully inverted.
 // An inverted ("inside-out") curve occurs in some specific situations
 // involving a buffer distance which should result in a fully-eroded (empty) buffer.
 // It can happen that the sides of a small, convex polygon
@@ -94,7 +94,7 @@ func (c *CurveBuilder) AddCurve(pts matrix.LineMatrix, leftLoc, rightLoc int) {
 // It must be discarded from the set of offset curves used in the buffer.
 // Heuristics are used to reduce the number of cases which area checked,
 // for efficiency and correctness.
-func (c *CurveBuilder) isRingCurveInverted(pts matrix.LineMatrix, distance float64) bool {
+func (c *CurveBuilder) IsRingCurveInverted(pts matrix.LineMatrix, distance float64) bool {
 	if distance == 0.0 {
 		return false
 	}
