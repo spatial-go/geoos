@@ -19,8 +19,8 @@ type TopologyPreservingSimplifier struct {
 func (t *TopologyPreservingSimplifier) Simplify(geom matrix.Steric, distanceTolerance float64) matrix.Steric {
 	tss := &TopologyPreservingSimplifier{InputGeom: geom}
 	tss.lineSimplifier = &TaggedLinesSimplifier{
-		&LineSegmentIndex{quadtree.DefaultQuadtree()},
-		&LineSegmentIndex{quadtree.DefaultQuadtree()},
+		&LineSegmentIndex{quadtree.NewQuadtree()},
+		&LineSegmentIndex{quadtree.NewQuadtree()},
 		distanceTolerance,
 	}
 	tss.setDistanceTolerance(distanceTolerance)

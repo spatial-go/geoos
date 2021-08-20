@@ -28,9 +28,9 @@ type HPRTree struct {
 	isBuilt         bool
 }
 
-// HPRTree return default HPRTree.
-func (h *HPRTree) HPRTree() *HPRTree {
-	h = &HPRTree{}
+// NewHPRTree return default NewHPRTree.
+func NewHPRTree() *HPRTree {
+	h := &HPRTree{}
 	h.nodeCapacity = DefaultNodeCapacity
 	h.totalExtent = &envelope.Envelope{}
 	return h
@@ -42,12 +42,13 @@ func (h *HPRTree) Size() int {
 }
 
 // Insert Adds a spatial item with an extent specified by the given Envelope to the index
-func (h *HPRTree) Insert(itemEnv *envelope.Envelope, item interface{}) {
+func (h *HPRTree) Insert(itemEnv *envelope.Envelope, item interface{}) error {
 	if h.isBuilt {
-		return
+		return index.ErrHPRInsert
 	}
 	h.Items = append(h.Items, &Item{itemEnv, item})
 	h.totalExtent.ExpandToIncludeEnv(itemEnv)
+	return nil
 }
 
 // Query Queries the index for all items whose extents intersect the given search  Envelope
@@ -69,16 +70,17 @@ func (h *HPRTree) Query(searchEnv *envelope.Envelope) interface{} {
 // and applies an  ItemVisitor to them.
 // Note that some kinds of indexes may also return objects which do not in fact
 // intersect the query envelope.
-func (h *HPRTree) QueryVisitor(searchEnv *envelope.Envelope, visitor index.ItemVisitor) {
+func (h *HPRTree) QueryVisitor(searchEnv *envelope.Envelope, visitor index.ItemVisitor) error {
 	h.build()
 	if !h.totalExtent.IsIntersects(searchEnv) {
-		return
+		return index.ErrHPRNotIsIntersects
 	}
 	if h.layerStartIndex == nil {
 		h.queryItems(0, searchEnv, visitor)
 	} else {
 		h.queryTopLayer(searchEnv, visitor)
 	}
+	return nil
 }
 func (h *HPRTree) queryTopLayer(searchEnv *envelope.Envelope, visitor index.ItemVisitor) {
 	layerIndex := len(h.layerStartIndex) - 2
@@ -306,7 +308,7 @@ func (h *HPRTree) getBounds() []*envelope.Envelope {
 }
 
 func (h *HPRTree) sortItems() {
-	comp := &ItemComparator{items: h.Items, encoder: (&HilbertEncoder{}).HilbertEncoder(HilbertLevel, h.totalExtent)}
+	comp := &ItemComparator{items: h.Items, encoder: NewHilbertEncoder(HilbertLevel, h.totalExtent)}
 	sort.Sort(comp)
 	h.Items = comp.items
 }

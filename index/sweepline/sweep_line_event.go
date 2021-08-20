@@ -16,8 +16,9 @@ type Event struct {
 	SweepInt *Interval
 }
 
-// SweepLineEvent create a default SweepLineEvent.
-func (s *Event) SweepLineEvent(x float64, insertEvent *Event, sweepInt *Interval) *Event {
+// NewEvent create a default NewEvent.
+func NewEvent(x float64, insertEvent *Event, sweepInt *Interval) *Event {
+	s := &Event{}
 	s.xValue = x
 	s.InsertEvent = insertEvent
 	s.eventType = InsertStatus

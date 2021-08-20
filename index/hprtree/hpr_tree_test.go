@@ -21,7 +21,7 @@ func TestMain(m *testing.M) {
 	fmt.Println("test end")
 }
 func buildTree() *HPRTree {
-	indexTree = (&HPRTree{}).HPRTree()
+	indexTree = NewHPRTree()
 	var ms matrix.Collection = matrix.Collection{
 		matrix.Matrix{1, 1},
 		matrix.Matrix{1, 1},

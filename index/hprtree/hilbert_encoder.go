@@ -18,8 +18,9 @@ type HilbertEncoder struct {
 	strideY float64
 }
 
-// HilbertEncoder ...
-func (h *HilbertEncoder) HilbertEncoder(level int, extent *envelope.Envelope) *HilbertEncoder {
+// NewHilbertEncoder ...
+func NewHilbertEncoder(level int, extent *envelope.Envelope) *HilbertEncoder {
+	h := &HilbertEncoder{}
 	h.level = level
 	hSide := math.Pow(2.0, float64(h.level)) - 1
 

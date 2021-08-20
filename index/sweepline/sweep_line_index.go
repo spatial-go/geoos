@@ -15,9 +15,9 @@ type Index struct {
 
 // Add ...
 func (s *Index) Add(sweepInt *Interval) {
-	insertEvent := (&Event{}).SweepLineEvent(sweepInt.Min, nil, sweepInt)
+	insertEvent := NewEvent(sweepInt.Min, nil, sweepInt)
 	s.events = append(s.events, insertEvent)
-	s.events = append(s.events, (&Event{}).SweepLineEvent(sweepInt.Max, insertEvent, sweepInt))
+	s.events = append(s.events, NewEvent(sweepInt.Max, insertEvent, sweepInt))
 }
 
 // buildIndex Because Delete Events have a link to their corresponding Insert event,
