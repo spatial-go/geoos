@@ -1,19 +1,27 @@
 package planar
 
-// GEOS geos algorithm name.
-const GEOS string = "GEOS"
+import (
+	"sync"
+)
+
+var algorithmMegrez Algorithm
+var once sync.Once
+
+type newAlgorithm func() Algorithm
 
 // NormalStrategy returns normal algorithm.
 func NormalStrategy() Algorithm {
-	return AlgorithmStrategy(GEOS)
+	return GetStrategy(newMegrezAlgorithm)
 }
 
-// AlgorithmStrategy returns algorithm by name
-func AlgorithmStrategy(name string) Algorithm {
-	switch name {
-	case GEOS:
-		return new(GEOAlgorithm)
-	default:
-		return new(GEOAlgorithm)
-	}
+// GetStrategy returns  algorithm by new Algorithm.
+func GetStrategy(f newAlgorithm) Algorithm {
+	return f()
+}
+
+func newMegrezAlgorithm() Algorithm {
+	once.Do(func() {
+		algorithmMegrez = &MegrezAlgorithm{}
+	})
+	return algorithmMegrez
 }

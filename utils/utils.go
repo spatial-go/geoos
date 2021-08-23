@@ -18,8 +18,7 @@ const (
 	UNKNOWN string = "UNKNOWN"
 )
 
-// GetStringEncoding
-// determine string encoding, UTF8 or GBK or UNKNOWN
+// GetStringEncoding determine string encoding, UTF8 or GBK or UNKNOWN
 func GetStringEncoding(dataStr string) string {
 	// filter special characters
 	dataStr = strings.ReplaceAll(dataStr, "·", "")
@@ -59,7 +58,7 @@ func IsGBK(data []byte) bool {
 
 func preNUm(data byte) int {
 	var mask byte = 0x80
-	var num int = 0
+	var num int
 	for i := 0; i < 8; i++ {
 		if (data & mask) == mask {
 			num++

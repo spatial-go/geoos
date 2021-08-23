@@ -5,41 +5,41 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/spatial-go/geoos"
+	"github.com/spatial-go/geoos/space"
 )
 
 // UnmarshalString encode to geom
-func UnmarshalString(s string) (geoos.Geometry, error) {
+func UnmarshalString(s string) (space.Geometry, error) {
 	p := Parser{NewLexer(strings.NewReader(s))}
 	return p.Parse()
 }
 
 // MarshalString decode to string
-func MarshalString(geom geoos.Geometry) string {
+func MarshalString(geom space.Geometry) string {
 	buf := bytes.NewBuffer(nil)
 	wkt(buf, geom)
 	return buf.String()
 }
 
-func wkt(buf *bytes.Buffer, geom geoos.Geometry) {
+func wkt(buf *bytes.Buffer, geom space.Geometry) {
 	switch g := geom.(type) {
-	case geoos.Point:
+	case space.Point:
 		_, _ = fmt.Fprintf(buf, "POINT(%g %g)", g.Lon(), g.Lat())
-	case geoos.MultiPoint:
+	case space.MultiPoint:
 		if len(g) == 0 {
 			buf.Write([]byte(`MULTIPOINT EMPTY`))
 			return
 		}
 
 		buf.Write([]byte(`MULTIPOINT(`))
-		for i, p := range g {
+		for i, p := range g.ToPointArray() {
 			if i != 0 {
 				buf.WriteByte(',')
 			}
 			_, _ = fmt.Fprintf(buf, "(%g %g)", p.Lon(), p.Lat())
 		}
 		buf.WriteByte(')')
-	case geoos.LineString:
+	case space.LineString:
 		if len(g) == 0 {
 			buf.Write([]byte(`LINESTRING EMPTY`))
 			return
@@ -47,7 +47,7 @@ func wkt(buf *bytes.Buffer, geom geoos.Geometry) {
 
 		buf.Write([]byte(`LINESTRING`))
 		writeLineString(buf, g)
-	case geoos.MultiLineString:
+	case space.MultiLineString:
 		if len(g) == 0 {
 			buf.Write([]byte(`MULTILINESTRING EMPTY`))
 			return
@@ -61,9 +61,9 @@ func wkt(buf *bytes.Buffer, geom geoos.Geometry) {
 			writeLineString(buf, ls)
 		}
 		buf.WriteByte(')')
-	case geoos.Ring:
-		wkt(buf, geoos.Polygon{g})
-	case geoos.Polygon:
+	case space.Ring:
+		wkt(buf, space.Polygon{g})
+	case space.Polygon:
 		if len(g) == 0 {
 			buf.Write([]byte(`POLYGON EMPTY`))
 			return
@@ -74,10 +74,10 @@ func wkt(buf *bytes.Buffer, geom geoos.Geometry) {
 			if i != 0 {
 				buf.WriteByte(',')
 			}
-			writeLineString(buf, geoos.LineString(r))
+			writeLineString(buf, space.LineString(r))
 		}
 		buf.WriteByte(')')
-	case geoos.MultiPolygon:
+	case space.MultiPolygon:
 		if len(g) == 0 {
 			buf.Write([]byte(`MULTIPOLYGON EMPTY`))
 			return
@@ -93,13 +93,13 @@ func wkt(buf *bytes.Buffer, geom geoos.Geometry) {
 				if j != 0 {
 					buf.WriteByte(',')
 				}
-				writeLineString(buf, geoos.LineString(r))
+				writeLineString(buf, space.LineString(r))
 			}
 			buf.WriteByte(')')
 		}
 		buf.WriteByte(')')
 
-	case geoos.Collection:
+	case space.Collection:
 		if len(g) == 0 {
 			buf.Write([]byte(`GEOMETRYCOLLECTION EMPTY`))
 			return
@@ -117,9 +117,9 @@ func wkt(buf *bytes.Buffer, geom geoos.Geometry) {
 	}
 }
 
-func writeLineString(buf *bytes.Buffer, ls geoos.LineString) {
+func writeLineString(buf *bytes.Buffer, ls space.LineString) {
 	buf.WriteByte('(')
-	for i, p := range ls {
+	for i, p := range ls.ToPointArray() {
 		if i != 0 {
 			buf.WriteByte(',')
 		}

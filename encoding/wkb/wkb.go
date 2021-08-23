@@ -1,15 +1,14 @@
 // Package wkb is for decoding ESRI's Well Known Binary (WKB) format
-// sepcification at https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry#Well-known_binary
+// specification at https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry#Well-known_binary
 package wkb
 
 import (
 	"bytes"
 	"encoding/binary"
+	"encoding/hex"
 	"io"
 
-	"github.com/spatial-go/geoos"
-	"github.com/spatial-go/geoos/encoding/wkt"
-	"github.com/spatial-go/geoos/geo"
+	"github.com/spatial-go/geoos/space"
 )
 
 // byteOrder represents little or big endian encoding.
@@ -52,7 +51,7 @@ type Encoder struct {
 
 // MustMarshal will encode the geometry and panic on error.
 // Currently there is no reason to error during geometry marshalling.
-func MustMarshal(geom geoos.Geometry, byteOrder ...binary.ByteOrder) []byte {
+func MustMarshal(geom space.Geometry, byteOrder ...binary.ByteOrder) []byte {
 	d, err := Marshal(geom, byteOrder...)
 	if err != nil {
 		panic(err)
@@ -62,7 +61,7 @@ func MustMarshal(geom geoos.Geometry, byteOrder ...binary.ByteOrder) []byte {
 }
 
 // Marshal encodes the geometry with the given byte order.
-func Marshal(geom geoos.Geometry, byteOrder ...binary.ByteOrder) ([]byte, error) {
+func Marshal(geom space.Geometry, byteOrder ...binary.ByteOrder) ([]byte, error) {
 	buf := bytes.NewBuffer(make([]byte, 0, geomLength(geom)))
 
 	e := NewEncoder(buf)
@@ -97,46 +96,53 @@ func (e *Encoder) SetByteOrder(bo binary.ByteOrder) {
 }
 
 // Encode will write the geometry encoded as WKB to the given writer.
-func (e *Encoder) Encode(geom geoos.Geometry) error {
-	if geom == nil {
+func (e *Encoder) Encode(geom space.Geometry) error {
+	if geom == nil || geom.IsEmpty() {
 		return nil
 	}
 
 	switch g := geom.(type) {
 	// nil values should not write any data. Empty sizes will still
 	// write an empty version of that type.
-	case geoos.MultiPoint:
+	case space.MultiPoint:
 		if g == nil {
 			return nil
 		}
-	case geoos.LineString:
+	case space.LineString:
 		if g == nil {
 			return nil
 		}
-	case geoos.MultiLineString:
+	case space.MultiLineString:
 		if g == nil {
 			return nil
 		}
-	case geoos.Polygon:
+	case space.Polygon:
 		if g == nil {
 			return nil
 		}
-	case geoos.MultiPolygon:
+	case space.MultiPolygon:
 		if g == nil {
 			return nil
 		}
-	case geoos.Collection:
+	case space.Collection:
 		if g == nil {
 			return nil
 		}
 	// deal with types that are not supported by wkb
-	case geoos.Ring:
+	case space.Ring:
 		if g == nil {
 			return nil
 		}
-		geom = geoos.Polygon{g}
-	case geoos.Bound:
+		geom = space.Polygon{g}
+	case space.Bound:
+		if g.Max == nil || g.Min == nil {
+			return nil
+		}
 		geom = g.ToPolygon()
+	case space.Point:
+		if g == nil {
+			return nil
+		}
 	}
 
 	var b []byte
@@ -156,19 +162,19 @@ func (e *Encoder) Encode(geom geoos.Geometry) error {
 	}
 
 	switch g := geom.(type) {
-	case geoos.Point:
+	case space.Point:
 		return e.writePoint(g)
-	case geoos.MultiPoint:
+	case space.MultiPoint:
 		return e.writeMultiPoint(g)
-	case geoos.LineString:
+	case space.LineString:
 		return e.writeLineString(g)
-	case geoos.MultiLineString:
+	case space.MultiLineString:
 		return e.writeMultiLineString(g)
-	case geoos.Polygon:
+	case space.Polygon:
 		return e.writePolygon(g)
-	case geoos.MultiPolygon:
+	case space.MultiPolygon:
 		return e.writeMultiPolygon(g)
-	case geoos.Collection:
+	case space.Collection:
 		return e.writeCollection(g)
 	}
 
@@ -181,7 +187,7 @@ type Decoder struct {
 }
 
 // Unmarshal will decode the type into a Geometry.
-func Unmarshal(data []byte) (geoos.Geometry, error) {
+func Unmarshal(data []byte) (space.Geometry, error) {
 	order, typ, data, err := unmarshalByteOrderType(data)
 	if err != nil {
 		return nil, err
@@ -220,7 +226,7 @@ func NewDecoder(r io.Reader) *Decoder {
 }
 
 // Decode will decode the next geometry off of the stream.
-func (d *Decoder) Decode() (geoos.Geometry, error) {
+func (d *Decoder) Decode() (space.Geometry, error) {
 	buf := make([]byte, 8)
 	order, typ, err := readByteOrderType(d.r, buf)
 	if err != nil {
@@ -245,19 +251,6 @@ func (d *Decoder) Decode() (geoos.Geometry, error) {
 	}
 
 	return nil, ErrUnsupportedGeometry
-}
-
-// GeoFromWKBHexStr convert hex string to geometry
-func GeoFromWKBHexStr(wkbHex string) (geometry geoos.Geometry, err error) {
-	geom, err := geo.GeomFromWKBHexStr(wkbHex)
-	if err != nil {
-		return
-	}
-	geoWek, err := geo.ToWKTStr(geom)
-	if err != nil {
-		return
-	}
-	return wkt.UnmarshalString(geoWek)
 }
 
 func readByteOrderType(r io.Reader, buf []byte) (byteOrder, uint32, error) {
@@ -339,36 +332,36 @@ func unmarshalUint32(order byteOrder, buf []byte) uint32 {
 }
 
 // geomLength helps to do preallocation during a marshal.
-func geomLength(geom geoos.Geometry) int {
+func geomLength(geom space.Geometry) int {
 	switch g := geom.(type) {
-	case geoos.Point:
+	case space.Point:
 		return 21
-	case geoos.MultiPoint:
+	case space.MultiPoint:
 		return 9 + 21*len(g)
-	case geoos.LineString:
+	case space.LineString:
 		return 9 + 16*len(g)
-	case geoos.MultiLineString:
+	case space.MultiLineString:
 		sum := 0
 		for _, ls := range g {
 			sum += 9 + 16*len(ls)
 		}
 
 		return 9 + sum
-	case geoos.Polygon:
+	case space.Polygon:
 		sum := 0
 		for _, r := range g {
 			sum += 4 + 16*len(r)
 		}
 
 		return 9 + sum
-	case geoos.MultiPolygon:
+	case space.MultiPolygon:
 		sum := 0
 		for _, c := range g {
 			sum += geomLength(c)
 		}
 
 		return 9 + sum
-	case geoos.Collection:
+	case space.Collection:
 		sum := 0
 		for _, c := range g {
 			sum += geomLength(c)
@@ -378,4 +371,13 @@ func geomLength(geom geoos.Geometry) int {
 	}
 
 	return 0
+}
+
+// GeoFromWKBHexStr Decode decodes an arbitrary geometry from a string.
+func GeoFromWKBHexStr(s string) (space.Geometry, error) {
+	data, err := hex.DecodeString(s)
+	if err != nil {
+		return nil, err
+	}
+	return Unmarshal(data)
 }

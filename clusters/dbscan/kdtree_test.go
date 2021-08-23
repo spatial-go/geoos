@@ -7,8 +7,8 @@ import (
 	"testing"
 	"testing/quick"
 
-	"github.com/spatial-go/geoos"
 	"github.com/spatial-go/geoos/clusters"
+	"github.com/spatial-go/geoos/space"
 )
 
 // A pointSlice is a slice of points that implements the quick.Generator
@@ -16,22 +16,12 @@ import (
 type pointSlice clusters.PointList
 
 func (pointSlice) Generate(r *rand.Rand, size int) reflect.Value {
-	ps := make([]geoos.Point, size)
+	ps := make([]space.Point, size)
 	for i := range ps {
-		for j := range ps[i] {
-			ps[i][j] = r.Float64()
-		}
+		ps[i] = append(ps[i], r.Float64(), r.Float64())
 	}
 	return reflect.ValueOf(ps)
 }
-
-// // Generate implements the Generator interface for Points
-// func (p geoos.Point) Generate(r *rand.Rand, _ int) reflect.Value {
-// 	for i := range p {
-// 		p[i] = r.Float64()
-// 	}
-// 	return reflect.ValueOf(p)
-// }
 
 // TestInsert tests the insert function, ensuring that random points
 // inserted into an empty tree maintain the K-D tree invariant.
@@ -39,7 +29,11 @@ func TestInsert(t *testing.T) {
 	if err := quick.Check(func(pts pointSlice) bool {
 		var tree = NewKDTree(nil)
 		for _, p := range pts {
-			tree.Insert(p)
+			if p == nil || p.IsEmpty() {
+				//tree.Insert(space.Point{0, 0})
+			} else {
+				tree.Insert(p)
+			}
 		}
 		_, ok := tree.invariantHolds(tree.Root)
 		return ok
@@ -64,7 +58,10 @@ func TestMake(t *testing.T) {
 // in the range are reported, and all points reported are indeed in
 // the range.
 func TestInRange(t *testing.T) {
-	if err := quick.Check(func(pts pointSlice, pt geoos.Point, r float64) bool {
+	if err := quick.Check(func(pts pointSlice, pt space.Point, r float64) bool {
+		if pt.IsEmpty() {
+			pt = space.Point{0, 0}
+		}
 		r = math.Abs(r)
 		tree := NewKDTree(clusters.PointList(pts))
 
@@ -76,7 +73,7 @@ func TestInRange(t *testing.T) {
 		num := 0
 		for i, p := range pts {
 			// dis:=pt.sqDist(&p)
-			dis := DistanceSphericalFast(&pt, &p)
+			dis := DistanceSphericalFast(pt, p)
 			if dis <= r*r {
 				num++
 				if !in[i] {
@@ -96,15 +93,15 @@ func TestInRange(t *testing.T) {
 // of the current node on the splitting dimension, and the points
 // in the right subtree have values greater than or equal to that of
 // the current node.
-func (tree *KDTree) invariantHolds(t *T) ([]geoos.Point, bool) {
+func (tree *KDTree) invariantHolds(t *T) ([]space.Point, bool) {
 	if t == nil {
-		return []geoos.Point{}, true
+		return nil, true
 	}
 
 	ok := true
 
 	for _, i := range t.EqualIDs {
-		if tree.Points[i] != tree.Points[t.PointID] {
+		if !tree.Points[i].Equals(tree.Points[t.PointID]) {
 			ok = false
 			break
 		}
@@ -162,7 +159,7 @@ func TestPreSort_SplitMed(t *testing.T) {
 		sorted := preSort(clusters.PointList(pts))
 		med, equal, left, right := sorted.splitMed(dim)
 		for _, p := range equal {
-			if pts[p] != pts[med] {
+			if pts[p].Equals(pts[med]) {
 				return false
 			}
 		}
