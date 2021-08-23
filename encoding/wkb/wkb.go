@@ -5,6 +5,7 @@ package wkb
 import (
 	"bytes"
 	"encoding/binary"
+	"encoding/hex"
 	"io"
 
 	"github.com/spatial-go/geoos/space"
@@ -370,4 +371,13 @@ func geomLength(geom space.Geometry) int {
 	}
 
 	return 0
+}
+
+// GeoFromWKBHexStr Decode decodes an arbitrary geometry from a string.
+func GeoFromWKBHexStr(s string) (space.Geometry, error) {
+	data, err := hex.DecodeString(s)
+	if err != nil {
+		return nil, err
+	}
+	return Unmarshal(data)
 }
