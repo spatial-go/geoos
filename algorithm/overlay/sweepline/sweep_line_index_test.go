@@ -20,16 +20,10 @@ func TestMain(m *testing.M) {
 	fmt.Println("test end")
 }
 func buildTree() *Index {
-	var ms matrix.Collection = matrix.Collection{
-		matrix.Matrix{1, 1},
-		matrix.Matrix{1, 1},
-		matrix.Matrix{2, 1},
-		matrix.Matrix{2, 2},
-		matrix.Matrix{3, 1},
-		matrix.Matrix{3, 2},
-	}
-	for i := 0; i < len(ms); i++ {
-		index.Add(&Interval{ms[i].(matrix.Matrix).Bound()[0][0], ms[i].(matrix.Matrix).Bound()[0][1], ms[i]})
+	var ms matrix.LineMatrix = matrix.LineMatrix{{1, 1}, {1.5, 1}, {2, 1}, {2, 2}, {2, 3}, {3, 3}}
+
+	for _, line := range ms.ToLineArray() {
+		index.Add(&Interval{line.P0[0], line.P1[0], line})
 	}
 	return index
 }
@@ -37,12 +31,12 @@ func TestIndex_Add(t *testing.T) {
 	type args struct {
 		sweepInt *Interval
 	}
-	matr := matrix.Matrix{1, 2}
+	matr := &matrix.LineSegment{P0: matrix.Matrix{1, 2}, P1: matrix.Matrix{1, 3}}
 	tests := []struct {
 		name string
 		args args
 	}{
-		{"add:", args{&Interval{matr.Bound()[0][0], matr.Bound()[0][1], matr}}},
+		{"add:", args{&Interval{matr.P0[0], matr.P1[0], matr}}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -70,7 +64,7 @@ func TestIndex_ComputeOverlaps(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			s := index
 			s.ComputeOverlaps(tt.args.action)
-			if index.nOverlaps == 0 {
+			if index.nOverlaps != 0 {
 				t.Errorf("%v = %v, want %v", tt.name, index.nOverlaps, "no zero")
 			}
 		})

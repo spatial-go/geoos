@@ -57,8 +57,9 @@ func (s *Index) processOverlaps(start, end int, s0 *Interval, action OverlapActi
 	for i := start; i < end; i++ {
 		ev := s.events[i]
 		if ev.IsInsert() {
-			action.Overlap(s0, ev.SweepInt)
-			s.nOverlaps++
+			if action.Overlap(s0, ev.SweepInt) {
+				s.nOverlaps++
+			}
 		}
 	}
 }
