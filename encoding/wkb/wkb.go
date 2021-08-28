@@ -269,6 +269,7 @@ func readByteOrderType(r io.Reader, buf []byte) (byteOrder, uint32, error) {
 
 	// the type which is 4 bytes
 	typ, err := readUint32(r, order, buf[:4])
+
 	if err != nil {
 		return 0, 0, err
 	}
@@ -370,4 +371,15 @@ func geomLength(geom space.Geometry) int {
 	}
 
 	return 0
+}
+
+// GeomFromWKBHexStr convert hex string to GEOSGeometry
+func GeomFromWKBHexStr(wkbHex string) (space.Geometry, error) {
+	wkbStr := HexToBytes(wkbHex)
+	//wkbStr, err := hex.DecodeString(wkbHex)
+
+	ewkb := &EWKBDecoder{r: bytes.NewReader(wkbStr)}
+	g, _ := ewkb.Decode()
+
+	return g, nil
 }

@@ -3,7 +3,9 @@ package wkb
 import (
 	"bytes"
 	"encoding/binary"
+	"encoding/hex"
 	"io/ioutil"
+	"reflect"
 	"testing"
 
 	"github.com/spatial-go/geoos/space"
@@ -40,6 +42,30 @@ var AllGeometries = []space.Geometry{
 func TestMarshal(t *testing.T) {
 	for _, g := range AllGeometries {
 		_, _ = Marshal(g, binary.BigEndian)
+	}
+	type args struct {
+		wkbHex space.Geometry
+	}
+	wkbStr, _ := hex.DecodeString("0101000020E610000000000020D8135D400000004072054440")
+	tests := []struct {
+		name    string
+		args    args
+		want    []byte
+		wantErr bool
+	}{
+		{" GeomFromWKBHexStr ", args{space.Point{116.310066223145, 40.0425491333008}}, wkbStr, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := Marshal(tt.args.wkbHex, binary.BigEndian)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GeomFromWKBHexStr() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GeomFromWKBHexStr() = %v, want %v", got, tt.want)
+			}
+		})
 	}
 }
 
@@ -162,5 +188,32 @@ func compare(t testing.TB, e space.Geometry, b []byte) {
 
 	if !sg.Equals(e) {
 		t.Errorf("scan: incorrect geometry: %v != %v", sg, e)
+	}
+}
+
+func TestGeomFromWKBHexStr(t *testing.T) {
+	type args struct {
+		wkbHex string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    space.Geometry
+		wantErr bool
+	}{
+		{" GeomFromWKBHexStr ", args{"0101000020E610000000000020D8135D400000004072054440"}, space.Point{116.310066223145, 40.0425491333008}, false},
+		{" GeomFromWKBHexStr ", args{"0101000020E6100000A9E2F33378145D4088C78C29E2064440"}, space.Point{116.319836605234, 40.0537769257926}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := GeomFromWKBHexStr(tt.args.wkbHex)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GeomFromWKBHexStr() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !got.EqualsExact(tt.want, 0.00000001) {
+				t.Errorf("GeomFromWKBHexStr() = %v, want %v", got, tt.want)
+			}
+		})
 	}
 }
