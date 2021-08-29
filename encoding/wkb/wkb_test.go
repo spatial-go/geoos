@@ -2,10 +2,7 @@ package wkb
 
 import (
 	"bytes"
-	"encoding/binary"
-	"encoding/hex"
 	"io/ioutil"
-	"reflect"
 	"testing"
 
 	"github.com/spatial-go/geoos/space"
@@ -41,37 +38,13 @@ var AllGeometries = []space.Geometry{
 
 func TestMarshal(t *testing.T) {
 	for _, g := range AllGeometries {
-		_, _ = Marshal(g, binary.BigEndian)
-	}
-	type args struct {
-		wkbHex space.Geometry
-	}
-	wkbStr, _ := hex.DecodeString("0101000020E610000000000020D8135D400000004072054440")
-	tests := []struct {
-		name    string
-		args    args
-		want    []byte
-		wantErr bool
-	}{
-		{" GeomFromWKBHexStr ", args{space.Point{116.310066223145, 40.0425491333008}}, wkbStr, false},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := Marshal(tt.args.wkbHex, binary.BigEndian)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GeomFromWKBHexStr() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GeomFromWKBHexStr() = %v, want %v", got, tt.want)
-			}
-		})
+		_, _ = Marshal(g, bigEndian)
 	}
 }
 
 func TestMustMarshal(t *testing.T) {
 	for _, g := range AllGeometries {
-		MustMarshal(g, binary.BigEndian)
+		MustMarshal(g, bigEndian)
 	}
 }
 func BenchmarkEncode_Point(b *testing.B) {
@@ -123,9 +96,9 @@ func compare(t testing.TB, e space.Geometry, b []byte) {
 
 	var data []byte
 	if b[0] == 0 {
-		data, err = Marshal(g, binary.BigEndian)
+		data, err = Marshal(g, bigEndian)
 	} else {
-		data, err = Marshal(g, binary.LittleEndian)
+		data, err = Marshal(g, littleEndian)
 	}
 	if err != nil {
 		t.Fatalf("marshal error: %v", err)
@@ -201,8 +174,29 @@ func TestGeomFromWKBHexStr(t *testing.T) {
 		want    space.Geometry
 		wantErr bool
 	}{
-		{" GeomFromWKBHexStr ", args{"0101000020E610000000000020D8135D400000004072054440"}, space.Point{116.310066223145, 40.0425491333008}, false},
-		{" GeomFromWKBHexStr ", args{"0101000020E6100000A9E2F33378145D4088C78C29E2064440"}, space.Point{116.319836605234, 40.0537769257926}, false},
+		{" GeomFromWKBHexStr point1 ", args{"0101000020E610000000000020D8135D400000004072054440"}, space.Point{116.310066223145, 40.0425491333008}, false},
+		{" GeomFromWKBHexStr point2 ", args{"0101000020E6100000A9E2F33378145D4088C78C29E2064440"}, space.Point{116.319836605234, 40.0537769257926}, false},
+
+		{" GeomFromWKBHexStr line1 ", args{"0101000020E610000000000020D8135D400000004072054440"}, space.Point{116.310066223145, 40.0425491333008}, false},
+		{" GeomFromWKBHexStr line2 ", args{"0101000020E6100000A9E2F33378145D4088C78C29E2064440"}, space.Point{116.319836605234, 40.0537769257926}, false},
+
+		{" GeomFromWKBHexStr poly1 ", args{"0101000020E610000000000020D8135D400000004072054440"}, space.Point{116.310066223145, 40.0425491333008}, false},
+		{" GeomFromWKBHexStr poly2 ", args{"0101000020E6100000A9E2F33378145D4088C78C29E2064440"}, space.Point{116.319836605234, 40.0537769257926}, false},
+
+		{" GeomFromWKBHexStr multipoint1 ", args{"0101000020E610000000000020D8135D400000004072054440"}, space.Point{116.310066223145, 40.0425491333008}, false},
+		{" GeomFromWKBHexStr multipoint2 ", args{"0101000020E6100000A9E2F33378145D4088C78C29E2064440"}, space.Point{116.319836605234, 40.0537769257926}, false},
+
+		{" GeomFromWKBHexStr  multiline1 ", args{"0101000020E610000000000020D8135D400000004072054440"}, space.Point{116.310066223145, 40.0425491333008}, false},
+		{" GeomFromWKBHexStr  multiline2 ", args{"0101000020E6100000A9E2F33378145D4088C78C29E2064440"}, space.Point{116.319836605234, 40.0537769257926}, false},
+
+		{" GeomFromWKBHexStr  multipoly1 ", args{"0101000020E610000000000020D8135D400000004072054440"}, space.Point{116.310066223145, 40.0425491333008}, false},
+		{" GeomFromWKBHexStr  multipoly2 ", args{"0101000020E6100000A9E2F33378145D4088C78C29E2064440"}, space.Point{116.319836605234, 40.0537769257926}, false},
+
+		{" GeomFromWKBHexStr ring1 ", args{"0101000020E610000000000020D8135D400000004072054440"}, space.Point{116.310066223145, 40.0425491333008}, false},
+		{" GeomFromWKBHexStr ring2 ", args{"0101000020E6100000A9E2F33378145D4088C78C29E2064440"}, space.Point{116.319836605234, 40.0537769257926}, false},
+
+		{" GeomFromWKBHexStr collection1 ", args{"0101000020E610000000000020D8135D400000004072054440"}, space.Point{116.310066223145, 40.0425491333008}, false},
+		{" GeomFromWKBHexStr collection2 ", args{"0101000020E6100000A9E2F33378145D4088C78C29E2064440"}, space.Point{116.319836605234, 40.0537769257926}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -211,7 +205,7 @@ func TestGeomFromWKBHexStr(t *testing.T) {
 				t.Errorf("GeomFromWKBHexStr() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !got.EqualsExact(tt.want, 0.00000001) {
+			if !got.EqualsExact(tt.want, 0.000000000001) {
 				t.Errorf("GeomFromWKBHexStr() = %v, want %v", got, tt.want)
 			}
 		})

@@ -38,21 +38,21 @@ type Line struct {
 	Start, End Point
 }
 
-// ElementValid describes a geographic Element Valid
-type ElementValid struct {
+// GeometryValid describes a geographic Element Valid
+type GeometryValid struct {
 	Geometry
 	CoordinateSystem int
 }
 
 // CreateElementValid Returns valid geom element. returns nil if geom is invalid.
-func CreateElementValid(geom Geometry) (*ElementValid, error) {
+func CreateElementValid(geom Geometry) (*GeometryValid, error) {
 	return CreateElementValidWithCoordSys(geom, GCJ02)
 }
 
 // CreateElementValidWithCoordSys Returns valid geom element. returns nil if geom is invalid.
-func CreateElementValidWithCoordSys(geom Geometry, coordSys int) (*ElementValid, error) {
+func CreateElementValidWithCoordSys(geom Geometry, coordSys int) (*GeometryValid, error) {
 	if geom.IsValid() {
-		return &ElementValid{geom, coordSys}, nil
+		return &GeometryValid{geom, coordSys}, nil
 	}
 	return nil, spaceerr.ErrNotValidGeometry
 }

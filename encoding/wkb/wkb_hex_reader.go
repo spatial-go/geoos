@@ -6,11 +6,8 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"math"
 	"strconv"
 
-	"github.com/spatial-go/geoos/algorithm/calc/bytevalues"
-	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/space"
 )
 
@@ -43,13 +40,9 @@ func BufferedReader(bufferedReader io.Reader) []space.Geometry {
 // EWKBDecoder Decoder can decoder EWKB geometry off of the stream.
 type EWKBDecoder struct {
 	r              io.Reader
-	byteOrder      int
-	ordValues      []float64
+	order          byteOrder
 	inputDimension int
-
-	// true if structurally invalid input should be reported rather than repaired.
-	// At some point this could be made client-controllable.
-	isStrict bool
+	Srid           uint32
 }
 
 func (d *EWKBDecoder) readByte() (byte, error) {
@@ -68,36 +61,7 @@ func (d *EWKBDecoder) readInt32() (uint32, error) {
 			return 0, ErrAttempt
 		}
 	}
-	return bytevalues.GetInt32(buf, d.byteOrder), nil
-}
-func (d *EWKBDecoder) readInt64() (uint64, error) {
-	buf := make([]byte, 8)
-	if num, err := d.r.Read(buf); err == nil {
-		if num < len(buf) {
-			return 0, ErrAttempt
-		}
-	}
-	return bytevalues.GetInt64(buf, d.byteOrder), nil
-}
-
-func (d *EWKBDecoder) readFloat32() (float32, error) {
-	buf := make([]byte, 4)
-	if num, err := d.r.Read(buf); err == nil {
-		if num < len(buf) {
-			return 0, ErrAttempt
-		}
-	}
-	return bytevalues.GetFloat32(buf, d.byteOrder), nil
-}
-
-func (d *EWKBDecoder) readFloat64() (float64, error) {
-	buf := make([]byte, 8)
-	if num, err := d.r.Read(buf); err == nil {
-		if num < len(buf) {
-			return 0, ErrAttempt
-		}
-	}
-	return bytevalues.GetFloat64(buf, d.byteOrder), nil
+	return d.order.Uint32(buf), nil
 }
 
 // Decode returns geometry,it will decode the next geometry off of the stream.
@@ -107,20 +71,16 @@ func (d *EWKBDecoder) Decode() (space.Geometry, error) {
 	byteOrderWKB, _ := d.readByte()
 
 	// always set byte order, since it may change from geometry to geometry
-	d.byteOrder = int(byteOrderWKB)
+	d.order = byteOrder(byteOrderWKB)
 
 	//if not strict and not XDR or NDR, then we just use the dis default set at the
 	//start of the geometry (if a multi-geometry).  This  allows WBKReader to work
 	//with Spatialite native BLOB WKB, as well as other WKB variants that might just
 	//specify endian-ness at the start of the multigeometry.
-
 	typeInt, _ := d.readInt32()
 
-	/**
-	 * To get geometry type mask out EWKB flag bits,
-	 * and use only low 3 digits of type word.
-	 * This supports both EWKB and ISO/OGC.
-	 */
+	// To get geometry type mask out EWKB flag bits,and use only low 3 digits of type word.
+	// This supports both EWKB and ISO/OGC.
 	geometryType := (typeInt & 0xffff) % 1000
 
 	// handle 3D and 4D WKB geometries
@@ -138,155 +98,42 @@ func (d *EWKBDecoder) Decode() (space.Geometry, error) {
 	if hasM {
 		d.inputDimension++
 	}
+
 	// determine if SRID are present (EWKB only)
 	hasSRID := (typeInt & 0x20000000) != 0
 	if hasSRID {
-		_, _ = d.readInt32()
+		d.Srid, _ = d.readInt32()
 		//fmt.Println(srid)
 	}
 
-	// only allocate ordValues buffer if necessary
-	if d.ordValues == nil || len(d.ordValues) < d.inputDimension {
-		d.ordValues = make([]float64, d.inputDimension)
-	}
-	var geom space.Geometry
 	var buf = make([]byte, 8)
+	order := byteOrder(d.order)
+
+	var geom space.Geometry
+	var err error
 	switch uint32(geometryType) {
 	case pointType:
-		geom, _ = readPoint(d.r, byteOrder(d.byteOrder), buf)
-		break
+		geom, err = readPoint(d.r, order, buf)
 	case lineStringType:
-		geom = d.readLineString()
-		break
+		geom, err = readLineString(d.r, order, buf)
 	case polygonType:
-		geom = d.readPolygon()
-		break
+		geom, err = readPolygon(d.r, order, buf)
 	case multiPointType:
-		geom = d.readMultiPoint()
-		break
+		geom, err = readMultiPoint(d.r, order, buf)
 	case multiLineStringType:
-		geom = d.readMultiLineString()
-		break
+		geom, err = readMultiLineString(d.r, order, buf)
 	case multiPolygonType:
-		geom = d.readMultiPolygon()
-		break
+		geom, err = readMultiPolygon(d.r, order, buf)
 	case geometryCollectionType:
-		geom = d.readGeometryCollection()
-		break
+		geom, err = readCollection(d.r, order, buf)
 	default:
 		return nil, ErrUnknownWKBType
 	}
-	return geom, nil
-}
-
-func (d *EWKBDecoder) readPoint() space.Point {
-	pts := d.readMatrixes(1)
-	// If X and Y are NaN create a empty point
-	if math.IsNaN(pts[0][0]) || math.IsNaN(pts[0][1]) {
-		return space.Point(matrix.Matrix{})
+	if err != nil {
+		return nil, err
 	}
-	return space.Point(pts[0])
-}
-
-func (d *EWKBDecoder) readMatrixes(size int) []matrix.Matrix {
-	pts := []matrix.Matrix{}
-	for i := 0; i < size; i++ {
-		d.readMatrix()
-		pt := matrix.Matrix{}
-		pt = append(pt, d.ordValues...)
-		pts = append(pts, pt)
-	}
-	return pts
-}
-
-/**
- * Reads a coordinate value with the specified dimensionality.
- * Makes the X and Y ordinates precise according to the precision model
- * in use.
- * @throws ParseException
- */
-func (d *EWKBDecoder) readMatrix() {
-	for i := 0; i < d.inputDimension; i++ {
-
-		rf, _ := d.readFloat64()
-
-		d.ordValues[i] = float64(rf)
-
-	}
-}
-
-func (d *EWKBDecoder) readLineString() space.LineString {
-	size := d.readNumField("numCoords")
-	pts := d.readMatrixes(size)
-	ls := space.LineString{}
-	for _, v := range pts {
-		ls = append(ls, v)
-	}
-	return ls
-}
-
-func (d *EWKBDecoder) readLinearRing() space.Ring {
-	size := d.readNumField("numCoords")
-	pts := d.readMatrixes(size)
-	ls := space.LineString{}
-	for _, v := range pts {
-		ls = append(ls, v)
-	}
-	ls = append(ls, ls[0])
-	return space.Ring(ls)
-}
-
-func (d *EWKBDecoder) readPolygon() space.Polygon {
-	numRings := d.readNumField("")
-	poly := space.Polygon{}
-	for i := 0; i < numRings; i++ {
-		poly = append(poly, d.readLinearRing())
-	}
-	return poly
-}
-func (d *EWKBDecoder) readMultiPoint() space.MultiPoint {
-	numGeom := d.readNumField("")
-	geoms := space.MultiPoint{}
-	for i := 0; i < numGeom; i++ {
-		g := d.readPoint()
-		geoms = append(geoms, g)
-	}
-	return geoms
-}
-
-func (d *EWKBDecoder) readMultiLineString() space.MultiLineString {
-	numGeom := d.readNumField("")
-	geoms := space.MultiLineString{}
-	for i := 0; i < numGeom; i++ {
-		g := d.readLineString()
-		geoms = append(geoms, g)
-	}
-	return geoms
-}
-
-func (d *EWKBDecoder) readMultiPolygon() space.MultiPolygon {
-	numGeom := d.readNumField("")
-	geoms := space.MultiPolygon{}
-	for i := 0; i < numGeom; i++ {
-		g := d.readPolygon()
-		geoms = append(geoms, g)
-	}
-	return geoms
-}
-
-func (d *EWKBDecoder) readGeometryCollection() space.Collection {
-	numGeom := d.readNumField("")
-	geoms := space.Collection{}
-	for i := 0; i < numGeom; i++ {
-		g, _ := d.Decode()
-		geoms = append(geoms, g)
-	}
-	return geoms
-}
-
-func (d *EWKBDecoder) readNumField(fieldName string) int {
-	num, _ := d.readInt32()
-	return int(num)
+	valid, err := space.CreateElementValidWithCoordSys(geom, int(d.Srid))
+	return valid, err
 }
 
 // HexToBytes Converts a hexadecimal string to a byte array. The hexadecimal digit symbols are case-insensitive.

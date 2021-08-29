@@ -21,7 +21,7 @@ func (g *MegrezAlgorithm) EqualsExact(geom1, geom2 space.Geometry, tolerance flo
 // IsClosed Returns TRUE if the LINESTRING's start and end points are coincident.
 // For Polyhedral Surfaces, reports if the surface is areal (open) or IsC (closed).
 func (g *MegrezAlgorithm) IsClosed(geom space.Geometry) (bool, error) {
-	elem := space.ElementValid{Geometry: geom}
+	elem := space.GeometryValid{Geometry: geom}
 	return elem.IsClosed(), nil
 }
 
@@ -33,7 +33,7 @@ func (g *MegrezAlgorithm) IsEmpty(geom space.Geometry) (bool, error) {
 
 // IsRing returns true if the lineal geometry has the ring property.
 func (g *MegrezAlgorithm) IsRing(geom space.Geometry) (bool, error) {
-	elem := space.ElementValid{Geometry: geom}
+	elem := space.GeometryValid{Geometry: geom}
 	return elem.IsClosed() && elem.IsSimple(), nil
 }
 
