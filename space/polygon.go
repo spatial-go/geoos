@@ -294,3 +294,8 @@ func (p Polygon) IsValid() bool {
 	}
 	return true
 }
+
+// CoordinateSystem return Coordinate System.
+func (p Polygon) CoordinateSystem() int {
+	return defaultCoordinateSystem()
+}

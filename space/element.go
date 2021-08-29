@@ -41,7 +41,7 @@ type Line struct {
 // GeometryValid describes a geographic Element Valid
 type GeometryValid struct {
 	Geometry
-	CoordinateSystem int
+	coordinateSystem int
 }
 
 // CreateElementValid Returns valid geom element. returns nil if geom is invalid.
@@ -55,6 +55,15 @@ func CreateElementValidWithCoordSys(geom Geometry, coordSys int) (*GeometryValid
 		return &GeometryValid{geom, coordSys}, nil
 	}
 	return nil, spaceerr.ErrNotValidGeometry
+}
+
+// CoordinateSystem return Coordinate System.
+func (g GeometryValid) CoordinateSystem() int {
+	return g.coordinateSystem
+}
+
+func defaultCoordinateSystem() int {
+	return GCJ02
 }
 
 // Centroid Computes the centroid point of a geometry.

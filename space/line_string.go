@@ -237,5 +237,10 @@ func (ls LineString) IsRing() bool {
 
 // IsValid returns true if the  geometry is valid.
 func (ls LineString) IsValid() bool {
-	return len(ls) >= 1 
+	return len(ls) >= 1
+}
+
+// CoordinateSystem return Coordinate System.
+func (ls LineString) CoordinateSystem() int {
+	return defaultCoordinateSystem()
 }

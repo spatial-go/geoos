@@ -296,3 +296,8 @@ func (b Bound) IsRing() bool {
 func (b Bound) IsValid() bool {
 	return b.Min.IsValid() && b.Max.IsValid()
 }
+
+// CoordinateSystem return Coordinate System.
+func (b Bound) CoordinateSystem() int {
+	return defaultCoordinateSystem()
+}

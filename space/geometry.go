@@ -20,6 +20,10 @@ const (
 
 // Geometry is the interface implemented by other spatial objects
 type Geometry interface {
+
+	// CoordinateSystem return Coordinate System.
+	CoordinateSystem() int
+
 	GeoJSONType() string
 	// e.g. 0d, 1d, 2d
 	Dimensions() int
@@ -120,4 +124,5 @@ var (
 	_ Geometry = Bound{}
 
 	_ Geometry = Collection{}
+	_ Geometry = GeometryValid{}
 )

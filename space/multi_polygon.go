@@ -237,3 +237,8 @@ func (mp MultiPolygon) IsValid() bool {
 	}
 	return true
 }
+
+// CoordinateSystem return Coordinate System.
+func (mp MultiPolygon) CoordinateSystem() int {
+	return defaultCoordinateSystem()
+}

@@ -283,3 +283,8 @@ func (c Collection) IsValid() bool {
 	}
 	return true
 }
+
+// CoordinateSystem return Coordinate System.
+func (c Collection) CoordinateSystem() int {
+	return defaultCoordinateSystem()
+}

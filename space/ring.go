@@ -175,3 +175,8 @@ func (r Ring) IsRing() bool {
 func (r Ring) IsValid() bool {
 	return (!r.IsEmpty()) && r.IsRing()
 }
+
+// CoordinateSystem return Coordinate System.
+func (r Ring) CoordinateSystem() int {
+	return defaultCoordinateSystem()
+}

@@ -218,3 +218,8 @@ func (mp MultiPoint) IsValid() bool {
 	}
 	return true
 }
+
+// CoordinateSystem return Coordinate System.
+func (mp MultiPoint) CoordinateSystem() int {
+	return defaultCoordinateSystem()
+}

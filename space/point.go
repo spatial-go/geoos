@@ -216,3 +216,8 @@ func (p Point) IsRing() bool {
 func (p Point) IsValid() bool {
 	return len(p) >= 2
 }
+
+// CoordinateSystem return Coordinate System.
+func (p Point) CoordinateSystem() int {
+	return defaultCoordinateSystem()
+}
