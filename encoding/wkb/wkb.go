@@ -167,7 +167,7 @@ func (e *Encoder) Encode(geom space.Geometry) error {
 		return e.writeCollection(g)
 	}
 
-	panic("unsupported type")
+	return ErrUnknownWKBType
 }
 
 // Decoder can decoder WKB geometry off of the stream.
