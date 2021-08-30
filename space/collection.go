@@ -107,7 +107,7 @@ func (c Collection) EqualsExact(g Geometry, tolerance float64) bool {
 		return false
 	}
 	for i, v := range c {
-		if v.EqualsExact((g.(Collection)[i]), tolerance) {
+		if !v.EqualsExact((g.(Collection)[i]), tolerance) {
 			return false
 		}
 	}

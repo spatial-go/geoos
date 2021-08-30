@@ -85,7 +85,7 @@ func (mp MultiPoint) EqualsExact(g Geometry, tolerance float64) bool {
 		return false
 	}
 	for i, v := range mp {
-		if v.EqualsExact((g.(MultiPoint)[i]), tolerance) {
+		if !v.EqualsExact((g.(MultiPoint)[i]), tolerance) {
 			return false
 		}
 	}
