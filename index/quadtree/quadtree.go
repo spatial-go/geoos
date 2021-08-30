@@ -42,8 +42,8 @@ func EnsureExtent(itemEnv *envelope.Envelope, minExtent float64) *envelope.Envel
 	return envelope.FourFloat(minx, maxx, miny, maxy)
 }
 
-// DefaultQuadtree  Constructs a Quadtree with zero items.
-func DefaultQuadtree() *Quadtree {
+// NewQuadtree  Constructs a Quadtree with zero items.
+func NewQuadtree() *Quadtree {
 	qt := &Quadtree{}
 	qt.Root = &Root{Node: &Node{}, origin: matrix.Matrix{0, 0}}
 	return qt
@@ -77,10 +77,11 @@ func (q *Quadtree) Size() int {
 }
 
 // Insert insert a single item to the tree.
-func (q *Quadtree) Insert(itemEnv *envelope.Envelope, item interface{}) {
+func (q *Quadtree) Insert(itemEnv *envelope.Envelope, item interface{}) error {
 	q.CollectStats(itemEnv)
 	insertEnv := EnsureExtent(itemEnv, q.MinExtent)
 	q.Root.Insert(insertEnv, item)
+	return nil
 }
 
 // Remove Removes a single item from the tree.
@@ -93,12 +94,13 @@ func (q *Quadtree) Remove(itemEnv *envelope.Envelope, item interface{}) bool {
 func (q *Quadtree) Query(searchEnv *envelope.Envelope) interface{} {
 	visitor := &index.ArrayVisitor{}
 	q.QueryVisitor(searchEnv, visitor)
-	return visitor.Items
+	return visitor.Items()
 }
 
 // QueryVisitor Queries the tree and visits items which may lie in the given search envelope.
-func (q *Quadtree) QueryVisitor(searchEnv *envelope.Envelope, visitor index.ItemVisitor) {
+func (q *Quadtree) QueryVisitor(searchEnv *envelope.Envelope, visitor index.ItemVisitor) error {
 	q.Root.Visit(searchEnv, visitor)
+	return nil
 }
 
 // CollectStats ...
@@ -112,3 +114,7 @@ func (q *Quadtree) CollectStats(itemEnv *envelope.Envelope) {
 		q.MinExtent = delY
 	}
 }
+
+var (
+	_ index.SpatialIndex = &Quadtree{}
+)

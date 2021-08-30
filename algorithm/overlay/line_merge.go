@@ -136,7 +136,7 @@ func MergeMatrix(ml matrix.Collection, i, j int, result matrix.Collection) (matr
 			return ml, false
 		}
 		for _, v := range ml[j].(matrix.LineMatrix).ToLineArray() {
-			if relate.InLine(m0, v.P0, v.P1) {
+			if in, _ := relate.InLine(m0, v.P0, v.P1); in {
 				result = append(result, ml[:i]...)
 				result = append(result, ml[i+1:]...)
 				return result, true

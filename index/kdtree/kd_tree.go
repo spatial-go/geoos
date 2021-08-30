@@ -84,10 +84,12 @@ func (k *KdTree) InsertMatrix(p matrix.Matrix, data interface{}) *KdNode {
 }
 
 //Insert Inserts a new point into the kd-tree.
-func (k *KdTree) Insert(env *envelope.Envelope, data interface{}) {
+func (k *KdTree) Insert(env *envelope.Envelope, data interface{}) error {
 	if m, ok := data.(matrix.Matrix); ok {
 		k.InsertNoData(m)
+		return nil
 	}
+	return index.ErrNotMatchType
 }
 
 // FindBestMatchNode Finds the node in the tree which is the best match for a point
@@ -155,9 +157,9 @@ func (k *KdTree) insertExact(p matrix.Matrix, data interface{}) *KdNode {
 
 // QueryNode Performs a range search of the points in the index and visits all nodes found.
 func (k *KdTree) QueryNode(currentNode *KdNode,
-	queryEnv *envelope.Envelope, odd bool, visitor index.ItemVisitor) {
+	queryEnv *envelope.Envelope, odd bool, visitor index.ItemVisitor) error {
 	if currentNode == nil {
-		return
+		return index.ErrTreeIsNil
 	}
 	var min, max, discriminant float64
 	if odd {
@@ -182,7 +184,7 @@ func (k *KdTree) QueryNode(currentNode *KdNode,
 	if searchRight {
 		k.QueryNode(currentNode.Right, queryEnv, !odd, visitor)
 	}
-
+	return nil
 }
 
 // QueryNodePoint Performs a range search of the points in the index and visits all nodes found.
@@ -211,8 +213,8 @@ func (k *KdTree) QueryNodePoint(currentNode *KdNode,
 }
 
 // QueryVisitor Performs a range search of the points in the index and visits all nodes found.
-func (k *KdTree) QueryVisitor(queryEnv *envelope.Envelope, visitor index.ItemVisitor) {
-	k.QueryNode(k.root, queryEnv, true, visitor)
+func (k *KdTree) QueryVisitor(queryEnv *envelope.Envelope, visitor index.ItemVisitor) error {
+	return k.QueryNode(k.root, queryEnv, true, visitor)
 }
 
 // Query  Performs a range search of the points in the index.
@@ -308,7 +310,13 @@ func (b *BestMatchVisitor) VisitItem(item interface{}) {
 	}
 }
 
+// Items returns items.
+func (b *BestMatchVisitor) Items() interface{} {
+	return b.MatchNode
+}
+
 var (
+	_ index.ItemVisitor  = &BestMatchVisitor{}
 	_ index.SpatialIndex = &quadtree.Quadtree{}
 	_ index.SpatialIndex = &KdTree{}
 )

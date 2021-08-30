@@ -255,3 +255,8 @@ func (mls MultiLineString) IsValid() bool {
 	}
 	return true
 }
+
+// CoordinateSystem return Coordinate System.
+func (mls MultiLineString) CoordinateSystem() int {
+	return defaultCoordinateSystem()
+}

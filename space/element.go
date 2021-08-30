@@ -38,23 +38,32 @@ type Line struct {
 	Start, End Point
 }
 
-// ElementValid describes a geographic Element Valid
-type ElementValid struct {
+// GeometryValid describes a geographic Element Valid
+type GeometryValid struct {
 	Geometry
-	CoordinateSystem int
+	coordinateSystem int
 }
 
 // CreateElementValid Returns valid geom element. returns nil if geom is invalid.
-func CreateElementValid(geom Geometry) (*ElementValid, error) {
+func CreateElementValid(geom Geometry) (*GeometryValid, error) {
 	return CreateElementValidWithCoordSys(geom, GCJ02)
 }
 
 // CreateElementValidWithCoordSys Returns valid geom element. returns nil if geom is invalid.
-func CreateElementValidWithCoordSys(geom Geometry, coordSys int) (*ElementValid, error) {
+func CreateElementValidWithCoordSys(geom Geometry, coordSys int) (*GeometryValid, error) {
 	if geom.IsValid() {
-		return &ElementValid{geom, coordSys}, nil
+		return &GeometryValid{geom, coordSys}, nil
 	}
 	return nil, spaceerr.ErrNotValidGeometry
+}
+
+// CoordinateSystem return Coordinate System.
+func (g GeometryValid) CoordinateSystem() int {
+	return g.coordinateSystem
+}
+
+func defaultCoordinateSystem() int {
+	return GCJ02
 }
 
 // Centroid Computes the centroid point of a geometry.

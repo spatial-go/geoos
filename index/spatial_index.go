@@ -13,7 +13,7 @@ import (
 //  such as testing other spatial relationships.
 type SpatialIndex interface {
 	// Insert Adds a spatial item with an extent specified by the given Envelope to the index
-	Insert(itemEnv *envelope.Envelope, item interface{})
+	Insert(itemEnv *envelope.Envelope, item interface{}) error
 
 	// Query Queries the index for all items whose extents intersect the given search  Envelope
 	// Note that some kinds of indexes may also return objects which do not in fact
@@ -23,7 +23,7 @@ type SpatialIndex interface {
 	// and applies an  ItemVisitor to them.
 	// Note that some kinds of indexes may also return objects which do not in fact
 	// intersect the query envelope.
-	QueryVisitor(searchEnv *envelope.Envelope, visitor ItemVisitor)
+	QueryVisitor(searchEnv *envelope.Envelope, visitor ItemVisitor) error
 
 	// Remove Removes a single item from the tree.
 	Remove(itemEnv *envelope.Envelope, item interface{}) bool

@@ -14,7 +14,7 @@ var indexTree *Quadtree
 var lineMatrix = matrix.LineMatrix{{1, 1}, {1, 5}, {5, 5}, {10, 8}, {8, 1}, {2, 3}}
 
 func TestMain(m *testing.M) {
-	indexTree = DefaultQuadtree()
+	indexTree = NewQuadtree()
 	segs := lineMatrix.ToLineArray()
 	for i := 0; i < len(segs); i++ {
 		seg := segs[i]

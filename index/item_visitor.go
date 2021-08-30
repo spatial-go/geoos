@@ -4,6 +4,8 @@ package index
 type ItemVisitor interface {
 	// VisitItem Visits an item in the index.
 	VisitItem(item interface{})
+
+	Items() interface{}
 }
 
 // compile time checks
