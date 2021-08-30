@@ -85,7 +85,7 @@ func (mp MultiPoint) EqualsExact(g Geometry, tolerance float64) bool {
 		return false
 	}
 	for i, v := range mp {
-		if v.EqualsExact((g.(MultiPoint)[i]), tolerance) {
+		if !v.EqualsExact((g.(MultiPoint)[i]), tolerance) {
 			return false
 		}
 	}
@@ -217,4 +217,9 @@ func (mp MultiPoint) IsValid() bool {
 		}
 	}
 	return true
+}
+
+// CoordinateSystem return Coordinate System.
+func (mp MultiPoint) CoordinateSystem() int {
+	return defaultCoordinateSystem()
 }

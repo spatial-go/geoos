@@ -107,7 +107,7 @@ func (c Collection) EqualsExact(g Geometry, tolerance float64) bool {
 		return false
 	}
 	for i, v := range c {
-		if v.EqualsExact((g.(Collection)[i]), tolerance) {
+		if !v.EqualsExact((g.(Collection)[i]), tolerance) {
 			return false
 		}
 	}
@@ -194,7 +194,7 @@ func (c Collection) Length() float64 {
 // IsSimple returns true if this space.Geometry has no anomalous geometric points,
 // such as self intersection or self tangency.
 func (c Collection) IsSimple() bool {
-	elem := &ElementValid{c, GCJ02}
+	elem := &GeometryValid{c, GCJ02}
 	return elem.IsSimple()
 }
 
@@ -282,4 +282,9 @@ func (c Collection) IsValid() bool {
 		}
 	}
 	return true
+}
+
+// CoordinateSystem return Coordinate System.
+func (c Collection) CoordinateSystem() int {
+	return defaultCoordinateSystem()
 }

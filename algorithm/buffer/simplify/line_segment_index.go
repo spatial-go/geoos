@@ -38,7 +38,7 @@ func (l *LineSegmentIndex) Query(querySeg *matrix.LineSegment) []*matrix.LineSeg
 
 	visitor := &index.LineSegmentVisitor{QuerySeg: querySeg}
 	l.index.QueryVisitor(env, visitor)
-	itemsFound := visitor.Items
+	itemsFound := visitor.Items()
 
-	return itemsFound
+	return itemsFound.([]*matrix.LineSegment)
 }

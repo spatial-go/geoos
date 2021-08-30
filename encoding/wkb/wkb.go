@@ -5,7 +5,6 @@ package wkb
 import (
 	"bytes"
 	"encoding/binary"
-	"encoding/hex"
 	"io"
 
 	"github.com/spatial-go/geoos/space"
@@ -40,19 +39,49 @@ const (
 // is none is specified.
 var DefaultByteOrder binary.ByteOrder = binary.LittleEndian
 
+func (b byteOrder) Uint32(buf []byte) uint32 {
+	if b == littleEndian {
+		return DefaultByteOrder.Uint32(buf)
+	}
+	return binary.BigEndian.Uint32(buf)
+}
+
+func (b byteOrder) Uint64(buf []byte) uint64 {
+	if b == littleEndian {
+		return DefaultByteOrder.Uint64(buf)
+	}
+	return binary.BigEndian.Uint64(buf)
+}
+
+func (b byteOrder) PutUint32(buf []byte, u uint32) {
+	if b == littleEndian {
+		DefaultByteOrder.PutUint32(buf, u)
+	} else {
+		binary.BigEndian.PutUint32(buf, u)
+	}
+}
+
+func (b byteOrder) PutUint64(buf []byte, u uint64) {
+	if b == littleEndian {
+		DefaultByteOrder.PutUint64(buf, u)
+	} else {
+		binary.BigEndian.PutUint64(buf, u)
+	}
+}
+
 // An Encoder will encode a geometry as WKB to the writer given at
 // creation time.
 type Encoder struct {
 	buf []byte
 
 	w     io.Writer
-	order binary.ByteOrder
+	order byteOrder
 }
 
 // MustMarshal will encode the geometry and panic on error.
 // Currently there is no reason to error during geometry marshalling.
-func MustMarshal(geom space.Geometry, byteOrder ...binary.ByteOrder) []byte {
-	d, err := Marshal(geom, byteOrder...)
+func MustMarshal(geom space.Geometry, bo ...byteOrder) []byte {
+	d, err := Marshal(geom, bo...)
 	if err != nil {
 		panic(err)
 	}
@@ -61,12 +90,12 @@ func MustMarshal(geom space.Geometry, byteOrder ...binary.ByteOrder) []byte {
 }
 
 // Marshal encodes the geometry with the given byte order.
-func Marshal(geom space.Geometry, byteOrder ...binary.ByteOrder) ([]byte, error) {
+func Marshal(geom space.Geometry, bo ...byteOrder) ([]byte, error) {
 	buf := bytes.NewBuffer(make([]byte, 0, geomLength(geom)))
 
 	e := NewEncoder(buf)
-	if len(byteOrder) > 0 {
-		e.SetByteOrder(byteOrder[0])
+	if len(bo) > 0 {
+		e.order = bo[0]
 	}
 
 	err := e.Encode(geom)
@@ -85,14 +114,8 @@ func Marshal(geom space.Geometry, byteOrder ...binary.ByteOrder) ([]byte, error)
 func NewEncoder(w io.Writer) *Encoder {
 	return &Encoder{
 		w:     w,
-		order: DefaultByteOrder,
+		order: 1,
 	}
-}
-
-// SetByteOrder will override the default byte order set when
-// the encoder was created.
-func (e *Encoder) SetByteOrder(bo binary.ByteOrder) {
-	e.order = bo
 }
 
 // Encode will write the geometry encoded as WKB to the given writer.
@@ -102,32 +125,6 @@ func (e *Encoder) Encode(geom space.Geometry) error {
 	}
 
 	switch g := geom.(type) {
-	// nil values should not write any data. Empty sizes will still
-	// write an empty version of that type.
-	case space.MultiPoint:
-		if g == nil {
-			return nil
-		}
-	case space.LineString:
-		if g == nil {
-			return nil
-		}
-	case space.MultiLineString:
-		if g == nil {
-			return nil
-		}
-	case space.Polygon:
-		if g == nil {
-			return nil
-		}
-	case space.MultiPolygon:
-		if g == nil {
-			return nil
-		}
-	case space.Collection:
-		if g == nil {
-			return nil
-		}
 	// deal with types that are not supported by wkb
 	case space.Ring:
 		if g == nil {
@@ -139,18 +136,10 @@ func (e *Encoder) Encode(geom space.Geometry) error {
 			return nil
 		}
 		geom = g.ToPolygon()
-	case space.Point:
-		if g == nil {
-			return nil
-		}
 	}
 
 	var b []byte
-	if e.order == binary.LittleEndian {
-		b = []byte{1}
-	} else {
-		b = []byte{0}
-	}
+	b = []byte{byte(e.order)}
 
 	_, err := e.w.Write(b)
 	if err != nil {
@@ -178,7 +167,7 @@ func (e *Encoder) Encode(geom space.Geometry) error {
 		return e.writeCollection(g)
 	}
 
-	panic("unsupported type")
+	return ErrUnknownWKBType
 }
 
 // Decoder can decoder WKB geometry off of the stream.
@@ -270,6 +259,7 @@ func readByteOrderType(r io.Reader, buf []byte) (byteOrder, uint32, error) {
 
 	// the type which is 4 bytes
 	typ, err := readUint32(r, order, buf[:4])
+
 	if err != nil {
 		return 0, 0, err
 	}
@@ -373,11 +363,13 @@ func geomLength(geom space.Geometry) int {
 	return 0
 }
 
-// GeoFromWKBHexStr Decode decodes an arbitrary geometry from a string.
-func GeoFromWKBHexStr(s string) (space.Geometry, error) {
-	data, err := hex.DecodeString(s)
-	if err != nil {
-		return nil, err
-	}
-	return Unmarshal(data)
+// GeomFromWKBHexStr convert hex string to GEOSGeometry
+func GeomFromWKBHexStr(wkbHex string) (space.Geometry, error) {
+	wkbStr := HexToBytes(wkbHex)
+	//wkbStr, err := hex.DecodeString(wkbHex)
+
+	ewkb := &EWKBDecoder{r: bytes.NewReader(wkbStr)}
+	g, _ := ewkb.Decode()
+
+	return g, nil
 }

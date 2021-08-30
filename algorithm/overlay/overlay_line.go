@@ -5,8 +5,8 @@ import (
 
 	"github.com/spatial-go/geoos/algorithm"
 	"github.com/spatial-go/geoos/algorithm/matrix"
+	"github.com/spatial-go/geoos/algorithm/overlay/chain"
 	"github.com/spatial-go/geoos/algorithm/relate"
-	"github.com/spatial-go/geoos/index/chain"
 )
 
 // LineOverlay  Computes the overlay of two geometries,either or both of which may be nil.
@@ -119,7 +119,7 @@ func IntersectLine(m, m1 matrix.LineMatrix) []relate.IntersectionResult {
 	il := relate.IntersectionResult{Ips: relate.IntersectionPointLine{}}
 	for i, line := range m.ToLineArray() {
 		for _, ip := range ips {
-			if relate.InLine(ip.Matrix, line.P0, line.P1) {
+			if in, _ := relate.InLine(ip.Matrix, line.P0, line.P1); in {
 				il.Pos = i
 				il.Line = *line
 				il.Start = i

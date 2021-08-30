@@ -26,7 +26,7 @@ func (r *Root) Insert(itemEnv *envelope.Envelope, item interface{}) {
 	node := r.Subnode[index]
 
 	if node == nil || !node.Env.Contains(itemEnv) {
-		largerNode := CreateExpanded(node, itemEnv)
+		largerNode := NewNodeExpanded(node, itemEnv)
 		r.Subnode[index] = largerNode
 	}
 
@@ -76,8 +76,7 @@ func (r *Root) Remove(itemEnv *envelope.Envelope, item interface{}) bool {
 		return found
 	}
 	// otherwise, try and remove the item from the list of items in this node
-	//TODO
-	//	found = n.Items.remove(item)
+	found = r.remove(item)
 	return found
 }
 

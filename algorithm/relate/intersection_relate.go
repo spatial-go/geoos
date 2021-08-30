@@ -20,12 +20,6 @@ func IntersectionLineSegment(l, o *matrix.LineSegment) (bool, IntersectionPointL
 
 // Intersection returns intersection of a and b.
 func Intersection(aStart, aEnd, bStart, bEnd matrix.Matrix) (mark bool, ips IntersectionPointLine) {
-	a1 := aEnd[1] - aStart[1]
-	b1 := aStart[0] - aEnd[0]
-	c1 := -aStart[0]*a1 - b1*aStart[1]
-	a2 := bEnd[1] - bStart[1]
-	b2 := bStart[0] - bEnd[0]
-	c2 := -a2*bStart[0] - b2*bStart[1]
 
 	u := matrix.Matrix{aEnd[0] - aStart[0], aEnd[1] - aStart[1]}
 	v := matrix.Matrix{bEnd[0] - bStart[0], bEnd[1] - bStart[1]}
@@ -39,32 +33,61 @@ func Intersection(aStart, aEnd, bStart, bEnd matrix.Matrix) (mark bool, ips Inte
 		} else if (u[0] < 0 && v[0] < 0) || (u[1] < 0 && v[1] < 0) {
 			isEnter = false
 		}
-		if InLine(bStart, aStart, aEnd) {
-			ips = append(ips, IntersectionPoint{bStart, true, isEnter, true, true})
+		if in, isVex := InLine(bStart, aStart, aEnd); in {
+			if isVex {
+				ips = append(ips, IntersectionPoint{bStart, false, isEnter, true, true})
+			} else {
+				ips = append(ips, IntersectionPoint{bStart, true, isEnter, true, true})
+			}
 			mark = true
 		}
-		if InLine(bEnd, aStart, aEnd) {
-			ips = append(ips, IntersectionPoint{bEnd, true, isEnter, true, true})
+		if in, isVex := InLine(bEnd, aStart, aEnd); in {
+			if isVex {
+				ips = append(ips, IntersectionPoint{bEnd, false, isEnter, true, true})
+			} else {
+				ips = append(ips, IntersectionPoint{bEnd, true, isEnter, true, true})
+			}
 			mark = true
 		}
-		if InLine(aStart, bStart, bEnd) && !aStart.Equals(bStart) && !aStart.Equals(bEnd) {
-			ips = append(ips, IntersectionPoint{aStart, true, isEnter, true, true})
+		if in, isVex := InLine(aStart, bStart, bEnd); in && !aStart.Equals(bStart) && !aStart.Equals(bEnd) {
+			if isVex {
+				ips = append(ips, IntersectionPoint{aStart, false, isEnter, true, true})
+			} else {
+				ips = append(ips, IntersectionPoint{aStart, true, isEnter, true, true})
+			}
 			mark = true
 		}
-		if InLine(aEnd, bStart, bEnd) && !aEnd.Equals(bStart) && !aEnd.Equals(bEnd) {
-			ips = append(ips, IntersectionPoint{aEnd, true, isEnter, true, true})
+		if in, isVex := InLine(aEnd, bStart, bEnd); in && !aEnd.Equals(bStart) && !aEnd.Equals(bEnd) {
+			if isVex {
+				ips = append(ips, IntersectionPoint{aEnd, false, isEnter, true, true})
+			} else {
+				ips = append(ips, IntersectionPoint{aEnd, true, isEnter, true, true})
+			}
 			mark = true
 		}
 	} else {
+		a1 := aEnd[1] - aStart[1]
+		b1 := aStart[0] - aEnd[0]
+		c1 := -aStart[0]*a1 - b1*aStart[1]
+		a2 := bEnd[1] - bStart[1]
+		b2 := bStart[0] - bEnd[0]
+		c2 := -a2*bStart[0] - b2*bStart[1]
 		ip := matrix.Matrix{(b1*c2 - b2*c1) / determinant, (a2*c1 - a1*c2) / determinant}
 
 		// check if point belongs to segment
-		if InLine(ip, aStart, aEnd) && InLine(ip, bStart, bEnd) {
-			if ip.Equals(aStart) || ip.Equals(aEnd) || ip.Equals(bStart) || ip.Equals(bEnd) {
-				ips = append(ips, IntersectionPoint{ip, true, determinant < 0, true, false})
-			} else {
-				ips = append(ips, IntersectionPoint{ip, true, determinant < 0, false, false})
+		ina, isVexA := InLine(ip, aStart, aEnd)
+		inb, inVexB := InLine(ip, bStart, bEnd)
+		if ina && inb {
+			isIntersectionPoint := true
+			if isVexA && inVexB {
+				isIntersectionPoint = false
 			}
+			isOriginal := false
+			if ip.Equals(aStart) || ip.Equals(aEnd) || ip.Equals(bStart) || ip.Equals(bEnd) {
+				isOriginal = true
+			}
+			ips = append(ips, IntersectionPoint{ip, isIntersectionPoint, determinant < 0, isOriginal, false})
+
 			mark = true
 		} else {
 			mark = false
@@ -79,16 +102,20 @@ func CrossProduct(a, b matrix.Matrix) float64 {
 }
 
 // InLine returns true if spot in ab,false else.
-func InLine(spot, a, b matrix.Matrix) bool {
+func InLine(spot, a, b matrix.Matrix) (in bool, isVertex bool) {
 	// x := spot[0] <= math.Max(a[0], b[0]) && spot[0] >= math.Min(a[0], b[0])
 	// y := spot[1] <= math.Max(a[1], b[1]) && spot[1] >= math.Min(a[1], b[1])
+
+	if spot.Equals(a) || spot.Equals(b) {
+		return true, true
+	}
 
 	if ((spot[0]-a[0])*(a[1]-b[1])) == ((a[0]-b[0])*(spot[1]-a[1])) &&
 		(spot[0] >= math.Min(a[0], b[0]) && spot[0] <= math.Max(a[0], b[0])) &&
 		((spot[1] >= math.Min(a[1], b[1])) && (spot[1] <= math.Max(a[1], b[1]))) {
-		return true
+		return true, false
 	}
-	return false
+	return false, false
 }
 
 // InLineVertex returns true if spot in LineVertex,false else..
@@ -108,7 +135,7 @@ func InLineVertex(spot matrix.Matrix, matr matrix.LineMatrix) (bool, bool) {
 func InLineMatrix(spot matrix.Matrix, matr matrix.LineMatrix) bool {
 	lines := matr.ToLineArray()
 	for _, line := range lines {
-		if InLine(spot, line.P0, line.P1) {
+		if in, _ := InLine(spot, line.P0, line.P1); in {
 			return true
 		}
 	}

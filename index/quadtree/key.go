@@ -25,8 +25,8 @@ func ComputeQuadLevel(env *envelope.Envelope) int {
 	return level
 }
 
-// KeyEnv ...
-func KeyEnv(itemEnv *envelope.Envelope) *Key {
+// NewKeyEnv ...
+func NewKeyEnv(itemEnv *envelope.Envelope) *Key {
 	k := &Key{Pt: matrix.Matrix{0, 0}}
 	k.ComputeKey(itemEnv)
 	return k

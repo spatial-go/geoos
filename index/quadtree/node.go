@@ -41,28 +41,28 @@ func SubnodeIndex(env *envelope.Envelope, centrex, centrey float64) int {
 	return subnodeIndex
 }
 
-// CreateNode ...
-func CreateNode(env *envelope.Envelope) *Node {
-	key := KeyEnv(env)
-	node := NodeEnv(key.Env, key.Level)
+// NewNode ...
+func NewNode(env *envelope.Envelope) *Node {
+	key := NewKeyEnv(env)
+	node := NewNodeEnv(key.Env, key.Level)
 	return node
 }
 
-// CreateExpanded ...
-func CreateExpanded(node *Node, addEnv *envelope.Envelope) *Node {
+// NewNodeExpanded ...
+func NewNodeExpanded(node *Node, addEnv *envelope.Envelope) *Node {
 	expandEnv := envelope.Env(addEnv)
 	if node != nil {
 		expandEnv.ExpandToIncludeEnv(node.Env)
 	}
-	largerNode := CreateNode(expandEnv)
+	largerNode := NewNode(expandEnv)
 	if node != nil {
 		largerNode.InsertNode(node)
 	}
 	return largerNode
 }
 
-// NodeEnv ...
-func NodeEnv(env *envelope.Envelope, level int) *Node {
+// NewNodeEnv ...
+func NewNodeEnv(env *envelope.Envelope, level int) *Node {
 	n := &Node{}
 	//this.parent = parent;
 	n.Env = env
@@ -323,6 +323,6 @@ func (n *Node) CreateSubnode(index int) *Node {
 		maxy = n.Env.MaxY
 	}
 	sqEnv := envelope.FourFloat(minx, maxx, miny, maxy)
-	node := NodeEnv(sqEnv, n.Level-1)
+	node := NewNodeEnv(sqEnv, n.Level-1)
 	return node
 }
