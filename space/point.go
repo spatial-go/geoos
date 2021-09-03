@@ -6,6 +6,7 @@ import (
 
 	"github.com/spatial-go/geoos/algorithm/buffer"
 	"github.com/spatial-go/geoos/algorithm/buffer/simplify"
+	"github.com/spatial-go/geoos/algorithm/filter"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
 	"github.com/spatial-go/geoos/space/spaceerr"
@@ -220,4 +221,9 @@ func (p Point) IsValid() bool {
 // CoordinateSystem return Coordinate System.
 func (p Point) CoordinateSystem() int {
 	return defaultCoordinateSystem()
+}
+
+// Filter Performs an operation with the provided .
+func (p Point) Filter(f filter.Filter) Geometry {
+	return p
 }

@@ -37,6 +37,8 @@ func (u *UniqueArrayFilter) Filter(matrix matrix.Matrix) {
 
 // FilterSteric Performs an operation with the provided .
 func (u *UniqueArrayFilter) FilterSteric(matr matrix.Steric) {
+	//set empty
+	u.matrixes = u.matrixes[:0]
 	switch m := matr.(type) {
 	case matrix.Matrix:
 		u.Filter(m)
