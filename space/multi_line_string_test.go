@@ -1,6 +1,10 @@
 package space
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/spatial-go/geoos/algorithm/filter"
+)
 
 func TestMultiLineString_Nums(t *testing.T) {
 	multiLineString := MultiLineString{
@@ -18,6 +22,27 @@ func TestMultiLineString_Nums(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.mls.Nums(); got != tt.want {
 				t.Errorf("MultiLineString.Nums() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestMultiLineString_Filter(t *testing.T) {
+	var f filter.Filter = &filter.UniqueArrayFilter{}
+	tests := []struct {
+		name string
+		mls  MultiLineString
+		want MultiLineString
+	}{
+		{"multi line filter", MultiLineString{LineString{{1, 1}, {1, 2}, {2, 2}, {2, 2}, {2, 1}, {1, 1}}, LineString{{1, 1}, {1, 2}, {2, 2}, {2, 2}, {2, 1}, {1, 1}}},
+			MultiLineString{LineString{{1, 1}, {1, 2}, {2, 2}, {2, 1}}, LineString{{1, 1}, {1, 2}, {2, 2}, {2, 1}}},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.mls.Filter(f)
+			if !got.Equals(tt.want) {
+				t.Errorf("Filter() = %v, want %v", got, tt.want)
 			}
 		})
 	}

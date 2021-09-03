@@ -3,6 +3,7 @@ package space
 import (
 	"github.com/spatial-go/geoos/algorithm/buffer"
 	"github.com/spatial-go/geoos/algorithm/buffer/simplify"
+	"github.com/spatial-go/geoos/algorithm/filter"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
 	"github.com/spatial-go/geoos/algorithm/operation"
@@ -222,4 +223,17 @@ func (mp MultiPoint) IsValid() bool {
 // CoordinateSystem return Coordinate System.
 func (mp MultiPoint) CoordinateSystem() int {
 	return defaultCoordinateSystem()
+}
+
+// Filter Performs an operation with the provided .
+func (mp MultiPoint) Filter(f filter.Filter) Geometry {
+
+	for _, v := range mp {
+		f.Filter(matrix.Matrix(v))
+	}
+	mp = mp[:0]
+	for _, v := range f.Matrixes() {
+		mp = append(mp, Point(v))
+	}
+	return mp
 }
