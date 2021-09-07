@@ -41,8 +41,7 @@ func (t *TopologyPreservingSimplifier) getResultGeometry() matrix.Steric {
 	if t.InputGeom.IsEmpty() {
 		return t.InputGeom
 	}
-
-	(&LineStringMapBuilderFilter{t}).filter(t.InputGeom)
+	t.InputGeom.Filter(&LineStringMapBuilderFilter{t})
 
 	t.lineSimplifier.Simplify(t.linestrings)
 
@@ -58,9 +57,24 @@ type LineStringMapBuilderFilter struct {
 	tps *TopologyPreservingSimplifier
 }
 
-// Filters linear geometries.
-func (l *LineStringMapBuilderFilter) filter(geom matrix.Steric) {
-	if line, ok := geom.(matrix.LineMatrix); ok {
+// Filter linear geometries.
+func (l *LineStringMapBuilderFilter) Filter(geom matrix.Matrix) {
+
+}
+
+// IsChanged  Returns the true when need change.
+func (l *LineStringMapBuilderFilter) IsChanged() bool {
+	return false
+}
+
+// Matrixes  Returns the gathered Matrixes.
+func (l *LineStringMapBuilderFilter) Matrixes() []matrix.Matrix {
+	return nil
+}
+
+// FilterMatrixes Performs an operation with the provided .
+func (l *LineStringMapBuilderFilter) FilterMatrixes(matrixes []matrix.Matrix) {
+	if line, ok := l.tps.InputGeom.(matrix.LineMatrix); ok {
 		// skip empty geometries
 		if line.IsEmpty() {
 			return
@@ -75,3 +89,13 @@ func (l *LineStringMapBuilderFilter) filter(geom matrix.Steric) {
 		l.tps.linestrings = append(l.tps.linestrings, taggedLine)
 	}
 }
+
+// Clear  clear Matrixes.
+func (l *LineStringMapBuilderFilter) Clear() {
+
+}
+
+// compile time checks
+var (
+	_ matrix.Filter = &LineStringMapBuilderFilter{}
+)

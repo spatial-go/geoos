@@ -258,8 +258,8 @@ func TestGeomFromWKBHexStr(t *testing.T) {
 				t.Errorf("GeomFromWKBHexStr() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !got.EqualsExact(tt.want, 0.00000000001) {
-				t.Errorf("GeomFromWKBHexStr() = %v, want %v", got, tt.want)
+			if !got.EqualsExact(tt.want, 0.0000001) {
+				t.Errorf("GeomFromWKBHexStr() = %v, \nwant %v", got, tt.want)
 			}
 		})
 	}

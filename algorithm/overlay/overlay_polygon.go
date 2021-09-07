@@ -3,6 +3,7 @@ package overlay
 import (
 	"github.com/spatial-go/geoos/algorithm"
 	"github.com/spatial-go/geoos/algorithm/calc"
+	"github.com/spatial-go/geoos/algorithm/filter"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/matrix/envelope"
 	"github.com/spatial-go/geoos/algorithm/relate"
@@ -207,22 +208,32 @@ type UniqueVertexFilter struct {
 }
 
 // Filter Performs an operation with the provided .
-func (u *UniqueVertexFilter) Filter(ip Vertex) {
+func (u *UniqueVertexFilter) Filter(ip interface{}) {
 	u.add(ip)
 }
 
-func (u *UniqueVertexFilter) add(ip Vertex) {
+// Entities  Returns the gathered Matrixes.
+func (u *UniqueVertexFilter) Entities() interface{} {
+	return u.Ips
+}
+
+func (u *UniqueVertexFilter) add(ip interface{}) {
 	hasMatrix := false
 	for _, v := range u.Ips {
-		if v.Matrix.Equals(ip.Matrix) {
+		if v.Matrix.Equals(ip.(Vertex).Matrix) {
 			hasMatrix = true
 			break
 		}
 	}
 	if !hasMatrix {
-		u.Ips = append(u.Ips, ip)
+		u.Ips = append(u.Ips, ip.(Vertex))
 	}
 }
+
+// compile time checks
+var (
+	_ filter.Filter = &UniqueVertexFilter{}
+)
 
 // ComputePolygon compute overlay.
 func (p *PolygonOverlay) ComputePolygon(exitingPoints []Vertex, cpo ComputePolyOverlay) *Plane {

@@ -3,7 +3,6 @@ package space
 import (
 	"github.com/spatial-go/geoos/algorithm/buffer"
 	"github.com/spatial-go/geoos/algorithm/buffer/simplify"
-	"github.com/spatial-go/geoos/algorithm/filter"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/space/spaceerr"
 )
@@ -291,12 +290,18 @@ func (c Collection) CoordinateSystem() int {
 }
 
 // Filter Performs an operation with the provided .
-func (c Collection) Filter(f filter.Filter) Geometry {
-
-	mc := c[:0]
-	for _, v := range c {
-		g := v.Filter(f)
-		mc = append(mc, g)
+func (c Collection) Filter(f matrix.Filter) Geometry {
+	if f.IsChanged() {
+		mc := c[:0]
+		for _, v := range c {
+			f.Clear()
+			g := v.Filter(f)
+			mc = append(mc, g)
+		}
+		return mc
 	}
-	return mc
+	for _, v := range c {
+		_ = v.Filter(f)
+	}
+	return c
 }

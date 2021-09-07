@@ -3,7 +3,7 @@ package space
 import (
 	"testing"
 
-	"github.com/spatial-go/geoos/algorithm/filter"
+	"github.com/spatial-go/geoos/algorithm/matrix"
 )
 
 func TestMultiLineString_Nums(t *testing.T) {
@@ -28,7 +28,7 @@ func TestMultiLineString_Nums(t *testing.T) {
 }
 
 func TestMultiLineString_Filter(t *testing.T) {
-	var f filter.Filter = &filter.UniqueArrayFilter{}
+	var f matrix.Filter = &matrix.UniqueArrayFilter{}
 	tests := []struct {
 		name string
 		mls  MultiLineString

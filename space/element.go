@@ -2,7 +2,6 @@ package space
 
 import (
 	"github.com/spatial-go/geoos/algorithm/buffer"
-	"github.com/spatial-go/geoos/algorithm/filter"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
 	"github.com/spatial-go/geoos/algorithm/relate"
@@ -52,7 +51,7 @@ func CreateElementValid(geom Geometry) (*GeometryValid, error) {
 
 // CreateElementValidWithCoordSys Returns valid geom element. returns nil if geom is invalid.
 func CreateElementValidWithCoordSys(geom Geometry, coordSys int) (*GeometryValid, error) {
-	geom = geom.Filter(&filter.UniqueArrayFilter{})
+	geom = geom.Filter(&matrix.UniqueArrayFilter{})
 	if geom.IsValid() {
 		return &GeometryValid{geom, coordSys}, nil
 	}

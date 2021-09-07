@@ -1,7 +1,6 @@
 package space
 
 import (
-	"github.com/spatial-go/geoos/algorithm/filter"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 )
 
@@ -117,7 +116,7 @@ type Geometry interface {
 	SpheroidDistance(g Geometry) (float64, error)
 
 	// Filter Performs an operation with the provided .
-	Filter(f filter.Filter) Geometry
+	Filter(f matrix.Filter) Geometry
 }
 
 // compile time checks

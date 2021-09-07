@@ -66,7 +66,7 @@ func (p *Plane) CloseRing() {
 func (p *Plane) Equal(pol *Plane) bool {
 	for i, v2 := range p.Rings {
 		for j, v1 := range v2.Vertexes {
-			if !v1.Equal(&pol.Rings[i].Vertexes[j]) {
+			if !v1.Equals(&pol.Rings[i].Vertexes[j]) {
 				return false
 			}
 		}

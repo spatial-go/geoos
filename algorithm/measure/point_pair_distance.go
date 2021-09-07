@@ -139,3 +139,106 @@ func ProjectionFactor(p, a, b matrix.Matrix) float64 {
 	}
 	return ((p[0]-a[0])*dx + (p[1]-a[1])*dy) / lenD
 }
+
+// MaxPointDistanceFilter ...
+type MaxPointDistanceFilter struct {
+	MaxPtDist, MinPtDist *PointPairDistance
+	euclideanDist        *DistanceToPoint
+	geom                 matrix.Steric
+}
+
+// IsChanged  Returns the true when need change.
+func (m *MaxPointDistanceFilter) IsChanged() bool {
+	return false
+}
+
+// Filter  Performs an operation with the provided .
+func (m *MaxPointDistanceFilter) Filter(pt matrix.Matrix) {
+	m.MinPtDist.IsNil = true
+	(&DistanceToPoint{}).computeDistance(m.geom, pt, m.MinPtDist)
+	m.MaxPtDist.setMaximum(m.MinPtDist)
+}
+
+// FilterMatrixes  Performs an operation with the provided .
+func (m *MaxPointDistanceFilter) FilterMatrixes(pts []matrix.Matrix) {
+	for i := 0; i < len(pts); i++ {
+		m.Filter(pts[i])
+	}
+}
+
+// Matrixes  Returns the gathered Matrixes.
+func (m *MaxPointDistanceFilter) Matrixes() []matrix.Matrix {
+	return matrix.TransMatrixes(m.geom)
+}
+
+// Clear  clear Matrixes.
+func (m *MaxPointDistanceFilter) Clear() {
+
+}
+
+// MaxDensifiedByFractionDistanceFilter ...
+type MaxDensifiedByFractionDistanceFilter struct {
+	MaxPtDist, MinPtDist *PointPairDistance
+	geom                 matrix.Steric
+	numSubSegs           int
+}
+
+// IsChanged  Returns the true when need change.
+func (m *MaxDensifiedByFractionDistanceFilter) IsChanged() bool {
+	return false
+}
+
+// Matrixes  Returns the gathered Matrixes.
+func (m *MaxDensifiedByFractionDistanceFilter) Matrixes() []matrix.Matrix {
+	return matrix.TransMatrixes(m.geom)
+}
+
+// FilterMatrixes  Performs an operation with the provided .
+func (m *MaxDensifiedByFractionDistanceFilter) FilterMatrixes(pts []matrix.Matrix) {
+
+	if len(pts) == 0 {
+		return
+	}
+	for i := 0; i < len(pts); i++ {
+		m.filterTwo(pts, i)
+	}
+}
+
+// filterTwo  Performs an operation with the provided .
+func (m *MaxDensifiedByFractionDistanceFilter) filterTwo(pts []matrix.Matrix, index int) {
+	//This logic also handles skipping Point geometries
+	if index == 0 {
+		return
+	}
+
+	p0 := pts[index-1]
+	p1 := pts[index]
+
+	delX := (p1[0] - p0[0]) / float64(m.numSubSegs)
+	delY := (p1[1] - p0[1]) / float64(m.numSubSegs)
+
+	for i := 0; i < m.numSubSegs; i++ {
+		x := p0[0] + float64(i)*delX
+		y := p0[1] + float64(i)*delY
+		pt := matrix.Matrix{x, y}
+		m.MinPtDist.IsNil = true
+		(&DistanceToPoint{}).computeDistance(m.geom, pt, m.MinPtDist)
+		m.MaxPtDist.setMaximum(m.MinPtDist)
+	}
+
+}
+
+// Clear  clear Matrixes.
+func (m *MaxDensifiedByFractionDistanceFilter) Clear() {
+
+}
+
+// Filter  Performs an operation with the provided .
+func (m *MaxDensifiedByFractionDistanceFilter) Filter(pt matrix.Matrix) {
+}
+
+// compile time checks
+var (
+	_ matrix.Filter = &MaxDensifiedByFractionDistanceFilter{}
+	_ matrix.Filter = &MaxPointDistanceFilter{}
+)
