@@ -3,7 +3,7 @@ package space
 import (
 	"testing"
 
-	"github.com/spatial-go/geoos/algorithm/filter"
+	"github.com/spatial-go/geoos/algorithm/matrix"
 )
 
 func TestMultiPolygon_Nums(t *testing.T) {
@@ -30,7 +30,7 @@ func TestMultiPolygon_Nums(t *testing.T) {
 }
 
 func TestMultiPolygon_Filter(t *testing.T) {
-	var f filter.Filter = &filter.UniqueArrayFilter{}
+	var f matrix.Filter = &matrix.UniqueArrayFilter{}
 	tests := []struct {
 		name string
 		mp   MultiPolygon

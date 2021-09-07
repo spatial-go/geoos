@@ -1,71 +1,46 @@
-// Package filter Define matrix data filter function.
+// Package filter Define  data filter function.
 package filter
 
-import (
-	"github.com/spatial-go/geoos/algorithm/matrix"
-)
+import "reflect"
 
-// Filter  An interface  which use the values of the coordinates in a  Geometry.
-//  Coordinate filters can be used to implement centroid and
-//  envelope computation, and many other functions.
+// Filter  An interface  which use the values of the entity in a  entities.
 type Filter interface {
-
-	// FilterSteric  Performs an operation with the provided .
-	FilterSteric(matrix matrix.Steric)
-
 	// Filter  Performs an operation with the provided .
-	Filter(matrix matrix.Matrix)
+	Filter(entity interface{})
 
 	// Matrixes ...
-	Matrixes() []matrix.Matrix
+	Entities() interface{}
 }
 
 // UniqueArrayFilter  A Filter that extracts a unique array.
 type UniqueArrayFilter struct {
-	matrixes []matrix.Matrix
+	entities []interface{}
 }
 
-// Matrixes  Returns the gathered Coordinates.
-func (u *UniqueArrayFilter) Matrixes() []matrix.Matrix {
-	return u.matrixes
+// Entities  Returns the gathered Matrixes.
+func (u *UniqueArrayFilter) Entities() interface{} {
+	return u.entities
 }
 
 // Filter Performs an operation with the provided .
-func (u *UniqueArrayFilter) Filter(matrix matrix.Matrix) {
-	u.add(matrix)
+func (u *UniqueArrayFilter) Filter(entity interface{}) {
+	u.add(entity)
 }
 
-// FilterSteric Performs an operation with the provided .
-func (u *UniqueArrayFilter) FilterSteric(matr matrix.Steric) {
-	//set empty
-	u.matrixes = u.matrixes[:0]
-	switch m := matr.(type) {
-	case matrix.Matrix:
-		u.Filter(m)
-	case matrix.LineMatrix:
-		for _, v := range m {
-			u.Filter(v)
-		}
-	case matrix.PolygonMatrix:
-		for _, v := range m {
-			u.FilterSteric(matrix.LineMatrix(v))
-		}
-	case matrix.Collection:
-		for _, v := range m {
-			u.FilterSteric(v)
-		}
-	}
-}
-
-func (u *UniqueArrayFilter) add(matrix matrix.Matrix) {
+func (u *UniqueArrayFilter) add(entity interface{}) {
 	hasMatrix := false
-	for _, v := range u.matrixes {
-		if v.Equals(matrix) {
+	for _, v := range u.entities {
+		if reflect.DeepEqual(v, entity) {
 			hasMatrix = true
 			break
 		}
 	}
 	if !hasMatrix {
-		u.matrixes = append(u.matrixes, matrix)
+		u.entities = append(u.entities, entity)
 	}
 }
+
+// compile time checks
+var (
+	_ Filter = &UniqueArrayFilter{}
+)

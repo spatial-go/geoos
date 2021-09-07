@@ -3,7 +3,6 @@ package space
 import (
 	"github.com/spatial-go/geoos/algorithm/buffer"
 	"github.com/spatial-go/geoos/algorithm/buffer/simplify"
-	"github.com/spatial-go/geoos/algorithm/filter"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
 	"github.com/spatial-go/geoos/algorithm/operation"
@@ -247,11 +246,14 @@ func (ls LineString) CoordinateSystem() int {
 }
 
 // Filter Performs an operation with the provided .
-func (ls LineString) Filter(f filter.Filter) Geometry {
-	f.FilterSteric(ls.ToMatrix())
-	ls = ls[:0]
-	for _, v := range f.Matrixes() {
-		ls = append(ls, v)
+func (ls LineString) Filter(f matrix.Filter) Geometry {
+	f.FilterMatrixes(matrix.TransMatrixes(ls.ToMatrix()))
+	if f.IsChanged() {
+		ls = ls[:0]
+		for _, v := range f.Matrixes() {
+			ls = append(ls, v)
+		}
+		return ls
 	}
 	return ls
 }

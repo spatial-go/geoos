@@ -5,7 +5,6 @@ import (
 	"sort"
 
 	"github.com/spatial-go/geoos/algorithm/calc"
-	"github.com/spatial-go/geoos/algorithm/filter"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/relate"
 )
@@ -33,8 +32,8 @@ func ConvexHullWithGeom(geom matrix.Steric) *ConvexHullComputer {
 }
 
 func extractMatrixes(geom matrix.Steric) []matrix.Matrix {
-	filter := filter.UniqueArrayFilter{}
-	filter.FilterSteric(geom)
+	filter := matrix.UniqueArrayFilter{IsNotChange: true}
+	_ = geom.Filter(&filter)
 	return filter.Matrixes()
 }
 

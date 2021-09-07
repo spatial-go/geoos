@@ -3,6 +3,7 @@ package relate
 import (
 	"math"
 
+	"github.com/spatial-go/geoos/algorithm/filter"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 )
 
@@ -179,19 +180,29 @@ type UniqueIntersectionEdgeFilter struct {
 }
 
 // Filter Performs an operation with the provided .
-func (u *UniqueIntersectionEdgeFilter) Filter(ip IntersectionPoint) {
+func (u *UniqueIntersectionEdgeFilter) Filter(ip interface{}) {
 	u.add(ip)
 }
 
-func (u *UniqueIntersectionEdgeFilter) add(ip IntersectionPoint) {
+func (u *UniqueIntersectionEdgeFilter) add(ip interface{}) {
 	hasMatrix := false
 	for _, v := range u.Ips {
-		if v.Matrix.Equals(ip.Matrix) {
+		if v.Matrix.Equals(ip.(IntersectionPoint).Matrix) {
 			hasMatrix = true
 			break
 		}
 	}
 	if !hasMatrix {
-		u.Ips = append(u.Ips, ip)
+		u.Ips = append(u.Ips, ip.(IntersectionPoint))
 	}
 }
+
+// Entities  Returns the gathered Matrixes.
+func (u *UniqueIntersectionEdgeFilter) Entities() interface{} {
+	return u.Ips
+}
+
+// compile time checks
+var (
+	_ filter.Filter = &UniqueIntersectionEdgeFilter{}
+)

@@ -3,7 +3,6 @@ package space
 import (
 	"github.com/spatial-go/geoos/algorithm/buffer"
 	"github.com/spatial-go/geoos/algorithm/buffer/simplify"
-	"github.com/spatial-go/geoos/algorithm/filter"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
 	"github.com/spatial-go/geoos/algorithm/operation"
@@ -302,11 +301,18 @@ func (p Polygon) CoordinateSystem() int {
 }
 
 // Filter Performs an operation with the provided .
-func (p Polygon) Filter(f filter.Filter) Geometry {
-	poly := Polygon{}
-	for _, v := range p {
-		r := Ring(v).Filter(f)
-		poly = append(poly, r.(Ring))
+func (p Polygon) Filter(f matrix.Filter) Geometry {
+	if f.IsChanged() {
+		poly := Polygon{}
+		for _, v := range p {
+			f.Clear()
+			r := Ring(v).Filter(f)
+			poly = append(poly, r.(Ring))
+		}
+		return poly
 	}
-	return poly
+	for _, v := range p {
+		_ = Ring(v).Filter(f)
+	}
+	return p
 }

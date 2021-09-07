@@ -3,7 +3,6 @@ package space
 import (
 	"math"
 
-	"github.com/spatial-go/geoos/algorithm/filter"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/space/spaceerr"
 )
@@ -304,6 +303,6 @@ func (b Bound) CoordinateSystem() int {
 }
 
 // Filter Performs an operation with the provided .
-func (b Bound) Filter(f filter.Filter) Geometry {
+func (b Bound) Filter(f matrix.Filter) Geometry {
 	return b
 }
