@@ -26,8 +26,8 @@ func TestAesDecryption(t *testing.T) {
 		want    []byte
 		wantErr bool
 	}{
-		{"AesEncryption", args{key: []byte(clientSecret), iv: []byte("0102030405060708"), plainText: origByte},
-			[]byte(`{"appId": 80619, "buyerId": 12255578320, "buyerPhone": "15600300151", "env": "PROD", "kdtId": 97848743, "openId": "TtPFscDu869539917284249600", "orderNo": "23202109082225040106117", "payTime": 1631111104000, "price": 0, "shopRole": "SINGLE_SHOP", "shopType": "WSC", "skuIntervalText": "31", "skuVersionText": "测试版套餐", "status": 20, "type": "APP_SUBSCRIBE"}`),
+		{"DesEncryption", args{key: []byte(clientSecret), iv: []byte("0102030405060708"), plainText: origByte},
+			[]byte(`{"appId":80619,"buyerId":12255578320,"buyerPhone":"15600300151","env":"PROD","kdtId":97848743,"openId":"TtPFscDu869539917284249600","orderNo":"23202109082225040106117","payTime":1631111104000,"price":0,"shopRole":"SINGLE_SHOP","shopType":"WSC","skuIntervalText":"31","skuVersionText":"测试版套餐","status":20,"type":"APP_SUBSCRIBE"}`),
 			false,
 		},
 	}
