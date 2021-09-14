@@ -65,7 +65,7 @@ func (g *MegrezAlgorithm) Relate(s, d space.Geometry) (string, error) {
 }
 
 // Touches returns TRUE if the only points in common between A and B lie in the union of the boundaries of A and B.
-// The ouches relation applies to all Area/Area, Line/Line, Line/Area, Point/Area and Point/Line pairs of relationships,
+// The touches relation applies to all Area/Area, Line/Line, Line/Area, Point/Area and Point/Line pairs of relationships,
 // but not to the Point/Point pair.
 func (g *MegrezAlgorithm) Touches(A, B space.Geometry) (bool, error) {
 	return space.Touches(A, B)

@@ -29,20 +29,27 @@ func (p *PolygonRelate) IntersectionMatrix(im *matrix.IntersectionMatrix) *matri
 
 func (p *PolygonRelate) computePolygon(im *matrix.IntersectionMatrix) {
 	inRing := -1
+	ipNum := 0
 	for i, v := range p.other.(matrix.PolygonMatrix) {
 		l := p.PolygonMatrix[0]
-		if IsIntersectionEdge(l, v) {
+		if mark, ips := IntersectionEdge(l, v); mark {
 			inRing = 1
+			ipNum = len(ips)
 		}
 		if i == 0 {
 			if inRing != 1 {
 				if InPolygon(l[0], v) {
 					inRing = 0
 				} else {
-					inRing = 2
+					if InPolygon(v[0], l) {
+						inRing = 20
+					} else {
+						inRing = 2
+					}
 				}
 			} else {
 				lInRing := 0
+				lInRingOther := 0
 				lOutRing := 0
 				for _, m := range l {
 					if InLineMatrix(m, v) {
@@ -54,12 +61,36 @@ func (p *PolygonRelate) computePolygon(im *matrix.IntersectionMatrix) {
 						lOutRing++
 					}
 				}
+				for _, m := range v {
+					if InLineMatrix(m, l) {
+						continue
+					}
+					if InPolygon(m, l) {
+						lInRingOther++
+					}
+				}
 				if lInRing > 0 && lOutRing == 0 {
-					inRing = 0
+					if ipNum > 1 {
+						inRing = 10
+					} else {
+						inRing = 11
+					}
 				} else if lInRing > 0 && lOutRing > 0 {
 					inRing = 1
 				} else if lInRing == 0 && lOutRing > 0 {
-					inRing = 2
+					if lInRingOther > 0 {
+						if ipNum > 1 {
+							inRing = 12
+						} else {
+							inRing = 13
+						}
+					} else {
+						if ipNum > 1 {
+							inRing = 22
+						} else {
+							inRing = 23
+						}
+					}
 				}
 			}
 		} else {
@@ -103,5 +134,19 @@ func (p *PolygonRelate) computePolygon(im *matrix.IntersectionMatrix) {
 		im.SetAtLeastString("212101212")
 	case 2:
 		im.SetAtLeastString("FF2FF1212")
+	case 10:
+		im.SetAtLeastString("2FF11F212")
+	case 12:
+		im.SetAtLeastString("212F11FF2")
+	case 13:
+		im.SetAtLeastString("212F01FF2")
+	case 11:
+		im.SetAtLeastString("2FF01F212")
+	case 20:
+		im.SetAtLeastString("212FF1FF2")
+	case 22:
+		im.SetAtLeastString("FF2F11212")
+	case 23:
+		im.SetAtLeastString("FF2F01212")
 	}
 }

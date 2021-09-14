@@ -231,7 +231,7 @@ func aInB(A, B Geometry) (bool, bool) {
 	if A.Bound().ContainsBound(B.Bound()) {
 		return false, true
 	}
-	// optimization for rectangle arguments
+	//optimization for rectangle arguments
 	if B.GeoJSONType() == TypePolygon && B.(Polygon).IsRectangle() {
 		return B.Bound().ContainsBound(A.Bound()), true
 	}
