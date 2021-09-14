@@ -8,7 +8,7 @@ import (
 
 // Circle describes a circle Valid
 type Circle struct {
-	Ring
+	Polygon
 	Centre   Point
 	Radius   float64
 	Segments int
@@ -22,7 +22,7 @@ func CreateCircle(centre Point, radius float64) (*Circle, error) {
 // CreateCircleWithSegments Returns valid circle.
 func CreateCircleWithSegments(centre Point, radius float64, segments int) (*Circle, error) {
 	circle := &Circle{Centre: centre, Radius: radius, Segments: segments}
-	circle.Ring = centre.Buffer(radius, segments).(Ring)
+	circle.Polygon = centre.Buffer(radius, segments).(Polygon)
 	return circle, nil
 }
 

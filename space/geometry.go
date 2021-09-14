@@ -17,7 +17,7 @@ const (
 
 	TypeBound = "Bound"
 
-	TypeCircle = "Circle"
+	TypeCircle = "Polygon"
 )
 
 // Geometry is the interface implemented by other spatial objects
