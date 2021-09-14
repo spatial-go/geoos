@@ -19,19 +19,37 @@ func UnaryUnionByHalf(matrix4 matrix.Collection, start, end int) matrix.Steric {
 		return nil
 	}
 	if end-start <= 1 {
-		return Union(matrix4[start].(matrix.PolygonMatrix), nil)
+		return Union(matrix4[start], nil)
 	} else if end-start == 2 {
-		return Union(matrix4[start].(matrix.PolygonMatrix), matrix4[start+1].(matrix.PolygonMatrix))
+		return Union(matrix4[start], matrix4[start+1])
 	} else {
 		mid := (end + start) / 2
 		g0 := UnaryUnionByHalf(matrix4, start, mid)
 		g1 := UnaryUnionByHalf(matrix4, mid, end)
-		return Union(g0.(matrix.PolygonMatrix), g1.(matrix.PolygonMatrix))
+		return Union(g0, g1)
 	}
 }
 
 // Union  Computes the Union of two geometries,either or both of which may be null.
-func Union(m0, m1 matrix.PolygonMatrix) matrix.Steric {
+func Union(m0, m1 matrix.Steric) (result matrix.Steric) {
+	switch m := m0.(type) {
+	case matrix.Matrix:
+		over := &PointOverlay{Subject: m, Clipping: m1}
+		result, _ = over.Union()
+	case matrix.LineMatrix:
+		over := &LineOverlay{PointOverlay: &PointOverlay{Subject: m0, Clipping: m1}}
+		result, _ = over.Union()
+	case matrix.PolygonMatrix:
+		polyOver := &PolygonOverlay{PointOverlay: &PointOverlay{Subject: m0, Clipping: m1}}
+		result, _ = polyOver.Union()
+	case matrix.Collection:
+		result = Union(UnaryUnion(m), m1)
+	}
+	return result
+}
+
+// UnionPolygon  Computes the UnionPolygon of two geometries,either or both of which may be null.
+func UnionPolygon(m0, m1 matrix.PolygonMatrix) matrix.Steric {
 
 	polyOver := &PolygonOverlay{PointOverlay: &PointOverlay{Subject: m0, Clipping: m1}}
 
