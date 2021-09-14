@@ -86,17 +86,7 @@ func (r *Computer) computeProperIntersectionIM(im *matrix.IntersectionMatrix) {
 	}
 }
 
-//   // updateIM update the IM with the sum of the IMs for each component
-//    func (r *Computer)  updateIM(im *matrix.IntersectionMatrix) {
-// 	 for (Iterator ei = isolatedEdges.iterator(); ei.hasNext(); ) {
-// 	   Edge e = (Edge) ei.next();
-// 	   e.updateIM(im);
-// 	 }
-// 	 for (Iterator ni = nodes.iterator(); ni.hasNext(); ) {
-// 	   RelateNode node = (RelateNode) ni.next();
-// 	   node.updateIM(im);
-//
-// 	   node.updateIMFromEdges(im);
-// 	 }
-//    }
-//
+//  updateIM update the IM with the sum of the IMs for each component
+func (r *Computer) updateIM(im *matrix.IntersectionMatrix) {
+	//TODO
+}

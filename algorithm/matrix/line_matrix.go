@@ -49,7 +49,7 @@ func (l LineMatrix) Bound() []Matrix {
 		return []Matrix{}
 	}
 
-	b := []Matrix{{0, 0}, {0, 0}}
+	b := []Matrix{{math.MaxFloat64, math.MaxFloat64}, {0, 0}}
 	for _, p := range l {
 		b[0][0] = math.Min(b[0][0], p[0])
 		b[0][1] = math.Min(b[0][1], p[1])

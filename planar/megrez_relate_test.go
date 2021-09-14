@@ -4,9 +4,61 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/spatial-go/geoos"
 	"github.com/spatial-go/geoos/encoding/wkt"
 	"github.com/spatial-go/geoos/space"
 )
+
+type args struct {
+	g1 space.Geometry
+	g2 space.Geometry
+}
+type TestStruct struct {
+	name    string
+	args    args
+	want    bool
+	wantErr bool
+}
+
+var polyTestscase = []struct {
+	name string
+	args args
+}{
+	{name: "poly 1",
+		args: args{g1: space.Polygon{{{1, 1}, {2, 1}, {2, 2}, {1, 2}, {1, 1}}},
+			g2: space.Polygon{{{3, 1}, {5, 1}, {5, 2}, {3, 2}, {3, 1}}},
+		},
+	},
+	{name: "poly 2",
+		args: args{g1: space.Polygon{{{1, 1}, {2, 1}, {2, 2}, {1, 2}, {1, 1}}},
+			g2: space.Polygon{{{2, 1}, {5, 1}, {5, 2}, {2, 2}, {2, 1}}},
+		},
+	},
+
+	{name: "poly 3",
+		args: args{g1: space.Polygon{{{1, 1}, {2, 1}, {2, 2}, {1, 2}, {1, 1}}},
+			g2: space.Polygon{{{2, 2}, {5, 2}, {5, 3}, {2, 3}, {2, 2}}},
+		},
+	},
+
+	{name: "poly 4",
+		args: args{g1: space.Polygon{{{1, 2}, {3, 2}, {3, 3}, {1, 3}, {1, 2}}},
+			g2: space.Polygon{{{2, 1}, {5, 1}, {5, 5}, {2, 5}, {2, 1}}},
+		},
+	},
+
+	{name: "poly 5",
+		args: args{g1: space.Polygon{{{1, 1}, {5, 1}, {5, 5}, {1, 5}, {1, 1}}},
+			g2: space.Polygon{{{2, 2}, {3, 2}, {3, 3}, {2, 3}, {2, 2}}},
+		},
+	},
+
+	{name: "poly 6",
+		args: args{g1: space.Polygon{{{1, 1}, {2, 1}, {2, 2}, {1, 2}, {1, 1}}},
+			g2: space.Polygon{{{1, 1}, {5, 1}, {5, 3}, {1, 3}, {1, 1}}},
+		},
+	},
+}
 
 func TestAlgorithm_Contains(t *testing.T) {
 	const polygon = `POLYGON((0 0, 6 0, 6 6, 0 6, 0 0))`
@@ -16,16 +68,8 @@ func TestAlgorithm_Contains(t *testing.T) {
 	p1, _ := wkt.UnmarshalString(point1)
 	p2, _ := wkt.UnmarshalString(point2)
 	poly, _ := wkt.UnmarshalString(polygon)
-	type args struct {
-		g1 space.Geometry
-		g2 space.Geometry
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    bool
-		wantErr bool
-	}{
+
+	tests := []TestStruct{
 		{name: "contain", args: args{
 			g1: poly,
 			g2: p1,
@@ -34,6 +78,13 @@ func TestAlgorithm_Contains(t *testing.T) {
 			g1: poly,
 			g2: p2,
 		}, want: false, wantErr: false},
+	}
+	for i, v := range polyTestscase {
+		want := true
+		if i != 4 {
+			want = false
+		}
+		tests = append(tests, TestStruct{v.name, v.args, want, false})
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -58,16 +109,7 @@ func TestAlgorithm_Covers(t *testing.T) {
 	p1, _ := wkt.UnmarshalString(point1)
 	p2, _ := wkt.UnmarshalString(point2)
 	poly, _ := wkt.UnmarshalString(polygon)
-	type args struct {
-		g1 space.Geometry
-		g2 space.Geometry
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    bool
-		wantErr bool
-	}{
+	tests := []TestStruct{
 		{name: "contain", args: args{
 			g1: poly,
 			g2: p1,
@@ -76,6 +118,13 @@ func TestAlgorithm_Covers(t *testing.T) {
 			g1: poly,
 			g2: p2,
 		}, want: false, wantErr: false},
+	}
+	for i, v := range polyTestscase {
+		want := true
+		if i != 4 {
+			want = false
+		}
+		tests = append(tests, TestStruct{v.name, v.args, want, false})
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -86,7 +135,7 @@ func TestAlgorithm_Covers(t *testing.T) {
 				return
 			}
 			if got != tt.want {
-				t.Errorf("Covers() got = %v, want %v", got, tt.want)
+				t.Errorf("Covers()%v got = %v, want %v", tt.name, got, tt.want)
 			}
 		})
 	}
@@ -100,35 +149,37 @@ func TestAlgorithm_CoveredBy(t *testing.T) {
 	p1, _ := wkt.UnmarshalString(point1)
 	p2, _ := wkt.UnmarshalString(point2)
 	poly, _ := wkt.UnmarshalString(polygon)
-	type args struct {
-		g1 space.Geometry
-		g2 space.Geometry
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    bool
-		wantErr bool
-	}{
+
+	tests := []TestStruct{
 		{name: "contain", args: args{
-			g1: poly,
-			g2: p1,
+			g2: poly,
+			g1: p1,
 		}, want: true, wantErr: false},
 		{name: "notcontain", args: args{
-			g1: poly,
-			g2: p2,
+			g2: poly,
+			g1: p2,
 		}, want: false, wantErr: false},
 	}
-	for _, tt := range tests {
+	for i, v := range polyTestscase {
+		want := true
+		if i != 5 {
+			want = false
+		}
+		tests = append(tests, TestStruct{v.name, v.args, want, false})
+	}
+	for i, tt := range tests {
+		if i < 0 {
+			continue
+		}
 		t.Run(tt.name, func(t *testing.T) {
 			G := NormalStrategy()
-			got, err := G.CoveredBy(tt.args.g2, tt.args.g1)
+			got, err := G.CoveredBy(tt.args.g1, tt.args.g2)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("CoveredBy() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("CoveredBy() got = %v, want %v", got, tt.want)
+				t.Errorf("CoveredBy()%v got = %v, want %v", tt.name, got, tt.want)
 			}
 		})
 	}
@@ -254,47 +305,6 @@ func TestAlgorithm_Relate(t *testing.T) {
 	}
 	tests := []TestStruct{}
 
-	g0 := space.Point{3, 3}
-
-	g1 := space.LineString{{3, 3}, {3, 4}}
-
-	g2 := space.Polygon{{{3, 3}, {3, 4}, {4, 4}, {4, 3}, {3, 3}}}
-	polys := []space.Polygon{
-		{{{2, 2}, {5, 2}, {5, 5}, {2, 5}, {2, 2}},
-			{{2.5, 2.5}, {4.5, 2.5}, {4.5, 4.5}, {2.5, 4.5}, {2.5, 2.5}}},
-		{{{2, 2}, {5, 2}, {5, 5}, {2, 5}, {2, 2}}},
-		{{{3.5, 3.5}, {3.5, 4.5}, {4.5, 4.5}, {4.5, 3.5}, {3.5, 3.5}}},
-		{{{5, 5}, {5, 6}, {6, 6}, {6, 5}, {5, 5}}},
-		{{{3, 3}, {3, 4}, {4, 4}, {4, 3}, {3, 3}}},
-	}
-	pts := []space.Point{{3, 3}, {4, 4}}
-	wants1 := []string{"0FFFFFFF2", "FF0FFF0F2"}
-	for i, v := range pts {
-		tests = append(tests, TestStruct{fmt.Sprintf("Point%v", i), args{g0, v}, wants1[i], false})
-	}
-	ls := []space.LineString{{{3.5, 2}, {3.5, 4}},
-		{{2, 2}, {5, 2}, {5, 5}, {2, 5}, {2, 2}},
-		{{3.5, 3.5}, {3.5, 4.5}, {4.5, 4.5}, {4.5, 3.5}, {3.5, 3.5}},
-		{{5, 5}, {5, 6}, {6, 6}, {6, 5}, {5, 5}},
-		{{3, 3}, {3, 6}}}
-	wants2 := []string{"FF0FFF102", "FF1FF0102", "FF0FFF1F2", "FF1FF01F2", "FF0FFF1F2", "FF1FF01F2", "FF0FFF1F2", "FF1FF01F2", "F0FFFF102", "1FF00F102"}
-	for i, v := range ls {
-		tests = append(tests, TestStruct{fmt.Sprintf("PointLine%v", i), args{g0, v}, wants2[i*2], false})
-		tests = append(tests, TestStruct{fmt.Sprintf("LineLine%v", i), args{g1, v}, wants2[i*2+1], false})
-	}
-
-	wants3 := []string{"FF0FFF212", "FF1FF0212", "FF2FF1212",
-		"0FFFFF212", "1FF0FF212", "2FF1FF212",
-		"FF0FFF212", "FF1FF0212", "212101212",
-		"FF0FFF212", "FF1FF0212", "FF2FF1212",
-		"F0FFFF212", "F1FF0F212", "2FFF1FFF2",
-	}
-	for i, v := range polys {
-		tests = append(tests, TestStruct{fmt.Sprintf("PointPoly%v", i), args{g0, v}, wants3[i*3], false})
-		tests = append(tests, TestStruct{fmt.Sprintf("LinePoly%v", i), args{g1, v}, wants3[i*3+1], false})
-		tests = append(tests, TestStruct{fmt.Sprintf("PolyPoly%v", i), args{g2, v}, wants3[i*3+2], false})
-	}
-
 	tests = append(tests, TestStruct{fmt.Sprintf("Disjoint%v", "00"),
 		args{space.Point{0, 0}, space.LineString{{2, 0}, {0, 2}}}, "FF0FFF102", false})
 	tests = append(tests, TestStruct{fmt.Sprintf("inter%v", "3-6"),
@@ -305,9 +315,29 @@ func TestAlgorithm_Relate(t *testing.T) {
 		args{space.Point{0, 2}, space.LineString{{0, 0}, {1, 1}, {0, 2}}}, "F0FFFF102", false})
 	tests = append(tests, TestStruct{fmt.Sprintf("polyPoly%v", "0f"),
 		args{space.Polygon{{{100, 100}, {100, 101}, {101, 101}, {101, 100}, {100, 100}}},
-			space.Polygon{{{90, 90}, {90, 101}, {101, 101}, {101, 90}, {90, 90}}}}, "2FF1FF212", false})
+			space.Polygon{{{90, 90}, {90, 101}, {101, 101}, {101, 90}, {90, 90}}}}, "2FF11F212", false})
+	tests = append(tests, TestStruct{fmt.Sprintf("polyPoly%v", "00f"),
+		args{space.Polygon{{{1, 1}, {2, 1}, {2, 2}, {1, 2}, {1, 1}}},
+			space.Polygon{{{1, 1}, {5, 1}, {5, 3}, {1, 3}, {1, 1}}}}, "2FF11F212", false})
+
+	tests = append(tests, TestStruct{fmt.Sprintf("polyPoly%v", "00f1"),
+		args{space.Polygon{{{1, 1}, {5, 1}, {5, 5}, {1, 5}, {1, 1}}},
+			space.Polygon{{{2, 2}, {3, 2}, {3, 3}, {2, 3}, {2, 2}}}}, "212FF1FF2", false})
+	tests = append(tests, TestStruct{fmt.Sprintf("polyPoly%v", "00f2"),
+		args{space.Polygon{{{1, 1}, {2, 1}, {2, 2}, {1, 2}, {1, 1}}},
+			space.Polygon{{{2, 1}, {5, 1}, {5, 2}, {2, 2}, {2, 1}}}}, "FF2F11212", false})
+
+	tests = append(tests, TestStruct{fmt.Sprintf("polyPoly%v", "00f3"),
+		args{space.Polygon{{{1, 1}, {2, 1}, {2, 2}, {1, 2}, {1, 1}}},
+			space.Polygon{{{2, 2}, {5, 2}, {5, 3}, {2, 3}, {2, 2}}}}, "FF2F01212", false})
+	tests = append(tests, TestStruct{fmt.Sprintf("polyPoly%v", "f1"),
+		args{space.Polygon{{{90, 90}, {90, 101}, {101, 101}, {101, 90}, {90, 90}}},
+			space.Polygon{{{100, 100}, {100, 101}, {101, 101}, {101, 100}, {100, 100}}}}, "212F11FF2", false})
 
 	for _, tt := range tests {
+		if !geoos.GeoosTestTag && tt.name != "LineLine0" {
+			continue
+		}
 		t.Run(tt.name, func(t *testing.T) {
 			//G := GEOAlgorithm{}
 			G := NormalStrategy()
@@ -388,7 +418,7 @@ func TestAlgorithm_Within(t *testing.T) {
 			g1: p1,
 			g2: poly,
 		}, want: true, wantErr: false},
-		{name: "notin", args: args{
+		{name: "not in", args: args{
 			g1: p2,
 			g2: poly,
 		}, want: false, wantErr: false},

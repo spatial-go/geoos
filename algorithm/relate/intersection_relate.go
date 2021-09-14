@@ -81,7 +81,7 @@ func Intersection(aStart, aEnd, bStart, bEnd matrix.Matrix) (mark bool, ips Inte
 		if ina && inb {
 			isIntersectionPoint := true
 			if isVexA && inVexB {
-				isIntersectionPoint = false
+				//isIntersectionPoint = false  //todo
 			}
 			isOriginal := false
 			if ip.Equals(aStart) || ip.Equals(aEnd) || ip.Equals(bStart) || ip.Equals(bEnd) {
@@ -180,11 +180,11 @@ type UniqueIntersectionEdgeFilter struct {
 }
 
 // Filter Performs an operation with the provided .
-func (u *UniqueIntersectionEdgeFilter) Filter(ip interface{}) {
-	u.add(ip)
+func (u *UniqueIntersectionEdgeFilter) Filter(ip interface{}) bool {
+	return u.add(ip)
 }
 
-func (u *UniqueIntersectionEdgeFilter) add(ip interface{}) {
+func (u *UniqueIntersectionEdgeFilter) add(ip interface{}) bool {
 	hasMatrix := false
 	for _, v := range u.Ips {
 		if v.Matrix.Equals(ip.(IntersectionPoint).Matrix) {
@@ -194,7 +194,9 @@ func (u *UniqueIntersectionEdgeFilter) add(ip interface{}) {
 	}
 	if !hasMatrix {
 		u.Ips = append(u.Ips, ip.(IntersectionPoint))
+		return true
 	}
+	return false
 }
 
 // Entities  Returns the gathered Matrixes.

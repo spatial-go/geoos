@@ -23,7 +23,7 @@ func TestVertex_Sub(t *testing.T) {
 		args   args
 		want   *Vertex
 	}{
-		{"bertex sub", fields{Matrix: matrix.Matrix{2, 2}},
+		{"vertex sub", fields{Matrix: matrix.Matrix{2, 2}},
 			args{&Vertex{Matrix: matrix.Matrix{1, 1}}}, &Vertex{Matrix: matrix.Matrix{1, 1}}},
 	}
 	for _, tt := range tests {

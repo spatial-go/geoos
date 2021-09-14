@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/spatial-go/geoos"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
 )
@@ -77,18 +78,76 @@ func TestPolygonOverlay_Union(t *testing.T) {
 	tests := []struct {
 		name    string
 		fields  fields
-		want    matrix.Steric
+		want    []matrix.Steric
 		wantErr bool
 	}{
 		{"poly poly", fields{PointOverlay: &PointOverlay{matrix.PolygonMatrix{{{0, 0}, {10, 0}, {10, 10}, {0, 10}, {0, 0}}},
 			matrix.PolygonMatrix{{{5, 5}, {15, 5}, {15, 15}, {5, 15}, {5, 5}}},
 		}},
-			matrix.PolygonMatrix{{{5, 10}, {0, 10}, {0, 0}, {10, 0}, {10, 5}, {15, 5}, {15, 15}, {5, 15}, {5, 10}}}, false},
+			[]matrix.Steric{matrix.PolygonMatrix{{{5, 10}, {0, 10}, {0, 0}, {10, 0}, {10, 5}, {15, 5}, {15, 15}, {5, 15}, {5, 10}}}}, false},
 
 		{"poly poly1", fields{PointOverlay: &PointOverlay{matrix.PolygonMatrix{{{100, 100}, {100, 101}, {101, 101}, {101, 100}, {100, 100}}},
 			matrix.PolygonMatrix{{{90, 90}, {90, 101}, {101, 101}, {101, 90}, {90, 90}}},
 		}},
-			matrix.PolygonMatrix{{{101, 100}, {101, 101}, {100, 101}, {90, 101}, {90, 90}, {101, 90}, {101, 100}}}, false},
+			[]matrix.Steric{matrix.PolygonMatrix{{{90, 90}, {90, 101}, {101, 101}, {101, 90}, {90, 90}}}}, false},
+
+		{name: "poly 1",
+			fields: fields{PointOverlay: &PointOverlay{matrix.PolygonMatrix{{{1, 1}, {2, 1}, {2, 2}, {1, 2}, {1, 1}}},
+				matrix.PolygonMatrix{{{3, 1}, {5, 1}, {5, 2}, {3, 2}, {3, 1}}},
+			},
+			}, want: []matrix.Steric{matrix.Collection{matrix.PolygonMatrix{{{1, 1}, {2, 1}, {2, 2}, {1, 2}, {1, 1}}},
+				matrix.PolygonMatrix{{{3, 1}, {5, 1}, {5, 2}, {3, 2}, {3, 1}}}},
+				matrix.Collection{matrix.PolygonMatrix{{{1, 1}, {2, 1}, {2, 2}, {1, 2}, {1, 1}}},
+					matrix.PolygonMatrix{{{3, 1}, {5, 1}, {5, 2}, {3, 2}, {3, 1}}}},
+			},
+			wantErr: false},
+
+		{name: "poly 2",
+			fields: fields{PointOverlay: &PointOverlay{matrix.PolygonMatrix{{{1, 1}, {2, 1}, {2, 2}, {1, 2}, {1, 1}}},
+				matrix.PolygonMatrix{{{2, 1}, {5, 1}, {5, 2}, {2, 2}, {2, 1}}},
+			},
+			}, want: []matrix.Steric{matrix.PolygonMatrix{{{1, 1}, {5, 1}, {5, 2}, {1, 2}, {1, 1}}},
+				matrix.PolygonMatrix{{{2, 2}, {1, 2}, {1, 1}, {2, 1}, {5, 1}, {5, 2}, {2, 2}}},
+			},
+			wantErr: false},
+
+		{name: "poly 3",
+			fields: fields{PointOverlay: &PointOverlay{matrix.PolygonMatrix{{{1, 1}, {2, 1}, {2, 2}, {1, 2}, {1, 1}}},
+				matrix.PolygonMatrix{{{2, 2}, {5, 2}, {5, 3}, {2, 3}, {2, 2}}},
+			},
+			}, want: []matrix.Steric{matrix.Collection{matrix.PolygonMatrix{{{2, 2}, {2, 1}, {1, 1}, {1, 2}, {2, 2}}},
+				matrix.PolygonMatrix{{{2, 2}, {2, 3}, {5, 3}, {5, 2}, {2, 2}}}},
+				matrix.Collection{matrix.PolygonMatrix{{{1, 1}, {2, 1}, {2, 2}, {1, 2}, {1, 1}}},
+					matrix.PolygonMatrix{{{2, 2}, {5, 2}, {5, 3}, {2, 3}, {2, 2}}}},
+			},
+			wantErr: false},
+
+		{name: "poly 4",
+			fields: fields{PointOverlay: &PointOverlay{matrix.PolygonMatrix{{{1, 2}, {3, 2}, {3, 3}, {1, 3}, {1, 2}}},
+				matrix.PolygonMatrix{{{2, 1}, {5, 1}, {5, 5}, {2, 5}, {2, 1}}},
+			},
+			}, want: []matrix.Steric{matrix.PolygonMatrix{{{2, 2}, {1, 2}, {1, 3}, {2, 3}, {2, 5}, {5, 5}, {5, 1}, {2, 1}, {2, 2}}},
+				matrix.PolygonMatrix{{{2, 3}, {1, 3}, {1, 2}, {2, 2}, {2, 1}, {5, 1}, {5, 5}, {2, 5}, {2, 3}}},
+			},
+			wantErr: false},
+
+		{name: "poly 5",
+			fields: fields{PointOverlay: &PointOverlay{matrix.PolygonMatrix{{{1, 1}, {5, 1}, {5, 5}, {1, 5}, {1, 1}}},
+				matrix.PolygonMatrix{{{2, 2}, {3, 2}, {3, 3}, {2, 3}, {2, 2}}},
+			},
+			}, want: []matrix.Steric{matrix.PolygonMatrix{{{1, 1}, {1, 5}, {5, 5}, {5, 1}, {1, 1}}},
+				matrix.PolygonMatrix{{{1, 1}, {5, 1}, {5, 5}, {1, 5}, {1, 1}}},
+			},
+			wantErr: false},
+
+		{name: "poly 6",
+			fields: fields{PointOverlay: &PointOverlay{matrix.PolygonMatrix{{{1, 1}, {2, 1}, {2, 2}, {1, 2}, {1, 1}}},
+				matrix.PolygonMatrix{{{1, 1}, {5, 1}, {5, 3}, {1, 3}, {1, 1}}},
+			},
+			}, want: []matrix.Steric{matrix.PolygonMatrix{{{2, 1}, {1, 1}, {1, 2}, {1, 3}, {5, 3}, {5, 1}, {2, 1}}},
+				matrix.PolygonMatrix{{{1, 1}, {5, 1}, {5, 3}, {1, 3}, {1, 1}}},
+			},
+			wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -102,8 +161,14 @@ func TestPolygonOverlay_Union(t *testing.T) {
 				t.Errorf("PolygonOverlay.Union() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("PolygonOverlay.Union() = %v, \nwant %v", got, tt.want)
+			isEqual := got.EqualsExact(tt.want[0], 0.000001)
+			if len(tt.want) > 1 {
+				isEqual1 := got.EqualsExact(tt.want[1], 0.000001)
+				isEqual = isEqual || isEqual1
+			}
+
+			if !isEqual {
+				t.Errorf("PolygonOverlay.Union()%v = %v, \nwant %v", tt.name, got, tt.want)
 			}
 		})
 	}
@@ -130,13 +195,22 @@ func TestPolygonOverlay_Difference(t *testing.T) {
 			matrix.PolygonMatrix{{{90, 90}, {90, 101}, {101, 101}, {101, 90}, {90, 90}}},
 		}},
 			matrix.PolygonMatrix{}, false},
-		{"poly poly1", fields{PointOverlay: &PointOverlay{
+
+		{"poly poly2", fields{PointOverlay: &PointOverlay{
 			matrix.PolygonMatrix{{{90, 90}, {90, 101}, {101, 101}, {101, 90}, {90, 90}}},
 			matrix.PolygonMatrix{{{100, 100}, {100, 101}, {101, 101}, {101, 100}, {100, 100}}},
 		}},
 			matrix.PolygonMatrix{{{100, 101}, {90, 101}, {90, 90}, {101, 90}, {101, 100}, {100, 100}, {100, 101}}}, false},
+		{"poly poly3", fields{PointOverlay: &PointOverlay{
+			matrix.PolygonMatrix{{{1, 1}, {5, 1}, {5, 5}, {1, 5}, {1, 1}}},
+			matrix.PolygonMatrix{{{2, 2}, {3, 2}, {3, 3}, {2, 3}, {2, 2}}},
+		}},
+			matrix.PolygonMatrix{{{1, 1}, {5, 1}, {5, 5}, {1, 5}, {1, 1}}, {{2, 2}, {3, 2}, {3, 3}, {2, 3}, {2, 2}}}, false},
 	}
 	for _, tt := range tests {
+		if !geoos.GeoosTestTag && tt.name != "poly poly3" {
+			continue
+		}
 		t.Run(tt.name, func(t *testing.T) {
 			p := &PolygonOverlay{
 				PointOverlay:  tt.fields.PointOverlay,
@@ -149,7 +223,7 @@ func TestPolygonOverlay_Difference(t *testing.T) {
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("PolygonOverlay.Difference() = %v, want %v", got, tt.want)
+				t.Errorf("PolygonOverlay.Difference()%v = %v, \nwant %v", tt.name, got, tt.want)
 			}
 		})
 	}

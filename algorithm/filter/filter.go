@@ -6,7 +6,7 @@ import "reflect"
 // Filter  An interface  which use the values of the entity in a  entities.
 type Filter interface {
 	// Filter  Performs an operation with the provided .
-	Filter(entity interface{})
+	Filter(entity interface{}) bool
 
 	// Matrixes ...
 	Entities() interface{}
@@ -23,11 +23,11 @@ func (u *UniqueArrayFilter) Entities() interface{} {
 }
 
 // Filter Performs an operation with the provided .
-func (u *UniqueArrayFilter) Filter(entity interface{}) {
-	u.add(entity)
+func (u *UniqueArrayFilter) Filter(entity interface{}) bool {
+	return u.add(entity)
 }
 
-func (u *UniqueArrayFilter) add(entity interface{}) {
+func (u *UniqueArrayFilter) add(entity interface{}) bool {
 	hasMatrix := false
 	for _, v := range u.entities {
 		if reflect.DeepEqual(v, entity) {
@@ -37,7 +37,9 @@ func (u *UniqueArrayFilter) add(entity interface{}) {
 	}
 	if !hasMatrix {
 		u.entities = append(u.entities, entity)
+		return true
 	}
+	return false
 }
 
 // compile time checks

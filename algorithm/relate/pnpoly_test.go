@@ -51,7 +51,7 @@ var testData = []struct {
 			{matrix.Matrix{1, 2}, false},
 			{matrix.Matrix{2, 1}, false},
 		}},
-	{"rc exagon", // (sic) "hexagon"
+	{"rc hexagon", // (sic) "hexagon"
 		matrix.LineMatrix{{3, 0}, {7, 0}, {10, 5}, {7, 10}, {3, 10}, {0, 5}},
 		[]args{
 			{matrix.Matrix{5, 5}, true},
