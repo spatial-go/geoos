@@ -37,6 +37,12 @@ func MergeLine(ml matrix.Collection, i, j int) (matrix.Collection, bool) {
 
 	var result matrix.Collection
 
+	if ml[i].Equals(ml[j]) {
+		result = append(result, ml[:i]...)
+		result = append(result, ml[i+1:]...)
+		return result, true
+	}
+
 	if _, ok := ml[i].(matrix.Matrix); ok {
 		if res, isMerge := MergeMatrix(ml, i, j, result); isMerge {
 			result = append(result, res...)

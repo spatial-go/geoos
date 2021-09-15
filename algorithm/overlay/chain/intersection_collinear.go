@@ -10,8 +10,11 @@ import (
 // IntersectionCollinear Finds intersections between line segments , and adds them.
 type IntersectionCollinear struct {
 	Intersections relate.IntersectionPointLine
-	result        matrix.Collection
-	line          matrix.LineMatrix
+	Edge          matrix.LineMatrix
+
+	result   matrix.Collection
+	line     matrix.LineMatrix
+	startPos int
 }
 
 // ProcessIntersections This method is called by clients  to process intersections for two segments being intersected.
@@ -38,11 +41,8 @@ func (ii *IntersectionCollinear) ProcessIntersections(
 		}
 		if len(ips) > 1 {
 			for _, v := range ips {
-				if !v.Matrix.Equals(matrix.Matrix(ii.line[len(ii.line)-1])) {
-					ii.line = append(ii.line, v.Matrix)
-				}
+				ii.line = append(ii.line, v.Matrix)
 			}
-
 		}
 		if ii.line != nil && len(ii.line) > 1 {
 			ii.result = append(ii.result, ii.line)

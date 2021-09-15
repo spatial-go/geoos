@@ -3,6 +3,7 @@ package overlay
 import (
 	"testing"
 
+	"github.com/spatial-go/geoos"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 )
 
@@ -42,11 +43,23 @@ func TestUnion(t *testing.T) {
 			want: matrix.Collection{matrix.Matrix{3, 3}, matrix.PolygonMatrix{{{1, 1}, {5, 1}, {5, 5}, {1, 5}, {1, 1}}, {{2, 2}, {4, 2}, {4, 4}, {2, 4}, {2, 2}}}},
 		},
 
-		// {name: "union line", args: args{g1: matrix.LineMatrix{{50, 100}, {50, 200}}, g2: matrix.LineMatrix{{50, 50}, {50, 150}}},
-		// 	want: matrix.Collection{matrix.LineMatrix{{50, 100}, {50, 150}}, matrix.LineMatrix{{50, 150}, {50, 200}}, matrix.LineMatrix{{50, 50}, {50, 100}}},
-		// },
+		{name: "line line", args: args{g1: matrix.LineMatrix{{50, 100}, {50, 200}}, g2: matrix.LineMatrix{{50, 50}, {50, 150}}},
+			want: matrix.Collection{matrix.LineMatrix{{50, 100}, {50, 150}}, matrix.LineMatrix{{50, 150}, {50, 200}}, matrix.LineMatrix{{50, 50}, {50, 100}}},
+		},
+		{name: "line line1", args: args{g1: matrix.LineMatrix{{50, 100}, {50, 200}}, g2: matrix.LineMatrix{{30, 150}, {80, 150}}},
+			want: matrix.Collection{matrix.LineMatrix{{50, 100}, {50, 150}}, matrix.LineMatrix{{50, 150}, {50, 200}}, matrix.LineMatrix{{30, 150}, {50, 150}}, matrix.LineMatrix{{50, 150}, {80, 150}}},
+		},
+		{name: "line line2", args: args{g1: matrix.LineMatrix{{50, 100}, {50, 200}}, g2: matrix.LineMatrix{{30, 30}, {30, 150}}},
+			want: matrix.Collection{matrix.LineMatrix{{50, 100}, {50, 200}}, matrix.LineMatrix{{30, 30}, {30, 150}}},
+		},
+		{name: "line line3", args: args{g1: matrix.LineMatrix{{50, 100}, {50, 200}}, g2: matrix.LineMatrix{{30, 30}, {30, 100}}},
+			want: matrix.Collection{matrix.LineMatrix{{50, 100}, {50, 200}}, matrix.LineMatrix{{30, 30}, {30, 100}}},
+		},
 	}
 	for _, tt := range tests {
+		if !geoos.GeoosTestTag && tt.name != "line line" {
+			continue
+		}
 		t.Run(tt.name, func(t *testing.T) {
 			if gotResult := Union(tt.args.g1, tt.args.g2); !tt.want.Equals(gotResult) {
 				t.Errorf("Union()%v = %v, want %v", tt.name, gotResult, tt.want)

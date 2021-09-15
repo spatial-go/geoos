@@ -117,7 +117,7 @@ func (g *MegrezAlgorithm) UnaryUnion(geom space.Geometry) (space.Geometry, error
 // Union returns a new geometry representing all points in this geometry and the other.
 func (g *MegrezAlgorithm) Union(geom1, geom2 space.Geometry) (space.Geometry, error) {
 	if geom1.GeoJSONType() == space.TypePolygon && geom2.GeoJSONType() == space.TypePolygon {
-		result := overlay.Union(matrix.PolygonMatrix(geom1.(space.Polygon)), matrix.PolygonMatrix(geom2.(space.Polygon)))
+		result := overlay.UnionPolygon(matrix.PolygonMatrix(geom1.(space.Polygon)), matrix.PolygonMatrix(geom2.(space.Polygon)))
 		return space.TransGeometry(result), nil
 	} else if geom1.GeoJSONType() == space.TypePoint && geom2.GeoJSONType() == space.TypePoint {
 		return space.MultiPoint{geom1.(space.Point), geom2.(space.Point)}, nil
