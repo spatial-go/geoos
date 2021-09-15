@@ -19,9 +19,24 @@ func (p *LineOverlay) Union() (matrix.Steric, error) {
 	if res, ok := p.unionCheck(); !ok {
 		return res, nil
 	}
-	if s, ok := p.Subject.(matrix.LineMatrix); ok {
-		if c, ok := p.Clipping.(matrix.LineMatrix); ok {
-			return LineMerge(matrix.Collection{s, c}), nil
+	if ps, ok := p.Subject.(matrix.LineMatrix); ok {
+		switch pc := p.Clipping.(type) {
+		case matrix.Matrix:
+			return Union(pc, ps), nil
+		case matrix.LineMatrix:
+			ins, _ := p.Intersection()
+			sds, _ := p.SymDifference()
+			ic := ins.(matrix.Collection)
+			if len(ic) == 1 {
+				if _, ok := ic[0].(matrix.Matrix); ok {
+					return sds.(matrix.Collection), nil
+				}
+			}
+			return append(ins.(matrix.Collection), sds.(matrix.Collection)...), nil
+		case matrix.PolygonMatrix:
+			return matrix.Collection{ps, pc}, nil
+		case matrix.Collection:
+			return append(pc, ps), nil
 		}
 	}
 	return nil, algorithm.ErrNotMatchType
@@ -50,9 +65,11 @@ func (p *LineOverlay) Intersection() (matrix.Steric, error) {
 	case matrix.PolygonMatrix:
 		result := matrix.Collection{}
 		for _, ring := range c {
-			res := intersectLine(line, ring)
+			res := intersectLine(line, ring[:len(ring)-1])
 			result = append(result, res...)
 		}
+		filt := &matrix.UniqueArrayFilter{}
+		result = result.Filter(filt).(matrix.Collection)
 		return LineMerge(result), nil
 	}
 	return nil, algorithm.ErrNotMatchType
@@ -91,10 +108,10 @@ func (p *LineOverlay) DifferenceReverse() (matrix.Steric, error) {
 func (p *LineOverlay) SymDifference() (matrix.Steric, error) {
 	result := matrix.Collection{}
 	if res, err := p.Difference(); err == nil {
-		result = append(result, res)
+		result = append(result, res.(matrix.Collection)...)
 	}
 	if res, err := p.DifferenceReverse(); err == nil {
-		result = append(result, res)
+		result = append(result, res.(matrix.Collection)...)
 	}
 	return result, nil
 }
@@ -102,8 +119,8 @@ func (p *LineOverlay) SymDifference() (matrix.Steric, error) {
 // intersectLine returns a array  that represents that part of geometry A intersect with geometry B.
 func intersectLine(m, m1 matrix.LineMatrix) matrix.Collection {
 	smi := &chain.SegmentMutualIntersector{SegmentMutual: m}
-	icd := &chain.IntersectionCollinear{}
-	smi.Process(m1.ToLineArray(), icd)
+	icd := &chain.IntersectionCollinear{Edge: m}
+	smi.Process(m1, icd)
 	result := icd.Result()
 	return result.(matrix.Collection)
 }
@@ -143,10 +160,10 @@ func IntersectLine(m, m1 matrix.LineMatrix) []relate.IntersectionResult {
 
 func differenceLine(m, m1 matrix.LineMatrix) (matrix.Steric, error) {
 	smi := &chain.SegmentMutualIntersector{SegmentMutual: m}
-	icd := &chain.IntersectionCollinearDifference{}
-	smi.Process(m1.ToLineArray(), icd)
+	icd := &chain.IntersectionCollinearDifference{Edge: m}
+	smi.Process(m1, icd)
 	result := icd.Result()
-	if m, ok := result.(matrix.Collection); ok {
+	if m, ok := result.(matrix.Collection); ok && m != nil {
 		return m, nil
 	}
 	return matrix.Collection{}, nil

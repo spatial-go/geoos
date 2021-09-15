@@ -11,7 +11,7 @@ func TestSegmentMutualIntersector_Process(t *testing.T) {
 		SegmentMutual matrix.LineMatrix
 	}
 	type args struct {
-		segStrings []*matrix.LineSegment
+		segStrings matrix.LineMatrix
 		segInt     Intersector
 	}
 	tests := []struct {
@@ -21,7 +21,7 @@ func TestSegmentMutualIntersector_Process(t *testing.T) {
 		want   matrix.Collection
 	}{
 		{"test ", fields{matrix.LineMatrix{{50, 100}, {50, 200}}},
-			args{matrix.LineMatrix{{50, 50}, {50, 150}}.ToLineArray(), &IntersectionCollinearDifference{}},
+			args{matrix.LineMatrix{{50, 50}, {50, 150}}, &IntersectionCollinearDifference{Edge: matrix.LineMatrix{{50, 100}, {50, 200}}}},
 			matrix.Collection{matrix.LineMatrix{{50, 150}, {50, 200}}},
 		},
 	}
