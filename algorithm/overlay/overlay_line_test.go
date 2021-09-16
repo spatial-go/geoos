@@ -18,15 +18,15 @@ func TestLineOverlay_Intersection(t *testing.T) {
 		want    matrix.Steric
 		wantErr bool
 	}{
-		// {"line point0", fields{&PointOverlay{matrix.LineMatrix{{100, 100}, {100, 101}}, matrix.Matrix{100, 100}}}, matrix.Matrix{100, 100}, false},
-		// {"line line0", fields{&PointOverlay{matrix.LineMatrix{{100, 100}, {100, 101}}, matrix.LineMatrix{{100, 100}, {100, 101}}}},
-		// 	matrix.Collection{matrix.LineMatrix{{100, 100}, {100, 101}}}, false},
-		// {"line line1", fields{&PointOverlay{matrix.LineMatrix{{100, 100}, {100, 101}}, matrix.LineMatrix{{100, 100}, {90, 102}}}},
-		// 	matrix.Collection{matrix.Matrix{100, 100}}, false},
-		// {"line poly1", fields{&PointOverlay{matrix.LineMatrix{{100, 100}, {101, 101}},
-		// 	matrix.PolygonMatrix{{{90, 90}, {90, 101}, {101, 101}, {101, 90}, {90, 90}}},
-		// }},
-		// 	matrix.Collection{matrix.Matrix{101, 101}}, false},
+		{"line point0", fields{&PointOverlay{matrix.LineMatrix{{100, 100}, {100, 101}}, matrix.Matrix{100, 100}}}, matrix.Matrix{100, 100}, false},
+		{"line line0", fields{&PointOverlay{matrix.LineMatrix{{100, 100}, {100, 101}}, matrix.LineMatrix{{100, 100}, {100, 101}}}},
+			matrix.Collection{matrix.LineMatrix{{100, 100}, {100, 101}}}, false},
+		{"line line1", fields{&PointOverlay{matrix.LineMatrix{{100, 100}, {100, 101}}, matrix.LineMatrix{{100, 100}, {90, 102}}}},
+			matrix.Collection{matrix.Matrix{100, 100}}, false},
+		{"line poly1", fields{&PointOverlay{matrix.LineMatrix{{100, 100}, {101, 101}},
+			matrix.PolygonMatrix{{{90, 90}, {90, 101}, {101, 101}, {101, 90}, {90, 90}}},
+		}},
+			matrix.Collection{matrix.Matrix{101, 101}}, false},
 		{"line poly2", fields{&PointOverlay{matrix.LineMatrix{{100, 100}, {100, 101}},
 			matrix.PolygonMatrix{{{100, 100}, {100, 101}, {101, 101}, {101, 100}, {100, 100}}},
 		}},
@@ -84,7 +84,7 @@ func TestLineOverlay_Difference(t *testing.T) {
 			matrix.Collection{matrix.LineMatrix{{50, 100}, {50, 150}}, matrix.LineMatrix{{50, 150}, {50, 200}, {60, 200}}}, false},
 	}
 	for _, tt := range tests {
-		if !geoos.GeoosTestTag && tt.name != "line line7" {
+		if !geoos.GeoosTestTag && tt.name != "line line5" {
 			continue
 		}
 		t.Run(tt.name, func(t *testing.T) {
