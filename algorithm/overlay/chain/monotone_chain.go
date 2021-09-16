@@ -33,9 +33,7 @@ func (m *MonotoneChain) EnvelopeExpansion(expansionDistance float64) *envelope.E
 		/**
 		 * The monotonicity property allows fast envelope determination
 		 */
-		p0 := m.Edge[m.Start]
-		p1 := m.Edge[m.End]
-		m.Env = envelope.TwoMatrix(p0, p1)
+		m.Env = envelope.Bound(m.Edge.Bound())
 		if expansionDistance > 0.0 {
 			m.Env.ExpandBy(expansionDistance)
 		}

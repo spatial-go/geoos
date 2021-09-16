@@ -5,6 +5,7 @@ import (
 
 	"github.com/spatial-go/geoos/algorithm"
 	"github.com/spatial-go/geoos/algorithm/matrix"
+	"github.com/spatial-go/geoos/algorithm/matrix/envelope"
 	"github.com/spatial-go/geoos/algorithm/overlay/chain"
 	"github.com/spatial-go/geoos/algorithm/relate"
 )
@@ -34,7 +35,27 @@ func (p *LineOverlay) Union() (matrix.Steric, error) {
 			}
 			return append(ins.(matrix.Collection), sds.(matrix.Collection)...), nil
 		case matrix.PolygonMatrix:
-			return matrix.Collection{ps, pc}, nil
+			inter := envelope.Bound(ps.Bound()).IsIntersects(envelope.Bound(pc.Bound()))
+			im := relate.IM(ps, pc, inter)
+			if mark := im.IsDisjoint(); mark {
+				return matrix.Collection{ps, pc}, nil
+			}
+			if mark := im.IsWithin(); mark {
+				return pc, nil
+			}
+			res, _ := p.Difference()
+			result := matrix.Collection{}
+			for _, v := range res.(matrix.Collection) {
+				inter := envelope.Bound(v.Bound()).IsIntersects(envelope.Bound(pc.Bound()))
+				im := relate.IM(pc, v, inter)
+				if !im.IsContains() {
+					result = append(result, v)
+				}
+			}
+			if len(result) > 0 {
+				return append(result, pc), nil
+			}
+			return pc, nil
 		case matrix.Collection:
 			return append(pc, ps), nil
 		}
@@ -65,7 +86,7 @@ func (p *LineOverlay) Intersection() (matrix.Steric, error) {
 	case matrix.PolygonMatrix:
 		result := matrix.Collection{}
 		for _, ring := range c {
-			res := intersectLine(line, ring[:len(ring)-1])
+			res := intersectLine(line, ring)
 			result = append(result, res...)
 		}
 		filt := &matrix.UniqueArrayFilter{}
@@ -82,13 +103,25 @@ func (p *LineOverlay) Difference() (matrix.Steric, error) {
 	if res, ok := p.differenceCheck(); !ok {
 		return res, nil
 	}
-	if s, ok := p.Subject.(matrix.LineMatrix); ok {
-		if c, ok := p.Clipping.(matrix.LineMatrix); ok {
+
+	if ps, ok := p.Subject.(matrix.LineMatrix); ok {
+		switch pc := p.Clipping.(type) {
+		case matrix.Matrix:
+			return ps, nil
+		case matrix.LineMatrix:
 			var err error
-			if result, err := differenceLine(s, c); err == nil {
+			if result, err := differenceLine(ps, pc); err == nil {
 				return result, nil
 			}
 			return nil, err
+		case matrix.PolygonMatrix:
+			var result matrix.Collection
+			for _, v := range pc {
+				if res, err := differenceLine(ps, v); err == nil {
+					result = append(result, res.(matrix.Collection)...)
+				}
+			}
+			return result, nil
 		}
 	}
 	return nil, algorithm.ErrNotMatchType

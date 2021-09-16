@@ -10,20 +10,17 @@ type SegmentMutualIntersector struct {
 // Process the given collection of SegmentStrings and the set of indexed segments.
 func (s *SegmentMutualIntersector) Process(segStrings matrix.LineMatrix, segInt Intersector) {
 	monoChains, testChains := []*MonotoneChain{}, []*MonotoneChain{}
-	monoArray := s.SegmentMutual.ToLineArray()
-	for _, v := range monoArray {
-		monoChains = s.AddToMonoChains(s.SegmentMutual, v, monoChains)
-	}
-	testArray := segStrings.ToLineArray()
-	for _, v := range testArray {
-		testChains = s.AddToMonoChains(segStrings, v, testChains)
-	}
+
+	monoChains = s.AddToMonoChains(s.SegmentMutual, "subject", monoChains)
+
+	testChains = s.AddToMonoChains(segStrings, "test", testChains)
+
 	s.IntersectChains(monoChains, testChains, segInt)
 }
 
 // AddToMonoChains ...
-func (s *SegmentMutualIntersector) AddToMonoChains(segMatrix matrix.LineMatrix, segStr *matrix.LineSegment, monoChains []*MonotoneChain) []*MonotoneChain {
-	segChains := ChainsContext(segMatrix, segStr)
+func (s *SegmentMutualIntersector) AddToMonoChains(segMatrix matrix.LineMatrix, context interface{}, monoChains []*MonotoneChain) []*MonotoneChain {
+	segChains := ChainsContext(segMatrix, context)
 
 	monoChains = append(monoChains, segChains...)
 	return monoChains
