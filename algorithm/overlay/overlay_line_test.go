@@ -82,9 +82,15 @@ func TestLineOverlay_Difference(t *testing.T) {
 			matrix.Collection{matrix.LineMatrix{{50, 100}, {50, 200}}}, false},
 		{"line line8", fields{&PointOverlay{matrix.LineMatrix{{50, 100}, {50, 200}, {60, 200}}, matrix.LineMatrix{{30, 150}, {60, 150}}}},
 			matrix.Collection{matrix.LineMatrix{{50, 100}, {50, 150}}, matrix.LineMatrix{{50, 150}, {50, 200}, {60, 200}}}, false},
+
+		{name: "line poly6", fields: fields{&PointOverlay{matrix.LineMatrix{{200, 300}, {500, 300}, {500, 600}, {800, 900}},
+			matrix.PolygonMatrix{{{300, 300}, {500, 300}, {500, 500}, {300, 500}, {300, 300}}},
+		}},
+			want: matrix.Collection{matrix.LineMatrix{{500, 500}, {500, 600}, {800, 900}}, matrix.LineMatrix{{200, 300}, {300, 300}}},
+		},
 	}
 	for _, tt := range tests {
-		if !geoos.GeoosTestTag && tt.name != "line line5" {
+		if !geoos.GeoosTestTag && tt.name != "line poly6" {
 			continue
 		}
 		t.Run(tt.name, func(t *testing.T) {

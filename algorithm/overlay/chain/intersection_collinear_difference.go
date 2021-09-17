@@ -58,51 +58,31 @@ func (ii *IntersectionCollinearDifference) ProcessIntersections(
 			mono = &MonotoneChain{Edge: edge, Start: 0, End: len(edge) - 1, Context: false}
 			ii.mono = append(ii.mono, mono)
 		}
-		if ips[0].IsCollinear {
 
+		if ips[0].IsCollinear {
 			sort.Sort(ips)
-			if matrix.Matrix(edge[0]).Equals(ips[0].Matrix) {
-				line = append(line, edge[:segIndex0-mono.Start]...)
-			} else {
-				line = append(line, edge[:segIndex0+1-mono.Start]...)
-				line = append(line, ips[0].Matrix)
-			}
-			if len(line) > 1 {
-				ii.mono = append(ii.mono, &MonotoneChain{Edge: line, Start: mono.Start, End: segIndex0 + 1, Context: true})
-			}
-			if matrix.Matrix(edge[len(edge)-1]).Equals(ips[len(ips)-1].Matrix) {
-				startPos = segIndex0 + 2
-			} else {
-				startPos = segIndex0 + 1
-			}
-			line = matrix.LineMatrix{}
-			line = append(line, ips[len(ips)-1].Matrix)
-			line = append(line, edge[startPos-mono.Start:]...)
-			if len(line) > 1 {
-				ii.mono = append(ii.mono, &MonotoneChain{Edge: line, Start: startPos - 1, End: mono.End, Context: true})
-			}
-		} else {
-			if matrix.Matrix(edge[0]).Equals(ips[0].Matrix) {
-				line = append(line, edge[:segIndex0-mono.Start]...)
-			} else {
-				line = append(line, edge[:segIndex0+1-mono.Start]...)
-				line = append(line, ips[0].Matrix)
-			}
-			if len(line) > 1 {
-				ii.mono = append(ii.mono, &MonotoneChain{Edge: line, Start: mono.Start, End: segIndex0 + 1, Context: true})
-			}
-			if matrix.Matrix(edge[len(edge)-1]).Equals(ips[len(ips)-1].Matrix) {
-				startPos = segIndex0 + 2
-			} else {
-				startPos = segIndex0 + 1
-			}
-			line = matrix.LineMatrix{}
-			line = append(line, ips[len(ips)-1].Matrix)
-			line = append(line, edge[startPos-mono.Start:]...)
-			if len(line) > 1 {
-				ii.mono = append(ii.mono, &MonotoneChain{Edge: line, Start: startPos - 1, End: mono.End, Context: true})
-			}
 		}
+		if matrix.Matrix(edge[0]).Equals(ips[0].Matrix) {
+			line = append(line, edge[:segIndex0-mono.Start]...)
+		} else {
+			line = append(line, edge[:segIndex0+1-mono.Start]...)
+			line = append(line, ips[0].Matrix)
+		}
+		if len(line) > 1 {
+			ii.mono = append(ii.mono, &MonotoneChain{Edge: line, Start: mono.Start, End: segIndex0 + 1, Context: true})
+		}
+		if matrix.Matrix(edge[len(edge)-1]).Equals(ips[len(ips)-1].Matrix) {
+			startPos = segIndex0 + 2
+		} else {
+			startPos = segIndex0 + 1
+		}
+		line = matrix.LineMatrix{}
+		line = append(line, ips[len(ips)-1].Matrix)
+		line = append(line, edge[startPos-mono.Start:]...)
+		if len(line) > 1 {
+			ii.mono = append(ii.mono, &MonotoneChain{Edge: line, Start: startPos - 1, End: mono.End, Context: true})
+		}
+
 	}
 }
 
