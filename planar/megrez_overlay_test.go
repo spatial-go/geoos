@@ -60,6 +60,17 @@ func TestAlgorithm_Intersection(t *testing.T) {
 		{name: "intersection", args: args{g1: point02, g2: line02}, want: expectPoint, wantErr: false},
 		{name: "intersection error", args: args{g1: space.Collection{point02}, g2: space.Collection{line02}}, want: nil, wantErr: true},
 		{name: "intersection error", args: args{g1: point02, g2: space.Collection{line02}}, want: nil, wantErr: true},
+		{
+			name: "intersection poly2",
+			args: args{space.Polygon{{{110.85205078124999, 38.92522904714054}, {110.72021484375, 37.80544394934271}, {113.22509765625, 37.64903402157866},
+				{113.818359375, 39.027718840211605}, {112.1484375, 39.57182223734374}, {110.85205078124999, 38.92522904714054}}},
+				space.Polygon{{{113.99414062499999, 38.25543637637947}, {112.3681640625, 38.70265930723801}, {112.03857421875, 37.37015718405753},
+					{114.01611328125, 36.29741818650811}, {114.43359375, 37.47485808497102}, {113.99414062499999, 38.25543637637947}}},
+			},
+			want: space.Polygon{{{113.53981129511264, 38.380399121337376}, {113.22509765625, 37.64903402157866}, {112.12455119147911, 37.717754359391186}, {112.3681640625, 38.70265930723801},
+				{113.53981129511264, 38.380399121337376}}},
+
+			wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

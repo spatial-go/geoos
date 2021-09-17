@@ -43,7 +43,7 @@ func (g *MegrezAlgorithm) Intersection(geom1, geom2 space.Geometry) (intersectGe
 		}
 	case space.TypePolygon:
 		over := &overlay.PolygonOverlay{PointOverlay: &overlay.PointOverlay{Subject: geom1.ToMatrix(), Clipping: geom2.ToMatrix()}}
-		if result, err := over.Intersection(); err != nil {
+		if result, err := over.Intersection(); err == nil {
 			intersectGeom = space.TransGeometry(result)
 		} else {
 			intersectErr = err
