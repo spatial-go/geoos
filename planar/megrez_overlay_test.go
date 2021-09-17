@@ -332,10 +332,16 @@ func TestAlgorithm_Union(t *testing.T) {
 				space.Polygon{{{112.124551191479, 37.7177543593912}, {110.72021484375, 37.8054439493427}, {110.85205078125, 38.9252290471405}, {112.1484375, 39.5718222373437},
 					{113.818359375, 39.0277188402116}, {113.539811295113, 38.3803991213374}, {113.994140625, 38.2554363763795}, {114.43359375, 37.474858084971},
 					{114.01611328125, 36.2974181865081}, {112.03857421875, 37.3701571840575}, {112.124551191479, 37.7177543593912}}},
+				space.Polygon{{{113.539811295113, 38.3803991213374}, {113.818359375, 39.0277188402116}, {112.1484375, 39.5718222373437}, {110.85205078125, 38.9252290471405},
+					{110.72021484375, 37.8054439493427}, {112.124551191479, 37.7177543593912}, {112.03857421875, 37.3701571840575}, {114.01611328125, 36.2974181865081},
+					{114.43359375, 37.474858084971}, {113.994140625, 38.2554363763795}, {113.539811295113, 38.3803991213374}}},
 			},
 			wantErr: false},
 	}
 	for _, tt := range tests {
+		if !geoos.GeoosTestTag && tt.name != "union poly2" {
+			continue
+		}
 		t.Run(tt.name, func(t *testing.T) {
 			G := NormalStrategy()
 			got, err := G.Union(tt.args.g1, tt.args.g2)
@@ -349,7 +355,7 @@ func TestAlgorithm_Union(t *testing.T) {
 				isEqual = isEqual || isEqual1
 			}
 			if !isEqual {
-				t.Errorf("Algorithm Union %v = %v, want %v", tt.name, wkt.MarshalString(got), wkt.MarshalString(tt.want[0]))
+				t.Errorf("Algorithm Union %v = %v, \nwant %v", tt.name, wkt.MarshalString(got), wkt.MarshalString(tt.want[0]))
 			}
 		})
 	}

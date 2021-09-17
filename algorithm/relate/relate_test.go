@@ -91,9 +91,15 @@ func TestRelate(t *testing.T) {
 	tests = append(tests, TestStruct{fmt.Sprintf("polyPoly%v", "f1"),
 		args{matrix.PolygonMatrix{{{90, 90}, {90, 101}, {101, 101}, {101, 90}, {90, 90}}},
 			matrix.PolygonMatrix{{{100, 100}, {100, 101}, {101, 101}, {101, 100}, {100, 100}}}}, "212F11FF2", false})
+	tests = append(tests, TestStruct{fmt.Sprintf("polyPoly%v", "_f2"),
+		args{matrix.PolygonMatrix{{{110.85205078124999, 38.92522904714054}, {110.72021484375, 37.80544394934271}, {113.22509765625, 37.64903402157866},
+			{113.818359375, 39.027718840211605}, {112.1484375, 39.57182223734374}, {110.85205078124999, 38.92522904714054}}},
+			matrix.PolygonMatrix{{{113.99414062499999, 38.25543637637947}, {112.3681640625, 38.70265930723801}, {112.03857421875, 37.37015718405753},
+				{114.01611328125, 36.29741818650811}, {114.43359375, 37.47485808497102}, {113.99414062499999, 38.25543637637947}}},
+		}, "212101212", false})
 
 	for _, tt := range tests {
-		if !geoos.GeoosTestTag && tt.name != "LineLine0" {
+		if !geoos.GeoosTestTag && tt.name != "polyPoly_f2" {
 			continue
 		}
 
