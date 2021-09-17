@@ -177,7 +177,7 @@ func TestAlgorithm_SharedPaths(t *testing.T) {
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("SharedPaths() got = %v, want %v", got, tt.want)
+				t.Errorf("SharedPaths() got = %v, \nwant %v", got, tt.want)
 			}
 		})
 	}
