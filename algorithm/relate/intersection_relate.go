@@ -3,6 +3,7 @@ package relate
 import (
 	"math"
 
+	"github.com/spatial-go/geoos/algorithm/calc"
 	"github.com/spatial-go/geoos/algorithm/filter"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 )
@@ -110,8 +111,9 @@ func InLine(spot, a, b matrix.Matrix) (in bool, isVertex bool) {
 	if spot.Equals(a) || spot.Equals(b) {
 		return true, true
 	}
-
-	if ((spot[0]-a[0])*(a[1]-b[1])) == ((a[0]-b[0])*(spot[1]-a[1])) &&
+	ax := (spot[0] - a[0]) * (a[1] - b[1])
+	bx := (a[0] - b[0]) * (spot[1] - a[1])
+	if ax-bx < calc.AccuracyFloat &&
 		(spot[0] >= math.Min(a[0], b[0]) && spot[0] <= math.Max(a[0], b[0])) &&
 		((spot[1] >= math.Min(a[1], b[1])) && (spot[1] <= math.Max(a[1], b[1]))) {
 		return true, false

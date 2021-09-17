@@ -15,6 +15,8 @@ const (
 
 	// MaxClosingSegLenFactor Factor which determines how short closing segs can be for round buffers
 	MaxClosingSegLenFactor = 80
+
+	AccuracyFloat = 1.0e-13
 )
 
 // const  Defined constant variable overlay parameters.
