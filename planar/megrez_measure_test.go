@@ -221,7 +221,7 @@ func TestMegrezAlgorithm_HausdorffDistanceDensify(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		g       *MegrezAlgorithm
+		g       *megrezAlgorithm
 		args    args
 		want    float64
 		wantErr bool

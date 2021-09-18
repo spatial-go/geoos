@@ -445,7 +445,7 @@ func TestAlgorithm_Overlaps(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		g       *MegrezAlgorithm
+		g       *megrezAlgorithm
 		args    args
 		want    bool
 		wantErr bool
@@ -461,7 +461,7 @@ func TestAlgorithm_Overlaps(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			g := &MegrezAlgorithm{}
+			g := &megrezAlgorithm{}
 			got, err := g.Overlaps(tt.args.A, tt.args.B)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("MegrezAlgorithm.Overlaps() error = %v, wantErr %v", err, tt.wantErr)

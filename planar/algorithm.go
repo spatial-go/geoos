@@ -93,3 +93,5 @@ type Algorithm interface {
 
 	Within(geom1, geom2 space.Geometry) (bool, error)
 }
+
+var _ Algorithm = &megrezAlgorithm{}
