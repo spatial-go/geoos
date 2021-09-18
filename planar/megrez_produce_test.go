@@ -374,17 +374,28 @@ func TestMegrezAlgorithm_Buffer(t *testing.T) {
 	}
 	tests := []struct {
 		name         string
-		g            *MegrezAlgorithm
+		g            *megrezAlgorithm
 		args         args
 		wantGeometry space.Geometry
 	}{
-		// TODO: Add test cases.
+		{name: "point buffer", args: args{
+			geom:     space.Point{100, 90},
+			width:    50,
+			quadsegs: 4,
+		}, wantGeometry: space.Polygon{
+			{{150, 90}, {146.193976625564, 70.8658283817455}, {135.355339059327, 54.6446609406727},
+				{119.134171618255, 43.8060233744357}, {100, 40}, {80.8658283817456, 43.8060233744356}, {64.6446609406727, 54.6446609406725},
+				{53.8060233744357, 70.8658283817454}, {50, 89.9999999999998}, {53.8060233744356, 109.134171618254}, {64.6446609406725, 125.355339059327},
+				{80.8658283817453, 136.193976625564}, {99.9999999999998, 140}, {119.134171618254, 136.193976625564}, {135.355339059327, 125.355339059328},
+				{146.193976625564, 109.134171618255}, {150, 90}},
+		},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			g := &MegrezAlgorithm{}
-			if gotGeometry := g.Buffer(tt.args.geom, tt.args.width, tt.args.quadsegs); !reflect.DeepEqual(gotGeometry, tt.wantGeometry) {
-				t.Errorf("MegrezAlgorithm.Buffer() = %v, want %v", gotGeometry, tt.wantGeometry)
+			g := &megrezAlgorithm{}
+			if gotGeometry := g.Buffer(tt.args.geom, tt.args.width, tt.args.quadsegs); !gotGeometry.EqualsExact(tt.wantGeometry, 0.0000001) {
+				t.Errorf("MegrezAlgorithm.Buffer() = %v, \nwant %v", gotGeometry, tt.wantGeometry)
 			}
 		})
 	}

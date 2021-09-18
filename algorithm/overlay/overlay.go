@@ -80,8 +80,16 @@ func (p *PointOverlay) Union() (matrix.Steric, error) {
 			}
 			return matrix.Collection{ps, pc}, nil
 		case matrix.Collection:
-			//TODO
-			return append(pc, ps), nil
+			var result matrix.Collection
+			for _, v := range pc {
+				res := Union(ps, v)
+				if _, ok = res.(matrix.Collection); ok {
+					result = append(result, res.(matrix.Collection)...)
+				} else {
+					result = append(result, res)
+				}
+			}
+			return result, nil
 		}
 
 	}
