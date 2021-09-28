@@ -4,6 +4,8 @@ import (
 	"github.com/spatial-go/geoos/algorithm/buffer"
 	"github.com/spatial-go/geoos/algorithm/buffer/simplify"
 	"github.com/spatial-go/geoos/algorithm/matrix"
+	"github.com/spatial-go/geoos/algorithm/measure"
+	"github.com/spatial-go/geoos/coordtransform"
 	"github.com/spatial-go/geoos/space/spaceerr"
 )
 
@@ -238,6 +240,23 @@ func (c Collection) Buffer(width float64, quadsegs int) Geometry {
 		return Polygon(b)
 	}
 	return nil
+}
+
+// BufferInMeter sReturns a geometry that represents all points whose distance
+// from this space.Geometry is less than or equal to distance.
+func (c Collection) BufferInMeter(width float64, quadsegs int) (geometry Geometry) {
+	centroid := c.Centroid()
+	width = measure.MercatorDistance(width, centroid.Lat())
+	transformer := coordtransform.NewTransformer(coordtransform.LLTOMERCATOR)
+	geomMatrix, _ := transformer.TransformGeometry(c.ToMatrix())
+	geometry = TransGeometry(geomMatrix)
+	geometry = geometry.Buffer(width, quadsegs)
+	if geometry != nil {
+		transformer.CoordType = coordtransform.MERCATORTOLL
+		geomMatrix, _ = transformer.TransformGeometry(geometry.ToMatrix())
+		geometry = TransGeometry(geomMatrix)
+	}
+	return
 }
 
 // Envelope returns the  minimum bounding box for the supplied geometry, as a geometry.

@@ -19,6 +19,8 @@ type Algorithm interface {
 
 	Buffer(geom space.Geometry, width float64, quadsegs int) space.Geometry
 
+	BufferInMeter(geom space.Geometry, width float64, quadsegs int) space.Geometry
+
 	Centroid(geom space.Geometry) (space.Geometry, error)
 
 	Contains(geom1, geom2 space.Geometry) (bool, error)
