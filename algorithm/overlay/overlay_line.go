@@ -84,14 +84,24 @@ func (p *LineOverlay) Intersection() (matrix.Steric, error) {
 		result := intersectLine(line, c)
 		return LineMerge(result), nil
 	case matrix.PolygonMatrix:
-		result := matrix.Collection{}
-		for _, ring := range c {
-			res := intersectLine(line, ring)
-			result = append(result, res...)
+		inter := envelope.Bound(line.Bound()).IsIntersects(envelope.Bound(c.Bound()))
+		im := relate.IM(line, c, inter)
+		if mark := im.IsDisjoint(); mark {
+			return matrix.Collection{}, nil
 		}
-		filt := &matrix.UniqueArrayFilter{}
-		result = result.Filter(filt).(matrix.Collection)
-		return LineMerge(result), nil
+		if mark := im.IsWithin(); mark {
+			return line, nil
+		}
+		res, _ := p.Difference()
+		result := matrix.Collection{}
+		for _, v := range res.(matrix.Collection) {
+			inter := envelope.Bound(v.Bound()).IsIntersects(envelope.Bound(c.Bound()))
+			im := relate.IM(c, v, inter)
+			if im.IsCovers() {
+				result = append(result, v)
+			}
+		}
+		return result, nil
 	}
 	return nil, algorithm.ErrNotMatchType
 }
