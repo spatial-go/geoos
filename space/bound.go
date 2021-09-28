@@ -260,6 +260,12 @@ func (b Bound) Buffer(width float64, quadsegs int) Geometry {
 	return b.ToPolygon().Buffer(width, quadsegs)
 }
 
+// BufferInMeter sReturns a geometry that represents all points whose distance
+// from this space.Geometry is less than or equal to distance.
+func (b Bound) BufferInMeter(width float64, quadsegs int) Geometry {
+	return b.ToPolygon().BufferInMeter(width, quadsegs)
+}
+
 // Envelope returns the  minimum bounding box for the supplied geometry, as a geometry.
 // The polygon is defined by the corner points of the bounding box
 // ((MINX, MINY), (MINX, MAXY), (MAXX, MAXY), (MAXX, MINY), (MINX, MINY)).

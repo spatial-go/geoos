@@ -29,9 +29,11 @@ const (
 	// BD09 Guojia cehui ju 02+BD ,unit degree
 	BD09 = 114326
 
-	// BD09 Guojia cehui ju 02+BD, unit m
+	// BD09Web Guojia cehui ju 02+BD, unit m
 	BD09Web = 113857
 )
+
+var projectionCoordinateSystem = []int{PseudoMercator, GCJ02Web, BD09Web}
 
 // Line  straight line  .
 type Line struct {
@@ -61,6 +63,16 @@ func CreateElementValidWithCoordSys(geom Geometry, coordSys int) (*GeometryValid
 // CoordinateSystem return Coordinate System.
 func (g GeometryValid) CoordinateSystem() int {
 	return g.coordinateSystem
+}
+
+// IsProjection returns true if the coordinateSystem is projection.
+func (g GeometryValid) IsProjection() bool {
+	for i, _ := range projectionCoordinateSystem {
+		if projectionCoordinateSystem[i] == g.coordinateSystem {
+			return true
+		}
+	}
+	return false
 }
 
 func defaultCoordinateSystem() int {
