@@ -80,7 +80,7 @@ func TestAlgorithm_Intersection(t *testing.T) {
 				t.Errorf("Intersection() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
+			if !((got == nil) == (tt.want == nil) || got.EqualsExact(tt.want, 0.000001)) {
 				t.Errorf("Intersection() got = %v, want %v", got, tt.want)
 			}
 		})

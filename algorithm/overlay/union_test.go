@@ -60,7 +60,7 @@ func TestUnion(t *testing.T) {
 			want: matrix.Collection{matrix.LineMatrix{{50, 100}, {50, 200}}, matrix.PolygonMatrix{{{300, 300}, {500, 300}, {500, 500}, {300, 500}, {300, 300}}}},
 		},
 		{name: "line poly1", args: args{g1: matrix.LineMatrix{{110, 100}, {600, 1000}}, g2: matrix.PolygonMatrix{{{300, 300}, {500, 300}, {500, 500}, {300, 500}, {300, 300}}}},
-			want: matrix.Collection{matrix.LineMatrix{{327.7777777777777715, 500}, {600, 1000}}, matrix.LineMatrix{{110, 100}, {300, 448.9795918367346985}},
+			want: matrix.Collection{matrix.LineMatrix{{327.7777777777777715, 500}, {600, 1000}}, matrix.LineMatrix{{110, 100}, {300, 448.9795918367346985}}, matrix.LineMatrix{{300, 448.9795918367346985}, {327.77777777777777, 500}},
 				matrix.PolygonMatrix{{{300, 300}, {500, 300}, {500, 500}, {300, 500}, {300, 300}}}},
 		},
 		{name: "line poly2", args: args{g1: matrix.LineMatrix{{500, 500}, {600, 1000}}, g2: matrix.PolygonMatrix{{{300, 300}, {500, 300}, {500, 500}, {300, 500}, {300, 300}}}},
