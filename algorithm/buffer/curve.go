@@ -305,7 +305,9 @@ func (c *Curve) addOutsideTurn(orientation int, addStartPoint bool) {
 	// This avoids problems with computing mitre corners in the case
 	// where the two segments are almost parallel
 	// (which is hard to compute a robust intersection for).
-	if measure.PlanarDistance(c.offset0.P1, c.offset1.P0) < c.distance*calc.OffsetSegmentSeparationFactor {
+	offsetFactor := calc.OffsetSegmentSeparationFactor
+	offsetFactor = offsetFactor * math.Pow10(int(math.Log10(c.offset0.P1[1]))) / 10.0
+	if measure.PlanarDistance(c.offset0.P1, c.offset1.P0) < c.distance*offsetFactor {
 		c.Add(c.offset0.P1)
 		return
 	}
@@ -362,7 +364,10 @@ func (c *Curve) addInsideTurn(orientation int, addStartPoint bool) {
 		// points
 		c.hasNarrowConcaveAngle = true
 		//System.out.println("NARROW ANGLE - distance = " + distance);
-		if measure.PlanarDistance(c.offset0.P1, c.offset1.P0) < c.distance*calc.InsideTurnVertexSnapDistanceFactor {
+
+		insideFactor := calc.InsideTurnVertexSnapDistanceFactor
+		insideFactor = insideFactor * math.Pow10(int(math.Log10(c.offset0.P1[1]))) / 10.0
+		if measure.PlanarDistance(c.offset0.P1, c.offset1.P0) < c.distance*insideFactor {
 			c.Add(c.offset0.P1)
 		} else {
 			// add endpoint of this segment offset
