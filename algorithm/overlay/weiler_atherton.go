@@ -39,6 +39,14 @@ EdgStart:
 				it++
 			}
 
+			if it < len(v.Vertexes) && v.Vertexes[it].Equals(ip) {
+				v.Vertexes[it] = *ip
+				break
+			} else if it == len(v.Vertexes) && v.Vertexes[0].Equals(ip) {
+				v.Vertexes[0] = *ip
+				break
+			}
+
 			circ := v.Vertexes[it:]
 			v.Vertexes = append([]Vertex{}, v.Vertexes[:it]...)
 			v.Vertexes = append(v.Vertexes, *ip)

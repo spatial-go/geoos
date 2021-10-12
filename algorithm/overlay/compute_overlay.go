@@ -21,19 +21,30 @@ func (c *ComputeMergeOverlay) Next(pol *Plane, start *Vertex) *Vertex {
 // Compute overlay polygon.
 func (c *ComputeMergeOverlay) Compute(pol *Plane, start *Vertex, which bool) *Vertex {
 	// find in each edge
-	walkings := c.subjectPlane.Rings
+	whichPlane := c.subjectPlane
+	otherPlane := c.clippingPlane
 	if !which {
-		walkings = c.clippingPlane.Rings
+		whichPlane = c.clippingPlane
+		otherPlane = c.subjectPlane
 	}
+	inHole := otherPlane.IsVertexInHole(start)
+	walkings := whichPlane.Rings
 	for _, w := range walkings {
 		if iter, err := SliceContains(w.Vertexes, start); err == nil {
 			for {
 				pol.AddPointWhich(&w.Vertexes[iter], which)
-
-				if w.IsClockwise {
-					iter--
+				if inHole {
+					if w.IsClockwise {
+						iter++
+					} else {
+						iter--
+					}
 				} else {
-					iter++
+					if w.IsClockwise {
+						iter--
+					} else {
+						iter++
+					}
 				}
 
 				// 循环列表
@@ -70,18 +81,28 @@ func (c *ComputeClipOverlay) Next(pol *Plane, start *Vertex) *Vertex {
 // Compute overlay polygon.
 func (c *ComputeClipOverlay) Compute(pol *Plane, start *Vertex, which bool) *Vertex {
 	// find in each edge
-	walkings := c.subjectPlane.Rings
+	whichPlane := c.subjectPlane
 	if !which {
-		walkings = c.clippingPlane.Rings
+		whichPlane = c.clippingPlane
 	}
-	for _, w := range walkings {
+	walkings := whichPlane.Rings
+	for i, w := range walkings {
 		if iter, err := SliceContains(w.Vertexes, start); err == nil {
 			for {
 				pol.AddPointWhich(&w.Vertexes[iter], which)
-				if w.IsClockwise {
-					iter++
+				inHole := (i > 0)
+				if inHole {
+					if w.IsClockwise {
+						iter--
+					} else {
+						iter++
+					}
 				} else {
-					iter--
+					if w.IsClockwise {
+						iter++
+					} else {
+						iter--
+					}
 				}
 				// 循环列表
 				if iter == len(w.Vertexes) {

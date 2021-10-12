@@ -30,13 +30,24 @@ func (p *Plane) AddPointWhich(point *Vertex, which bool) {
 			return
 		}
 		p.Edge.Vertexes = append(p.Edge.Vertexes, Vertex{Matrix: matrix.Matrix{point.X(), point.Y()}})
-		// add line
-		if len(p.Edge.Vertexes) > 1 {
-			line := Line{IsMain: which}
-			line.Start = &p.Edge.Vertexes[len(p.Edge.Vertexes)-2]
-			line.End = &p.Edge.Vertexes[len(p.Edge.Vertexes)-1]
-			p.Lines = append(p.Lines, line)
+	}
+}
+
+// addLines
+func (p *Plane) addLines() {
+	if len(p.Edge.Vertexes) <= 1 {
+		return
+	}
+	for i := range p.Edge.Vertexes {
+		line := Line{}
+		start := i
+		end := i + 1
+		if end >= len(p.Edge.Vertexes) {
+			end = 0
 		}
+		line.Start = &p.Edge.Vertexes[start]
+		line.End = &p.Edge.Vertexes[end]
+		p.Lines = append(p.Lines, line)
 	}
 }
 
@@ -50,15 +61,21 @@ func (p *Plane) CloseRing() {
 	if p.Edge != nil {
 		p.Edge.NowStatus = calc.OverlayClosed
 		p.Edge.SetClockwise()
+		if p.Edge.IsClockwise {
+			p.Reverse()
+			p.Edge.SetClockwise()
+		}
+		p.addLines()
+	}
+}
 
-		// add line
-		line := Line{}
-		line.Start = &p.Edge.Vertexes[len(p.Edge.Vertexes)-1]
-		line.End = &p.Edge.Vertexes[0]
-		p.Lines = append(p.Lines, line)
-		// if !p.edge.points[len(p.edge.points)-1].Equal(&p.edge.points[0]) {
-		// 	p.edge.points = append(p.edge.points, p.edge.points[0])
-		// }
+// Reverse reverse vertexes
+func (p *Plane) Reverse() {
+	vertexesLength := len(p.Edge.Vertexes) - 1
+	for i := 0; i < vertexesLength/2; i++ {
+		temp := p.Edge.Vertexes[i]
+		p.Edge.Vertexes[i] = p.Edge.Vertexes[vertexesLength-1-i]
+		p.Edge.Vertexes[vertexesLength-1-i] = temp
 	}
 }
 
@@ -98,4 +115,18 @@ func (p *Plane) ToString() string {
 		ss += "}"
 	}
 	return string(ss)
+}
+
+// IsVertexInHole
+func (p *Plane) IsVertexInHole(v *Vertex) (inHole bool) {
+	for i, w := range p.Rings {
+		if i == 0 {
+			continue
+		}
+		if _, err := SliceContains(w.Vertexes, v); err == nil {
+			inHole = true
+			break
+		}
+	}
+	return
 }
