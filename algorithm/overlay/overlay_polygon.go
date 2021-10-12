@@ -15,6 +15,46 @@ type PolygonOverlay struct {
 	subjectPlane, clippingPlane *Plane
 }
 
+// isPolyInHole
+func (p *PolygonOverlay) isPolyInHole(polyMatrix matrix.PolygonMatrix) (inHole bool) {
+	subjectPoly, ok := p.Subject.(matrix.PolygonMatrix)
+	if !ok {
+		return
+	}
+	for i := range subjectPoly {
+		if i == 0 {
+			continue
+		}
+		subjectMatrix := matrix.PolygonMatrix{subjectPoly[i]}
+		inter := envelope.Bound(polyMatrix.Bound()).IsIntersects(envelope.Bound(subjectMatrix.Bound()))
+		im := relate.IM(subjectMatrix, polyMatrix, inter)
+		if mark := im.IsContains(); mark {
+			inHole = true
+			break
+		}
+	}
+	if inHole {
+		return
+	}
+	clippingPoly, ok := p.Clipping.(matrix.PolygonMatrix)
+	if !ok {
+		return
+	}
+	for i := range clippingPoly {
+		if i == 0 {
+			continue
+		}
+		clippingMatrix := matrix.PolygonMatrix{clippingPoly[i]}
+		inter := envelope.Bound(polyMatrix.Bound()).IsIntersects(envelope.Bound(clippingMatrix.Bound()))
+		im := relate.IM(clippingMatrix, polyMatrix, inter)
+		if mark := im.IsContains(); mark {
+			inHole = true
+			break
+		}
+	}
+	return
+}
+
 // Union  Computes the Union of two geometries,either or both of which may be nil.
 func (p *PolygonOverlay) Union() (matrix.Steric, error) {
 	if res, ok := p.unionCheck(); !ok {
@@ -91,7 +131,18 @@ func (p *PolygonOverlay) Intersection() (matrix.Steric, error) {
 		cpo.prepare()
 		_, exitingPoints := cpo.Weiler()
 		result := ToPolygonMatrix(cpo.ComputePolygon(exitingPoints, cpo))
-		return result, nil
+		// remove the parts of result in hole
+		intersectionResult := matrix.PolygonMatrix{}
+		for _, r := range result {
+			inHole := false
+			polyMatrix := matrix.PolygonMatrix{r}
+			inHole = p.isPolyInHole(polyMatrix)
+			if inHole {
+				continue
+			}
+			intersectionResult = append(intersectionResult, r)
+		}
+		return intersectionResult, nil
 	}
 	return nil, algorithm.ErrNotMatchType
 }
@@ -113,9 +164,7 @@ func (p *PolygonOverlay) Difference() (matrix.Steric, error) {
 
 			}
 			if mark, _ := im.Matches("212FF1FF2"); mark {
-				for _, v := range c {
-					poly = append(poly, v)
-				}
+				poly = append(poly, c...)
 				return poly, nil
 			}
 
@@ -261,16 +310,15 @@ var (
 // ComputePolygon compute overlay.
 func (p *PolygonOverlay) ComputePolygon(exitingPoints []Vertex, cpo ComputePolyOverlay) *Plane {
 	var pol = &Plane{}
-ExitPoint:
-	for _, iterPoints := range exitingPoints {
-		if iterPoints.IsChecked {
+	for _, iterPoint := range exitingPoints {
+		if iterPoint.IsChecked {
 			continue
 		}
 		edge := &Edge{}
 		pol.Edge = edge
 		pol.Rings = append(pol.Rings, edge)
 
-		start := &iterPoints
+		start := &iterPoint
 		next := &Vertex{Matrix: matrix.Matrix{start.X(), start.Y()}}
 		start.IsChecked = true
 
@@ -281,7 +329,7 @@ ExitPoint:
 			}
 			if next.X() == start.X() && next.Y() == start.Y() {
 				pol.CloseRing()
-				break ExitPoint
+				break
 			}
 		}
 	}
@@ -293,6 +341,10 @@ ExitPoint:
 func ToPolygonMatrix(poly *Plane) matrix.PolygonMatrix {
 	result := matrix.PolygonMatrix{}
 	for _, v2 := range poly.Rings {
+		if len(v2.Vertexes) < 3 {
+			// skip invalid polygon
+			continue
+		}
 		var edge matrix.LineMatrix
 		for _, v1 := range v2.Vertexes {
 			edge = append(edge, v1.Matrix)

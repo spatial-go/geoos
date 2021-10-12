@@ -29,6 +29,11 @@ func TestPolygonOverlay_Intersection(t *testing.T) {
 			matrix.LineMatrix{{100, 100}, {90, 101}}}},
 			matrix.Collection{}, false},
 
+		{"poly poly1", fields{PointOverlay: &PointOverlay{matrix.PolygonMatrix{{{100, 100}, {100, 101}, {101, 101}, {101, 100}, {100, 100}}},
+			matrix.PolygonMatrix{{{90, 90}, {90, 101}, {101, 101}, {101, 90}, {90, 90}}},
+		}},
+			matrix.PolygonMatrix{{{101, 100}, {100, 100}, {100, 101}, {101, 101}, {101, 100}}}, false},
+
 		{"poly poly2", fields{PointOverlay: &PointOverlay{matrix.PolygonMatrix{{{105, 105}, {105, 103}, {103, 103}, {103, 105}, {105, 105}}},
 			matrix.PolygonMatrix{{{100, 100}, {100, 101}, {101, 101}, {101, 100}, {100, 100}}},
 		}},
@@ -37,11 +42,10 @@ func TestPolygonOverlay_Intersection(t *testing.T) {
 			matrix.PolygonMatrix{{{5, 5}, {15, 5}, {15, 15}, {5, 15}, {5, 5}}},
 		}},
 			matrix.PolygonMatrix{{{5, 10}, {10, 10}, {10, 5}, {5, 5}, {5, 10}}}, false},
-
-		{"poly poly1", fields{PointOverlay: &PointOverlay{matrix.PolygonMatrix{{{100, 100}, {100, 101}, {101, 101}, {101, 100}, {100, 100}}},
-			matrix.PolygonMatrix{{{90, 90}, {90, 101}, {101, 101}, {101, 90}, {90, 90}}},
+		{"poly poly3-1", fields{PointOverlay: &PointOverlay{matrix.PolygonMatrix{{{0, 0}, {10, 0}, {10, 10}, {0, 10}, {0, 0}}},
+			matrix.PolygonMatrix{{{5, 5}, {5, 15}, {15, 15}, {15, 5}, {5, 5}}},
 		}},
-			matrix.PolygonMatrix{{{101, 100}, {100, 100}, {100, 101}, {101, 101}, {101, 100}}}, false},
+			matrix.PolygonMatrix{{{5, 10}, {10, 10}, {10, 5}, {5, 5}, {5, 10}}}, false},
 		{"poly poly4", fields{PointOverlay: &PointOverlay{
 			matrix.PolygonMatrix{{{111.30523681640625, 38.11727165830543}, {112.34344482421875, 38.11727165830543}, {112.34344482421875, 38.89103282648846},
 				{111.30523681640625, 38.89103282648846}, {111.30523681640625, 38.117271658305}}},
@@ -50,9 +54,18 @@ func TestPolygonOverlay_Intersection(t *testing.T) {
 		}},
 			matrix.PolygonMatrix{{{112.34344482421875, 38.35027253825765}, {112.34344482421875, 38.11727165830543}, {111.50848388671875, 38.11727165830543},
 				{111.50848388671875, 38.35027253825765}, {112.34344482421875, 38.35027253825765}}}, false},
+
+		{"poly poly5", fields{PointOverlay: &PointOverlay{matrix.PolygonMatrix{{{0, 0}, {10, 0}, {10, 10}, {0, 10}, {0, 0}}, {{1, 1}, {9, 1}, {9, 9}, {1, 9}, {1, 1}}},
+			matrix.PolygonMatrix{{{5, 5}, {15, 5}, {15, 15}, {5, 15}, {5, 5}}},
+		}},
+			matrix.PolygonMatrix{{{9, 9}, {9, 5}, {10, 5}, {10, 10}, {5, 10}, {5, 9}, {9, 9}}}, false},
+		{"poly poly5-1", fields{PointOverlay: &PointOverlay{matrix.PolygonMatrix{{{5, 5}, {15, 5}, {15, 15}, {5, 15}, {5, 5}}},
+			matrix.PolygonMatrix{{{0, 0}, {10, 0}, {10, 10}, {0, 10}, {0, 0}}, {{1, 1}, {9, 1}, {9, 9}, {1, 9}, {1, 1}}},
+		}},
+			matrix.PolygonMatrix{{{9, 9}, {9, 5}, {10, 5}, {10, 10}, {5, 10}, {5, 9}, {9, 9}}}, false},
 	}
 	for _, tt := range tests {
-		if !geoos.GeoosTestTag && tt.name != "poly poly4" {
+		if !geoos.GeoosTestTag && tt.name != "poly poly5" {
 			continue
 		}
 		t.Run(tt.name, func(t *testing.T) {
@@ -96,6 +109,24 @@ func TestPolygonOverlay_Union(t *testing.T) {
 			matrix.PolygonMatrix{{{5, 5}, {15, 5}, {15, 15}, {5, 15}, {5, 5}}},
 		}},
 			[]matrix.Steric{matrix.PolygonMatrix{{{5, 10}, {0, 10}, {0, 0}, {10, 0}, {10, 5}, {15, 5}, {15, 15}, {5, 15}, {5, 10}}}}, false},
+
+		{"poly poly01", fields{PointOverlay: &PointOverlay{matrix.PolygonMatrix{{{0, 0}, {10, 0}, {10, 10}, {0, 10}, {0, 0}}},
+			matrix.PolygonMatrix{{{5, 5}, {5, 15}, {15, 15}, {15, 5}, {5, 5}}},
+		}},
+			[]matrix.Steric{
+				matrix.PolygonMatrix{{{10, 5}, {10, 0}, {0, 0}, {0, 10}, {5, 10}, {5, 15}, {15, 15}, {15, 5}, {10, 5}}},
+				matrix.PolygonMatrix{{{5, 10}, {0, 10}, {0, 0}, {10, 0}, {10, 5}, {15, 5}, {15, 15}, {5, 15}, {5, 10}}},
+			}, false},
+
+		{"poly poly02", fields{PointOverlay: &PointOverlay{matrix.PolygonMatrix{{{0, 0}, {10, 0}, {10, 10}, {0, 10}, {0, 0}}, {{1, 1}, {9, 1}, {9, 9}, {1, 9}, {1, 1}}},
+			matrix.PolygonMatrix{{{5, 5}, {15, 5}, {15, 15}, {5, 15}, {5, 5}}},
+		}},
+			[]matrix.Steric{matrix.PolygonMatrix{{{5, 10}, {0, 10}, {0, 0}, {10, 0}, {10, 5}, {15, 5}, {15, 15}, {5, 15}, {5, 10}}, {{5, 9}, {1, 9}, {1, 1}, {9, 1}, {9, 5}, {5, 5}, {5, 9}}}}, false},
+
+		{"poly poly03", fields{PointOverlay: &PointOverlay{matrix.PolygonMatrix{{{5, 5}, {15, 5}, {15, 15}, {5, 15}, {5, 5}}},
+			matrix.PolygonMatrix{{{0, 0}, {10, 0}, {10, 10}, {0, 10}, {0, 0}}, {{1, 1}, {9, 1}, {9, 9}, {1, 9}, {1, 1}}},
+		}},
+			[]matrix.Steric{matrix.PolygonMatrix{{{10, 5}, {15, 5}, {15, 15}, {5, 15}, {5, 10}, {0, 10}, {0, 0}, {10, 0}, {10, 5}}, {{9, 5}, {5, 5}, {5, 9}, {1, 9}, {1, 1}, {9, 1}, {9, 5}}}}, false},
 
 		{"poly poly1", fields{PointOverlay: &PointOverlay{matrix.PolygonMatrix{{{100, 100}, {100, 101}, {101, 101}, {101, 100}, {100, 100}}},
 			matrix.PolygonMatrix{{{90, 90}, {90, 101}, {101, 101}, {101, 90}, {90, 90}}},
@@ -161,6 +192,9 @@ func TestPolygonOverlay_Union(t *testing.T) {
 			wantErr: false},
 	}
 	for _, tt := range tests {
+		if !geoos.GeoosTestTag && tt.name != "poly poly03" {
+			continue
+		}
 		t.Run(tt.name, func(t *testing.T) {
 			p := &PolygonOverlay{
 				PointOverlay:  tt.fields.PointOverlay,
@@ -219,7 +253,7 @@ func TestPolygonOverlay_Difference(t *testing.T) {
 			matrix.PolygonMatrix{{{1, 1}, {5, 1}, {5, 5}, {1, 5}, {1, 1}}, {{2, 2}, {3, 2}, {3, 3}, {2, 3}, {2, 2}}}, false},
 	}
 	for _, tt := range tests {
-		if !geoos.GeoosTestTag && tt.name != "poly poly3" {
+		if !geoos.GeoosTestTag && tt.name != "poly poly2" {
 			continue
 		}
 		t.Run(tt.name, func(t *testing.T) {
@@ -257,8 +291,7 @@ func TestPolygonOverlay_SymDifference(t *testing.T) {
 		}},
 			matrix.Collection{matrix.PolygonMatrix{{{5, 10}, {0, 10}, {0, 0}, {10, 0}, {10, 5}, {5, 5}, {5, 10}}},
 				matrix.PolygonMatrix{{{10, 5}, {15, 5}, {15, 15}, {5, 15}, {5, 10}, {10, 10}, {10, 5}}}}, false},
-
-		{"poly poly1", fields{PointOverlay: &PointOverlay{matrix.PolygonMatrix{{{100, 100}, {100, 101}, {101, 101}, {101, 100}, {100, 100}}},
+		{"poly poly0", fields{PointOverlay: &PointOverlay{matrix.PolygonMatrix{{{100, 100}, {100, 101}, {101, 101}, {101, 100}, {100, 100}}},
 			matrix.PolygonMatrix{{{90, 90}, {90, 101}, {101, 101}, {101, 90}, {90, 90}}},
 		}},
 			matrix.Collection{
