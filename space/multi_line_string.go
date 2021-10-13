@@ -6,7 +6,6 @@ import (
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
 	"github.com/spatial-go/geoos/algorithm/operation"
-	"github.com/spatial-go/geoos/coordtransform"
 )
 
 // MultiLineString is a set of polylines.
@@ -221,19 +220,8 @@ func (mls MultiLineString) Buffer(width float64, quadsegs int) Geometry {
 
 // BufferInMeter sReturns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
-func (mls MultiLineString) BufferInMeter(width float64, quadsegs int) (geometry Geometry) {
-	centroid := mls.Centroid()
-	width = measure.MercatorDistance(width, centroid.Lat())
-	transformer := coordtransform.NewTransformer(coordtransform.LLTOMERCATOR)
-	geomMatrix, _ := transformer.TransformGeometry(mls.ToMatrix())
-	geometry = TransGeometry(geomMatrix)
-	geometry = geometry.Buffer(width, quadsegs)
-	if geometry != nil {
-		transformer.CoordType = coordtransform.MERCATORTOLL
-		geomMatrix, _ = transformer.TransformGeometry(geometry.ToMatrix())
-		geometry = TransGeometry(geomMatrix)
-	}
-	return
+func (mls MultiLineString) BufferInMeter(width float64, quadsegs int) Geometry {
+	return BufferInMeter(mls, width, quadsegs)
 }
 
 // Envelope returns the  minimum bounding box for the supplied geometry, as a geometry.
