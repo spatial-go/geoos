@@ -5,6 +5,7 @@ import (
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
 	"github.com/spatial-go/geoos/algorithm/relate"
+	"github.com/spatial-go/geoos/coordtransform"
 	"github.com/spatial-go/geoos/space/spaceerr"
 )
 
@@ -307,4 +308,19 @@ func TransGeometry(inputGeom matrix.Steric) Geometry {
 	default:
 		return nil
 	}
+}
+
+func BufferInMeter(geometry Geometry, width float64, quadsegs int) Geometry {
+	centroid := geometry.Centroid()
+	width = measure.MercatorDistance(width, centroid.Lat())
+	transformer := coordtransform.NewTransformer(coordtransform.LLTOMERCATOR)
+	geomMatrix, _ := transformer.TransformGeometry(geometry.ToMatrix())
+	geometry = TransGeometry(geomMatrix)
+	geometry = geometry.Buffer(width, quadsegs)
+	if geometry != nil {
+		transformer.CoordType = coordtransform.MERCATORTOLL
+		geomMatrix, _ = transformer.TransformGeometry(geometry.ToMatrix())
+		geometry = TransGeometry(geomMatrix)
+	}
+	return geometry
 }
