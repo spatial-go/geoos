@@ -205,7 +205,7 @@ func (mls MultiLineString) SimplifyP(tolerance float64) Geometry {
 	return TransGeometry(result)
 }
 
-// Buffer sReturns a geometry that represents all points whose distance
+// Buffer Returns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
 func (mls MultiLineString) Buffer(width float64, quadsegs int) Geometry {
 	buff := buffer.Buffer(mls.ToMatrix(), width, quadsegs)
@@ -218,7 +218,7 @@ func (mls MultiLineString) Buffer(width float64, quadsegs int) Geometry {
 	return nil
 }
 
-// BufferInMeter sReturns a geometry that represents all points whose distance
+// BufferInMeter Returns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
 func (mls MultiLineString) BufferInMeter(width float64, quadsegs int) Geometry {
 	return BufferInMeter(mls, width, quadsegs)

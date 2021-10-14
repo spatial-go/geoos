@@ -15,7 +15,7 @@ func (g *MegrezAlgorithm) Boundary(geom space.Geometry) (space.Geometry, error) 
 	return geom.Boundary()
 }
 
-// Buffer sReturns a geometry that represents all points whose distance
+// Buffer Returns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
 func (g *MegrezAlgorithm) Buffer(geom space.Geometry, width float64, quadsegs int) (geometry space.Geometry) {
 	buff := buffer.Buffer(geom.ToMatrix(), width, quadsegs)
@@ -28,7 +28,7 @@ func (g *MegrezAlgorithm) Buffer(geom space.Geometry, width float64, quadsegs in
 	return nil
 }
 
-// BufferInMeter sReturns a geometry that represents all points whose distance
+// BufferInMeter Returns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
 func (g *MegrezAlgorithm) BufferInMeter(geom space.Geometry, width float64, quadsegs int) (geometry space.Geometry) {
 	if geom == nil {
