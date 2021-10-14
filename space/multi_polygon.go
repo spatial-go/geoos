@@ -181,7 +181,7 @@ func (mp MultiPolygon) SimplifyP(tolerance float64) Geometry {
 	return TransGeometry(result)
 }
 
-// Buffer sReturns a geometry that represents all points whose distance
+// Buffer Returns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
 func (mp MultiPolygon) Buffer(width float64, quadsegs int) Geometry {
 	buff := buffer.Buffer(mp.ToMatrix(), width, quadsegs)
@@ -194,7 +194,7 @@ func (mp MultiPolygon) Buffer(width float64, quadsegs int) Geometry {
 	return nil
 }
 
-// BufferInMeter sReturns a geometry that represents all points whose distance
+// BufferInMeter Returns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
 func (mp MultiPolygon) BufferInMeter(width float64, quadsegs int) Geometry {
 	return BufferInMeter(mp, width, quadsegs)

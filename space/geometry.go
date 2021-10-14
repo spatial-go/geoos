@@ -48,9 +48,14 @@ type Geometry interface {
 
 	// Boundary returns the closure of the combinatorial boundary of this space.Geometry.
 	Boundary() (Geometry, error)
-	// Buffer sReturns a geometry that represents all points whose distance
+
+	// Buffer Returns a geometry that represents all points whose distance
 	// from this space.Geometry is less than or equal to distance.
 	Buffer(width float64, quadsegs int) Geometry
+
+	// BufferInMeter Returns a geometry that represents all points whose distance
+	// from this space.Geometry is less than or equal to distance.
+	BufferInMeter(width float64, quadsegs int) Geometry
 
 	// Centroid Computes the centroid point of a geometry.
 	Centroid() Point

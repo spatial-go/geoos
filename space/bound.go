@@ -254,13 +254,13 @@ func (b Bound) SimplifyP(tolerance float64) Geometry {
 	return b.ToPolygon()
 }
 
-// Buffer sReturns a geometry that represents all points whose distance
+// Buffer Returns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
 func (b Bound) Buffer(width float64, quadsegs int) Geometry {
 	return b.ToPolygon().Buffer(width, quadsegs)
 }
 
-// BufferInMeter sReturns a geometry that represents all points whose distance
+// BufferInMeter Returns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
 func (b Bound) BufferInMeter(width float64, quadsegs int) Geometry {
 	return b.ToPolygon().BufferInMeter(width, quadsegs)
