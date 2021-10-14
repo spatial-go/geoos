@@ -19,7 +19,7 @@ func GetStrategy(f newAlgorithm) Algorithm {
 	return f()
 }
 
-//  NewMegrezAlgorithm returns Algorithm that is MegrezAlgorithm.
+// NewMegrezAlgorithm returns Algorithm that is MegrezAlgorithm.
 func NewMegrezAlgorithm() Algorithm {
 	once.Do(func() {
 		algorithmMegrez = &megrezAlgorithm{}
