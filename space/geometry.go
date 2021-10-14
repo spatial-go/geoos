@@ -16,6 +16,8 @@ const (
 	TypeCollection = "GeometryCollection"
 
 	TypeBound = "Bound"
+
+	TypeCircle = "Polygon"
 )
 
 // Geometry is the interface implemented by other spatial objects
@@ -125,4 +127,6 @@ var (
 
 	_ Geometry = Collection{}
 	_ Geometry = GeometryValid{}
+
+	_ Geometry = &Circle{}
 )
