@@ -403,7 +403,7 @@ func TestMegrezAlgorithm_BufferInMeter(t *testing.T) {
 		args args
 		want space.Geometry
 	}{
-		{name: "BufferInMeter point", args: args{geom: space.Point{110, 40}, width: 100, quadsegs: 8}, want: wantGeometry},
+		{name: "BufferInMeter point1", args: args{geom: space.Point{110, 40}, width: 100, quadsegs: 8}, want: wantGeometry},
 		{name: "BufferInMeter linestring", args: args{geom: space.LineString{{110, 40}, {110.1, 40.1}}, width: 100, quadsegs: 8}, want: wantGeometry2},
 	}
 	for _, tt := range tests {
