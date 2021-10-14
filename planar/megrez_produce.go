@@ -30,7 +30,7 @@ func (g *megrezAlgorithm) Buffer(geom space.Geometry, width float64, quadsegs in
 
 // BufferInMeter Returns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
-func (g *MegrezAlgorithm) BufferInMeter(geom space.Geometry, width float64, quadsegs int) (geometry space.Geometry) {
+func (g *megrezAlgorithm) BufferInMeter(geom space.Geometry, width float64, quadsegs int) (geometry space.Geometry) {
 	if geom == nil {
 		return
 	}

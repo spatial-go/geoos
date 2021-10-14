@@ -414,12 +414,12 @@ func TestMegrezAlgorithm_BufferInMeter(t *testing.T) {
 		args args
 		want space.Geometry
 	}{
-		{name: "BufferInMeter point1", args: args{geom: space.Point{110, 40}, width: 100, quadsegs: 8}, want: wantGeometry},
+		{name: "BufferInMeter point", args: args{geom: space.Point{110, 40}, width: 100, quadsegs: 8}, want: wantGeometry},
 		{name: "BufferInMeter linestring", args: args{geom: space.LineString{{110, 40}, {110.1, 40.1}}, width: 100, quadsegs: 8}, want: wantGeometry2},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			g := &MegrezAlgorithm{}
+			g := &megrezAlgorithm{}
 			gotGeometry := g.BufferInMeter(tt.args.geom, tt.args.width, tt.args.quadsegs)
 			isEqual, _ := g.EqualsExact(gotGeometry, tt.want, 0.000001)
 			if !isEqual {
