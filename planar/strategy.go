@@ -11,7 +11,7 @@ type newAlgorithm func() Algorithm
 
 // NormalStrategy returns normal algorithm.
 func NormalStrategy() Algorithm {
-	return GetStrategy(newMegrezAlgorithm)
+	return GetStrategy(NewMegrezAlgorithm)
 }
 
 // GetStrategy returns  algorithm by new Algorithm.
@@ -19,9 +19,10 @@ func GetStrategy(f newAlgorithm) Algorithm {
 	return f()
 }
 
-func newMegrezAlgorithm() Algorithm {
+//  NewMegrezAlgorithm returns Algorithm that is MegrezAlgorithm.
+func NewMegrezAlgorithm() Algorithm {
 	once.Do(func() {
-		algorithmMegrez = &MegrezAlgorithm{}
+		algorithmMegrez = &megrezAlgorithm{}
 	})
 	return algorithmMegrez
 }

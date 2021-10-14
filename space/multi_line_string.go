@@ -266,3 +266,20 @@ func (mls MultiLineString) IsValid() bool {
 func (mls MultiLineString) CoordinateSystem() int {
 	return defaultCoordinateSystem()
 }
+
+// Filter Performs an operation with the provided .
+func (mls MultiLineString) Filter(f matrix.Filter) Geometry {
+	if f.IsChanged() {
+		ml := mls[:0]
+		for _, v := range mls {
+			f.Clear()
+			l := LineString(v).Filter(f)
+			ml = append(ml, l.(LineString))
+		}
+		return ml
+	}
+	for _, v := range mls {
+		_ = LineString(v).Filter(f)
+	}
+	return mls
+}

@@ -51,9 +51,9 @@ func (ls LineString) Bound() Bound {
 	return b
 }
 
-// EqualLineString compares two line strings. Returns true if lengths are the same
+// EqualsLineString compares two line strings. Returns true if lengths are the same
 // and all points are Equal.
-func (ls LineString) EqualLineString(lineString LineString) bool {
+func (ls LineString) EqualsLineString(lineString LineString) bool {
 	if len(ls) != len(lineString) {
 		return false
 	}
@@ -70,7 +70,7 @@ func (ls LineString) Equals(g Geometry) bool {
 	if g.GeoJSONType() != ls.GeoJSONType() {
 		return false
 	}
-	return ls.EqualLineString(g.(LineString))
+	return ls.EqualsLineString(g.(LineString))
 }
 
 // EqualsExact Returns true if the two Geometries are exactly equal,
@@ -249,4 +249,17 @@ func (ls LineString) IsValid() bool {
 // CoordinateSystem return Coordinate System.
 func (ls LineString) CoordinateSystem() int {
 	return defaultCoordinateSystem()
+}
+
+// Filter Performs an operation with the provided .
+func (ls LineString) Filter(f matrix.Filter) Geometry {
+	f.FilterMatrixes(matrix.TransMatrixes(ls.ToMatrix()))
+	if f.IsChanged() {
+		ls = ls[:0]
+		for _, v := range f.Matrixes() {
+			ls = append(ls, v)
+		}
+		return ls
+	}
+	return ls
 }

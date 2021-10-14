@@ -3,6 +3,8 @@ package relate
 import (
 	"math"
 
+	"github.com/spatial-go/geoos/algorithm/calc"
+	"github.com/spatial-go/geoos/algorithm/filter"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 )
 
@@ -66,13 +68,16 @@ func Intersection(aStart, aEnd, bStart, bEnd matrix.Matrix) (mark bool, ips Inte
 			mark = true
 		}
 	} else {
-		a1 := aEnd[1] - aStart[1]
-		b1 := aStart[0] - aEnd[0]
-		c1 := -aStart[0]*a1 - b1*aStart[1]
-		a2 := bEnd[1] - bStart[1]
-		b2 := bStart[0] - bEnd[0]
-		c2 := -a2*bStart[0] - b2*bStart[1]
-		ip := matrix.Matrix{(b1*c2 - b2*c1) / determinant, (a2*c1 - a1*c2) / determinant}
+		aa1 := calc.ValueOf(aEnd[1]).SelfSubtractPair(calc.ValueOf(aStart[1]))
+		bb1 := calc.ValueOf(aStart[0]).SelfSubtractPair(calc.ValueOf(aEnd[0]))
+		cc1 := calc.DeterminantPair(calc.ValueOf(-aStart[0]), bb1, calc.ValueOf(aStart[1]), aa1)
+		aa2 := calc.ValueOf(bEnd[1]).SelfSubtractPair(calc.ValueOf(bStart[1]))
+		bb2 := calc.ValueOf(bStart[0]).SelfSubtractPair(calc.ValueOf(bEnd[0]))
+		cc2 := calc.DeterminantPair(calc.ValueOf(0).SelfSubtractPair(aa2), bb2, calc.ValueOf(bStart[1]), calc.ValueOf(bStart[0]))
+
+		x := calc.DeterminantPair(bb1, bb2, cc1, cc2).SelfDividePair(calc.ValueOf(determinant)).Value()
+		y := calc.DeterminantPair(aa2, aa1, cc2, cc1).SelfDividePair(calc.ValueOf(determinant)).Value()
+		ip := matrix.Matrix{x, y}
 
 		// check if point belongs to segment
 		ina, isVexA := InLine(ip, aStart, aEnd)
@@ -80,7 +85,7 @@ func Intersection(aStart, aEnd, bStart, bEnd matrix.Matrix) (mark bool, ips Inte
 		if ina && inb {
 			isIntersectionPoint := true
 			if isVexA && inVexB {
-				isIntersectionPoint = false
+				//isIntersectionPoint = false  //todo
 			}
 			isOriginal := false
 			if ip.Equals(aStart) || ip.Equals(aEnd) || ip.Equals(bStart) || ip.Equals(bEnd) {
@@ -98,7 +103,7 @@ func Intersection(aStart, aEnd, bStart, bEnd matrix.Matrix) (mark bool, ips Inte
 
 // CrossProduct Returns cross product of a,b Matrix.
 func CrossProduct(a, b matrix.Matrix) float64 {
-	return a[0]*b[1] - a[1]*b[0]
+	return calc.Determinant(a[0], a[1], b[0], b[1]).Value()
 }
 
 // InLine returns true if spot in ab,false else.
@@ -109,8 +114,9 @@ func InLine(spot, a, b matrix.Matrix) (in bool, isVertex bool) {
 	if spot.Equals(a) || spot.Equals(b) {
 		return true, true
 	}
-
-	if ((spot[0]-a[0])*(a[1]-b[1])) == ((a[0]-b[0])*(spot[1]-a[1])) &&
+	ax := (spot[0] - a[0]) * (a[1] - b[1])
+	bx := (a[0] - b[0]) * (spot[1] - a[1])
+	if math.Abs(ax-bx) < calc.AccuracyFloat &&
 		(spot[0] >= math.Min(a[0], b[0]) && spot[0] <= math.Max(a[0], b[0])) &&
 		((spot[1] >= math.Min(a[1], b[1])) && (spot[1] <= math.Max(a[1], b[1]))) {
 		return true, false
@@ -179,19 +185,31 @@ type UniqueIntersectionEdgeFilter struct {
 }
 
 // Filter Performs an operation with the provided .
-func (u *UniqueIntersectionEdgeFilter) Filter(ip IntersectionPoint) {
-	u.add(ip)
+func (u *UniqueIntersectionEdgeFilter) Filter(ip interface{}) bool {
+	return u.add(ip)
 }
 
-func (u *UniqueIntersectionEdgeFilter) add(ip IntersectionPoint) {
+func (u *UniqueIntersectionEdgeFilter) add(ip interface{}) bool {
 	hasMatrix := false
 	for _, v := range u.Ips {
-		if v.Matrix.Equals(ip.Matrix) {
+		if v.Matrix.Equals(ip.(IntersectionPoint).Matrix) {
 			hasMatrix = true
 			break
 		}
 	}
 	if !hasMatrix {
-		u.Ips = append(u.Ips, ip)
+		u.Ips = append(u.Ips, ip.(IntersectionPoint))
+		return true
 	}
+	return false
 }
+
+// Entities  Returns the gathered Matrixes.
+func (u *UniqueIntersectionEdgeFilter) Entities() interface{} {
+	return u.Ips
+}
+
+// compile time checks
+var (
+	_ filter.Filter = &UniqueIntersectionEdgeFilter{}
+)

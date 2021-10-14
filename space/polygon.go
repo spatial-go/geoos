@@ -305,3 +305,20 @@ func (p Polygon) IsValid() bool {
 func (p Polygon) CoordinateSystem() int {
 	return defaultCoordinateSystem()
 }
+
+// Filter Performs an operation with the provided .
+func (p Polygon) Filter(f matrix.Filter) Geometry {
+	if f.IsChanged() {
+		poly := Polygon{}
+		for _, v := range p {
+			f.Clear()
+			r := Ring(v).Filter(f)
+			poly = append(poly, r.(Ring))
+		}
+		return poly
+	}
+	for _, v := range p {
+		_ = Ring(v).Filter(f)
+	}
+	return p
+}

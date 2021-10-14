@@ -227,3 +227,8 @@ func (p Point) IsValid() bool {
 func (p Point) CoordinateSystem() int {
 	return defaultCoordinateSystem()
 }
+
+// Filter Performs an operation with the provided .
+func (p Point) Filter(f matrix.Filter) Geometry {
+	return p
+}

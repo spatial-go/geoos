@@ -17,6 +17,34 @@ func ValueOf(x float64) *PairFloat {
 	return &PairFloat{x, 0.0}
 }
 
+// AddOne  Adds the argument to the value of DD.
+// To prevent altering constants,
+// this method must only be used on values known to
+// be newly created.
+func (d *PairFloat) AddOne(y float64) *PairFloat {
+	newPair := &PairFloat{d.Hi, d.Lo}
+	return newPair.SelfAddOne(y)
+	// return selfAdd(y, 0.0);
+}
+
+// AddPair  Adds the argument to the value of DD.
+// To prevent altering constants,
+// this method must only be used on values known to
+// be newly created.
+func (d *PairFloat) AddPair(y *PairFloat) *PairFloat {
+	newPair := &PairFloat{d.Hi, d.Lo}
+	return newPair.SelfAddPair(y)
+}
+
+// Add  Adds the argument to the value of DD.
+// To prevent altering constants,
+// this method must only be used on values known to
+// be newly created.
+func (d *PairFloat) Add(yhi, ylo float64) *PairFloat {
+	newPair := &PairFloat{d.Hi, d.Lo}
+	return newPair.SelfAdd(yhi, ylo)
+}
+
 // SelfAddOne  Adds the argument to the value of DD.
 // To prevent altering constants,
 // this method must only be used on values known to
@@ -34,6 +62,14 @@ func (d *PairFloat) SelfAddOne(y float64) *PairFloat {
 	d.Lo = h + (H - d.Hi)
 	return d
 	// return selfAdd(y, 0.0);
+}
+
+// SelfAddPair  Adds the argument to the value of DD.
+// To prevent altering constants,
+// this method must only be used on values known to
+// be newly created.
+func (d *PairFloat) SelfAddPair(y *PairFloat) *PairFloat {
+	return d.SelfAdd(y.Hi, y.Lo)
 }
 
 // SelfAdd  Adds the argument to the value of DD.
@@ -62,12 +98,56 @@ func (d *PairFloat) SelfAdd(yhi, ylo float64) *PairFloat {
 	return d
 }
 
+// SubtractPair Subtracts the argument from the value of DD.
+// To prevent altering constants,
+// this method must only be used on values known to
+// be newly created.
+func (d *PairFloat) SubtractPair(y *PairFloat) *PairFloat {
+	newPair := &PairFloat{d.Hi, d.Lo}
+	return newPair.SelfAdd(-y.Hi, -y.Lo)
+}
+
+// Subtract Subtracts the argument from the value of DD.
+// To prevent altering constants,
+// this method must only be used on values known to
+// be newly created.
+func (d *PairFloat) Subtract(yhi, ylo float64) *PairFloat {
+	newPair := &PairFloat{d.Hi, d.Lo}
+	return newPair.SelfAdd(-yhi, -ylo)
+}
+
+// SelfSubtractPair Subtracts the argument from the value of DD.
+// To prevent altering constants,
+// this method must only be used on values known to
+// be newly created.
+func (d *PairFloat) SelfSubtractPair(y *PairFloat) *PairFloat {
+	return d.SelfAdd(-y.Hi, -y.Lo)
+}
+
 // SelfSubtract Subtracts the argument from the value of DD.
 // To prevent altering constants,
 // this method must only be used on values known to
 // be newly created.
 func (d *PairFloat) SelfSubtract(yhi, ylo float64) *PairFloat {
 	return d.SelfAdd(-yhi, -ylo)
+}
+
+// MultiplyPair Multiplies this object by the argument, returning DD.
+// To prevent altering constants,
+// this method must only be used on values known to
+// be newly created.
+func (d *PairFloat) MultiplyPair(y *PairFloat) *PairFloat {
+	newPair := &PairFloat{d.Hi, d.Lo}
+	return newPair.SelfMultiply(y.Hi, y.Lo)
+}
+
+// Multiply Multiplies this object by the argument, returning DD.
+// To prevent altering constants,
+// this method must only be used on values known to
+// be newly created.
+func (d *PairFloat) Multiply(yhi, ylo float64) *PairFloat {
+	newPair := &PairFloat{d.Hi, d.Lo}
+	return newPair.SelfMultiply(yhi, ylo)
 }
 
 // SelfMultiplyPair Multiplies this object by the argument, returning DD.
@@ -100,6 +180,32 @@ func (d *PairFloat) SelfMultiply(yhi, ylo float64) *PairFloat {
 	d.Hi = zhi
 	d.Lo = zlo
 	return d
+}
+
+// DividePair Divides this object by the argument, returning DD.
+// To prevent altering constants,
+// this method must only be used on values known to
+// be newly created.
+func (d *PairFloat) DividePair(y *PairFloat) *PairFloat {
+	newPair := &PairFloat{d.Hi, d.Lo}
+	return newPair.SelfDivide(y.Hi, y.Lo)
+}
+
+// Divide Divides this object by the argument, returning DD.
+// To prevent altering constants,
+// this method must only be used on values known to
+// be newly created.
+func (d *PairFloat) Divide(yhi, ylo float64) *PairFloat {
+	newPair := &PairFloat{d.Hi, d.Lo}
+	return newPair.SelfDivide(yhi, ylo)
+}
+
+// SelfDividePair Divides this object by the argument, returning DD.
+// To prevent altering constants,
+// this method must only be used on values known to
+// be newly created.
+func (d *PairFloat) SelfDividePair(y *PairFloat) *PairFloat {
+	return d.SelfDivide(y.Hi, y.Lo)
 }
 
 // SelfDivide Divides this object by the argument, returning DD.
@@ -192,6 +298,11 @@ func (d *PairFloat) CompareTo(other *PairFloat) int {
 	return 0
 }
 
+// Value Converts this value to the nearest double-precision number.
+func (d *PairFloat) Value() float64 {
+	return d.Hi + d.Lo
+}
+
 // Signum Returns an integer indicating the sign of this value.
 func Signum(x float64) int {
 	if x > 0 {
@@ -201,4 +312,14 @@ func Signum(x float64) int {
 		return -1
 	}
 	return 0
+}
+
+// Determinant Computes the determinant of the 2x2 matrix with the given entries.
+func Determinant(x1, y1, x2, y2 float64) *PairFloat {
+	return DeterminantPair(ValueOf(x1), ValueOf(y1), ValueOf(x2), ValueOf(y2))
+}
+
+// DeterminantPair Computes the determinant of the 2x2 matrix with the given entries.
+func DeterminantPair(x1, y1, x2, y2 *PairFloat) *PairFloat {
+	return x1.MultiplyPair(y2).SelfSubtractPair(y1.MultiplyPair(x2))
 }

@@ -64,7 +64,7 @@ func TestIndex_ComputeOverlaps(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			s := index
 			s.ComputeOverlaps(tt.args.action)
-			if index.nOverlaps != 0 {
+			if index.nOverlaps == 0 {
 				t.Errorf("%v = %v, want %v", tt.name, index.nOverlaps, "no zero")
 			}
 		})

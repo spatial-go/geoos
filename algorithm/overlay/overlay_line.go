@@ -5,6 +5,7 @@ import (
 
 	"github.com/spatial-go/geoos/algorithm"
 	"github.com/spatial-go/geoos/algorithm/matrix"
+	"github.com/spatial-go/geoos/algorithm/matrix/envelope"
 	"github.com/spatial-go/geoos/algorithm/overlay/chain"
 	"github.com/spatial-go/geoos/algorithm/relate"
 )
@@ -19,9 +20,44 @@ func (p *LineOverlay) Union() (matrix.Steric, error) {
 	if res, ok := p.unionCheck(); !ok {
 		return res, nil
 	}
-	if s, ok := p.Subject.(matrix.LineMatrix); ok {
-		if c, ok := p.Clipping.(matrix.LineMatrix); ok {
-			return LineMerge(matrix.Collection{s, c}), nil
+	if ps, ok := p.Subject.(matrix.LineMatrix); ok {
+		switch pc := p.Clipping.(type) {
+		case matrix.Matrix:
+			return Union(pc, ps), nil
+		case matrix.LineMatrix:
+			ins, _ := p.Intersection()
+			sds, _ := p.SymDifference()
+			ic := ins.(matrix.Collection)
+			if len(ic) == 1 {
+				if _, ok := ic[0].(matrix.Matrix); ok {
+					return sds.(matrix.Collection), nil
+				}
+			}
+			return append(ins.(matrix.Collection), sds.(matrix.Collection)...), nil
+		case matrix.PolygonMatrix:
+			inter := envelope.Bound(ps.Bound()).IsIntersects(envelope.Bound(pc.Bound()))
+			im := relate.IM(ps, pc, inter)
+			if mark := im.IsDisjoint(); mark {
+				return matrix.Collection{ps, pc}, nil
+			}
+			if mark := im.IsWithin(); mark {
+				return pc, nil
+			}
+			res, _ := p.Difference()
+			result := matrix.Collection{}
+			for _, v := range res.(matrix.Collection) {
+				inter := envelope.Bound(v.Bound()).IsIntersects(envelope.Bound(pc.Bound()))
+				im := relate.IM(pc, v, inter)
+				if !im.IsContains() {
+					result = append(result, v)
+				}
+			}
+			if len(result) > 0 {
+				return append(result, pc), nil
+			}
+			return pc, nil
+		case matrix.Collection:
+			return append(pc, ps), nil
 		}
 	}
 	return nil, algorithm.ErrNotMatchType
@@ -48,12 +84,24 @@ func (p *LineOverlay) Intersection() (matrix.Steric, error) {
 		result := intersectLine(line, c)
 		return LineMerge(result), nil
 	case matrix.PolygonMatrix:
-		result := matrix.Collection{}
-		for _, ring := range c {
-			res := intersectLine(line, ring)
-			result = append(result, res...)
+		inter := envelope.Bound(line.Bound()).IsIntersects(envelope.Bound(c.Bound()))
+		im := relate.IM(line, c, inter)
+		if mark := im.IsDisjoint(); mark {
+			return matrix.Collection{}, nil
 		}
-		return LineMerge(result), nil
+		if mark := im.IsWithin(); mark {
+			return line, nil
+		}
+		res, _ := p.Difference()
+		result := matrix.Collection{}
+		for _, v := range res.(matrix.Collection) {
+			inter := envelope.Bound(v.Bound()).IsIntersects(envelope.Bound(c.Bound()))
+			im := relate.IM(c, v, inter)
+			if im.IsCovers() {
+				result = append(result, v)
+			}
+		}
+		return result, nil
 	}
 	return nil, algorithm.ErrNotMatchType
 }
@@ -65,13 +113,25 @@ func (p *LineOverlay) Difference() (matrix.Steric, error) {
 	if res, ok := p.differenceCheck(); !ok {
 		return res, nil
 	}
-	if s, ok := p.Subject.(matrix.LineMatrix); ok {
-		if c, ok := p.Clipping.(matrix.LineMatrix); ok {
+
+	if ps, ok := p.Subject.(matrix.LineMatrix); ok {
+		switch pc := p.Clipping.(type) {
+		case matrix.Matrix:
+			return ps, nil
+		case matrix.LineMatrix:
 			var err error
-			if result, err := differenceLine(s, c); err == nil {
+			if result, err := differenceLine(ps, pc); err == nil {
 				return result, nil
 			}
 			return nil, err
+		case matrix.PolygonMatrix:
+			var result matrix.Collection
+			for _, v := range pc {
+				if res, err := differenceLine(ps, v); err == nil {
+					result = append(result, res.(matrix.Collection)...)
+				}
+			}
+			return result, nil
 		}
 	}
 	return nil, algorithm.ErrNotMatchType
@@ -91,10 +151,10 @@ func (p *LineOverlay) DifferenceReverse() (matrix.Steric, error) {
 func (p *LineOverlay) SymDifference() (matrix.Steric, error) {
 	result := matrix.Collection{}
 	if res, err := p.Difference(); err == nil {
-		result = append(result, res)
+		result = append(result, res.(matrix.Collection)...)
 	}
 	if res, err := p.DifferenceReverse(); err == nil {
-		result = append(result, res)
+		result = append(result, res.(matrix.Collection)...)
 	}
 	return result, nil
 }
@@ -102,8 +162,8 @@ func (p *LineOverlay) SymDifference() (matrix.Steric, error) {
 // intersectLine returns a array  that represents that part of geometry A intersect with geometry B.
 func intersectLine(m, m1 matrix.LineMatrix) matrix.Collection {
 	smi := &chain.SegmentMutualIntersector{SegmentMutual: m}
-	icd := &chain.IntersectionCollinear{}
-	smi.Process(m1.ToLineArray(), icd)
+	icd := &chain.IntersectionCollinear{Edge: m}
+	smi.Process(m1, icd)
 	result := icd.Result()
 	return result.(matrix.Collection)
 }
@@ -143,10 +203,10 @@ func IntersectLine(m, m1 matrix.LineMatrix) []relate.IntersectionResult {
 
 func differenceLine(m, m1 matrix.LineMatrix) (matrix.Steric, error) {
 	smi := &chain.SegmentMutualIntersector{SegmentMutual: m}
-	icd := &chain.IntersectionCollinearDifference{}
-	smi.Process(m1.ToLineArray(), icd)
+	icd := &chain.IntersectionCollinearDifference{Edge: m}
+	smi.Process(m1, icd)
 	result := icd.Result()
-	if m, ok := result.(matrix.Collection); ok {
+	if m, ok := result.(matrix.Collection); ok && m != nil {
 		return m, nil
 	}
 	return matrix.Collection{}, nil

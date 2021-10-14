@@ -9,10 +9,9 @@ import (
 
 // IntersectionCollinearDifference Finds interior intersections between line segments , and adds them.
 type IntersectionCollinearDifference struct {
-	Intersections relate.IntersectionPointLine
-	startPos      int
-	result        matrix.Collection
-	line          matrix.LineMatrix
+	mono   []*MonotoneChain
+	Edge   matrix.LineMatrix
+	result matrix.Collection
 }
 
 // ProcessIntersections This method is called by clients  to process intersections for two segments being intersected.
@@ -29,33 +28,61 @@ func (ii *IntersectionCollinearDifference) ProcessIntersections(
 		return
 	}
 	mark, ips := relate.Intersection(e0[segIndex0], e0[segIndex0+1], e1[segIndex1], e1[segIndex1+1])
-
 	if mark {
+		var monos = []*MonotoneChain{}
+		var mono *MonotoneChain
+		var edge matrix.LineMatrix
+		var line matrix.LineMatrix
+		var startPos = 0
+		monoNum := 0
+		for _, v := range ii.mono {
+			if segIndex0 >= v.Start && segIndex0 < v.End && v.Context.(bool) {
+				monoNum++
+				mono = v
+				monos = append(monos, v)
+			}
+		}
+		if monoNum > 1 {
+			for _, v := range monos {
+				if markInter := relate.IsIntersectionEdge(v.Edge, matrix.LineMatrix{e1[segIndex1], e1[segIndex1+1]}); markInter {
+					mono = v
+					edge = mono.Edge
+					mono.Context = false
+				}
+			}
+		} else if monoNum == 1 {
+			edge = mono.Edge
+			mono.Context = false
+		} else {
+			edge = ii.Edge
+			mono = &MonotoneChain{Edge: edge, Start: 0, End: len(edge) - 1, Context: false}
+			ii.mono = append(ii.mono, mono)
+		}
+
 		if ips[0].IsCollinear {
 			sort.Sort(ips)
-			if matrix.Matrix(e0[segIndex0]).Equals(ips[0].Matrix) {
-				ii.line = append(ii.line, e0[ii.startPos:segIndex0]...)
-			} else {
-				ii.line = append(ii.line, e0[ii.startPos:segIndex0+1]...)
-				ii.line = append(ii.line, ips[0].Matrix)
-			}
-			if len(ii.line) > 1 {
-				ii.result = append(ii.result, ii.line)
-			}
-			if segIndex0 < len(e0)-1 && matrix.Matrix(e0[segIndex0+1]).Equals(ips[len(ips)-1].Matrix) {
-				ii.startPos = segIndex0 + 2
-			} else {
-				ii.startPos = segIndex0 + 1
-			}
-			ii.line = matrix.LineMatrix{}
-			ii.line = append(ii.line, ips[len(ips)-1].Matrix)
 		}
-	}
-	if segIndex0 == len(e0)-2 {
-		ii.line = append(ii.line, e0[ii.startPos:]...)
-		if len(ii.line) > 1 {
-			ii.result = append(ii.result, ii.line)
+		if matrix.Matrix(edge[0]).Equals(ips[0].Matrix) {
+			line = append(line, edge[:segIndex0-mono.Start]...)
+		} else {
+			line = append(line, edge[:segIndex0+1-mono.Start]...)
+			line = append(line, ips[0].Matrix)
 		}
+		if len(line) > 1 {
+			ii.mono = append(ii.mono, &MonotoneChain{Edge: line, Start: mono.Start, End: segIndex0 + 1, Context: true})
+		}
+		if matrix.Matrix(edge[len(edge)-1]).Equals(ips[len(ips)-1].Matrix) {
+			startPos = segIndex0 + 2
+		} else {
+			startPos = segIndex0 + 1
+		}
+		line = matrix.LineMatrix{}
+		line = append(line, ips[len(ips)-1].Matrix)
+		line = append(line, edge[startPos-mono.Start:]...)
+		if len(line) > 1 {
+			ii.mono = append(ii.mono, &MonotoneChain{Edge: line, Start: startPos - 1, End: mono.End, Context: true})
+		}
+
 	}
 }
 
@@ -66,5 +93,13 @@ func (ii *IntersectionCollinearDifference) IsDone() bool {
 
 // Result returns result.
 func (ii *IntersectionCollinearDifference) Result() interface{} {
+	for _, v := range ii.mono {
+		if v.Context.(bool) {
+			ii.result = append(ii.result, v.Edge)
+		}
+	}
+	if ii.result == nil && len(ii.mono) <= 0 {
+		ii.result = append(ii.result, ii.Edge)
+	}
 	return ii.result
 }

@@ -1,6 +1,10 @@
 package space
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/spatial-go/geoos/algorithm/matrix"
+)
 
 func TestMultiPolygon_Nums(t *testing.T) {
 	mp := MultiPolygon{
@@ -20,6 +24,29 @@ func TestMultiPolygon_Nums(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.mp.Nums(); got != tt.want {
 				t.Errorf("MultiPolygon.Nums() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestMultiPolygon_Filter(t *testing.T) {
+	var f matrix.Filter = &matrix.UniqueArrayFilter{}
+	tests := []struct {
+		name string
+		mp   MultiPolygon
+		want MultiPolygon
+	}{
+		{"multi polygon filter", MultiPolygon{Polygon{{{1, 1}, {1, 2}, {2, 2}, {2, 2}, {2, 1}, {1, 1}}, {{1.5, 1.5}, {1.5, 2}, {2, 2}, {2, 2}, {2, 1.5}, {1.5, 1.5}}},
+			Polygon{{{1, 1}, {1, 2}, {2, 2}, {2, 2}, {2, 1}, {1, 1}}, {{1.5, 1.5}, {1.5, 2}, {2, 2}, {2, 2}, {2, 1.5}, {1.5, 1.5}}}},
+			MultiPolygon{Polygon{{{1, 1}, {1, 2}, {2, 2}, {2, 1}, {1, 1}}, {{1.5, 1.5}, {1.5, 2}, {2, 2}, {2, 1.5}, {1.5, 1.5}}},
+				Polygon{{{1, 1}, {1, 2}, {2, 2}, {2, 1}, {1, 1}}, {{1.5, 1.5}, {1.5, 2}, {2, 2}, {2, 1.5}, {1.5, 1.5}}}},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.mp.Filter(f)
+			if !got.Equals(tt.want) {
+				t.Errorf("Filter() = %v, want %v", got, tt.want)
 			}
 		})
 	}

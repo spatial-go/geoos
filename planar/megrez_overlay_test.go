@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/spatial-go/geoos"
 	"github.com/spatial-go/geoos/encoding/wkt"
 	"github.com/spatial-go/geoos/space"
 )
@@ -59,6 +60,17 @@ func TestAlgorithm_Intersection(t *testing.T) {
 		{name: "intersection", args: args{g1: point02, g2: line02}, want: expectPoint, wantErr: false},
 		{name: "intersection error", args: args{g1: space.Collection{point02}, g2: space.Collection{line02}}, want: nil, wantErr: true},
 		{name: "intersection error", args: args{g1: point02, g2: space.Collection{line02}}, want: nil, wantErr: true},
+		{
+			name: "intersection poly2",
+			args: args{space.Polygon{{{110.85205078124999, 38.92522904714054}, {110.72021484375, 37.80544394934271}, {113.22509765625, 37.64903402157866},
+				{113.818359375, 39.027718840211605}, {112.1484375, 39.57182223734374}, {110.85205078124999, 38.92522904714054}}},
+				space.Polygon{{{113.99414062499999, 38.25543637637947}, {112.3681640625, 38.70265930723801}, {112.03857421875, 37.37015718405753},
+					{114.01611328125, 36.29741818650811}, {114.43359375, 37.47485808497102}, {113.99414062499999, 38.25543637637947}}},
+			},
+			want: space.Polygon{{{113.53981129511264, 38.380399121337376}, {113.22509765625, 37.64903402157866}, {112.12455119147911, 37.717754359391186}, {112.3681640625, 38.70265930723801},
+				{113.53981129511264, 38.380399121337376}}},
+
+			wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -68,7 +80,7 @@ func TestAlgorithm_Intersection(t *testing.T) {
 				t.Errorf("Intersection() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
+			if !((got == nil) == (tt.want == nil) || got.EqualsExact(tt.want, 0.000001)) {
 				t.Errorf("Intersection() got = %v, want %v", got, tt.want)
 			}
 		})
@@ -176,15 +188,14 @@ func TestAlgorithm_SharedPaths(t *testing.T) {
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("SharedPaths() got = %v, want %v", got, tt.want)
+				t.Errorf("SharedPaths() got = %v, \nwant %v", got, tt.want)
 			}
 		})
 	}
 }
 
 func TestAlgorithm_UnaryUnion(t *testing.T) {
-	multiPolygon, _ := wkt.UnmarshalString(`MULTIPOLYGON(((0 0, 10 0, 10 10, 0 10, 0 0)), ((5 5, 15 5, 15 15, 5 15, 5 5)))`)
-	expectPolygon, _ := wkt.UnmarshalString(`POLYGON((5 10,0 10,0 0,10 0,10 5,15 5,15 15,5 15,5 10))`)
+
 	type args struct {
 		g space.Geometry
 	}
@@ -194,9 +205,77 @@ func TestAlgorithm_UnaryUnion(t *testing.T) {
 		want    []space.Geometry
 		wantErr bool
 	}{
-		{name: "UnaryUnion Polygon", args: args{g: multiPolygon}, want: []space.Geometry{expectPolygon}, wantErr: false},
+		{name: "UnaryUnion Polygon", args: args{g: space.MultiPolygon{space.Polygon{{{0, 0}, {10, 0}, {10, 10}, {0, 10}, {0, 0}}},
+			space.Polygon{{{5, 5}, {15, 5}, {15, 15}, {5, 15}, {5, 5}}}}}, want: []space.Geometry{space.Polygon{{{5, 10}, {0, 10}, {0, 0}, {10, 0}, {10, 5}, {15, 5}, {15, 15}, {5, 15}, {5, 10}}}}, wantErr: false},
+
+		{name: "poly 1",
+			args: args{space.MultiPolygon{space.Polygon{{{1, 1}, {2, 1}, {2, 2}, {1, 2}, {1, 1}}},
+				space.Polygon{{{3, 1}, {5, 1}, {5, 2}, {3, 2}, {3, 1}}},
+			},
+			},
+			want: []space.Geometry{space.MultiPolygon{space.Polygon{{{1, 1}, {2, 1}, {2, 2}, {1, 2}, {1, 1}}},
+				space.Polygon{{{3, 1}, {5, 1}, {5, 2}, {3, 2}, {3, 1}}}},
+				space.MultiPolygon{space.Polygon{{{1, 1}, {2, 1}, {2, 2}, {1, 2}, {1, 1}}},
+					space.Polygon{{{3, 1}, {5, 1}, {5, 2}, {3, 2}, {3, 1}}}},
+			},
+			wantErr: false},
+
+		{name: "poly 2",
+			args: args{space.MultiPolygon{space.Polygon{{{1, 1}, {2, 1}, {2, 2}, {1, 2}, {1, 1}}},
+				space.Polygon{{{2, 1}, {5, 1}, {5, 2}, {2, 2}, {2, 1}}},
+			},
+			},
+			want: []space.Geometry{space.Polygon{{{1, 1}, {5, 1}, {5, 2}, {1, 2}, {1, 1}}},
+				space.Polygon{{{2, 2}, {1, 2}, {1, 1}, {2, 1}, {5, 1}, {5, 2}, {2, 2}}},
+			},
+			wantErr: false},
+
+		{name: "poly 3",
+			args: args{space.MultiPolygon{space.Polygon{{{1, 1}, {2, 1}, {2, 2}, {1, 2}, {1, 1}}},
+				space.Polygon{{{2, 2}, {5, 2}, {5, 3}, {2, 3}, {2, 2}}},
+			},
+			},
+			want: []space.Geometry{space.MultiPolygon{space.Polygon{{{2, 2}, {2, 1}, {1, 1}, {1, 2}, {2, 2}}},
+				space.Polygon{{{2, 2}, {2, 3}, {5, 3}, {5, 2}, {2, 2}}}},
+				space.MultiPolygon{space.Polygon{{{1, 1}, {2, 1}, {2, 2}, {1, 2}, {1, 1}}},
+					space.Polygon{{{2, 2}, {5, 2}, {5, 3}, {2, 3}, {2, 2}}}},
+			},
+			wantErr: false},
+
+		{name: "poly 4",
+			args: args{space.MultiPolygon{space.Polygon{{{1, 2}, {3, 2}, {3, 3}, {1, 3}, {1, 2}}},
+				space.Polygon{{{2, 1}, {5, 1}, {5, 5}, {2, 5}, {2, 1}}},
+			},
+			},
+			want: []space.Geometry{space.Polygon{{{2, 2}, {1, 2}, {1, 3}, {2, 3}, {2, 5}, {5, 5}, {5, 1}, {2, 1}, {2, 2}}},
+				space.Polygon{{{2, 3}, {1, 3}, {1, 2}, {2, 2}, {2, 1}, {5, 1}, {5, 5}, {2, 5}, {2, 3}}},
+			},
+			wantErr: false},
+
+		{name: "poly 5",
+			args: args{space.MultiPolygon{space.Polygon{{{1, 1}, {5, 1}, {5, 5}, {1, 5}, {1, 1}}},
+				space.Polygon{{{2, 2}, {3, 2}, {3, 3}, {2, 3}, {2, 2}}},
+			},
+			},
+			want: []space.Geometry{space.Polygon{{{1, 1}, {1, 5}, {5, 5}, {5, 1}, {1, 1}}},
+				space.Polygon{{{1, 1}, {5, 1}, {5, 5}, {1, 5}, {1, 1}}},
+			},
+			wantErr: false},
+
+		{name: "poly 6",
+			args: args{space.MultiPolygon{space.Polygon{{{1, 1}, {2, 1}, {2, 2}, {1, 2}, {1, 1}}},
+				space.Polygon{{{1, 1}, {5, 1}, {5, 3}, {1, 3}, {1, 1}}},
+			},
+			},
+			want: []space.Geometry{space.Polygon{{{2, 1}, {1, 1}, {1, 2}, {1, 3}, {5, 3}, {5, 1}, {2, 1}}},
+				space.Polygon{{{1, 1}, {5, 1}, {5, 3}, {1, 3}, {1, 1}}},
+			},
+			wantErr: false},
 	}
 	for _, tt := range tests {
+		if !geoos.GeoosTestTag && tt.name != "poly 4" {
+			continue
+		}
 		t.Run(tt.name, func(t *testing.T) {
 			G := NormalStrategy()
 			gotGeometry, err := G.UnaryUnion(tt.args.g)
@@ -206,8 +285,12 @@ func TestAlgorithm_UnaryUnion(t *testing.T) {
 				return
 			}
 			isEqual, _ := G.EqualsExact(gotGeometry, tt.want[0], 0.000001)
+			if len(tt.want) > 1 {
+				isEqual1, _ := G.EqualsExact(gotGeometry, tt.want[1], 0.000001)
+				isEqual = isEqual || isEqual1
+			}
 			if !isEqual {
-				t.Errorf("Algorithm UnaryUnion = %v, want %v", wkt.MarshalString(gotGeometry), wkt.MarshalString(tt.want[0]))
+				t.Errorf("Algorithm UnaryUnion %v = %v, want %v", tt.name, wkt.MarshalString(gotGeometry), wkt.MarshalString(tt.want[0]))
 			}
 		})
 	}
@@ -229,13 +312,47 @@ func TestAlgorithm_Union(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    space.Geometry
+		want    []space.Geometry
 		wantErr bool
 	}{
-		{name: "union", args: args{g1: point01, g2: point02}, want: expectMultiPoint},
-		{name: "union line", args: args{g1: line01, g2: line02}, want: expectMultiline},
+		{name: "union", args: args{g1: point01, g2: point02}, want: []space.Geometry{expectMultiPoint}},
+		{name: "union line", args: args{g1: line01, g2: line02}, want: []space.Geometry{expectMultiline}},
+		{name: "UnaryUnion Polygon", args: args{g1: space.Polygon{{{0, 0}, {10, 0}, {10, 10}, {0, 10}, {0, 0}}},
+			g2: space.Polygon{{{5, 5}, {15, 5}, {15, 15}, {5, 15}, {5, 5}}}},
+			want:    []space.Geometry{space.Polygon{{{5, 10}, {0, 10}, {0, 0}, {10, 0}, {10, 5}, {15, 5}, {15, 15}, {5, 15}, {5, 10}}}},
+			wantErr: false},
+
+		{name: "poly 1",
+			args: args{space.Polygon{{{1, 1}, {2, 1}, {2, 2}, {1, 2}, {1, 1}}},
+				space.Polygon{{{3, 1}, {5, 1}, {5, 2}, {3, 2}, {3, 1}}},
+			},
+			want: []space.Geometry{space.MultiPolygon{space.Polygon{{{1, 1}, {2, 1}, {2, 2}, {1, 2}, {1, 1}}},
+				space.Polygon{{{3, 1}, {5, 1}, {5, 2}, {3, 2}, {3, 1}}}},
+				space.MultiPolygon{space.Polygon{{{1, 1}, {2, 1}, {2, 2}, {1, 2}, {1, 1}}},
+					space.Polygon{{{3, 1}, {5, 1}, {5, 2}, {3, 2}, {3, 1}}}},
+			},
+			wantErr: false},
+		{
+			name: "union poly2",
+			args: args{space.Polygon{{{110.85205078124999, 38.92522904714054}, {110.72021484375, 37.80544394934271}, {113.22509765625, 37.64903402157866},
+				{113.818359375, 39.027718840211605}, {112.1484375, 39.57182223734374}, {110.85205078124999, 38.92522904714054}}},
+				space.Polygon{{{113.99414062499999, 38.25543637637947}, {112.3681640625, 38.70265930723801}, {112.03857421875, 37.37015718405753},
+					{114.01611328125, 36.29741818650811}, {114.43359375, 37.47485808497102}, {113.99414062499999, 38.25543637637947}}},
+			},
+			want: []space.Geometry{
+				space.Polygon{{{112.124551191479, 37.7177543593912}, {110.72021484375, 37.8054439493427}, {110.85205078125, 38.9252290471405}, {112.1484375, 39.5718222373437},
+					{113.818359375, 39.0277188402116}, {113.539811295113, 38.3803991213374}, {113.994140625, 38.2554363763795}, {114.43359375, 37.474858084971},
+					{114.01611328125, 36.2974181865081}, {112.03857421875, 37.3701571840575}, {112.124551191479, 37.7177543593912}}},
+				space.Polygon{{{113.539811295113, 38.3803991213374}, {113.818359375, 39.0277188402116}, {112.1484375, 39.5718222373437}, {110.85205078125, 38.9252290471405},
+					{110.72021484375, 37.8054439493427}, {112.124551191479, 37.7177543593912}, {112.03857421875, 37.3701571840575}, {114.01611328125, 36.2974181865081},
+					{114.43359375, 37.474858084971}, {113.994140625, 38.2554363763795}, {113.539811295113, 38.3803991213374}}},
+			},
+			wantErr: false},
 	}
 	for _, tt := range tests {
+		if !geoos.GeoosTestTag && tt.name != "union poly2" {
+			continue
+		}
 		t.Run(tt.name, func(t *testing.T) {
 			G := NormalStrategy()
 			got, err := G.Union(tt.args.g1, tt.args.g2)
@@ -243,8 +360,13 @@ func TestAlgorithm_Union(t *testing.T) {
 				t.Errorf("Union() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Union() got = %v, want %v", got, tt.want)
+			isEqual, _ := G.EqualsExact(got, tt.want[0], 0.000001)
+			if len(tt.want) > 1 {
+				isEqual1, _ := G.EqualsExact(got, tt.want[1], 0.000001)
+				isEqual = isEqual || isEqual1
+			}
+			if !isEqual {
+				t.Errorf("Algorithm Union %v = %v, \nwant %v", tt.name, wkt.MarshalString(got), wkt.MarshalString(tt.want[0]))
 			}
 		})
 	}

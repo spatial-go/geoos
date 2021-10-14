@@ -307,3 +307,8 @@ func (b Bound) IsValid() bool {
 func (b Bound) CoordinateSystem() int {
 	return defaultCoordinateSystem()
 }
+
+// Filter Performs an operation with the provided .
+func (b Bound) Filter(f matrix.Filter) Geometry {
+	return b
+}

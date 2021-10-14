@@ -3,6 +3,8 @@ package space
 import (
 	"reflect"
 	"testing"
+
+	"github.com/spatial-go/geoos/algorithm/matrix"
 )
 
 func TestPolygon_Buffer(t *testing.T) {
@@ -36,6 +38,27 @@ func TestPolygon_Buffer(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.p.Buffer(tt.args.width, tt.args.quadsegs); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Polygon.Buffer() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestPolygon_Filter(t *testing.T) {
+	var f matrix.Filter = &matrix.UniqueArrayFilter{}
+	tests := []struct {
+		name string
+		p    Polygon
+		want Polygon
+	}{
+		{"polygon filter", Polygon{{{1, 1}, {1, 2}, {2, 2}, {2, 2}, {2, 1}, {1, 1}}, {{1.5, 1.5}, {1.5, 2}, {2, 2}, {2, 2}, {2, 1.5}, {1.5, 1.5}}},
+			Polygon{{{1, 1}, {1, 2}, {2, 2}, {2, 1}, {1, 1}}, {{1.5, 1.5}, {1.5, 2}, {2, 2}, {2, 1.5}, {1.5, 1.5}}},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.p.Filter(f)
+			if !got.Equals(tt.want) {
+				t.Errorf("Filter() = %v, want %v", got, tt.want)
 			}
 		})
 	}

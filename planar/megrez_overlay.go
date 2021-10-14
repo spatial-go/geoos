@@ -13,7 +13,7 @@ import (
 // Difference returns a geometry that represents that part of geometry A that does not intersect with geometry B.
 // One can think of this as GeometryA - Intersection(A,B).
 // If A is completely contained in B then an empty geometry collection is returned.
-func (g *MegrezAlgorithm) Difference(geom1, geom2 space.Geometry) (space.Geometry, error) {
+func (g *megrezAlgorithm) Difference(geom1, geom2 space.Geometry) (space.Geometry, error) {
 	if (geom1.GeoJSONType()) != (geom2.GeoJSONType()) {
 		return nil, algorithm.ErrNotMatchType
 	}
@@ -25,7 +25,7 @@ func (g *MegrezAlgorithm) Difference(geom1, geom2 space.Geometry) (space.Geometr
 }
 
 // Intersection returns a geometry that represents the point set intersection of the Geometries.
-func (g *MegrezAlgorithm) Intersection(geom1, geom2 space.Geometry) (intersectGeom space.Geometry, intersectErr error) {
+func (g *megrezAlgorithm) Intersection(geom1, geom2 space.Geometry) (intersectGeom space.Geometry, intersectErr error) {
 	switch geom1.GeoJSONType() {
 	case space.TypePoint:
 		over := &overlay.PointOverlay{Subject: geom1.ToMatrix(), Clipping: geom2.ToMatrix()}
@@ -43,7 +43,7 @@ func (g *MegrezAlgorithm) Intersection(geom1, geom2 space.Geometry) (intersectGe
 		}
 	case space.TypePolygon:
 		over := &overlay.PolygonOverlay{PointOverlay: &overlay.PointOverlay{Subject: geom1.ToMatrix(), Clipping: geom2.ToMatrix()}}
-		if result, err := over.Intersection(); err != nil {
+		if result, err := over.Intersection(); err == nil {
 			intersectGeom = space.TransGeometry(result)
 		} else {
 			intersectErr = err
@@ -55,7 +55,7 @@ func (g *MegrezAlgorithm) Intersection(geom1, geom2 space.Geometry) (intersectGe
 }
 
 // LineMerge returns a (set of) LineString(s) formed by sewing together the constituent line work of a MULTILINESTRING.
-func (g *MegrezAlgorithm) LineMerge(geom space.Geometry) (space.Geometry, error) {
+func (g *megrezAlgorithm) LineMerge(geom space.Geometry) (space.Geometry, error) {
 	if geom.GeoJSONType() != space.TypeMultiLineString {
 		return nil, spaceerr.ErrNotSupportGeometry
 	}
@@ -72,7 +72,7 @@ func (g *MegrezAlgorithm) LineMerge(geom space.Geometry) (space.Geometry, error)
 // Those going in the same direction are in the first element of the collection,
 // those going in the opposite direction are in the second element.
 // The paths themselves are given in the direction of the first geometry.
-func (g *MegrezAlgorithm) SharedPaths(geom1, geom2 space.Geometry) (string, error) {
+func (g *megrezAlgorithm) SharedPaths(geom1, geom2 space.Geometry) (string, error) {
 	forwDir, backDir, _ := sharedpaths.SharedPaths(geom1.ToMatrix(), geom2.ToMatrix())
 	var forw, back space.Geometry
 	if forwDir == nil {
@@ -93,7 +93,7 @@ func (g *MegrezAlgorithm) SharedPaths(geom1, geom2 space.Geometry) (string, erro
 // SymDifference returns a geometry that represents the portions of A and B that do not intersect.
 // It is called a symmetric difference because SymDifference(A,B) = SymDifference(B,A).
 // One can think of this as Union(geomA,geomB) - Intersection(A,B).
-func (g *MegrezAlgorithm) SymDifference(geom1, geom2 space.Geometry) (space.Geometry, error) {
+func (g *megrezAlgorithm) SymDifference(geom1, geom2 space.Geometry) (space.Geometry, error) {
 	if geom1.GeoJSONType() != geom2.GeoJSONType() {
 		return nil, algorithm.ErrNotMatchType
 	}
@@ -106,24 +106,16 @@ func (g *MegrezAlgorithm) SymDifference(geom1, geom2 space.Geometry) (space.Geom
 
 // UnaryUnion does dissolve boundaries between components of a multipolygon (invalid) and does perform union
 // between the components of a geometrycollection
-func (g *MegrezAlgorithm) UnaryUnion(geom space.Geometry) (space.Geometry, error) {
+func (g *megrezAlgorithm) UnaryUnion(geom space.Geometry) (space.Geometry, error) {
 	if geom.GeoJSONType() == space.TypeMultiPolygon {
 		result := overlay.UnaryUnion(geom.ToMatrix())
-		return space.Polygon(result.(matrix.PolygonMatrix)), nil
+		return space.TransGeometry(result), nil
 	}
 	return nil, ErrNotPolygon
 }
 
 // Union returns a new geometry representing all points in this geometry and the other.
-func (g *MegrezAlgorithm) Union(geom1, geom2 space.Geometry) (space.Geometry, error) {
-	if geom1.GeoJSONType() == space.TypePolygon && geom2.GeoJSONType() == space.TypePolygon {
-		result := overlay.Union(matrix.PolygonMatrix(geom1.(space.Polygon)), matrix.PolygonMatrix(geom2.(space.Polygon)))
-		return space.Polygon(result.(matrix.PolygonMatrix)), nil
-	} else if geom1.GeoJSONType() == space.TypePoint && geom2.GeoJSONType() == space.TypePoint {
-		return space.MultiPoint{geom1.(space.Point), geom2.(space.Point)}, nil
-	} else if geom1.GeoJSONType() == space.TypeLineString && geom2.GeoJSONType() == space.TypeLineString {
-		result := overlay.UnionLine(geom1.ToMatrix().(matrix.LineMatrix), geom2.ToMatrix().(matrix.LineMatrix))
-		return space.TransGeometry(result), nil
-	}
-	return space.Collection{geom1, geom2}, nil
+func (g *megrezAlgorithm) Union(geom1, geom2 space.Geometry) (space.Geometry, error) {
+	result := overlay.Union(geom1.ToMatrix(), geom2.ToMatrix())
+	return space.TransGeometry(result), nil
 }

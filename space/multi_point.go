@@ -229,3 +229,16 @@ func (mp MultiPoint) IsValid() bool {
 func (mp MultiPoint) CoordinateSystem() int {
 	return defaultCoordinateSystem()
 }
+
+// Filter Performs an operation with the provided .
+func (mp MultiPoint) Filter(f matrix.Filter) Geometry {
+	f.FilterMatrixes(matrix.TransMatrixes(mp.ToMatrix()))
+	if f.IsChanged() {
+		mp = mp[:0]
+		for _, v := range f.Matrixes() {
+			mp = append(mp, Point(v))
+		}
+		return mp
+	}
+	return mp
+}

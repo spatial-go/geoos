@@ -248,3 +248,19 @@ func (mp MultiPolygon) IsValid() bool {
 func (mp MultiPolygon) CoordinateSystem() int {
 	return defaultCoordinateSystem()
 }
+
+// Filter Performs an operation with the provided .
+func (mp MultiPolygon) Filter(f matrix.Filter) Geometry {
+	if f.IsChanged() {
+		mPoly := mp[:0]
+		for _, v := range mp {
+			p := Polygon(v).Filter(f)
+			mPoly = append(mPoly, p.(Polygon))
+		}
+		return mPoly
+	}
+	for _, v := range mp {
+		_ = Polygon(v).Filter(f)
+	}
+	return mp
+}

@@ -15,8 +15,7 @@ func Test_perform(t *testing.T) {
 
 	subject := matrix.PolygonMatrix{{{0, 0}, {10, 0}, {10, 10}, {0, 10}, {0, 0}}}
 	clipping := matrix.PolygonMatrix{{{5, 5}, {15, 5}, {15, 15}, {5, 15}, {5, 5}}}
-
-	want := matrix.PolygonMatrix{{{5, 10}, {10, 10}, {10, 5}, {5, 5}, {5, 10}}}
+	want := matrix.PolygonMatrix{{{10, 5}, {10, 10}, {5, 10}, {5, 5}, {10, 5}}}
 
 	tests := []struct {
 		name string

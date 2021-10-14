@@ -54,6 +54,7 @@ func CreateElementValid(geom Geometry) (*GeometryValid, error) {
 
 // CreateElementValidWithCoordSys Returns valid geom element. returns nil if geom is invalid.
 func CreateElementValidWithCoordSys(geom Geometry, coordSys int) (*GeometryValid, error) {
+	geom = geom.Filter(&matrix.UniqueArrayFilter{})
 	if geom.IsValid() {
 		return &GeometryValid{geom, coordSys}, nil
 	}
@@ -243,7 +244,7 @@ func aInB(A, B Geometry) (bool, bool) {
 	if A.Bound().ContainsBound(B.Bound()) {
 		return false, true
 	}
-	// optimization for rectangle arguments
+	//optimization for rectangle arguments
 	if B.GeoJSONType() == TypePolygon && B.(Polygon).IsRectangle() {
 		return B.Bound().ContainsBound(A.Bound()), true
 	}

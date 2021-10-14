@@ -53,8 +53,8 @@ func (v *Vertex) Sub(point *Vertex) *Vertex {
 	return &Vertex{Matrix: matrix.Matrix{x, y}}
 }
 
-// Equal Returns p == point  .
-func (v *Vertex) Equal(point *Vertex) bool {
+// Equals Returns p == point  .
+func (v *Vertex) Equals(point *Vertex) bool {
 	return v.X() == point.X() && v.Y() == point.Y()
 }
 

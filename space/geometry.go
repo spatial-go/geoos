@@ -1,6 +1,8 @@
 package space
 
-import "github.com/spatial-go/geoos/algorithm/matrix"
+import (
+	"github.com/spatial-go/geoos/algorithm/matrix"
+)
 
 // const geomtype
 const (
@@ -16,6 +18,8 @@ const (
 	TypeCollection = "GeometryCollection"
 
 	TypeBound = "Bound"
+
+	TypeCircle = "Polygon"
 )
 
 // Geometry is the interface implemented by other spatial objects
@@ -115,6 +119,9 @@ type Geometry interface {
 
 	// SpheroidDistance returns  spheroid distance Between the two Geometry.
 	SpheroidDistance(g Geometry) (float64, error)
+
+	// Filter Performs an operation with the provided .
+	Filter(f matrix.Filter) Geometry
 }
 
 // compile time checks
@@ -130,4 +137,6 @@ var (
 
 	_ Geometry = Collection{}
 	_ Geometry = GeometryValid{}
+
+	_ Geometry = &Circle{}
 )

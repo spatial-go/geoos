@@ -294,3 +294,20 @@ func (c Collection) IsValid() bool {
 func (c Collection) CoordinateSystem() int {
 	return defaultCoordinateSystem()
 }
+
+// Filter Performs an operation with the provided .
+func (c Collection) Filter(f matrix.Filter) Geometry {
+	if f.IsChanged() {
+		mc := c[:0]
+		for _, v := range c {
+			f.Clear()
+			g := v.Filter(f)
+			mc = append(mc, g)
+		}
+		return mc
+	}
+	for _, v := range c {
+		_ = v.Filter(f)
+	}
+	return c
+}

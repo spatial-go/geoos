@@ -35,3 +35,41 @@ func TestPairFloat_SelfAdd(t *testing.T) {
 		})
 	}
 }
+
+func TestPairFloat_Ge(t *testing.T) {
+	type fields struct {
+		Hi float64
+		Lo float64
+	}
+	type args struct {
+		y *PairFloat
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   bool
+	}{
+		{"Ge", fields{
+			Hi: 112.64007568359376,
+			Lo: 0.0,
+		},
+			args{&PairFloat{
+				Hi: 112.64007568359375,
+				Lo: 0.0,
+			}},
+			true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			d := &PairFloat{
+				Hi: tt.fields.Hi,
+				Lo: tt.fields.Lo,
+			}
+			if got := d.Ge(tt.args.y); got != tt.want {
+				t.Errorf("PairFloat.Ge() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
