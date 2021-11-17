@@ -6,9 +6,9 @@ import (
 	geoos "github.com/spatial-go/geoos/space"
 )
 
-func DecodeFeature(msg *proto.Data, feature *proto.Data_Feature) *geojson.Feature {
+func DecodeFeature(data *proto.Data, feature *proto.Data_Feature) *geojson.Feature {
 	geo := feature.Geometry
-	decodedGeo := DecodeGeometry(geo, msg.Precision, msg.Dimensions)
+	decodedGeo := DecodeGeometry(geo, data.Precision, data.Dimensions)
 	var geoFeature *geojson.Feature
 	switch decodedGeo.Type {
 	case geoos.TypeCollection:
@@ -29,17 +29,17 @@ func DecodeFeature(msg *proto.Data, feature *proto.Data_Feature) *geojson.Featur
 		val := feature.Values[valIdx]
 		switch actualVal := val.ValueType.(type) {
 		case *proto.Data_Value_BoolValue:
-			geoFeature.Properties[msg.Keys[keyIdx]] = actualVal.BoolValue
+			geoFeature.Properties[data.Keys[keyIdx]] = actualVal.BoolValue
 		case *proto.Data_Value_DoubleValue:
-			geoFeature.Properties[msg.Keys[keyIdx]] = actualVal.DoubleValue
+			geoFeature.Properties[data.Keys[keyIdx]] = actualVal.DoubleValue
 		case *proto.Data_Value_StringValue:
-			geoFeature.Properties[msg.Keys[keyIdx]] = actualVal.StringValue
+			geoFeature.Properties[data.Keys[keyIdx]] = actualVal.StringValue
 		case *proto.Data_Value_PosIntValue:
-			geoFeature.Properties[msg.Keys[keyIdx]] = uint(actualVal.PosIntValue)
+			geoFeature.Properties[data.Keys[keyIdx]] = uint(actualVal.PosIntValue)
 		case *proto.Data_Value_NegIntValue:
-			geoFeature.Properties[msg.Keys[keyIdx]] = int(actualVal.NegIntValue) * -1
+			geoFeature.Properties[data.Keys[keyIdx]] = int(actualVal.NegIntValue) * -1
 		case *proto.Data_Value_JsonValue:
-			geoFeature.Properties[msg.Keys[keyIdx]] = actualVal.JsonValue
+			geoFeature.Properties[data.Keys[keyIdx]] = actualVal.JsonValue
 		}
 	}
 	switch id := feature.IdType.(type) {
