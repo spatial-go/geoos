@@ -250,6 +250,18 @@ func (d *PairFloat) Signum() int {
 	return 0
 }
 
+// Sqr Returns the square of this value.
+func (d *PairFloat) Sqr() *PairFloat {
+	return d.MultiplyPair(d)
+}
+
+// SelfSqr Squares this object.
+// To prevent altering constants,
+// this method must only be used on values known to be newly created.
+func (d *PairFloat) SelfSqr() *PairFloat {
+	return d.SelfMultiplyPair(d)
+}
+
 // IsZero Tests whether this value is equal to 0.
 func (d *PairFloat) IsZero() bool {
 	return d.Hi == 0.0 && d.Lo == 0.0
