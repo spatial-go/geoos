@@ -93,6 +93,28 @@ func TwoMatrix(p1, p2 matrix.Matrix) *Envelope {
 	return el
 }
 
+// MatrixList Creates an Envelope from a matrix list
+func MatrixList(ps []matrix.Matrix) *Envelope {
+	el := &Envelope{}
+	for _, p := range ps {
+		el.ExpandToIncludeMatrix(p)
+	}
+	return el
+}
+
+// PolygonMatrixList Creates an Envelope from a polygon matrix list
+func PolygonMatrixList(ps []matrix.PolygonMatrix) *Envelope {
+	el := &Envelope{}
+	for _, polygon := range ps {
+		for _, part := range polygon {
+			for _, p := range part {
+				el.ExpandToInclude(p[0], p[1])
+			}
+		}
+	}
+	return el
+}
+
 // Matrix  Creates an Envelope for a region defined by a single matrix.
 func Matrix(p matrix.Matrix) *Envelope {
 	el := &Envelope{}
@@ -444,4 +466,16 @@ func (e *Envelope) CompareTo(other *Envelope) int {
 	}
 	return 0
 
+}
+
+func (e *Envelope) ToMatrix() *matrix.PolygonMatrix {
+	return &matrix.PolygonMatrix{
+		{
+			{e.MinX, e.MinY},
+			{e.MinX, e.MaxY},
+			{e.MaxX, e.MaxY},
+			{e.MaxX, e.MinY},
+			{e.MinX, e.MinY},
+		},
+	}
 }
