@@ -70,7 +70,6 @@ func TestAlgorithm_Contains(t *testing.T) {
 	const polygon2 = `POLYGON((113.48581807062143 23.33621329259057,113.48785155569199 23.336383160940287,113.48792833916376 23.335028970144833,113.48582512451681 23.33493907732756,113.48581807062143 23.33621329259057))`
 	const polygon3 = `POLYGON((113.48668269733025 23.335774475286513,113.48720314737876 23.3358047169134,113.4873120145494 23.335572135724533,113.48676140749377 23.33538486387792,113.48668269733025 23.335774475286513))`
 
-
 	p1, _ := wkt.UnmarshalString(point1)
 	p2, _ := wkt.UnmarshalString(point2)
 
@@ -97,13 +96,6 @@ func TestAlgorithm_Contains(t *testing.T) {
 			g1: poly2,
 			g2: poly3,
 		}, want: true, wantErr: false},
-	}
-	for i, v := range polyTestscase {
-		want := true
-		if i != 4 {
-			want = false
-		}
-		tests = append(tests, TestStruct{v.name, v.args, want, false})
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

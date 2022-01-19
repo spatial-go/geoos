@@ -118,12 +118,11 @@ func Relate(a, b Geometry) (string, error) {
 // For this function to make sense, the source geometries must both be of the same coordinate projection,
 // having the same SRID.
 func Within(A, B Geometry) (bool, error) {
-	result := false
-	if inter, ret := aInB(A, B); ret {
-		result = inter
-		return inter, nil
+	isIntersect, isAInB, isSure:=aInB(A, B)
+	if(isSure){
+		return isAInB, nil
 	}
-	im := relate.IM(A.ToMatrix(), B.ToMatrix(), result)
+	im := relate.IM(A.ToMatrix(), B.ToMatrix(), isIntersect)
 	return im.IsWithin(), nil
 }
 
@@ -134,33 +133,31 @@ func Within(A, B Geometry) (bool, error) {
 // For this function to make sense, the source geometries must both be of the same coordinate projection,
 // having the same SRID.
 func Contains(A, B Geometry) (bool, error) {
-	result, ret := aInB(B, A)
-	if ret {
-		return result, nil
+	isIntersect, isAInB, isSure:=aInB(B, A)
+	if(isSure){
+		return isAInB, nil
 	}
-	im := relate.IM(A.ToMatrix(), B.ToMatrix(), result)
+	im := relate.IM(A.ToMatrix(), B.ToMatrix(), isIntersect)
 	return im.IsContains(), nil
 }
 
 // Covers returns TRUE if no point in space.Geometry B is outside space.Geometry A
 func Covers(A, B Geometry) (bool, error) {
-	result := false
-	if inter, ret := aInB(B, A); ret {
-		result = inter
-		return inter, nil
+	isIntersect, isAInB, isSure:=aInB(B, A)
+	if(isSure){
+		return isAInB, nil
 	}
-	im := relate.IM(A.ToMatrix(), B.ToMatrix(), result)
+	im := relate.IM(A.ToMatrix(), B.ToMatrix(), isIntersect)
 	return im.IsCovers(), nil
 }
 
 // CoveredBy returns TRUE if no point in space.Geometry A is outside space.Geometry B
 func CoveredBy(A, B Geometry) (bool, error) {
-	result := false
-	if inter, ret := aInB(A, B); ret {
-		result = inter
-		return inter, nil
+	isIntersect, isAInB, isSure:=aInB(A, B)
+	if(isSure){
+		return isAInB, nil
 	}
-	im := relate.IM(A.ToMatrix(), B.ToMatrix(), result)
+	im := relate.IM(A.ToMatrix(), B.ToMatrix(), isIntersect)
 	return im.IsCoveredBy(), nil
 }
 
@@ -227,32 +224,34 @@ func Overlaps(A, B Geometry) (bool, error) {
 	return im.IsOverlaps(A.Dimensions(), B.Dimensions()), nil
 }
 
-func aInB(A, B Geometry) (bool, bool) {
+func aInB(A, B Geometry) (isIntersect, isAInB, isSure bool) {
 
 	// optimization - lower dimension cannot contain areas
 	if A.Dimensions() == 2 && B.Dimensions() < 2 {
-		return false, true
+		isIntersect, isAInB, isSure = false, false, true
+		return
 	}
 	// optimization - P cannot contain a non-zero-length L
 	// Note that a point can contain a zero-length lineal geometry,
 	// since the line has no boundary due to Mod-2 Boundary Rule
 	if A.Dimensions() == 1 && B.Dimensions() < 1 && A.Length() > 0.0 {
-		return false, true
+		isIntersect, isAInB, isSure = false, false, true
+		return
 	}
 	// optimization - envelope test
 	if A.Bound().ContainsBound(B.Bound()) {
-		return false, true
+		isIntersect, isAInB, isSure = false, false, true
+		return
 	}
 	//optimization for rectangle arguments
 	if B.GeoJSONType() == TypePolygon && B.(Polygon).IsRectangle() {
-		return B.Bound().ContainsBound(A.Bound()), true
+		isIntersect, isAInB, isSure = false, B.Bound().ContainsBound(A.Bound()), true
+		return
 	}
 
-	intersectBound := B.Bound().IntersectsBound(A.Bound())
-	if B.Bound().ContainsBound(A.Bound()) || A.Bound().ContainsBound(B.Bound()) {
-		intersectBound = true
-	}
-	return intersectBound, false
+	isIntersect, isAInB, isSure = B.Bound().IntersectsBound(A.Bound()), false, false
+
+	return
 
 }
 
