@@ -62,12 +62,16 @@ var polyTestscase = []struct {
 
 func TestAlgorithm_Contains(t *testing.T) {
 	const polygon = `POLYGON((0 0, 6 0, 6 6, 0 6, 0 0))`
+
 	const point1 = `POINT(3 3)`
 	const point2 = `POINT(-1 35)`
+
+	const polygon0 = `POLYGON((1 1, 5 1, 5 5, 1 5, 1 1))`
 
 	p1, _ := wkt.UnmarshalString(point1)
 	p2, _ := wkt.UnmarshalString(point2)
 	poly, _ := wkt.UnmarshalString(polygon)
+	poly0, _ := wkt.UnmarshalString(polygon0)
 
 	tests := []TestStruct{
 		{name: "contain", args: args{
@@ -78,6 +82,10 @@ func TestAlgorithm_Contains(t *testing.T) {
 			g1: poly,
 			g2: p2,
 		}, want: false, wantErr: false},
+		{name: "notcontain", args: args{
+			g1: poly,
+			g2: poly0,
+		}, want: true, wantErr: false},
 	}
 	for i, v := range polyTestscase {
 		want := true

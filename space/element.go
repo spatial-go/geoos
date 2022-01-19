@@ -134,10 +134,9 @@ func Within(A, B Geometry) (bool, error) {
 // For this function to make sense, the source geometries must both be of the same coordinate projection,
 // having the same SRID.
 func Contains(A, B Geometry) (bool, error) {
-	result := false
-	if inter, ret := aInB(B, A); ret {
-		result = inter
-		return inter, nil
+	result, ret := aInB(B, A)
+	if ret {
+		return result, nil
 	}
 	im := relate.IM(A.ToMatrix(), B.ToMatrix(), result)
 	return im.IsContains(), nil
