@@ -4,7 +4,9 @@ import (
 	"github.com/spatial-go/geoos/algorithm/buffer"
 	"github.com/spatial-go/geoos/algorithm/buffer/simplify"
 	"github.com/spatial-go/geoos/algorithm/matrix"
+	"github.com/spatial-go/geoos/algorithm/measure"
 	"github.com/spatial-go/geoos/algorithm/overlay/snap"
+	"github.com/spatial-go/geoos/coordtransform"
 	"github.com/spatial-go/geoos/space"
 )
 
@@ -13,7 +15,7 @@ func (g *megrezAlgorithm) Boundary(geom space.Geometry) (space.Geometry, error) 
 	return geom.Boundary()
 }
 
-// Buffer sReturns a geometry that represents all points whose distance
+// Buffer Returns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
 func (g *megrezAlgorithm) Buffer(geom space.Geometry, width float64, quadsegs int) (geometry space.Geometry) {
 	buff := buffer.Buffer(geom.ToMatrix(), width, quadsegs)
@@ -24,6 +26,26 @@ func (g *megrezAlgorithm) Buffer(geom space.Geometry, width float64, quadsegs in
 		return space.Polygon(b)
 	}
 	return nil
+}
+
+// BufferInMeter Returns a geometry that represents all points whose distance
+// from this space.Geometry is less than or equal to distance.
+func (g *megrezAlgorithm) BufferInMeter(geom space.Geometry, width float64, quadsegs int) (geometry space.Geometry) {
+	if geom == nil {
+		return
+	}
+	centroid := geom.Centroid()
+	width = measure.MercatorDistance(width, centroid.Lat())
+	transformer := coordtransform.NewTransformer(coordtransform.LLTOMERCATOR)
+	geomMatrix, _ := transformer.TransformGeometry(geom.ToMatrix())
+	geom = space.TransGeometry(geomMatrix)
+	geometry = g.Buffer(geom, width, quadsegs)
+	if geometry != nil {
+		transformer.CoordType = coordtransform.MERCATORTOLL
+		geomMatrix, _ := transformer.TransformGeometry(geometry.ToMatrix())
+		geometry = space.TransGeometry(geomMatrix)
+	}
+	return
 }
 
 // Centroid  computes the geometric center of a geometry, or equivalently, the center of mass of the geometry as a POINT.

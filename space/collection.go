@@ -227,7 +227,7 @@ func (c Collection) SimplifyP(tolerance float64) Geometry {
 	return TransGeometry(result)
 }
 
-// Buffer sReturns a geometry that represents all points whose distance
+// Buffer Returns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
 func (c Collection) Buffer(width float64, quadsegs int) Geometry {
 	buff := buffer.Buffer(c.ToMatrix(), width, quadsegs)
@@ -238,6 +238,12 @@ func (c Collection) Buffer(width float64, quadsegs int) Geometry {
 		return Polygon(b)
 	}
 	return nil
+}
+
+// BufferInMeter Returns a geometry that represents all points whose distance
+// from this space.Geometry is less than or equal to distance.
+func (c Collection) BufferInMeter(width float64, quadsegs int) Geometry {
+	return BufferInMeter(c, width, quadsegs)
 }
 
 // Envelope returns the  minimum bounding box for the supplied geometry, as a geometry.

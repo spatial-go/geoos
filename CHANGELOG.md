@@ -1,7 +1,24 @@
 # Change Log
+
+## [1.0.4] - 2021-12-31
+### Added
+- Delaunay triangle method and Voronoi diagram
+## [1.0.3] - 2021-11-18
+### Added
+- Geobuf compression and decompression method can be used for vector data compression, compact structure data transfer faster
+## [1.0.2] - 2021-10-14
+### Added
+- A correlation method to verify the validity of spatial geometry
+- WKB transforms Str correlation methods
+- Add circle geometry
+### Fix
+- Fix buffer analysis bug
+- Fix overlay analysis bug
+
 ## [1.0.1] - 2021-08-30
 ### Added
 - Methods for creating spatial indexes include Kd Tree, Quad Tree, Interval Tree, and Hilbert Packed R-Tree
+
 ## [1.0.0] - 2021-08-09
 ### Added
 - Reconstruction of geometric coverage, spatial analysis, vector construction and other related methods

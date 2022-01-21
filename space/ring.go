@@ -35,9 +35,9 @@ func (r Ring) Bound() Bound {
 	return LineString(r).Bound()
 }
 
-// EqualRing compares two rings. Returns true if lengths are the same
+// EqualsRing compares two rings. Returns true if lengths are the same
 // and all points are Equal.
-func (r Ring) EqualRing(ring Ring) bool {
+func (r Ring) EqualsRing(ring Ring) bool {
 	return LineString(r).Equals(LineString(ring))
 }
 
@@ -46,7 +46,7 @@ func (r Ring) Equals(g Geometry) bool {
 	if g.GeoJSONType() != r.GeoJSONType() {
 		return false
 	}
-	return r.EqualRing(g.(Ring))
+	return r.EqualsRing(g.(Ring))
 }
 
 // EqualsExact Returns true if the two Geometries are exactly equal,
@@ -59,7 +59,7 @@ func (r Ring) EqualsExact(g Geometry, tolerance float64) bool {
 	return LineString(r).Equals(LineString(g.(Ring)))
 }
 
-// Area returns the area of a polygonal geometry. The area of a ring is 0.
+// Area returns the area of a polygonal geometry.
 func (r Ring) Area() (float64, error) {
 	return measure.Area(r.ToMatrix().(matrix.LineMatrix)), nil
 }
@@ -133,10 +133,16 @@ func (r Ring) SimplifyP(tolerance float64) Geometry {
 	return TransGeometry(result)
 }
 
-// Buffer sReturns a geometry that represents all points whose distance
+// Buffer Returns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
 func (r Ring) Buffer(width float64, quadsegs int) Geometry {
 	return LineString(r).Buffer(width, quadsegs)
+}
+
+// BufferInMeter Returns a geometry that represents all points whose distance
+// from this space.Geometry is less than or equal to distance.
+func (r Ring) BufferInMeter(width float64, quadsegs int) Geometry {
+	return LineString(r).BufferInMeter(width, quadsegs)
 }
 
 // Envelope returns the  minimum bounding box for the supplied geometry, as a geometry.

@@ -174,8 +174,12 @@ func TestGeomFromWKBHexStr(t *testing.T) {
 		want    space.Geometry
 		wantErr bool
 	}{
-		{" GeomFromWKBHexStr point1 ", args{"0101000020E610000000000020D8135D400000004072054440"}, space.Point{116.310066223145, 40.0425491333008}, false},
-		{" GeomFromWKBHexStr point2 ", args{"0101000020E6100000A9E2F33378145D4088C78C29E2064440"}, space.Point{116.319836605234, 40.0537769257926}, false},
+		{" GeomFromWKBHexStr point1 ", args{"0101000020E610000000000020D8135D400000004072054440"},
+			space.Point{116.310066223145, 40.0425491333008}, false},
+		{" GeomFromWKBHexStr point11 ", args{"0101000020e610000021000020d8135d400300004072054440"},
+			space.Point{116.310066223145, 40.0425491333008}, false},
+		{" GeomFromWKBHexStr point2 ", args{"0101000020E6100000A9E2F33378145D4088C78C29E2064440"},
+			space.Point{116.319836605234, 40.0537769257926}, false},
 
 		{" GeomFromWKBHexStr line1 ", args{"0102000020E610000004000000F7FFFF7F20155D40C9D9B446F6F843400F000020B51C5D409241C66566F94340DDFFFFFF791D5D40336A670189F04340E8FFFF5FA7175D409DF9A3B974EF4340"},
 			space.LineString{
@@ -256,6 +260,39 @@ func TestGeomFromWKBHexStr(t *testing.T) {
 			}
 			if !got.EqualsExact(tt.want, 0.0000001) {
 				t.Errorf("GeomFromWKBHexStr() = %v, \nwant %v", got, tt.want)
+<<<<<<< HEAD
+=======
+			}
+		})
+	}
+}
+
+func TestGeomToWKBHexStr(t *testing.T) {
+	type args struct {
+		geom space.Geometry
+	}
+	tests := []struct {
+		name       string
+		args       args
+		wantWkbHex string
+		wantErr    bool
+	}{
+
+		{name: "Point0",
+			args:       args{space.Point{116.310066223145, 40.0425491333008}},
+			wantWkbHex: "0101000020e610000021000020d8135d400300004072054440",
+			wantErr:    false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotWkbHex, err := GeomToWKBHexStr(tt.args.geom)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GeomToWKBHexStr() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if gotWkbHex != tt.wantWkbHex {
+				t.Errorf("GeomToWKBHexStr() = %v, want %v", gotWkbHex, tt.wantWkbHex)
+>>>>>>> 7d68fdd0673acd057b734be42fa63ca1c896ad14
 			}
 		})
 	}

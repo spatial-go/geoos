@@ -4,13 +4,17 @@ package wkb
 
 import (
 	"io"
+	"math"
 
 	"github.com/spatial-go/geoos/space"
 )
 
 // BufferedWriter returns []Geometry from reader.
 func BufferedWriter(bufferedWriter io.Writer, geoms []space.Geometry) {
-	ewkb := &EWKBEncoder{Encoder: NewEncoder(bufferedWriter)}
+	ewkb := &EWKBEncoder{
+		Encoder: NewEncoder(bufferedWriter),
+		Srid:    space.WGS84,
+	}
 	for _, v := range geoms {
 		_ = ewkb.Encode(v)
 	}
@@ -50,17 +54,6 @@ func (e *EWKBEncoder) Encode(geom space.Geometry) error {
 	if err != nil {
 		return err
 	}
-
-	if e.Srid != 0 {
-		buf := make([]byte, 4)
-		e.order.PutUint32(buf, e.Srid)
-
-		_, err := e.w.Write(buf)
-		if err != nil {
-			return err
-		}
-	}
-
 	if e.buf == nil {
 		e.buf = make([]byte, 16)
 	}
@@ -84,3 +77,30 @@ func (e *EWKBEncoder) Encode(geom space.Geometry) error {
 
 	return ErrUnknownWKBType
 }
+func (e *EWKBEncoder) writeGeometryType(geometryType uint32) {
+	//  flag3D := (outputDimension == 3) ? 0x80000000 : 0;
+	flag3D := uint32(0)
+	typeInt := geometryType | flag3D
+	if e.Srid != 0 {
+		typeInt |= 0x20000000
+	} else {
+		typeInt |= 0
+	}
+	buf := make([]byte, 4)
+	e.order.PutUint32(buf, uint32(typeInt))
+	e.w.Write(buf)
+	if e.Srid != 0 {
+		e.order.PutUint32(buf, e.Srid)
+		e.w.Write(buf)
+	}
+}
+func (e *EWKBEncoder) writePoint(p space.Point) (err error) {
+	e.writeGeometryType(pointType)
+
+	e.order.PutUint64(e.buf, math.Float64bits(p[0]))
+	e.order.PutUint64(e.buf[8:], math.Float64bits(p[1]))
+	_, err = e.w.Write(e.buf)
+	return err
+}
+
+// TODO rewrite others types

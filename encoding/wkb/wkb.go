@@ -5,6 +5,7 @@ package wkb
 import (
 	"bytes"
 	"encoding/binary"
+	"encoding/hex"
 	"io"
 
 	"github.com/spatial-go/geoos/space"
@@ -372,4 +373,13 @@ func GeomFromWKBHexStr(wkbHex string) (space.Geometry, error) {
 	g, _ := ewkb.Decode()
 
 	return g, nil
+}
+
+func GeomToWKBHexStr(geom space.Geometry) (wkbHex string, err error) {
+	buf := bytes.NewBuffer(make([]byte, 0, geomLength(geom)))
+
+	BufferedWriter(buf, []space.Geometry{geom})
+	bytes0 := buf.Bytes()
+
+	return hex.EncodeToString(bytes0), err
 }
