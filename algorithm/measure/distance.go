@@ -173,6 +173,11 @@ func DistanceLineAndLine(from, to matrix.LineMatrix, f Distance) (dist float64) 
 			dist = distP
 		}
 	}
+	for _, v := range to {
+		if distP := f(from, matrix.Matrix(v)); dist > distP {
+			dist = distP
+		}
+	}
 	return dist
 }
 
