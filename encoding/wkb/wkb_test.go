@@ -260,8 +260,6 @@ func TestGeomFromWKBHexStr(t *testing.T) {
 			}
 			if !got.EqualsExact(tt.want, 0.0000001) {
 				t.Errorf("GeomFromWKBHexStr() = %v, \nwant %v", got, tt.want)
-<<<<<<< HEAD
-=======
 			}
 		})
 	}
@@ -292,7 +290,6 @@ func TestGeomToWKBHexStr(t *testing.T) {
 			}
 			if gotWkbHex != tt.wantWkbHex {
 				t.Errorf("GeomToWKBHexStr() = %v, want %v", gotWkbHex, tt.wantWkbHex)
->>>>>>> 7d68fdd0673acd057b734be42fa63ca1c896ad14
 			}
 		})
 	}

@@ -396,8 +396,6 @@ func TestMegrezAlgorithm_Buffer(t *testing.T) {
 			g := &megrezAlgorithm{}
 			if gotGeometry := g.Buffer(tt.args.geom, tt.args.width, tt.args.quadsegs); !gotGeometry.EqualsExact(tt.wantGeometry, 0.0000001) {
 				t.Errorf("MegrezAlgorithm.Buffer() = %v, \nwant %v", gotGeometry, tt.wantGeometry)
-<<<<<<< HEAD
-=======
 			}
 		})
 	}
@@ -426,7 +424,6 @@ func TestMegrezAlgorithm_BufferInMeter(t *testing.T) {
 			isEqual, _ := g.EqualsExact(gotGeometry, tt.want, 0.000001)
 			if !isEqual {
 				t.Errorf("MegrezAlgorithm.BufferInMeter() = %v, want %v", wkt.MarshalString(gotGeometry), wkt.MarshalString(tt.want))
->>>>>>> 7d68fdd0673acd057b734be42fa63ca1c896ad14
 			}
 		})
 	}

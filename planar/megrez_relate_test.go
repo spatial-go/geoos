@@ -72,16 +72,12 @@ func TestAlgorithm_Contains(t *testing.T) {
 
 	p1, _ := wkt.UnmarshalString(point1)
 	p2, _ := wkt.UnmarshalString(point2)
-<<<<<<< HEAD
-	poly, _ := wkt.UnmarshalString(polygon)
-=======
 
 	poly0, _ := wkt.UnmarshalString(polygon0)
 	poly1, _ := wkt.UnmarshalString(polygon1)
 
 	poly2, _ := wkt.UnmarshalString(polygon2)
 	poly3, _ := wkt.UnmarshalString(polygon3)
->>>>>>> 7d68fdd0673acd057b734be42fa63ca1c896ad14
 
 	tests := []TestStruct{
 		{name: "contain", args: args{
