@@ -141,12 +141,10 @@ func DistanceSegmentToPoint(p, a, b matrix.Matrix, f Distance) float64 {
 func DistanceLineToPoint(line matrix.LineMatrix, pt matrix.Matrix, f Distance) (dist float64) {
 	dist = math.MaxFloat64
 	for i, v := range line {
-		tmpDist := 0.0
 		if i < len(line)-1 {
-			tmpDist = DistanceSegmentToPoint(pt, v, line[i+1], f)
-		}
-		if dist > tmpDist {
-			dist = tmpDist
+			if tmpDist := DistanceSegmentToPoint(pt, v, line[i+1], f); dist > tmpDist {
+				dist = tmpDist
+			}
 		}
 	}
 	return

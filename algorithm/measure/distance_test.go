@@ -6,25 +6,28 @@ import (
 	"github.com/spatial-go/geoos/algorithm/matrix"
 )
 
-func TestDistance(t *testing.T) {
+func TestSpheroidDistance(t *testing.T) {
 	fromPoint := matrix.Matrix{12, 15}
 	toPoint := matrix.Matrix{13, 15}
+	line0 := matrix.LineMatrix{{116.40495300292967, 39.926785883895654}, {116.3975715637207, 39.9295502919}}
+	line1 := matrix.LineMatrix{{116.37310981750488, 39.92099342895789}, {116.39928817749023, 39.9174387253541}}
 
 	wantResult := 107405.96007592858
 	type args struct {
-		fromPoint matrix.Matrix
-		toPoint   matrix.Matrix
+		from matrix.Steric
+		to   matrix.Steric
 	}
 	tests := []struct {
 		name string
 		args args
 		want float64
 	}{
-		{name: "testDistance", args: args{fromPoint: fromPoint, toPoint: toPoint}, want: wantResult},
+		{name: "testDistance", args: args{from: fromPoint, to: toPoint}, want: wantResult},
+		{name: "testDistanceLine", args: args{from: line0, to: line1}, want: 1496.1462214750002},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := SpheroidDistance(tt.args.fromPoint, tt.args.toPoint); got != tt.want {
+			if got := SpheroidDistance(tt.args.from, tt.args.to); got != tt.want {
 				t.Errorf("Distance() = %v, want %v", got, tt.want)
 			}
 		})
