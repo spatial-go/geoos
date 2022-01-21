@@ -6,9 +6,10 @@ import (
 	"github.com/spatial-go/geoos/algorithm/subdivision/quadedge"
 )
 
+// DelaunayTriangulation ...
 type DelaunayTriangulation struct {
 	sites       []matrix.Matrix
-	sitesEnv  *envelope.Envelope
+	sitesEnv    *envelope.Envelope
 	subdivision *quadedge.QuadEdgeSubdivision
 }
 
@@ -29,6 +30,7 @@ func (d *DelaunayTriangulation) create() {
 	triangulator.insertSites(d.sites)
 }
 
+// Subdivision ...
 func (d *DelaunayTriangulation) Subdivision() *quadedge.QuadEdgeSubdivision {
 	d.create()
 	return d.subdivision
