@@ -121,7 +121,7 @@ func (c *CurveBuilder) IsRingCurveInverted(pts matrix.LineMatrix, distance float
 
 	maxDist := 0.0
 	for _, v := range c.Curve.Line {
-		dist := measure.DistanceLineToPoint(pts, v, measure.PlanarDistance)
+		dist := measure.PlanarDistance(pts, matrix.Matrix(v))
 		if dist > maxDist {
 			maxDist = dist
 		}

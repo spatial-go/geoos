@@ -42,7 +42,7 @@ func (d *DouglasPeuckerLineSimplifier) simplifySection(i, j int) {
 	maxDistance := -1.0
 	maxIndex := i
 	for k := i + 1; k < j; k++ {
-		distance := measure.DistanceSegmentToPoint(d.pts[k], d.seg0, d.seg1, measure.PlanarDistance)
+		distance := measure.PlanarDistance(d.pts[k], matrix.LineMatrix{d.seg0, d.seg1})
 		if distance > maxDistance {
 			maxDistance = distance
 			maxIndex = k

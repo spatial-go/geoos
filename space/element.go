@@ -98,8 +98,10 @@ func Distance(from, to Geometry, f measure.Distance) (float64, error) {
 		to == nil || to.IsEmpty() {
 		return 0, nil
 	}
-	elem := &measure.ElementDistance{From: from.ToMatrix(), To: to.ToMatrix(), F: f}
-	return elem.Distance()
+	if from.IsEmpty() != to.IsEmpty() {
+		return 0, spaceerr.ErrNilGeometry
+	}
+	return f(from.ToMatrix(), to.ToMatrix()), nil
 }
 
 // Relate Computes the  Intersection Matrix for the spatial relationship

@@ -119,7 +119,7 @@ func (l *LineSimplifier) IsShallowConcavity(p0, p1, p2 matrix.Matrix, distanceTo
 	if !isAngleToSimplify {
 		return false
 	}
-	dist := measure.DistanceSegmentToPoint(p2, p1, p0, measure.PlanarDistance)
+	dist := measure.PlanarDistance(p2, matrix.LineMatrix{p1, p0})
 	return dist < distanceTol
 }
 
@@ -141,7 +141,7 @@ func (l *LineSimplifier) isShallowSampled(p0, p2 matrix.Matrix, i0, i2 int, dist
 }
 
 func (l *LineSimplifier) isShallow(p0, p1, p2 matrix.Matrix, distanceTol float64) bool {
-	dist := measure.DistanceSegmentToPoint(p2, p1, p0, measure.PlanarDistance)
+	dist := measure.PlanarDistance(p2, matrix.LineMatrix{p1, p0})
 	return dist < distanceTol
 }
 

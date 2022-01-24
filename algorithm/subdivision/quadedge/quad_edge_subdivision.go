@@ -121,7 +121,7 @@ func (q *QuadEdgeSubdivision) IsVertexOfEdge(e *QuadEdge, v matrix.Matrix) bool 
 }
 
 func (q *QuadEdgeSubdivision) IsOnEdge(e *QuadEdge, p matrix.Matrix) bool {
-	dist := measure.DistanceSegmentToPoint(p, e.Origin(), e.Destination(), measure.PlanarDistance)
+	dist := measure.PlanarDistance(p, matrix.LineMatrix{e.Origin(), e.Destination()})
 	return dist < q.edgeCoincidenceTolerance
 }
 
@@ -330,6 +330,6 @@ func (q *QuadEdgeSubdivision) Edges() []*QuadEdge {
 	return q.quadEdgeList
 }
 
-func (q *QuadEdgeSubdivision) SetEdges(edges []*QuadEdge){
+func (q *QuadEdgeSubdivision) SetEdges(edges []*QuadEdge) {
 	q.quadEdgeList = edges
 }

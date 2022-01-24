@@ -13,6 +13,7 @@ func TestSpheroidDistance(t *testing.T) {
 	line1 := matrix.LineMatrix{{116.37310981750488, 39.92099342895789}, {116.39928817749023, 39.9174387253541}}
 
 	wantResult := 107405.96007592858
+	wantResult1 := 1147.420777283722
 	type args struct {
 		from matrix.Steric
 		to   matrix.Steric
@@ -23,7 +24,7 @@ func TestSpheroidDistance(t *testing.T) {
 		want float64
 	}{
 		{name: "testDistance", args: args{from: fromPoint, to: toPoint}, want: wantResult},
-		{name: "testDistanceLine", args: args{from: line0, to: line1}, want: 1496.1462214750002},
+		{name: "testDistanceLine", args: args{from: line0, to: line1}, want: wantResult1},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -73,7 +73,7 @@ func (t *TaggedLineStringSimplifier) findFurthestPoint(pts []matrix.Matrix, i, j
 	maxIndex := i
 	for k := i + 1; k < j; k++ {
 		midPt := pts[k]
-		distance := measure.DistanceSegmentToPoint(midPt, seg.P0, seg.P1, measure.PlanarDistance)
+		distance := measure.PlanarDistance(midPt, matrix.LineMatrix{seg.P0, seg.P1})
 		if distance > maxDist {
 			maxDist = distance
 			maxIndex = k
