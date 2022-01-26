@@ -108,3 +108,8 @@ func (c *Circle) IsRing() bool {
 func (c *Circle) IsValid() bool {
 	return true
 }
+
+// Geom return Geometry without Coordinate System.
+func (c *Circle) Geom() Geometry {
+	return c
+}

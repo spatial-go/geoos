@@ -242,3 +242,8 @@ func (mp MultiPoint) Filter(f matrix.Filter) Geometry {
 	}
 	return mp
 }
+
+// Geom return Geometry without Coordinate System.
+func (mp MultiPoint) Geom() Geometry {
+	return mp
+}

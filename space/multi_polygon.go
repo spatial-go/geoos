@@ -264,3 +264,8 @@ func (mp MultiPolygon) Filter(f matrix.Filter) Geometry {
 	}
 	return mp
 }
+
+// Geom return Geometry without Coordinate System.
+func (mp MultiPolygon) Geom() Geometry {
+	return mp
+}

@@ -62,18 +62,23 @@ func CreateElementValidWithCoordSys(geom Geometry, coordSys int) (*GeometryValid
 }
 
 // CoordinateSystem return Coordinate System.
-func (g GeometryValid) CoordinateSystem() int {
+func (g *GeometryValid) CoordinateSystem() int {
 	return g.coordinateSystem
 }
 
 // IsProjection returns true if the coordinateSystem is projection.
-func (g GeometryValid) IsProjection() bool {
+func (g *GeometryValid) IsProjection() bool {
 	for i := range projectionCoordinateSystem {
 		if projectionCoordinateSystem[i] == g.coordinateSystem {
 			return true
 		}
 	}
 	return false
+}
+
+// Geom return Geometry without Coordinate System.
+func (g *GeometryValid) Geom() Geometry {
+	return g.Geometry
 }
 
 func defaultCoordinateSystem() int {
@@ -311,6 +316,7 @@ func TransGeometry(inputGeom matrix.Steric) Geometry {
 	}
 }
 
+// BufferInMeter ...
 func BufferInMeter(geometry Geometry, width float64, quadsegs int) Geometry {
 	centroid := geometry.Centroid()
 	width = measure.MercatorDistance(width, centroid.Lat())

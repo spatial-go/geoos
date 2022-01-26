@@ -21,70 +21,77 @@ func MarshalString(geom space.Geometry) string {
 	return buf.String()
 }
 
-func wkt(buf *bytes.Buffer, geom space.Geometry) {
-	switch g := geom.(type) {
-	case space.Point:
-		_, _ = fmt.Fprintf(buf, "POINT(%g %g)", g.Lon(), g.Lat())
-	case space.MultiPoint:
-		if len(g) == 0 {
+func wkt(buf *bytes.Buffer, geometry space.Geometry) {
+	if geometry == nil {
+		buf.Write([]byte(``))
+		return
+	}
+	_, _ = fmt.Fprintf(buf, "SRID=%v;", geometry.CoordinateSystem())
+	geom := geometry.Geom()
+	switch geom.GeoJSONType() {
+	case space.TypePoint:
+		if geom.IsEmpty() {
+			buf.Write([]byte(`POINT EMPTY`))
+			return
+		}
+		_, _ = fmt.Fprintf(buf, "POINT(%g %g)", geom.(space.Point).Lon(), geom.(space.Point).Lat())
+	case space.TypeMultiPoint:
+		if geom.IsEmpty() {
 			buf.Write([]byte(`MULTIPOINT EMPTY`))
 			return
 		}
-
 		buf.Write([]byte(`MULTIPOINT(`))
-		for i, p := range g.ToPointArray() {
+		for i, p := range geom.(space.MultiPoint) {
 			if i != 0 {
 				buf.WriteByte(',')
 			}
 			_, _ = fmt.Fprintf(buf, "(%g %g)", p.Lon(), p.Lat())
 		}
 		buf.WriteByte(')')
-	case space.LineString:
-		if len(g) == 0 {
+	case space.TypeLineString:
+		if geom.IsEmpty() {
 			buf.Write([]byte(`LINESTRING EMPTY`))
 			return
 		}
 
 		buf.Write([]byte(`LINESTRING`))
-		writeLineString(buf, g)
-	case space.MultiLineString:
-		if len(g) == 0 {
+		writeLineString(buf, geom.(space.LineString))
+	case space.TypeMultiLineString:
+		if geom.IsEmpty() {
 			buf.Write([]byte(`MULTILINESTRING EMPTY`))
 			return
 		}
 
 		buf.Write([]byte(`MULTILINESTRING(`))
-		for i, ls := range g {
+		for i, ls := range geom.(space.MultiLineString) {
 			if i != 0 {
 				buf.WriteByte(',')
 			}
 			writeLineString(buf, ls)
 		}
 		buf.WriteByte(')')
-	case space.Ring:
-		wkt(buf, space.Polygon{g})
-	case space.Polygon:
-		if len(g) == 0 {
+	case space.TypePolygon:
+		if geom.IsEmpty() {
 			buf.Write([]byte(`POLYGON EMPTY`))
 			return
 		}
 
 		buf.Write([]byte(`POLYGON(`))
-		for i, r := range g {
+		for i, r := range geom.(space.Polygon) {
 			if i != 0 {
 				buf.WriteByte(',')
 			}
 			writeLineString(buf, space.LineString(r))
 		}
 		buf.WriteByte(')')
-	case space.MultiPolygon:
-		if len(g) == 0 {
+	case space.TypeMultiPolygon:
+		if geom.IsEmpty() {
 			buf.Write([]byte(`MULTIPOLYGON EMPTY`))
 			return
 		}
 
 		buf.Write([]byte(`MULTIPOLYGON(`))
-		for i, p := range g {
+		for i, p := range geom.(space.MultiPolygon) {
 			if i != 0 {
 				buf.WriteByte(',')
 			}
@@ -99,13 +106,13 @@ func wkt(buf *bytes.Buffer, geom space.Geometry) {
 		}
 		buf.WriteByte(')')
 
-	case space.Collection:
-		if len(g) == 0 {
+	case space.TypeCollection:
+		if geom.IsEmpty() {
 			buf.Write([]byte(`GEOMETRYCOLLECTION EMPTY`))
 			return
 		}
 		buf.Write([]byte(`GEOMETRYCOLLECTION(`))
-		for i, c := range g {
+		for i, c := range geom.(space.Collection) {
 			if i != 0 {
 				buf.WriteByte(',')
 			}
@@ -113,7 +120,7 @@ func wkt(buf *bytes.Buffer, geom space.Geometry) {
 		}
 		buf.WriteByte(')')
 	default:
-		panic("unsupported type")
+		buf.Write([]byte(``))
 	}
 }
 

@@ -311,3 +311,8 @@ func (c Collection) Filter(f matrix.Filter) Geometry {
 	}
 	return c
 }
+
+// Geom return Geometry without Coordinate System.
+func (c Collection) Geom() Geometry {
+	return c
+}

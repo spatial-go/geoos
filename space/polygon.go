@@ -322,3 +322,8 @@ func (p Polygon) Filter(f matrix.Filter) Geometry {
 	}
 	return p
 }
+
+// Geom return Geometry without Coordinate System.
+func (p Polygon) Geom() Geometry {
+	return p
+}

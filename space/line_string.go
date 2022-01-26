@@ -263,3 +263,8 @@ func (ls LineString) Filter(f matrix.Filter) Geometry {
 	}
 	return ls
 }
+
+// Geom return Geometry without Coordinate System.
+func (ls LineString) Geom() Geometry {
+	return ls
+}

@@ -195,3 +195,8 @@ func (r Ring) Filter(f matrix.Filter) Geometry {
 	}
 	return r
 }
+
+// Geom return Geometry without Coordinate System.
+func (r Ring) Geom() Geometry {
+	return r
+}

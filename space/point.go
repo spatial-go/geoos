@@ -232,3 +232,8 @@ func (p Point) CoordinateSystem() int {
 func (p Point) Filter(f matrix.Filter) Geometry {
 	return p
 }
+
+// Geom return Geometry without Coordinate System.
+func (p Point) Geom() Geometry {
+	return p
+}
