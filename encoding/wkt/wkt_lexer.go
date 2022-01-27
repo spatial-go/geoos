@@ -16,12 +16,16 @@ const (
 	LeftParen tokenType = iota
 	RightParen
 	Comma
+	EqualSign
+	Semicolon
 
 	// Keyword
 	Empty
 	Z
 	M
 	ZM
+
+	Srid
 
 	// Geometry type
 	PointEnum
@@ -30,9 +34,11 @@ const (
 	Multipoint
 	MultilineString
 	MultiPolygonEnum
+	GeometryCollection
 
 	// Values
 	Float
+	Int
 
 	EOF
 )
@@ -103,6 +109,19 @@ func (l *Lexer) scanToLowerWord(r rune) string {
 	return buf.String()
 }
 
+// scanInt scan a string representing a int
+func (l *Lexer) scanInt(r rune) string {
+	var buf bytes.Buffer
+	buf.WriteRune(r)
+	r = l.read()
+	for beginFloat(r) {
+		buf.WriteRune(r)
+		r = l.read()
+	}
+	l.unread()
+	return buf.String()
+}
+
 // scanFloat scan a string representing a float
 func (l *Lexer) scanFloat(r rune) string {
 	var buf bytes.Buffer
@@ -131,6 +150,8 @@ func (l *Lexer) scanToken() (Token, error) {
 		return l.getToken(RightParen, ")"), nil
 	case r == ',':
 		return l.getToken(Comma, ","), nil
+	case r == '=':
+		return l.getToken(EqualSign, "="), nil
 	case unicode.IsLetter(r):
 		w := l.scanToLowerWord(r)
 		switch w {
@@ -154,6 +175,10 @@ func (l *Lexer) scanToken() (Token, error) {
 			return l.getToken(MultilineString, "multilinestring"), nil
 		case "multipolygon":
 			return l.getToken(MultiPolygonEnum, "multipolygon"), nil
+		case "geometrycollection":
+			return l.getToken(GeometryCollection, "geometrycollection"), nil
+		case "srid":
+			return l.getToken(Srid, "srid"), nil
 		default:
 			return Token{}, fmt.Errorf("Unexpected word %s on character %d", w, l.pos)
 		}
@@ -165,6 +190,10 @@ func (l *Lexer) scanToken() (Token, error) {
 	default:
 		return Token{}, fmt.Errorf("Unexpected rune %s on character %d", string(r), l.pos)
 	}
+}
+
+func beginInt(r rune) bool {
+	return unicode.IsNumber(r)
 }
 
 func beginFloat(r rune) bool {

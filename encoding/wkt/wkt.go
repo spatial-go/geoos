@@ -11,7 +11,17 @@ import (
 // UnmarshalString encode to geom
 func UnmarshalString(s string) (space.Geometry, error) {
 	p := Parser{NewLexer(strings.NewReader(s))}
-	return p.Parse()
+	geom, err := p.Parse()
+
+	t, err := p.scanToken()
+	if err != nil {
+		return geom, err
+	}
+	if t.ttype != EOF {
+		return geom, fmt.Errorf("parse point unexpected token %s on pos %d", t.lexeme, t.pos)
+	}
+
+	return geom, err
 }
 
 // MarshalString decode to string

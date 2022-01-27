@@ -18,28 +18,70 @@ func (p *Parser) Parse() (space.Geometry, error) {
 	if err != nil {
 		return nil, err
 	}
+	var srid = 0
+	var geom space.Geometry
 	switch t.ttype {
 	case PointEnum:
-		return p.parsePoint()
+		geom, err = p.parsePoint()
 	case Linestring:
-		return p.parseLineString()
+		geom, err = p.parseLineString()
 	case PolygonEnum:
-		return p.parsePolygon()
+		geom, err = p.parsePolygon()
 	case Multipoint:
 		line, err := p.parseLineString()
-		return space.MultiPoint(line.ToPointArray()), err
+		if err != nil {
+			return nil, err
+		}
+		geom = space.MultiPoint(line.ToPointArray())
 	case MultilineString:
 		poly, err := p.parsePolygon()
+		if err != nil {
+			return nil, err
+		}
 		multiline := make(space.MultiLineString, 0, len(poly))
 		for _, ring := range poly {
 			multiline = append(multiline, space.LineString(ring))
 		}
-		return multiline, err
+		geom = multiline
 	case MultiPolygonEnum:
-		return p.parseMultiPolygon()
+		geom, err = p.parseMultiPolygon()
+	case GeometryCollection:
+		geom, err = p.parseGeometryCollection()
+
+	case Srid:
+		if srid == 0 {
+			srid, err = p.parseSrid()
+		}
+		geom, err = p.Parse()
 	default:
 		return nil, fmt.Errorf("Parse unexpected token %s on pos %d expected geometry type", t.lexeme, t.pos)
 	}
+	if err != nil {
+		return nil, err
+	}
+	if srid != 0 {
+		return space.CreateElementValidWithCoordSys(geom, srid)
+	}
+	return geom, nil
+}
+
+func (p *Parser) parseSrid() (srid int, err error) {
+	t, err := p.scanToken()
+	if err != nil {
+		return 0, err
+	}
+	switch t.ttype {
+	case EqualSign:
+		s, err := p.scanToken()
+		if err != nil {
+			return 0, err
+		}
+		srid, _ = strconv.Atoi(s.lexeme)
+		if s, err := p.scanToken(); err != nil || s.ttype != Semicolon {
+			return srid, fmt.Errorf("parse srid unexpected token %s on pos %d", s.lexeme, s.pos)
+		}
+	}
+	return
 }
 
 func (p *Parser) parsePoint() (point space.Point, err error) {
@@ -88,14 +130,6 @@ func (p *Parser) parsePoint() (point space.Point, err error) {
 		return point, fmt.Errorf("parse point unexpected token %s on pos %d", t.lexeme, t.pos)
 	}
 
-	t, err = p.scanToken()
-	if err != nil {
-		return point, err
-	}
-	if t.ttype != EOF {
-		return point, fmt.Errorf("parse point unexpected token %s on pos %d", t.lexeme, t.pos)
-	}
-
 	return point, nil
 }
 
@@ -126,14 +160,6 @@ func (p *Parser) parseLineString() (line space.LineString, err error) {
 		}
 	default:
 		return line, fmt.Errorf("unexpected token %s on pos %d", t.lexeme, t.pos)
-	}
-
-	t, err = p.scanToken()
-	if err != nil {
-		return line, err
-	}
-	if t.ttype != EOF {
-		return line, fmt.Errorf("unexpected token %s on pos %d, expected EOF", t.lexeme, t.pos)
 	}
 
 	return line, nil
@@ -197,14 +223,6 @@ func (p *Parser) parsePolygon() (poly space.Polygon, err error) {
 		return poly, fmt.Errorf("unexpected token %s on pos %d", t.lexeme, t.pos)
 	}
 
-	t, err = p.scanToken()
-	if err != nil {
-		return poly, err
-	}
-	if t.ttype != EOF {
-		return poly, fmt.Errorf("unexpected token %s on pos %d, expected EOF", t.lexeme, t.pos)
-	}
-
 	return poly, nil
 }
 
@@ -266,14 +284,6 @@ func (p *Parser) parseMultiPolygon() (multi space.MultiPolygon, err error) {
 		return multi, fmt.Errorf("unexpected token %s on pos %d", t.lexeme, t.pos)
 	}
 
-	t, err = p.scanToken()
-	if err != nil {
-		return multi, err
-	}
-	if t.ttype != EOF {
-		return multi, fmt.Errorf("unexpected token %s on pos %d, expected EOF", t.lexeme, t.pos)
-	}
-
 	return multi, nil
 }
 
@@ -304,6 +314,58 @@ func (p *Parser) parseMultiPolygonText(ttype tokenType) (multi space.MultiPolygo
 		}
 	}
 	return multi, nil
+}
+func (p *Parser) parseGeometryCollection() (coll space.Collection, err error) {
+	coll = make(space.Collection, 0)
+	t, err := p.scanToken()
+	if err != nil {
+		return coll, err
+	}
+	switch t.ttype {
+	case Empty:
+	case Z, M, ZM:
+		t1, err := p.scanToken()
+		if err != nil {
+			return coll, err
+		}
+		if t1.ttype == Empty {
+			break
+		}
+		if t1.ttype != LeftParen {
+			return coll, fmt.Errorf("unexpected token %s on pos %d expected '('", t.lexeme, t.pos)
+		}
+		fallthrough
+	case LeftParen:
+		coll, err = p.parseGeometryCollectionText(t.ttype)
+		if err != nil {
+			return coll, err
+		}
+	default:
+		return coll, fmt.Errorf("unexpected token %s on pos %d", t.lexeme, t.pos)
+	}
+
+	return coll, nil
+}
+
+func (p *Parser) parseGeometryCollectionText(ttype tokenType) (coll space.Collection, err error) {
+	coll = make(space.Collection, 0)
+	for {
+		if geom, err := p.Parse(); err != nil {
+			return coll, err
+		} else {
+			coll = append(coll, geom)
+		}
+		t, err := p.scanToken()
+		if err != nil {
+			return coll, err
+		}
+		if t.ttype == RightParen {
+			break
+		} else if t.ttype != Comma {
+			return coll, fmt.Errorf("unexpected token %s on pos %d expected ','", t.lexeme, t.pos)
+		}
+	}
+	return coll, nil
 }
 
 func (p *Parser) parseCoord() (point space.Point, err error) {
