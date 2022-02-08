@@ -312,3 +312,8 @@ func (b Bound) CoordinateSystem() int {
 func (b Bound) Filter(f matrix.Filter) Geometry {
 	return b
 }
+
+// Geom return Geometry without Coordinate System.
+func (b Bound) Geom() Geometry {
+	return b
+}

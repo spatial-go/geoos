@@ -46,7 +46,7 @@ func (c *Curve) SetParameters(parameters *CurveParameters) {
 // AddLine add a line.
 func (c *Curve) AddLine(line matrix.LineMatrix) {
 	for _, pt := range line {
-		if len(c.Line) > 0 && measure.PlanarDistance(c.Line[len(c.Line)-1], pt) <= c.minimimVertexDistance {
+		if len(c.Line) > 0 && measure.PlanarDistance(matrix.Matrix(c.Line[len(c.Line)-1]), matrix.Matrix(pt)) <= c.minimimVertexDistance {
 			continue
 		}
 		c.AddPt(pt)
@@ -56,7 +56,7 @@ func (c *Curve) AddLine(line matrix.LineMatrix) {
 // Add add a Pts.
 func (c *Curve) Add(pts ...matrix.Matrix) {
 	for _, pt := range pts {
-		if len(c.Line) > 0 && measure.PlanarDistance(c.Line[len(c.Line)-1], pt) <= c.minimimVertexDistance {
+		if len(c.Line) > 0 && measure.PlanarDistance(matrix.Matrix(c.Line[len(c.Line)-1]), pt) <= c.minimimVertexDistance {
 			continue
 		}
 		c.Line = append(c.Line, matrix.Matrix{pt[0], pt[1]})

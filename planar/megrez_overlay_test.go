@@ -159,7 +159,7 @@ func TestAlgorithm_SharedPaths(t *testing.T) {
 	const mullinestring = `MULTILINESTRING((26 125,26 200,126 200,126 125,26 125),
 	   (51 150,101 150,76 175,51 150))`
 	const linestring = `LINESTRING(151 100,126 156.25,126 125,90 161, 76 175)`
-	const res = `GEOMETRYCOLLECTION(MULTILINESTRING((126 156.25,126 125),(101 150,90 161),(90 161,76 175)),MULTILINESTRING EMPTY)`
+	const res = `SRID=104326;GEOMETRYCOLLECTION(SRID=104326;MULTILINESTRING((126 156.25,126 125),(101 150,90 161),(90 161,76 175)),SRID=104326;MULTILINESTRING EMPTY)`
 
 	mulline, _ := wkt.UnmarshalString(mullinestring)
 	line, _ := wkt.UnmarshalString(linestring)

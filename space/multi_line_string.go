@@ -283,3 +283,8 @@ func (mls MultiLineString) Filter(f matrix.Filter) Geometry {
 	}
 	return mls
 }
+
+// Geom return Geometry without Coordinate System.
+func (mls MultiLineString) Geom() Geometry {
+	return mls
+}

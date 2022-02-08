@@ -117,7 +117,7 @@ func (p *Plane) ToString() string {
 	return string(ss)
 }
 
-// IsVertexInHole
+// IsVertexInHole ...
 func (p *Plane) IsVertexInHole(v *Vertex) (inHole bool) {
 	for i, w := range p.Rings {
 		if i == 0 {

@@ -468,6 +468,7 @@ func (e *Envelope) CompareTo(other *Envelope) int {
 
 }
 
+// ToMatrix ...
 func (e *Envelope) ToMatrix() *matrix.PolygonMatrix {
 	return &matrix.PolygonMatrix{
 		{

@@ -62,18 +62,23 @@ func CreateElementValidWithCoordSys(geom Geometry, coordSys int) (*GeometryValid
 }
 
 // CoordinateSystem return Coordinate System.
-func (g GeometryValid) CoordinateSystem() int {
+func (g *GeometryValid) CoordinateSystem() int {
 	return g.coordinateSystem
 }
 
 // IsProjection returns true if the coordinateSystem is projection.
-func (g GeometryValid) IsProjection() bool {
-	for i, _ := range projectionCoordinateSystem {
+func (g *GeometryValid) IsProjection() bool {
+	for i := range projectionCoordinateSystem {
 		if projectionCoordinateSystem[i] == g.coordinateSystem {
 			return true
 		}
 	}
 	return false
+}
+
+// Geom return Geometry without Coordinate System.
+func (g *GeometryValid) Geom() Geometry {
+	return g.Geometry
 }
 
 func defaultCoordinateSystem() int {
@@ -98,8 +103,10 @@ func Distance(from, to Geometry, f measure.Distance) (float64, error) {
 		to == nil || to.IsEmpty() {
 		return 0, nil
 	}
-	elem := &measure.ElementDistance{From: from.ToMatrix(), To: to.ToMatrix(), F: f}
-	return elem.Distance()
+	if from.IsEmpty() != to.IsEmpty() {
+		return 0, spaceerr.ErrNilGeometry
+	}
+	return f(from.ToMatrix(), to.ToMatrix()), nil
 }
 
 // Relate Computes the  Intersection Matrix for the spatial relationship
@@ -118,8 +125,8 @@ func Relate(a, b Geometry) (string, error) {
 // For this function to make sense, the source geometries must both be of the same coordinate projection,
 // having the same SRID.
 func Within(A, B Geometry) (bool, error) {
-	isIntersect, isAInB, isSure:=aInB(A, B)
-	if(isSure){
+	isIntersect, isAInB, isSure := aInB(A, B)
+	if isSure {
 		return isAInB, nil
 	}
 	im := relate.IM(A.ToMatrix(), B.ToMatrix(), isIntersect)
@@ -133,8 +140,8 @@ func Within(A, B Geometry) (bool, error) {
 // For this function to make sense, the source geometries must both be of the same coordinate projection,
 // having the same SRID.
 func Contains(A, B Geometry) (bool, error) {
-	isIntersect, isAInB, isSure:=aInB(B, A)
-	if(isSure){
+	isIntersect, isAInB, isSure := aInB(B, A)
+	if isSure {
 		return isAInB, nil
 	}
 	im := relate.IM(A.ToMatrix(), B.ToMatrix(), isIntersect)
@@ -143,8 +150,8 @@ func Contains(A, B Geometry) (bool, error) {
 
 // Covers returns TRUE if no point in space.Geometry B is outside space.Geometry A
 func Covers(A, B Geometry) (bool, error) {
-	isIntersect, isAInB, isSure:=aInB(B, A)
-	if(isSure){
+	isIntersect, isAInB, isSure := aInB(B, A)
+	if isSure {
 		return isAInB, nil
 	}
 	im := relate.IM(A.ToMatrix(), B.ToMatrix(), isIntersect)
@@ -153,8 +160,8 @@ func Covers(A, B Geometry) (bool, error) {
 
 // CoveredBy returns TRUE if no point in space.Geometry A is outside space.Geometry B
 func CoveredBy(A, B Geometry) (bool, error) {
-	isIntersect, isAInB, isSure:=aInB(A, B)
-	if(isSure){
+	isIntersect, isAInB, isSure := aInB(A, B)
+	if isSure {
 		return isAInB, nil
 	}
 	im := relate.IM(A.ToMatrix(), B.ToMatrix(), isIntersect)
@@ -309,6 +316,7 @@ func TransGeometry(inputGeom matrix.Steric) Geometry {
 	}
 }
 
+// BufferInMeter ...
 func BufferInMeter(geometry Geometry, width float64, quadsegs int) Geometry {
 	centroid := geometry.Centroid()
 	width = measure.MercatorDistance(width, centroid.Lat())

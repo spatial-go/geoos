@@ -97,6 +97,13 @@ func TestAlgorithm_Contains(t *testing.T) {
 			g2: poly3,
 		}, want: true, wantErr: false},
 	}
+	for i, v := range polyTestscase {
+		want := true
+		if i != 4 {
+			want = false
+		}
+		tests = append(tests, TestStruct{v.name, v.args, want, false})
+	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			G := NormalStrategy()

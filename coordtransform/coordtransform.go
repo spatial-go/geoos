@@ -100,7 +100,7 @@ func (t *Transformer) TransformGeometry(geom matrix.Steric) (matrix.Steric, erro
 	case matrix.PolygonMatrix:
 		return t.TransformPolygon(mt), nil
 	case matrix.Collection:
-		for i, _ := range mt {
+		for i := range mt {
 			mt[i], _ = t.TransformGeometry(mt[i])
 		}
 		return mt, nil

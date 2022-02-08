@@ -5,7 +5,7 @@ import (
 
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/relate"
-	"github.com/spatial-go/geoos/space/spaceerr"
+	"github.com/spatial-go/geoos/coordtransform"
 )
 
 const (
@@ -17,40 +17,112 @@ const (
 )
 
 // Distance is a func of measure distance.
-type Distance func(from, to matrix.Matrix) float64
-
-// SpheroidDistance Calculate distance, return unit: meter
-func SpheroidDistance(from, to matrix.Matrix) float64 {
-	rad := math.Pi / 180.0
-	lat0 := from[1] * rad
-	lng0 := from[0] * rad
-	lat1 := to[1] * rad
-	lng1 := to[0] * rad
-	theta := lng1 - lng0
-	dist := math.Acos(math.Sin(lat0)*math.Sin(lat1) + math.Cos(lat0)*math.Cos(lat1)*math.Cos(theta))
-	return dist * R
-}
+type Distance func(from, to matrix.Steric) float64
 
 // MercatorDistance scale factor is changed along the meridians as a function of latitude
 // https://gis.stackexchange.com/questions/110730/mercator-scale-factor-is-changed-along-the-meridians-as-a-function-of-latitude
 // https://gis.stackexchange.com/questions/93332/calculating-distance-scale-factor-by-latitude-for-mercator
 func MercatorDistance(distance float64, lat float64) float64 {
-	lat = lat * math.Pi / 180
-	factor := math.Sqrt(1-math.Pow(E, 2)*math.Pow(math.Sin(lat), 2)) * (1 / math.Cos(lat))
-	distance = distance * factor
+	k, c := MercatorFctor(lat)
+	distance = distance * k * c
 	return distance
 }
 
-// PlanarDistance returns Distance of pq.
-func PlanarDistance(from, to matrix.Matrix) float64 {
-	return math.Sqrt((from[0]-to[0])*(from[0]-to[0]) + (from[1]-to[1])*(from[1]-to[1]))
+// MercatorFctor scale factor the meridians as a function of latitude
+func MercatorFctor(lat float64) (float64, float64) {
+	lat = lat * math.Pi / 180
+	k := (1 / math.Cos(lat))
+	c := math.Sqrt(1 - math.Pow(E, 2)*math.Pow(math.Sin(lat), 2))
+	return k, c
 }
 
-// DistanceSegmentToPoint Returns Distance of p,ab
-func DistanceSegmentToPoint(p, a, b matrix.Matrix, f Distance) float64 {
+// SpheroidDistance Calculate distance, return unit: meter
+func SpheroidDistance(fromSteric, toSteric matrix.Steric) float64 {
+	if to, ok := toSteric.(matrix.Matrix); ok {
+		if from, ok := fromSteric.(matrix.Matrix); ok {
+			rad := math.Pi / 180.0
+			lat0 := from[1] * rad
+			lng0 := from[0] * rad
+			lat1 := to[1] * rad
+			lng1 := to[0] * rad
+			theta := lng1 - lng0
+			dist := math.Acos(math.Sin(lat0)*math.Sin(lat1) + math.Cos(lat0)*math.Cos(lat1)*math.Cos(theta))
+			return dist * R
+		}
+	}
+	trans := coordtransform.NewTransformer(coordtransform.LLTOMERCATOR)
+	from, _ := trans.TransformGeometry(fromSteric)
+	to, _ := trans.TransformGeometry(toSteric)
+	locMatrix := []matrix.Matrix{{0, 0}, {0, 0}}
+	dist := distanceCompute(from, to, locMatrix)
+
+	trans = coordtransform.NewTransformer(coordtransform.MERCATORTOLL)
+	loc0, _ := trans.TransformGeometry(locMatrix[0])
+	loc1, _ := trans.TransformGeometry(locMatrix[1])
+	k, _ := MercatorFctor((loc0.(matrix.Matrix)[1] + loc1.(matrix.Matrix)[1]) / 2)
+	return dist / k
+}
+
+// PlanarDistance returns Distance of form to.
+func PlanarDistance(fromSteric, toSteric matrix.Steric) float64 {
+	locMatrix := []matrix.Matrix{{0, 0}, {0, 0}}
+	return distanceCompute(fromSteric, toSteric, locMatrix)
+}
+
+// distanceCompute returns Distance of form to.
+func distanceCompute(fromSteric, toSteric matrix.Steric, locMatrix []matrix.Matrix) float64 {
+	switch to := toSteric.(type) {
+	case matrix.Matrix:
+		if from, ok := fromSteric.(matrix.Matrix); ok {
+			locMatrix[0], locMatrix[1] = from, to
+			return math.Sqrt((from[0]-to[0])*(from[0]-to[0]) + (from[1]-to[1])*(from[1]-to[1]))
+		}
+		return distanceCompute(to, fromSteric, locMatrix)
+
+	case matrix.LineMatrix:
+		if from, ok := fromSteric.(matrix.Matrix); ok {
+			return distanceLineToPoint(to, from, locMatrix)
+		} else if from, ok := fromSteric.(matrix.LineMatrix); ok {
+			return distanceLineAndLine(from, to, locMatrix)
+		}
+		return distanceCompute(to, fromSteric, locMatrix)
+	case matrix.PolygonMatrix:
+		if from, ok := fromSteric.(matrix.Matrix); ok {
+			return distancePolygonToPoint(to, from, locMatrix)
+		} else if from, ok := fromSteric.(matrix.LineMatrix); ok {
+			return distancePolygonAndLine(to, from, locMatrix)
+		} else if from, ok := fromSteric.(matrix.PolygonMatrix); ok {
+			dist := math.MaxFloat64
+			loc := []matrix.Matrix{{0, 0}, {0, 0}}
+			for _, v := range from {
+				if distP := distanceCompute(matrix.LineMatrix(v), to, loc); dist > distP {
+					locMatrix[0], locMatrix[1] = loc[0], loc[1]
+					dist = distP
+				}
+			}
+			return dist
+		}
+		return PlanarDistance(to, fromSteric)
+	case matrix.Collection:
+		dist := math.MaxFloat64
+		loc := []matrix.Matrix{{0, 0}, {0, 0}}
+		for _, v := range to {
+			if distP := distanceCompute(fromSteric, v, loc); dist > distP {
+				locMatrix[0], locMatrix[1] = loc[0], loc[1]
+				dist = distP
+			}
+		}
+		return dist
+	default:
+		return 0
+	}
+}
+
+// distanceSegmentToPoint Returns Distance of p,ab
+func distanceSegmentToPoint(p, a, b matrix.Matrix) float64 {
 	// if start = end, then just compute distance to one of the endpoints
 	if a[0] == b[0] && a[1] == b[1] {
-		return f(p, a)
+		return PlanarDistance(p, a)
 	}
 	// otherwise use comp.graphics.algorithms Frequently Asked Questions method
 	//
@@ -69,10 +141,10 @@ func DistanceSegmentToPoint(p, a, b matrix.Matrix, f Distance) float64 {
 	r := ((p[0]-a[0])*(b[0]-a[0]) + (p[1]-a[1])*(b[1]-a[1])) / len2
 
 	if r <= 0.0 {
-		return f(p, a)
+		return PlanarDistance(p, a)
 	}
 	if r >= 1.0 {
-		return f(p, b)
+		return PlanarDistance(p, b)
 	}
 
 	//
@@ -89,115 +161,70 @@ func DistanceSegmentToPoint(p, a, b matrix.Matrix, f Distance) float64 {
 	return math.Abs(s) * math.Sqrt(len2)
 }
 
-// DistanceLineToPoint Returns Distance of p,line
-func DistanceLineToPoint(line matrix.LineMatrix, pt matrix.Matrix, f Distance) (dist float64) {
+// distanceLineToPoint Returns Distance of p,line
+func distanceLineToPoint(line matrix.LineMatrix, pt matrix.Matrix, locMatrix []matrix.Matrix) (dist float64) {
+	dist = math.MaxFloat64
 	for i, v := range line {
-		tmpDist := 0.0
 		if i < len(line)-1 {
-			tmpDist = DistanceSegmentToPoint(pt, v, line[i+1], f)
-		}
-		if dist > tmpDist {
-			dist = tmpDist
-		}
-	}
-	return
-}
-
-// DistancePolygonToPoint Returns Distance of p,polygon
-func DistancePolygonToPoint(poly matrix.PolygonMatrix, pt matrix.Matrix, f Distance) (dist float64) {
-
-	for _, v := range poly {
-		tmpDist := DistanceLineToPoint(v, pt, f)
-		if dist > tmpDist {
-			dist = tmpDist
-		}
-	}
-	return
-}
-
-// ElementDistance describes a geographic ElementDistance
-type ElementDistance struct {
-	From, To matrix.Steric
-	F        Distance
-}
-
-// Distance returns distance Between the two Geometry.
-func (el *ElementDistance) Distance() (float64, error) {
-	if el.From.IsEmpty() && el.To.IsEmpty() {
-		return 0, nil
-	}
-	if el.From.IsEmpty() != el.To.IsEmpty() {
-		return 0, spaceerr.ErrNilGeometry
-	}
-	switch to := el.To.(type) {
-	case matrix.Matrix:
-		if from, ok := el.From.(matrix.Matrix); ok {
-			return el.F(to, from), nil
-		}
-		elem := &ElementDistance{el.To, el.From, el.F}
-		return elem.Distance()
-	case matrix.LineMatrix:
-		if from, ok := el.From.(matrix.Matrix); ok {
-			return DistanceLineToPoint(to, from, el.F), nil
-		} else if _, ok := el.From.(matrix.LineMatrix); ok {
-			return el.distanceLineAndLine()
-		}
-		elem := &ElementDistance{el.To, el.From, el.F}
-		return elem.Distance()
-	case matrix.PolygonMatrix:
-		if from, ok := el.From.(matrix.Matrix); ok {
-			return DistancePolygonToPoint(to, from, el.F), nil
-		} else if _, ok := el.From.(matrix.LineMatrix); ok {
-			return el.distancePolygonAndLine()
-		} else if from, ok := el.From.(matrix.PolygonMatrix); ok {
-			var dist float64
-			for _, v := range from {
-				elem := &ElementDistance{matrix.LineMatrix(v), el.To, el.F}
-				if distP, _ := elem.Distance(); dist > distP {
-					dist = distP
+			if tmpDist := distanceSegmentToPoint(pt, v, line[i+1]); dist > tmpDist {
+				locMatrix[0] = pt
+				if PlanarDistance(pt, matrix.Matrix(v)) < PlanarDistance(pt, matrix.Matrix(line[i+1])) {
+					locMatrix[1] = v
+				} else {
+					locMatrix[1] = line[i+1]
 				}
-			}
-			return dist, nil
-		}
-		elem := &ElementDistance{el.To, el.From, el.F}
-		return elem.Distance()
-	case matrix.Collection:
-		var dist float64
-		for _, v := range to {
-			elem := &ElementDistance{v, el.From, el.F}
-			if distP, err := elem.Distance(); err == nil && dist > distP {
-				dist = distP
+				dist = tmpDist
 			}
 		}
-		return dist, nil
-	default:
-		return 0, nil
 	}
+	return
+}
+
+// distancePolygonToPoint Returns Distance of p,polygon
+func distancePolygonToPoint(poly matrix.PolygonMatrix, pt matrix.Matrix, locMatrix []matrix.Matrix) (dist float64) {
+	dist = math.MaxFloat64
+	loc := []matrix.Matrix{{0, 0}, {0, 0}}
+	for _, v := range poly {
+		tmpDist := distanceLineToPoint(v, pt, loc)
+		if dist > tmpDist {
+			locMatrix[0], locMatrix[1] = loc[0], loc[1]
+			dist = tmpDist
+		}
+	}
+	return
 }
 
 // distanceLineAndLine returns distance Between the two Geometry.
-func (el *ElementDistance) distanceLineAndLine() (float64, error) {
-	var dist float64
-	if mark := relate.IsIntersectionEdge(el.From.(matrix.LineMatrix), el.To.(matrix.LineMatrix)); mark {
-		return 0, nil
+func distanceLineAndLine(from, to matrix.LineMatrix, locMatrix []matrix.Matrix) (dist float64) {
+	dist = math.MaxFloat64
+	loc := []matrix.Matrix{{0, 0}, {0, 0}}
+	if mark := relate.IsIntersectionEdge(from, to); mark {
+		return 0
 	}
-	for _, v := range el.From.(matrix.LineMatrix) {
-		elem := &ElementDistance{matrix.Matrix(v), el.To, el.F}
-		if distP, _ := elem.Distance(); dist > distP {
+	for _, v := range from {
+		if distP := distanceLineToPoint(to, matrix.Matrix(v), loc); dist > distP {
+			locMatrix[0], locMatrix[1] = loc[0], loc[1]
 			dist = distP
 		}
 	}
-	return dist, nil
+	for _, v := range to {
+		if distP := distanceLineToPoint(from, matrix.Matrix(v), loc); dist > distP {
+			locMatrix[0], locMatrix[1] = loc[0], loc[1]
+			dist = distP
+		}
+	}
+	return dist
 }
 
 // distancePolygonAndLine returns distance Between the two Geometry.
-func (el *ElementDistance) distancePolygonAndLine() (float64, error) {
-	var dist float64
-	for _, v := range el.To.(matrix.PolygonMatrix) {
-		elem := &ElementDistance{matrix.LineMatrix(v), el.From, el.F}
-		if distP, _ := elem.Distance(); dist > distP {
+func distancePolygonAndLine(poly matrix.PolygonMatrix, line matrix.LineMatrix, locMatrix []matrix.Matrix) (dist float64) {
+	dist = math.MaxFloat64
+	loc := []matrix.Matrix{{0, 0}, {0, 0}}
+	for _, v := range poly {
+		if distP := distanceLineAndLine(matrix.LineMatrix(v), line, loc); dist > distP {
+			locMatrix[0], locMatrix[1] = loc[0], loc[1]
 			dist = distP
 		}
 	}
-	return dist, nil
+	return dist
 }

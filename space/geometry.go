@@ -28,6 +28,9 @@ type Geometry interface {
 	// CoordinateSystem return Coordinate System.
 	CoordinateSystem() int
 
+	// Geom return Geometry without Coordinate System.
+	Geom() Geometry
+
 	GeoJSONType() string
 	// e.g. 0d, 1d, 2d
 	Dimensions() int
@@ -136,7 +139,8 @@ var (
 	_ Geometry = Bound{}
 
 	_ Geometry = Collection{}
-	_ Geometry = GeometryValid{}
+	_ Geometry = &GeometryValid{}
 
 	_ Geometry = &Circle{}
+	_ Geometry = &GeometryValid{}
 )

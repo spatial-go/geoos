@@ -124,7 +124,7 @@ func (l *LineSnapper) findSegmentIndexToSnap(snapPt matrix.Matrix) int {
 			return -1
 		}
 
-		dist := measure.DistanceSegmentToPoint(snapPt, p0, p1, measure.PlanarDistance)
+		dist := measure.PlanarDistance(snapPt, matrix.LineMatrix{p0, p1})
 		if dist < l.snapTolerance && dist < minDist {
 			minDist = dist
 			snapIndex = i
