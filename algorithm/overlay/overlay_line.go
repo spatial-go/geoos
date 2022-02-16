@@ -159,7 +159,7 @@ func (p *LineOverlay) SymDifference() (matrix.Steric, error) {
 	return result, nil
 }
 
-// intersectLine returns a array  that represents that part of geometry A intersect with geometry B.
+// intersectLine returns a Collection  that represents that part of geometry A intersect with geometry B.
 func intersectLine(m, m1 matrix.LineMatrix) matrix.Collection {
 	smi := &chain.SegmentMutualIntersector{SegmentMutual: m}
 	icd := &chain.IntersectionCollinear{Edge: m}
