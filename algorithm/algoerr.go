@@ -7,10 +7,10 @@ import (
 )
 
 // ErrNotGraphCollection ...
-var ErrNotGraphCollection = fmt.Errorf("Operation does not support not match type ,please try CreateGraphCollection.")
+var ErrNotGraphCollection = fmt.Errorf("Operation does not support not match type ,please try CreateGraphCollection")
 
 // ErrNotGraph ...
-var ErrNotGraph = fmt.Errorf("Operation does not support not match type ,please try CreateGraph.")
+var ErrNotGraph = fmt.Errorf("Operation does not support not match type ,please try CreateGraph")
 
 // ErrQuadrant ...
 var ErrQuadrant = fmt.Errorf("Cannot compute the quadrant for point")

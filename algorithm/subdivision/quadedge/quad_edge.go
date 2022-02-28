@@ -6,20 +6,24 @@ import (
 	"github.com/spatial-go/geoos/algorithm/matrix"
 )
 
+// IsCCW ...
 func IsCCW(a matrix.Matrix, b matrix.Matrix, c matrix.Matrix) bool {
 	return (b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]) > 0
 }
 
+// IsInCircle ...
 func IsInCircle(v matrix.Matrix, a matrix.Matrix, b matrix.Matrix, c matrix.Matrix) bool {
 	return isInCircleRobust(a, b, c, v)
 }
 
+// QuadEdge ...
 type QuadEdge struct {
 	vertex matrix.Matrix
 	next   *QuadEdge
 	rot    *QuadEdge
 }
 
+// EmptyQuadEdge ...
 func EmptyQuadEdge() *QuadEdge {
 	return &QuadEdge{}
 }
@@ -49,6 +53,7 @@ func NewQuadEdge(o matrix.Matrix, d matrix.Matrix) *QuadEdge {
 	return qe
 }
 
+// Connect ...
 func Connect(a, b *QuadEdge) *QuadEdge {
 	e := NewQuadEdge(a.Destination(), b.Origin())
 	Splice(e, a.LNext())
@@ -72,6 +77,7 @@ func Splice(a *QuadEdge, b *QuadEdge) {
 	beta.next = t4
 }
 
+// Swap ....
 func Swap(e *QuadEdge) {
 	var (
 		a = e.OPrev()
@@ -166,9 +172,9 @@ func (q *QuadEdge) Primary() *QuadEdge {
 	value, _ := q.Origin().Compare(q.Destination())
 	if value <= 0 {
 		return q
-	} else {
-		return q.Sym()
 	}
+	return q.Sym()
+
 }
 
 // ToString ...

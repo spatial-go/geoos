@@ -121,3 +121,11 @@ func (l LineMatrix) Filter(f Filter) Steric {
 	}
 	return l
 }
+
+// Reverse  this LineMatrix.
+func (l LineMatrix) Reverse() LineMatrix {
+	for i, j := 0, len(l)-1; i < j; i, j = i+1, j-1 {
+		l[i], l[j] = l[j], l[i]
+	}
+	return l
+}

@@ -4,6 +4,7 @@ import (
 	"sort"
 )
 
+// KeyStore ...
 type KeyStore interface {
 	Keys() []string
 	IndexOf(key string) int
@@ -16,27 +17,32 @@ type keyStore struct {
 	sorted bool
 }
 
-func NewKeyStoreWithKeys(keys []string) *keyStore {
+// NewKeyStoreWithKeys ...
+func NewKeyStoreWithKeys(keys []string) KeyStore {
 	if keys == nil {
 		return NewKeyStore()
 	}
 	return &keyStore{keys: keys}
 }
 
-func NewKeyStore() *keyStore {
+// NewKeyStore ...
+func NewKeyStore() KeyStore {
 	return &keyStore{keys: []string{}}
 }
 
+// Keys ...
 func (k *keyStore) Keys() []string {
 	k.sort()
 	return k.keys
 }
 
+// IndexOf ...
 func (k *keyStore) IndexOf(key string) int {
 	k.sort()
 	return sort.SearchStrings(k.keys, key)
 }
 
+// Add ...
 func (k *keyStore) Add(key string) int {
 	idx := k.IndexOf(key)
 	if len(k.keys) <= idx || k.keys[idx] != key {
@@ -47,6 +53,7 @@ func (k *keyStore) Add(key string) int {
 	return idx
 }
 
+// Reset ...
 func (k *keyStore) Reset() {
 	k.keys = []string{}
 	k.sorted = true

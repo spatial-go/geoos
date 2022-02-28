@@ -1,0 +1,308 @@
+// package graph ...
+
+package graph
+
+import (
+	"github.com/spatial-go/geoos/algorithm"
+	"github.com/spatial-go/geoos/algorithm/matrix"
+	"github.com/spatial-go/geoos/algorithm/relate"
+)
+
+// GenerateGraph create graph with matrix.
+func GenerateGraph(m matrix.Steric) (Graph, error) {
+	g := &MatrixGraph{}
+	switch mType := m.(type) {
+	case matrix.Matrix:
+		g.AddNode(&Node{Value: mType, NodeType: PNode})
+	case matrix.LineMatrix:
+		return lineCreateGraph(mType)
+	case matrix.PolygonMatrix:
+		return polyCreateGraph(mType)
+	case matrix.Collection:
+		return nil, algorithm.ErrNotGraphCollection
+	default:
+		return nil, algorithm.ErrNotMatchType
+
+	}
+	return g, nil
+}
+
+// GenerateGraphCollection create graph with matrix.
+func GenerateGraphCollection(m matrix.Steric) ([]Graph, error) {
+
+	switch mType := m.(type) {
+	case matrix.Collection:
+		gc := []Graph{}
+		for _, v := range mType {
+			if g, err := GenerateGraph(v); err == nil {
+				gc = append(gc, g)
+			}
+		}
+	default:
+		return nil, algorithm.ErrNotGraph
+
+	}
+	return nil, algorithm.ErrNotMatchType
+}
+
+// lineCreateGraph create graph with matrix.
+func lineCreateGraph(m matrix.LineMatrix) (Graph, error) {
+	g := &MatrixGraph{}
+
+	node := &Node{Value: m, NodeType: LNode}
+	g.AddNode(node)
+
+	return g, nil
+}
+
+// polyCreateGraph create graph with matrix.
+func polyCreateGraph(m matrix.PolygonMatrix) (Graph, error) {
+	g := &MatrixGraph{}
+
+	node := &Node{Value: m, NodeType: ANode}
+	g.AddNode(node)
+
+	return g, nil
+}
+
+// IntersectionHandle handle graph with m1 and m2.
+func IntersectionHandle(m1, m2 matrix.Steric, g1, g2 Graph) error {
+	switch m1Type := m1.(type) {
+	case matrix.Matrix:
+		return matrixIntersectionHandle(m1Type, m2, g1, g2)
+	case matrix.LineMatrix:
+		return lineIntersectionHandle(m1Type, m2, g1, g2)
+	case matrix.PolygonMatrix:
+		return polyIntersectionHandle(m1Type, m2, g1, g2)
+	case matrix.Collection:
+		return algorithm.ErrNotGraphCollection
+	default:
+		return algorithm.ErrNotMatchType
+
+	}
+}
+
+// polyIntersectionHandle handle graph with m1 and m2.
+func polyIntersectionHandle(m1 matrix.PolygonMatrix, m2 matrix.Steric, g1, g2 Graph) error {
+
+	switch m2Type := m2.(type) {
+	case matrix.Matrix:
+		for _, l := range m1 {
+			matrixAndLineHandle(m2Type, l, g2, g1)
+		}
+		return nil
+	case matrix.LineMatrix:
+		return lineAndPolygonHandle(m2Type, m1, g2, g1)
+	case matrix.PolygonMatrix:
+		return polygonAndPolygonHandle(m1, m2Type, g1, g2)
+	case matrix.Collection:
+		return algorithm.ErrNotGraphCollection
+	default:
+		return algorithm.ErrNotMatchType
+	}
+}
+
+// lineIntersectionHandle handle graph with m1 and m2.
+func lineIntersectionHandle(m1 matrix.LineMatrix, m2 matrix.Steric, g1, g2 Graph) error {
+
+	switch m2Type := m2.(type) {
+	case matrix.Matrix:
+		return matrixAndLineHandle(m2Type, m1, g2, g1)
+	case matrix.LineMatrix:
+		return lineAndLineHandle(m1, m2Type, g1, g2)
+	case matrix.PolygonMatrix:
+		return lineAndPolygonHandle(m1, m2Type, g1, g2)
+	case matrix.Collection:
+		return algorithm.ErrNotGraphCollection
+	default:
+		return algorithm.ErrNotMatchType
+	}
+}
+
+// matrixIntersectionHandle handle graph with m1 and m2.
+func matrixIntersectionHandle(m1 matrix.Matrix, m2 matrix.Steric, g1, g2 Graph) error {
+
+	switch m2Type := m2.(type) {
+	case matrix.Matrix:
+		return nil
+	case matrix.LineMatrix:
+		return matrixAndLineHandle(m1, m2Type, g1, g2)
+	case matrix.PolygonMatrix:
+		for _, l := range m2Type {
+			matrixAndLineHandle(m1, l, g1, g2)
+		}
+		return nil
+	case matrix.Collection:
+		return algorithm.ErrNotGraphCollection
+	default:
+		return algorithm.ErrNotMatchType
+	}
+}
+
+// matrixIntersectionHandle handle graph with m1 and m2.
+func matrixAndLineHandle(m1 matrix.Matrix, m2 matrix.LineMatrix, g1, g2 Graph) error {
+	if m1.Equals(matrix.Matrix(m2[0])) || m1.Equals(matrix.Matrix(m2[len(m2)-1])) {
+		node := &Node{Value: m1, NodeType: PNode}
+		g2.AddNode(node)
+		g2.AddEdge(g2.Nodes()[0], node)
+		return nil
+	}
+	lines := m2.ToLineArray()
+	line := matrix.LineMatrix{}
+	inLine := false
+	var nodeIntersect *Node
+	for _, ls := range lines {
+
+		line = append(line, ls.P0)
+		if m1.Equals(ls.P0) {
+			nodeIntersect = &Node{Value: m1, NodeType: PNode}
+			g2.AddNode(nodeIntersect)
+			node := &Node{Value: line, NodeType: LNode}
+			g2.AddNode(node)
+			inLine = true
+			g2.AddEdge(nodeIntersect, node)
+			line = matrix.LineMatrix{}
+			line = append(line, m1)
+		} else if m1.Equals(ls.P1) {
+			continue
+		} else {
+			if inLine, _ = relate.InLine(m1, ls.P0, ls.P1); inLine {
+				line = append(line, m1)
+				node := &Node{Value: line, NodeType: LNode}
+				g2.AddNode(node)
+				nodeIntersect = &Node{Value: m1, NodeType: PNode}
+				g2.AddNode(nodeIntersect)
+
+				g2.AddEdge(nodeIntersect, node)
+				line = matrix.LineMatrix{}
+				line = append(line, m1)
+			}
+		}
+	}
+	if inLine {
+		line = append(line, m2[len(m2)-1])
+		node := &Node{Value: line, NodeType: LNode}
+		g2.AddNode(node)
+		g2.AddEdge(nodeIntersect, node)
+	}
+	return nil
+}
+
+// lineAndLineHandle handle graph with m1 and m2.
+func lineAndLineHandle(m1, m2 matrix.LineMatrix, g1, g2 Graph) error {
+	g := []Graph{g1, g2}
+	corrNodes := IntersectLine(m1, m2)
+	for i, corrs := range corrNodes {
+		for _, corr := range corrs {
+			node := &Node{Value: corr.InterNode, NodeType: PNode}
+
+			nodeLine := &Node{Value: corr.CorrelationNode, NodeType: LNode}
+
+			g[i].AddNode(node)
+			g[i].AddNode(nodeLine)
+			g[i].AddEdge(node, nodeLine)
+		}
+	}
+	return nil
+}
+
+// lineAndPolygonHandle handle graph with m1 and m2.
+func lineAndPolygonHandle(m1 matrix.LineMatrix, m2 matrix.PolygonMatrix, g1, g2 Graph) error {
+
+	corrNodes := IntersectLinePolygon(m1, m2)
+	for i, corrs := range corrNodes {
+		gNum := g1
+		if i > 0 {
+			gNum = g2
+		}
+		startNode, endNode := &Node{}, &Node{}
+		startNodeLine, endNodeLine := &Node{}, &Node{}
+		for j, corr := range corrs {
+
+			node := &Node{Value: corr.InterNode, NodeType: PNode}
+			nodeLine := &Node{Value: corr.CorrelationNode, NodeType: LNode}
+
+			if j == 0 {
+				startNode = node
+				startNodeLine = nodeLine
+			}
+			if j == len(corrs)-1 {
+				endNode = node
+				endNodeLine = nodeLine
+			}
+
+			gNum.AddNode(node)
+			gNum.AddNode(nodeLine)
+			gNum.AddEdge(node, nodeLine)
+		}
+		if i == 0 && m1.IsClosed() {
+			if startNode.Value != nil && startNode.Value.Equals(matrix.Matrix(m1[0])) {
+				gNum.AddEdge(startNode, endNodeLine)
+			}
+			if endNode.Value != nil && endNode.Value.Equals(matrix.Matrix(m1[len(m1)-1])) {
+				gNum.AddEdge(endNode, startNodeLine)
+			}
+		}
+		if i > 0 {
+			if startNode.Value != nil && startNode.Value.Equals(matrix.Matrix(m2[i-1][0])) {
+				gNum.AddEdge(startNode, endNodeLine)
+			}
+			if endNode.Value != nil && endNode.Value.Equals(matrix.Matrix(m2[i-1][len(m2[i-1])-1])) {
+				gNum.AddEdge(endNode, startNodeLine)
+			}
+		}
+	}
+
+	if m1.IsClosed() {
+		RingNodeHandle(matrix.PolygonMatrix{m1}, m2, g1, g2)
+	}
+
+	return nil
+}
+
+// polygonAndPolygonHandle handle graph with m1 and m2.
+func polygonAndPolygonHandle(m1, m2 matrix.PolygonMatrix, g1, g2 Graph) error {
+	g := []Graph{g1, g2}
+	twoCorrNodes := IntersectPolygons(m1, m2)
+	for i, corrNodes := range twoCorrNodes {
+		for k, corrs := range corrNodes {
+			startNode, endNode := &Node{}, &Node{}
+			startNodeLine, endNodeLine := &Node{}, &Node{}
+			for j, corr := range corrs {
+				node := &Node{Value: corr.InterNode, NodeType: PNode}
+
+				nodeLine := &Node{Value: corr.CorrelationNode, NodeType: LNode}
+				if j == 0 {
+					startNode = node
+					startNodeLine = nodeLine
+				}
+				if j == len(corrs)-1 {
+					endNode = node
+					endNodeLine = nodeLine
+				}
+
+				g[i].AddNode(node)
+				if nodeLine.Value.Nums() != 0 {
+					g[i].AddNode(nodeLine)
+					g[i].AddEdge(node, nodeLine)
+				}
+			}
+			m := matrix.PolygonMatrix{}
+			if i == 0 {
+				m = m1
+			} else {
+				m = m2
+			}
+			if startNode.Value != nil && startNode.Value.Equals(matrix.Matrix(m[k][0])) {
+				g[i].AddEdge(startNode, endNodeLine)
+			}
+			if endNode.Value != nil && endNode.Value.Equals(matrix.Matrix(m[k][len(m[k])-1])) {
+				g[i].AddEdge(endNode, startNodeLine)
+			}
+
+		}
+	}
+
+	RingNodeHandle(m1, m2, g1, g2)
+	return nil
+}

@@ -6,25 +6,27 @@ import (
 	"github.com/spatial-go/geoos/geojson"
 )
 
+// FeatureEncode ...
 type FeatureEncode struct{}
 
-func EncodeFeature(feature *geojson.Feature, cfg *EncodingConfig) (protoFeature *proto.Data_Feature, err error) {
-	geo := EncodeGeometry(&feature.Geometry, cfg)
+// Feature ...
+func Feature(feature *geojson.Feature, cfg *EncodingConfig) (protoFeature *proto.Data_Feature, err error) {
+	geo := Geometry(&feature.Geometry, cfg)
 	if err != nil {
 		return
 	}
-	id, err := utils.EncodeId(feature.ID)
+	id, err := utils.EncodeID(feature.ID)
 	protoFeature = &proto.Data_Feature{
 		Geometry: geo,
 	}
 	if err == nil {
 		protoFeature.IdType = id
 	} else {
-		newId, newErr := utils.EncodeId(feature.ID)
+		newID, newErr := utils.EncodeID(feature.ID)
 		if newErr != nil {
 			return nil, newErr
 		}
-		protoFeature.IdType = newId
+		protoFeature.IdType = newID
 	}
 	properties := make([]uint32, 0, 2*len(feature.Properties))
 	values := make([]*proto.Data_Value, 0, len(feature.Properties))

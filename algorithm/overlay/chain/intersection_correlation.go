@@ -13,6 +13,8 @@ type IntersectionCorrelation struct {
 	Edge, Edge1 matrix.LineMatrix
 	result0     IntersectionNodeOfLine
 	result1     IntersectionNodeOfLine
+	// 0 not check, 1 equals,-1 not equals
+	isEquals int
 }
 
 // ProcessIntersections This method is called by clients  to process intersections for two segments being intersected.
@@ -23,8 +25,37 @@ func (ii *IntersectionCorrelation) ProcessIntersections(
 	e1 matrix.LineMatrix, segIndex1 int) {
 	// don't bother intersecting a segment with itself
 
-	if e0.Equals(e1) && segIndex0 == segIndex1 {
+	if ii.isEquals == 1 {
 		return
+	}
+	if ii.isEquals == 0 {
+		if e0.Equals(e1) {
+			ii.isEquals = 1
+			inr0 := &IntersectionNodeResult{0, 1, relate.IntersectionPoint{Matrix: matrix.Matrix(ii.Edge[0]), IsCollinear: true},
+				matrix.LineSegment{P0: ii.Edge[0], P1: ii.Edge[1]}, matrix.LineSegment{P0: ii.Edge[0], P1: ii.Edge[1]}, ii.Edge1}
+			ii.result0 = append(ii.result0, inr0)
+			ii.result0 = append(ii.result0, inr0)
+			if !matrix.Matrix(ii.Edge[len(ii.Edge)-1]).Equals(matrix.Matrix(ii.Edge[0])) {
+				inr0 = &IntersectionNodeResult{len(ii.Edge) - 2, len(ii.Edge) - 1, relate.IntersectionPoint{Matrix: matrix.Matrix(ii.Edge[len(ii.Edge)-1]), IsCollinear: true},
+					matrix.LineSegment{P0: ii.Edge[0], P1: ii.Edge[len(ii.Edge)-1]}, matrix.LineSegment{P0: ii.Edge[0], P1: ii.Edge[len(ii.Edge)-1]}, ii.Edge1}
+				ii.result0 = append(ii.result0, inr0)
+				ii.result0 = append(ii.result0, inr0)
+			}
+
+			inr0 = &IntersectionNodeResult{0, 1, relate.IntersectionPoint{Matrix: matrix.Matrix(ii.Edge1[0]), IsCollinear: true},
+				matrix.LineSegment{P0: ii.Edge1[0], P1: ii.Edge1[1]}, matrix.LineSegment{P0: ii.Edge1[0], P1: ii.Edge1[1]}, ii.Edge}
+			ii.result1 = append(ii.result1, inr0)
+			ii.result1 = append(ii.result1, inr0)
+			if !matrix.Matrix(ii.Edge[len(ii.Edge)-1]).Equals(matrix.Matrix(ii.Edge[0])) {
+				inr0 = &IntersectionNodeResult{len(ii.Edge1) - 2, len(ii.Edge1) - 1, relate.IntersectionPoint{Matrix: matrix.Matrix(ii.Edge1[len(ii.Edge1)-1]), IsCollinear: true},
+					matrix.LineSegment{P0: ii.Edge1[0], P1: ii.Edge1[len(ii.Edge1)-1]}, matrix.LineSegment{P0: ii.Edge1[0], P1: ii.Edge1[len(ii.Edge1)-1]}, ii.Edge}
+				ii.result1 = append(ii.result1, inr0)
+				ii.result1 = append(ii.result1, inr0)
+			}
+			return
+		}
+		ii.isEquals = -1
+
 	}
 	if segIndex0 > len(e0)-1 || segIndex1 > len(e1)-1 {
 		return
@@ -40,8 +71,16 @@ func (ii *IntersectionCorrelation) ProcessIntersections(
 		}
 
 		for _, ip := range ips {
-			inr0 := &IntersectionNodeResult{segIndex0, segIndex0 + 1, ip.Matrix}
-			inr1 := &IntersectionNodeResult{segIndex1, segIndex1 + 1, ip.Matrix}
+			inr0 := &IntersectionNodeResult{segIndex0, segIndex0 + 1, ip,
+				matrix.LineSegment{P0: e0[segIndex0], P1: e0[segIndex0+1]},
+				matrix.LineSegment{P0: e1[segIndex1], P1: e1[segIndex1+1]},
+				ii.Edge1,
+			}
+			inr1 := &IntersectionNodeResult{segIndex1, segIndex1 + 1, ip,
+				matrix.LineSegment{P0: e1[segIndex1], P1: e1[segIndex1+1]},
+				matrix.LineSegment{P0: e0[segIndex0], P1: e0[segIndex0+1]},
+				ii.Edge,
+			}
 
 			ii.result0 = append(ii.result0, inr0)
 			ii.result1 = append(ii.result1, inr1)
@@ -51,19 +90,8 @@ func (ii *IntersectionCorrelation) ProcessIntersections(
 
 // IsDone Always process all intersections
 func (ii *IntersectionCorrelation) IsDone() bool {
-	if ii.Edge.Equals(ii.Edge1) {
-		inr0 := &IntersectionNodeResult{0, 1, ii.Edge[0]}
-		ii.result0 = append(ii.result0, inr0)
-		inr0 = &IntersectionNodeResult{len(ii.Edge) - 2, len(ii.Edge) - 1, ii.Edge[len(ii.Edge)-1]}
-		ii.result0 = append(ii.result0, inr0)
-
-		inr0 = &IntersectionNodeResult{0, 1, ii.Edge1[0]}
-		ii.result1 = append(ii.result1, inr0)
-		inr0 = &IntersectionNodeResult{len(ii.Edge1) - 2, len(ii.Edge1) - 1, ii.Edge1[len(ii.Edge1)-1]}
-		ii.result1 = append(ii.result1, inr0)
-
+	if ii.isEquals == 1 {
 		return true
-
 	}
 	return false
 }
@@ -72,162 +100,22 @@ func (ii *IntersectionCorrelation) IsDone() bool {
 func (ii *IntersectionCorrelation) Result() interface{} {
 	sort.Sort(ii.result0)
 	sort.Sort(ii.result1)
-	resultCorr0 := []*IntersectionCorrelationNode{}
-	resultCorr1 := []*IntersectionCorrelationNode{}
-	lines0 := []matrix.LineMatrix{}
-	lines1 := []matrix.LineMatrix{}
-	totalIps := 0
-	ips := []IntersectionNodeOfLine{{}, {}}
-	pos := [2]int{0, 0}
-	pos1 := [2]int{0, 0}
 
-	correlationNode0 := matrix.LineMatrix{}
-	correlationNode1 := matrix.LineMatrix{}
-
-	for i := 0; i < len(ii.result0); i++ {
-		r0 := ii.result0[i]
-		r1 := ii.result1[i]
-
-		if i == 0 {
-			correlationNode := matrix.LineMatrix{}
-			for j := 0; j <= r0.Pos; j++ {
-				correlationNode = append(correlationNode, ii.Edge[j])
-			}
-			correlationNode = append(correlationNode, r0.InterNode)
-
-			lines0 = append(lines0, correlationNode)
-
-			correlationNode = matrix.LineMatrix{}
-
-			for j := 0; j <= r1.Pos; j++ {
-				correlationNode = append(correlationNode, ii.Edge1[j])
-			}
-			correlationNode = append(correlationNode, r1.InterNode)
-
-			lines1 = append(lines1, correlationNode)
-
-			correlationNode = matrix.LineMatrix{}
-			totalIps++
-			ips[0] = append(ips[0], r0)
-			ips[1] = append(ips[1], r1)
-		}
-
-		if i == len(ii.result0)-1 {
-			correlationNode := matrix.LineMatrix{}
-			correlationNode = append(correlationNode, r0.InterNode)
-			for j := r0.End; j < len(ii.Edge); j++ {
-				correlationNode = append(correlationNode, ii.Edge[j])
-			}
-			lines0 = append(lines0, correlationNode)
-			correlationNode = matrix.LineMatrix{}
-			correlationNode = append(correlationNode, r1.InterNode)
-			for j := r1.End; j < len(ii.Edge1); j++ {
-				correlationNode = append(correlationNode, ii.Edge1[j])
-			}
-
-			lines1 = append(lines1, correlationNode)
-			//totalIps++
-			ips[0] = append(ips[0], r0)
-			ips[1] = append(ips[1], r1)
-
-		}
-
-		if i < len(ii.result0)-2 {
-			r01 := ii.result0[i+1]
-			r11 := ii.result1[i+1]
-			r02 := ii.result0[i+2]
-			//r12 := ii.result1[i+2]
-			if r02.InterNode.Equals(r01.InterNode) {
-				if pos[0] == 0 {
-					pos[0] = r0.End
-					pos[1] = r1.End
-					correlationNode0 = append(correlationNode0, r0.InterNode)
-					correlationNode1 = append(correlationNode1, r1.InterNode)
-				}
-				if r0.Pos == r01.Pos || r1.Pos == r11.Pos {
-					if i < len(ii.result0)-3 {
-						i++
-					}
-				}
-				continue
-			}
-		}
-		if pos[0] == 0 {
-			pos[0] = r0.End
-			pos[1] = r1.End
-			correlationNode0 = append(correlationNode0, r0.InterNode)
-			correlationNode1 = append(correlationNode1, r1.InterNode)
-		}
-		endNode0 := r0.InterNode
-		endNode1 := r1.InterNode
-		pos1[0] = r0.End
-		pos1[1] = r1.End
-		if i < len(ii.result0)-2 {
-			r01 := ii.result0[i+1]
-			r11 := ii.result1[i+1]
-			pos1[0] = r01.End
-			pos1[1] = r11.End
-			endNode0 = r01.InterNode
-			endNode1 = r11.InterNode
-		}
-
-		for j := pos[0]; j < pos1[0]; j++ {
-			correlationNode0 = append(correlationNode0, ii.Edge[j])
-		}
-		correlationNode0 = append(correlationNode0, endNode0)
-		lines0 = append(lines0, correlationNode0)
-
-		for j := pos[1]; j < pos1[1]; j++ {
-			correlationNode1 = append(correlationNode1, ii.Edge1[j])
-		}
-		correlationNode1 = append(correlationNode1, endNode1)
-
-		lines1 = append(lines1, correlationNode1)
-		totalIps++
-		ips[0] = append(ips[0], r0)
-		ips[1] = append(ips[1], r1)
-
-		correlationNode0 = matrix.LineMatrix{}
-		correlationNode1 = matrix.LineMatrix{}
-
-	}
-
-	for i := 0; i < totalIps; i++ {
-
-		if !matrix.Matrix(lines0[i][0]).Equals(matrix.Matrix(lines0[i][len(lines0[i])-1])) {
-			resultCorr0 = append(resultCorr0,
-				&IntersectionCorrelationNode{ips[0][i].Pos, ips[0][i].InterNode, lines0[i]})
-		}
-		if !matrix.Matrix(lines0[i+1][0]).Equals(matrix.Matrix(lines0[i+1][len(lines0[i+1])-1])) {
-			resultCorr0 = append(resultCorr0,
-				&IntersectionCorrelationNode{ips[0][i].Pos, ips[0][i].InterNode, lines0[i+1]})
-		}
-
-		if !matrix.Matrix(lines1[i][0]).Equals(matrix.Matrix(lines1[i][len(lines1[i])-1])) {
-			resultCorr1 = append(resultCorr1,
-				&IntersectionCorrelationNode{ips[1][i].Pos, ips[1][i].InterNode, lines1[i]})
-		}
-		if !matrix.Matrix(lines1[i+1][0]).Equals(matrix.Matrix(lines1[i+1][len(lines1[i+1])-1])) {
-			resultCorr1 = append(resultCorr1,
-				&IntersectionCorrelationNode{ips[1][i].Pos, ips[1][i].InterNode, lines1[i+1]})
-		}
-	}
-
-	return CorrelationNodeResult{resultCorr0, resultCorr1}
+	return []IntersectionNodeOfLine{ii.result0, ii.result1}
 }
 
 // CorrelationNodeResult ...
-type CorrelationNodeResult [2][]*IntersectionCorrelationNode
+type CorrelationNodeResult [][]*IntersectionCorrelationNode
 
 // IntersectionCorrelationNode ...
 type IntersectionCorrelationNode struct {
-	Pos             int
+	//Pos             int
 	InterNode       matrix.Matrix
 	CorrelationNode matrix.LineMatrix
 }
 
 func (ic *IntersectionCorrelationNode) String() string {
-	return fmt.Sprintf("CorrelationNode{Pos:%v,InterNode:%v,CorrelationNode:%v}\n", ic.Pos, ic.InterNode, ic.CorrelationNode)
+	return fmt.Sprintf("CorrelationNode{InterNode:%v,CorrelationNode:%v}\n", ic.InterNode, ic.CorrelationNode)
 
 }
 
@@ -235,7 +123,10 @@ func (ic *IntersectionCorrelationNode) String() string {
 type IntersectionNodeResult struct {
 	Pos       int
 	End       int
-	InterNode matrix.Matrix
+	InterNode relate.IntersectionPoint
+	Line      matrix.LineSegment
+	OtherLine matrix.LineSegment
+	OtherEdge matrix.LineMatrix
 }
 
 // IntersectionNodeOfLine overlay point array.
@@ -248,6 +139,23 @@ func (ipl IntersectionNodeOfLine) Len() int {
 
 // Less ...
 func (ipl IntersectionNodeOfLine) Less(i, j int) bool {
+	if ipl[i].Pos == ipl[j].Pos {
+		line := ipl[i].Line
+		if line.P0 == nil {
+			return false
+		}
+		if tes, _ := line.P0.Compare(line.P1); tes > 0 {
+			if ipl[i].InterNode.Matrix[0] == ipl[j].InterNode.Matrix[0] {
+				return ipl[i].InterNode.Matrix[1] < ipl[j].InterNode.Matrix[1]
+			}
+			return ipl[i].InterNode.Matrix[0] < ipl[j].InterNode.Matrix[0]
+		}
+		if ipl[i].InterNode.Matrix[0] == ipl[j].InterNode.Matrix[0] {
+			return ipl[i].InterNode.Matrix[1] > ipl[j].InterNode.Matrix[1]
+		}
+		return ipl[i].InterNode.Matrix[0] > ipl[j].InterNode.Matrix[0]
+
+	}
 	return ipl[i].Pos < ipl[j].Pos
 }
 

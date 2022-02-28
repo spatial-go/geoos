@@ -7,13 +7,14 @@ import (
 	"github.com/spatial-go/geoos/algorithm/subdivision/quadedge"
 )
 
+// DefaultTolerance ...
 const DefaultTolerance = 0.000000001
 
 // Voronoi ...
 type Voronoi struct {
 	sites       []matrix.Matrix
 	envelope    *envelope.Envelope
-	subdivision *quadedge.QuadEdgeSubdivision
+	subdivision *quadedge.Subdivision
 	result      []matrix.PolygonMatrix
 }
 

@@ -7,11 +7,13 @@ import (
 	"github.com/spatial-go/geoos/algorithm/matrix"
 )
 
+// CoordType Transformer
 const (
 	MERCATORTOLL = "MERCATORTOLL"
 	LLTOMERCATOR = "LLTOMERCATOR"
 )
 
+// Transformer ...
 type Transformer struct {
 	CoordType string
 }

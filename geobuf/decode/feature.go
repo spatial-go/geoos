@@ -6,9 +6,10 @@ import (
 	geoos "github.com/spatial-go/geoos/space"
 )
 
-func DecodeFeature(data *proto.Data, feature *proto.Data_Feature) *geojson.Feature {
+// Feature ...
+func Feature(data *proto.Data, feature *proto.Data_Feature) *geojson.Feature {
 	geo := feature.Geometry
-	decodedGeo := DecodeGeometry(geo, data.Precision, data.Dimensions)
+	decodedGeo := Geometry(geo, data.Precision, data.Dimensions)
 	var geoFeature *geojson.Feature
 	switch decodedGeo.Type {
 	case geoos.TypeCollection:
