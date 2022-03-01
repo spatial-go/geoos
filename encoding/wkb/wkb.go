@@ -375,6 +375,7 @@ func GeomFromWKBHexStr(wkbHex string) (space.Geometry, error) {
 	return g, nil
 }
 
+// GeomToWKBHexStr ...
 func GeomToWKBHexStr(geom space.Geometry) (wkbHex string, err error) {
 	buf := bytes.NewBuffer(make([]byte, 0, geomLength(geom)))
 

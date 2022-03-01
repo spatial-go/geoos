@@ -5,13 +5,16 @@ import (
 	"github.com/spatial-go/geoos/algorithm/matrix"
 )
 
+// TriangleVisitor ...
 type TriangleVisitor interface {
 	Visit(triEdges []*QuadEdge)
 }
 
+// TriangleCircumcentreVisitor ...
 type TriangleCircumcentreVisitor struct {
 }
 
+// Visit ...
 func (t *TriangleCircumcentreVisitor) Visit(triEdges []*QuadEdge) {
 	var (
 		a = triEdges[0].Origin()

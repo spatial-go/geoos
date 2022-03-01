@@ -5,10 +5,11 @@ import (
 	"github.com/spatial-go/geoos/geojson"
 )
 
-func EncodeFeatureCollection(g geojson.FeatureCollection, cfg *EncodingConfig) (*proto.Data_FeatureCollection, error) {
+// FeatureCollection ...
+func FeatureCollection(g geojson.FeatureCollection, cfg *EncodingConfig) (*proto.Data_FeatureCollection, error) {
 	features := make([]*proto.Data_Feature, len(g.Features))
 	for i, feature := range g.Features {
-		encoded, err := EncodeFeature(feature, cfg)
+		encoded, err := Feature(feature, cfg)
 		if err != nil {
 			return nil, err
 		}

@@ -7,6 +7,7 @@ import (
 	"github.com/spatial-go/geoos/geobuf/proto"
 )
 
+// EncodeValue ...
 func EncodeValue(val interface{}) (*proto.Data_Value, error) {
 	v := reflect.ValueOf(val)
 	return encodeValue(v, val)

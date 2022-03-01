@@ -2,10 +2,13 @@ package planar
 
 import (
 	"github.com/spatial-go/geoos/space"
+	"github.com/spatial-go/geoos/space/topograph"
 )
 
 // megrezAlgorithm algorithm implement
-type megrezAlgorithm struct{}
+type megrezAlgorithm struct {
+	topog topograph.Relationship
+}
 
 // Equals returns TRUE if the given Geometries are "spatially equal".
 func (g *megrezAlgorithm) Equals(geom1, geom2 space.Geometry) (bool, error) {

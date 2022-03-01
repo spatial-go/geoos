@@ -10,7 +10,7 @@ import (
 type DelaunayTriangulation struct {
 	sites       []matrix.Matrix
 	sitesEnv    *envelope.Envelope
-	subdivision *quadedge.QuadEdgeSubdivision
+	subdivision *quadedge.Subdivision
 }
 
 func (d *DelaunayTriangulation) computeEnvelope() {
@@ -31,7 +31,7 @@ func (d *DelaunayTriangulation) create() {
 }
 
 // Subdivision ...
-func (d *DelaunayTriangulation) Subdivision() *quadedge.QuadEdgeSubdivision {
+func (d *DelaunayTriangulation) Subdivision() *quadedge.Subdivision {
 	d.create()
 	return d.subdivision
 }

@@ -350,11 +350,12 @@ func (p *Parser) parseGeometryCollection() (coll space.Collection, err error) {
 func (p *Parser) parseGeometryCollectionText(ttype tokenType) (coll space.Collection, err error) {
 	coll = make(space.Collection, 0)
 	for {
-		if geom, err := p.Parse(); err != nil {
+		geom, err := p.Parse()
+		if err != nil {
 			return coll, err
-		} else {
-			coll = append(coll, geom)
 		}
+		coll = append(coll, geom)
+
 		t, err := p.scanToken()
 		if err != nil {
 			return coll, err

@@ -5,11 +5,13 @@ import (
 	"github.com/spatial-go/geoos/algorithm/subdivision/quadedge"
 )
 
+// IncrementalDelaunayTriangulator ...
 type IncrementalDelaunayTriangulator struct {
-	subdivision *quadedge.QuadEdgeSubdivision
+	subdivision *quadedge.Subdivision
 }
 
-func NewIncrementalDelaunayTriangulator(subdivision *quadedge.QuadEdgeSubdivision) *IncrementalDelaunayTriangulator {
+// NewIncrementalDelaunayTriangulator ...
+func NewIncrementalDelaunayTriangulator(subdivision *quadedge.Subdivision) *IncrementalDelaunayTriangulator {
 	return &IncrementalDelaunayTriangulator{
 		subdivision: subdivision,
 	}

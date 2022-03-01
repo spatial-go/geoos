@@ -8,7 +8,8 @@ import (
 	geoos "github.com/spatial-go/geoos/space"
 )
 
-func EncodeGeometry(g *geojson.Geometry, cfg *EncodingConfig) *proto.Data_Geometry {
+// Geometry ...
+func Geometry(g *geojson.Geometry, cfg *EncodingConfig) *proto.Data_Geometry {
 	switch g.Type {
 	case geoos.TypePoint:
 		p := g.Coordinates.(geoos.Point)

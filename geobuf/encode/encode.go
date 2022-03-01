@@ -6,15 +6,17 @@ import (
 	"github.com/spatial-go/geoos/geojson"
 )
 
+// Encode ...
 func Encode(obj interface{}) *proto.Data {
-	data, err := EncodeWithOptions(obj, FromAnalysis(obj))
+	data, err := WithOptions(obj, FromAnalysis(obj))
 	if err != nil {
 		panic(err)
 	}
 	return data
 }
 
-func EncodeWithOptions(obj interface{}, opts ...EncodingOption) (*proto.Data, error) {
+// WithOptions ...
+func WithOptions(obj interface{}, opts ...EncodingOption) (*proto.Data, error) {
 	cfg := &EncodingConfig{
 		Dimension: 2,
 		Precision: 100,
@@ -32,7 +34,7 @@ func EncodeWithOptions(obj interface{}, opts ...EncodingOption) (*proto.Data, er
 
 	switch t := obj.(type) {
 	case *geojson.FeatureCollection:
-		collection, err := EncodeFeatureCollection(*t, cfg)
+		collection, err := FeatureCollection(*t, cfg)
 		if err != nil {
 			return nil, err
 		}
@@ -40,7 +42,7 @@ func EncodeWithOptions(obj interface{}, opts ...EncodingOption) (*proto.Data, er
 			FeatureCollection: collection,
 		}
 	case *geojson.Feature:
-		feature, err := EncodeFeature(t, cfg)
+		feature, err := Feature(t, cfg)
 		if err != nil {
 			return nil, err
 		}
@@ -49,7 +51,7 @@ func EncodeWithOptions(obj interface{}, opts ...EncodingOption) (*proto.Data, er
 		}
 	case *geojson.Geometry:
 		data.DataType = &proto.Data_Geometry_{
-			Geometry: EncodeGeometry(t, cfg),
+			Geometry: Geometry(t, cfg),
 		}
 	}
 

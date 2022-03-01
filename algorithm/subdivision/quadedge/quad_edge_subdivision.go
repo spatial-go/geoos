@@ -10,9 +10,11 @@ import (
 	"github.com/spatial-go/geoos/utils"
 )
 
+// EdgeCoincidenceTolFactor ...
 const EdgeCoincidenceTolFactor = 1000
 
-type QuadEdgeSubdivision struct {
+// Subdivision ...
+type Subdivision struct {
 	tolerance                float64
 	edgeCoincidenceTolerance float64
 	quadEdge                 *QuadEdge
@@ -25,8 +27,9 @@ type QuadEdgeSubdivision struct {
 	visitedKey               int
 }
 
-func NewQuadEdgeSubdivision(env *envelope.Envelope, tolerance float64) *QuadEdgeSubdivision {
-	q := &QuadEdgeSubdivision{}
+// NewQuadEdgeSubdivision ...
+func NewQuadEdgeSubdivision(env *envelope.Envelope, tolerance float64) *Subdivision {
+	q := &Subdivision{}
 	q.triEdges = make([]*QuadEdge, 3, 3)
 	q.tolerance = tolerance
 	q.edgeCoincidenceTolerance = tolerance / EdgeCoincidenceTolFactor
@@ -36,7 +39,7 @@ func NewQuadEdgeSubdivision(env *envelope.Envelope, tolerance float64) *QuadEdge
 	return q
 }
 
-func (q *QuadEdgeSubdivision) createFrame(env *envelope.Envelope) {
+func (q *Subdivision) createFrame(env *envelope.Envelope) {
 	var (
 		deltaX = env.Width()
 		deltaY = env.Height()
@@ -56,13 +59,14 @@ func (q *QuadEdgeSubdivision) createFrame(env *envelope.Envelope) {
 	q.frameEnv.ExpandToIncludeMatrix(q.frameVertex[2])
 }
 
-func (q *QuadEdgeSubdivision) MakeEdge(o matrix.Matrix, d matrix.Matrix) *QuadEdge {
+// MakeEdge ...
+func (q *Subdivision) MakeEdge(o matrix.Matrix, d matrix.Matrix) *QuadEdge {
 	qe := NewQuadEdge(o, d)
 	q.quadEdgeList = append(q.quadEdgeList, qe)
 	return qe
 }
 
-func (q *QuadEdgeSubdivision) initSubdivision() {
+func (q *Subdivision) initSubdivision() {
 	var (
 		ea = q.MakeEdge(q.frameVertex[0], q.frameVertex[1])
 		eb = q.MakeEdge(q.frameVertex[1], q.frameVertex[2])
@@ -74,13 +78,15 @@ func (q *QuadEdgeSubdivision) initSubdivision() {
 	q.startingEdge = ea
 }
 
-func (q *QuadEdgeSubdivision) Connect(a *QuadEdge, b *QuadEdge) *QuadEdge {
+// Connect ...
+func (q *Subdivision) Connect(a *QuadEdge, b *QuadEdge) *QuadEdge {
 	e := Connect(a, b)
 	q.quadEdgeList = append(q.quadEdgeList, e)
 	return e
 }
 
-func (q *QuadEdgeSubdivision) Delete(e *QuadEdge) {
+// Delete ...
+func (q *Subdivision) Delete(e *QuadEdge) {
 	Splice(e, e.OPrev())
 	Splice(e.Sym(), e.Sym().OPrev())
 	var (
@@ -100,7 +106,7 @@ func (q *QuadEdgeSubdivision) Delete(e *QuadEdge) {
 	eRotSym.rot = nil
 }
 
-func (q *QuadEdgeSubdivision) removeEdge(e *QuadEdge) {
+func (q *Subdivision) removeEdge(e *QuadEdge) {
 	var (
 		index = -1
 	)
@@ -116,16 +122,19 @@ func (q *QuadEdgeSubdivision) removeEdge(e *QuadEdge) {
 	q.quadEdgeList = append(q.quadEdgeList[:index], q.quadEdgeList[index+1:]...)
 }
 
-func (q *QuadEdgeSubdivision) IsVertexOfEdge(e *QuadEdge, v matrix.Matrix) bool {
+// IsVertexOfEdge ...
+func (q *Subdivision) IsVertexOfEdge(e *QuadEdge, v matrix.Matrix) bool {
 	return (v.EqualsExact(e.Origin(), q.tolerance)) || (v.EqualsExact(e.Destination(), q.tolerance))
 }
 
-func (q *QuadEdgeSubdivision) IsOnEdge(e *QuadEdge, p matrix.Matrix) bool {
+// IsOnEdge ...
+func (q *Subdivision) IsOnEdge(e *QuadEdge, p matrix.Matrix) bool {
 	dist := measure.PlanarDistance(p, matrix.LineMatrix{e.Origin(), e.Destination()})
 	return dist < q.edgeCoincidenceTolerance
 }
 
-func (q *QuadEdgeSubdivision) IsFrameVertex(v matrix.Matrix) bool {
+// IsFrameVertex ...
+func (q *Subdivision) IsFrameVertex(v matrix.Matrix) bool {
 	if v.Equals(q.frameVertex[0]) {
 		return true
 	} else if v.Equals(q.frameVertex[1]) {
@@ -136,8 +145,8 @@ func (q *QuadEdgeSubdivision) IsFrameVertex(v matrix.Matrix) bool {
 	return false
 }
 
-func (q *QuadEdgeSubdivision) getPrimaryEdges(includeFrame bool) []*QuadEdge {
-	q.visitedKey += 1
+func (q *Subdivision) getPrimaryEdges(includeFrame bool) []*QuadEdge {
+	q.visitedKey++
 
 	var (
 		edges        = make([]*QuadEdge, 0, 0)
@@ -166,11 +175,11 @@ func (q *QuadEdgeSubdivision) getPrimaryEdges(includeFrame bool) []*QuadEdge {
 }
 
 // IsFrameEdge whether a QuadEdge is an edge incident on a frame triangle vertex
-func (q *QuadEdgeSubdivision) IsFrameEdge(e *QuadEdge) bool {
+func (q *Subdivision) IsFrameEdge(e *QuadEdge) bool {
 	return (q.IsFrameVertex(e.Origin())) || (q.IsFrameVertex(e.Destination()))
 }
 
-func (q *QuadEdgeSubdivision) getVertexUniqueEdges(includeFrame bool) []*QuadEdge {
+func (q *Subdivision) getVertexUniqueEdges(includeFrame bool) []*QuadEdge {
 	var (
 		edges           []*QuadEdge
 		visitedVertices = make(map[string]struct{})
@@ -198,7 +207,7 @@ func (q *QuadEdgeSubdivision) getVertexUniqueEdges(includeFrame bool) []*QuadEdg
 	return edges
 }
 
-func (q *QuadEdgeSubdivision) locateFromEdge(v matrix.Matrix, startEdge *QuadEdge) (*QuadEdge, error) {
+func (q *Subdivision) locateFromEdge(v matrix.Matrix, startEdge *QuadEdge) (*QuadEdge, error) {
 	var (
 		iter    = 0
 		maxIter = len(q.quadEdgeList)
@@ -228,8 +237,8 @@ func (q *QuadEdgeSubdivision) locateFromEdge(v matrix.Matrix, startEdge *QuadEdg
 	return qe, nil
 }
 
-func (q *QuadEdgeSubdivision) visitTriangles(triVisitor TriangleVisitor, includeFrame bool) {
-	q.visitedKey += 1
+func (q *Subdivision) visitTriangles(triVisitor TriangleVisitor, includeFrame bool) {
+	q.visitedKey++
 	var (
 		edgeStack    = utils.NewStack()
 		visitedEdges = make(map[*QuadEdge]struct{})
@@ -247,7 +256,7 @@ func (q *QuadEdgeSubdivision) visitTriangles(triVisitor TriangleVisitor, include
 	}
 }
 
-func (q *QuadEdgeSubdivision) fetchTriangleToVisit(edge *QuadEdge, edgeStack *utils.Stack, includeFrame bool,
+func (q *Subdivision) fetchTriangleToVisit(edge *QuadEdge, edgeStack *utils.Stack, includeFrame bool,
 	visitedEdges map[*QuadEdge]struct{}) []*QuadEdge {
 	var (
 		curr      = edge
@@ -272,20 +281,20 @@ func (q *QuadEdgeSubdivision) fetchTriangleToVisit(edge *QuadEdge, edgeStack *ut
 
 		visitedEdges[curr] = struct{}{}
 
-		edgeCount += 1
+		edgeCount++
 		curr = curr.LNext()
 		done = true
 	}
 
 	if isFrame && !includeFrame {
 		return nil
-	} else {
-		return q.triEdges
 	}
+	return q.triEdges
+
 }
 
 // GetVoronoiCellPolygons ...
-func (q *QuadEdgeSubdivision) GetVoronoiCellPolygons() []matrix.PolygonMatrix {
+func (q *Subdivision) GetVoronoiCellPolygons() []matrix.PolygonMatrix {
 	q.visitTriangles(&TriangleCircumcentreVisitor{}, true)
 
 	var (
@@ -322,14 +331,17 @@ func getVoronoiCellPolygon(qe *QuadEdge) matrix.PolygonMatrix {
 	return cellPoly
 }
 
-func (q *QuadEdgeSubdivision) Locate(v matrix.Matrix) *QuadEdge {
+// Locate ...
+func (q *Subdivision) Locate(v matrix.Matrix) *QuadEdge {
 	return q.locator.locate(v)
 }
 
-func (q *QuadEdgeSubdivision) Edges() []*QuadEdge {
+// Edges ...
+func (q *Subdivision) Edges() []*QuadEdge {
 	return q.quadEdgeList
 }
 
-func (q *QuadEdgeSubdivision) SetEdges(edges []*QuadEdge) {
+// SetEdges ...
+func (q *Subdivision) SetEdges(edges []*QuadEdge) {
 	q.quadEdgeList = edges
 }

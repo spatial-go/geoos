@@ -29,10 +29,84 @@ type Steric interface {
 	// IsEmpty returns true if the Matrix is empty.
 	IsEmpty() bool
 
-	Bound() []Matrix
+	Bound() Bound
 
 	// Filter Performs an operation with the provided .
 	Filter(f Filter) Steric
+}
+
+// A Bound represents a closed box or rectangle.
+// To create a bound with two points you can do something like:
+// MultiPoint{p1, p2}.Bound()
+type Bound []Matrix
+
+// Equals checks if the Bound represents the same Geometry or vector.
+func (b Bound) Equals(g Bound) bool {
+	return b[0].Equals(g[0]) && b[1].Equals(g[1])
+}
+
+// IsEmpty returns true if it contains zero area or if
+// it's in some malformed negative state where the left point is larger than the right.
+// This can be caused by padding too much negative.
+func (b Bound) IsEmpty() bool {
+	if b == nil || len(b) < 2 || b[0] == nil || b[1] == nil {
+		return true
+	}
+	return b[0][0] > b[1][0] || b[0][1] > b[1][1]
+}
+
+// ToRing converts the bound into a loop defined
+// by the boundary of the box.
+func (b Bound) ToRing() LineMatrix {
+	return LineMatrix{
+		b[0],
+		{b[1][0], b[0][1]},
+		b[1],
+		{b[0][0], b[1][1]},
+		b[0],
+	}
+}
+
+// ToPolygon converts the bound into a Polygon object.
+func (b Bound) ToPolygon() PolygonMatrix {
+	return PolygonMatrix{b.ToRing()}
+}
+
+// Contains determines if the point is within the bound.
+// Points on the boundary are considered within.
+func (b Bound) Contains(m Matrix) bool {
+	if m[1] < b[0][1] || b[1][1] < m[1] {
+		return false
+	}
+
+	if m[0] < b[0][0] || b[1][0] < m[0] {
+		return false
+	}
+
+	return true
+}
+
+// ContainsBound determines if the bound is within the bound.
+func (b Bound) ContainsBound(bound Bound) bool {
+	if b.IsEmpty() || bound.IsEmpty() {
+		return false
+	}
+	return bound[0][0] >= b[0][0] &&
+		bound[1][0] <= b[1][0] &&
+		bound[0][1] >= b[0][1] &&
+		bound[1][1] <= b[1][1]
+}
+
+// IntersectsBound Tests if the region defined by other
+// intersects the region of this Envelope.
+func (b Bound) IntersectsBound(other Bound) bool {
+	if b.IsEmpty() || other.IsEmpty() {
+		return false
+	}
+	return !(other[0][0] > b[1][0] ||
+		other[1][0] < b[0][0] ||
+		other[0][1] > b[1][1] ||
+		other[1][1] < b[0][1])
 }
 
 // Matrix is a one-dimensional matrix.
@@ -60,7 +134,7 @@ func (m Matrix) IsEmpty() bool {
 }
 
 // Bound returns a single point bound of the point.
-func (m Matrix) Bound() []Matrix {
+func (m Matrix) Bound() Bound {
 	return []Matrix{m, m}
 }
 

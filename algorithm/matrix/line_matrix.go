@@ -44,7 +44,7 @@ func (l LineMatrix) IsEmpty() bool {
 }
 
 // Bound returns a rect around the line string. Uses rectangular coordinates.
-func (l LineMatrix) Bound() []Matrix {
+func (l LineMatrix) Bound() Bound {
 	if len(l) == 0 {
 		return []Matrix{}
 	}
@@ -118,6 +118,14 @@ func (l LineMatrix) Filter(f Filter) Steric {
 			l = append(l, v)
 		}
 		return l
+	}
+	return l
+}
+
+// Reverse  this LineMatrix.
+func (l LineMatrix) Reverse() LineMatrix {
+	for i, j := 0, len(l)-1; i < j; i, j = i+1, j-1 {
+		l[i], l[j] = l[j], l[i]
 	}
 	return l
 }

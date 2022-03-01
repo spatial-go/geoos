@@ -2,6 +2,8 @@ package planar
 
 import (
 	"sync"
+
+	"github.com/spatial-go/geoos/space/topograph"
 )
 
 var algorithmMegrez Algorithm
@@ -22,7 +24,7 @@ func GetStrategy(f newAlgorithm) Algorithm {
 // NewMegrezAlgorithm returns Algorithm that is MegrezAlgorithm.
 func NewMegrezAlgorithm() Algorithm {
 	once.Do(func() {
-		algorithmMegrez = &megrezAlgorithm{}
+		algorithmMegrez = &megrezAlgorithm{topograph.NormalRelationship()}
 	})
 	return algorithmMegrez
 }

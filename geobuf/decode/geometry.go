@@ -9,7 +9,8 @@ import (
 	geoos "github.com/spatial-go/geoos/space"
 )
 
-func DecodeGeometry(geo *proto.Data_Geometry, precision, dimensions uint32) *geojson.Geometry {
+// Geometry ...
+func Geometry(geo *proto.Data_Geometry, precision, dimensions uint32) *geojson.Geometry {
 	switch geo.Type {
 	case proto.Data_Geometry_POINT:
 		return geojson.NewGeometry(makePoint(geo.Coords, precision))
@@ -46,11 +47,11 @@ func makeMultiPolygon(lengths []uint32, inCords []int64, precision uint32, dimen
 	polyCount := int(lengths[0])
 	polygons := make([]geoos.Polygon, polyCount)
 	lengths = lengths[1:]
-	for i := 0; i < polyCount; i += 1 {
+	for i := 0; i < polyCount; i++ {
 		ringCount := lengths[0]
 		polygons[i] = makePolygon(lengths[1:ringCount+1], inCords, precision, dimension)
 		skip := 0
-		for i := 0; i < int(ringCount); i += 1 {
+		for i := 0; i < int(ringCount); i++ {
 			skip += int(lengths[i]) * int(dimension)
 		}
 

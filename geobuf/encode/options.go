@@ -6,32 +6,38 @@ import (
 	geoos "github.com/spatial-go/geoos/space"
 )
 
+// EncodingConfig ...
 type EncodingConfig struct {
 	Dimension uint
 	Precision uint
 	Keys      utils.KeyStore
 }
 
+// EncodingOption ...
 type EncodingOption func(o *EncodingConfig)
 
+// WithPrecision ...
 func WithPrecision(precision uint) EncodingOption {
 	return func(o *EncodingConfig) {
 		o.Precision = uint(utils.DecodePrecision(uint32(precision)))
 	}
 }
 
+// WithDimension ...
 func WithDimension(dimension uint) EncodingOption {
 	return func(o *EncodingConfig) {
 		o.Dimension = dimension
 	}
 }
 
+// WithKeyStore ...
 func WithKeyStore(store utils.KeyStore) EncodingOption {
 	return func(o *EncodingConfig) {
 		o.Keys = store
 	}
 }
 
+// FromAnalysis ...
 func FromAnalysis(obj interface{}) EncodingOption {
 	return func(o *EncodingConfig) {
 		analyze(obj, o)
@@ -47,7 +53,7 @@ func analyze(obj interface{}, opts *EncodingConfig) {
 		}
 	case *geojson.Feature:
 		analyze(geojson.NewGeometry(t.Geometry.Geometry()), opts)
-		for key, _ := range t.Properties {
+		for key := range t.Properties {
 			opts.Keys.Add(key)
 		}
 	case *geojson.Geometry:

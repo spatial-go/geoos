@@ -2,16 +2,19 @@ package quadedge
 
 import "github.com/spatial-go/geoos/algorithm/matrix"
 
+// Locator ...
 type Locator interface {
 	locate(v matrix.Matrix) *QuadEdge
 }
 
+// LastFoundQuadEdgeLocator ...
 type LastFoundQuadEdgeLocator struct {
-	subdivision *QuadEdgeSubdivision
+	subdivision *Subdivision
 	lastEdge    *QuadEdge
 }
 
-func NewLastFoundQuadEdgeLocator(subdivision *QuadEdgeSubdivision) *LastFoundQuadEdgeLocator {
+// NewLastFoundQuadEdgeLocator ...
+func NewLastFoundQuadEdgeLocator(subdivision *Subdivision) *LastFoundQuadEdgeLocator {
 	locator := &LastFoundQuadEdgeLocator{subdivision: subdivision}
 	locator.init()
 	return locator
