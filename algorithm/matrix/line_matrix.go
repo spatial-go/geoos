@@ -44,7 +44,7 @@ func (l LineMatrix) IsEmpty() bool {
 }
 
 // Bound returns a rect around the line string. Uses rectangular coordinates.
-func (l LineMatrix) Bound() []Matrix {
+func (l LineMatrix) Bound() Bound {
 	if len(l) == 0 {
 		return []Matrix{}
 	}

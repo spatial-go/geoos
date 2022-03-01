@@ -10,6 +10,37 @@ func (r *Relationship) lineAnalyse(pointInPolygon, entityInPolygon int) {
 	switch r.Arg[1].(type) {
 	case matrix.LineMatrix:
 		switch {
+		case r.pNum == 2 && r.lNum == 1 && r.maxDlLine == 6:
+			r.relationshipSymbol = RLL3
+		case r.pNum == 2 && r.lNum == 1 && r.maxDlLine == 5:
+			r.relationshipSymbol = RLL8
+		case r.pNum == 2 && r.lNum == 1 && r.maxDlLine == 4:
+			r.relationshipSymbol = RLL10
+		case r.pNum == 2 && r.lNum == 1 && r.maxDlLine == 1:
+			r.relationshipSymbol = RLL25
+		case r.pNum == 2 && r.lNum == 1 && r.maxDlLine == 3:
+			r.relationshipSymbol = RLL26
+		case r.pNum == 2 && r.lNum == 1 && r.maxDlLine == 2:
+			r.relationshipSymbol = RLL30
+
+		// TODO two case is the same
+		case r.pNum == 3 && r.lNum == 1 && r.maxDlLine == 5 && r.maxDlPoint == 3:
+			r.relationshipSymbol = RLL9
+		case r.pNum == 3 && r.lNum == 1 && r.maxDlLine == 5 && r.maxDlPoint == 3:
+			r.relationshipSymbol = RLL18
+		case r.pNum == 3 && r.lNum == 1 && r.maxDlLine == 3 && r.maxDlPoint == 2:
+			r.relationshipSymbol = RLL24
+		case r.pNum == 3 && r.lNum == 1 && r.maxDlLine == 3 && r.maxDlPoint == 3:
+			r.relationshipSymbol = RLL29
+
+		case r.pNum == 4 && r.lNum == 1 && r.maxDlLine == 5:
+			r.relationshipSymbol = RLL19
+		case r.pNum == 4 && r.lNum == 1 && r.maxDlLine == 3:
+			r.relationshipSymbol = RLL33
+
+		case r.pNum >= 5 && r.lNum == 1 && r.maxDlLine == 5:
+			r.relationshipSymbol = RLL17
+
 		case r.pNum == 1 && r.lNum == 0 && r.maxDlPoint == 4:
 			r.relationshipSymbol = RLL2
 		case r.pNum == 1 && r.lNum == 0 && r.maxDlPoint == 3:
@@ -54,42 +85,44 @@ func (r *Relationship) lineAnalyse(pointInPolygon, entityInPolygon int) {
 			r.relationshipSymbol = RLL16
 		case r.pNum == 4 && r.lNum == 0 && r.maxDlPoint == 4 && r.sumDlPoint == 12:
 			r.relationshipSymbol = RLL32
-		case r.pNum == 5 && r.lNum == 0 && r.maxDlPoint == 4:
+		case r.pNum >= 5 && r.lNum == 0 && r.maxDlPoint == 4:
 			r.relationshipSymbol = RLL14
-
-		case r.pNum == 2 && r.lNum == 1 && r.maxDlLine == 6:
-			r.relationshipSymbol = RLL3
-		case r.pNum == 2 && r.lNum == 1 && r.maxDlLine == 5:
-			r.relationshipSymbol = RLL8
-		case r.pNum == 2 && r.lNum == 1 && r.maxDlLine == 4:
-			r.relationshipSymbol = RLL10
-		case r.pNum == 2 && r.lNum == 1 && r.maxDlLine == 1:
-			r.relationshipSymbol = RLL25
-		case r.pNum == 2 && r.lNum == 1 && r.maxDlLine == 3:
-			r.relationshipSymbol = RLL26
-		case r.pNum == 2 && r.lNum == 1 && r.maxDlLine == 2:
-			r.relationshipSymbol = RLL30
-
-		// TODO two case is the same
-		case r.pNum == 3 && r.lNum == 1 && r.maxDlLine == 5 && r.maxDlPoint == 3:
-			r.relationshipSymbol = RLL9
-		case r.pNum == 3 && r.lNum == 1 && r.maxDlLine == 5 && r.maxDlPoint == 3:
-			r.relationshipSymbol = RLL18
-		case r.pNum == 3 && r.lNum == 1 && r.maxDlLine == 3 && r.maxDlPoint == 2:
-			r.relationshipSymbol = RLL24
-		case r.pNum == 3 && r.lNum == 1 && r.maxDlLine == 3 && r.maxDlPoint == 3:
-			r.relationshipSymbol = RLL29
-
-		case r.pNum == 4 && r.lNum == 1 && r.maxDlLine == 5:
-			r.relationshipSymbol = RLL19
-		case r.pNum == 4 && r.lNum == 1 && r.maxDlLine == 3:
-			r.relationshipSymbol = RLL33
-
-		case r.pNum == 5 && r.lNum == 1 && r.maxDlLine == 5:
-			r.relationshipSymbol = RLL17
 		}
 	case matrix.PolygonMatrix:
 		switch {
+		case r.pNum == 2 && r.lNum >= 1 && r.maxDlLine == 6 && pointInPolygon == OnlyOutPolygon:
+			r.relationshipSymbol = RLA4
+		case r.pNum == 2 && r.lNum >= 1 && r.maxDlLine == 6 && pointInPolygon == OnlyInPolygon:
+			r.relationshipSymbol = RLA6
+		case r.pNum == 2 && r.lNum >= 1 && r.maxDlLine == 6 && pointInPolygon == BothPolygon:
+			r.relationshipSymbol = RLA12
+		case r.pNum == 2 && r.lNum >= 1 && r.maxDlLine == 4:
+			r.relationshipSymbol = RLA24
+		case r.pNum == 2 && r.lNum >= 1 && r.maxDlLine == 5 && entityInPolygon == OnlyOutPolygon:
+			r.relationshipSymbol = RLA26
+		case r.pNum == 2 && r.lNum >= 1 && r.maxDlLine == 5 && pointInPolygon == OnlyInPolygon:
+			r.relationshipSymbol = RLA30
+
+		case r.pNum == 3 && r.lNum >= 1 && r.maxDlLine == 6 && r.maxDlPoint == 4 && pointInPolygon == OnlyOutPolygon:
+			r.relationshipSymbol = RLA10
+		case r.pNum == 3 && r.lNum >= 1 && r.maxDlLine == 6 && r.maxDlPoint == 4 && pointInPolygon == OnlyInPolygon:
+			r.relationshipSymbol = RLA11
+		case r.pNum == 3 && r.lNum >= 1 && r.maxDlLine == 6 && r.maxDlPoint == 3:
+			r.relationshipSymbol = RLA18
+		case r.pNum == 3 && r.lNum >= 1 && r.maxDlLine == 5 && r.maxDlPoint == 3:
+			r.relationshipSymbol = RLA25
+		case r.pNum == 3 && r.lNum >= 1 && r.maxDlLine == 5 && r.maxDlPoint == 3:
+			r.relationshipSymbol = RLA27
+		case r.pNum == 3 && r.lNum >= 1 && r.maxDlLine == 5 && r.maxDlPoint == 4 && pointInPolygon == OnlyOutPolygon:
+			r.relationshipSymbol = RLA29
+		case r.pNum == 3 && r.lNum >= 1 && r.maxDlLine == 5 && r.maxDlPoint == 4 && pointInPolygon == OnlyInPolygon:
+			r.relationshipSymbol = RLA31
+
+		case r.pNum >= 4 && r.lNum >= 1 && r.maxDlLine == 6:
+			r.relationshipSymbol = RLA17
+		case r.pNum >= 4 && r.lNum >= 1 && r.maxDlLine == 5:
+			r.relationshipSymbol = RLA28
+
 		case r.pNum == 1 && r.lNum == 0 && r.maxDlPoint == 3 && pointInPolygon == OnlyOutPolygon:
 			r.relationshipSymbol = RLA3
 		case r.pNum == 1 && r.lNum == 0 && r.maxDlPoint == 3 && pointInPolygon == OnlyInPolygon:
@@ -116,43 +149,11 @@ func (r *Relationship) lineAnalyse(pointInPolygon, entityInPolygon int) {
 		case r.pNum == 2 && r.lNum == 0 && r.maxDlPoint == 3 && entityInPolygon == OnlyInPolygon:
 			r.relationshipSymbol = RLA16
 
-		case r.pNum == 3 && r.lNum == 0 && r.maxDlPoint == 4 && entityInPolygon == OnlyInPolygon:
+		case r.pNum >= 3 && r.lNum == 0 && r.maxDlPoint == 4 && entityInPolygon == OnlyInPolygon:
 			r.relationshipSymbol = RLA19
-		case r.pNum == 3 && r.lNum == 0 && r.maxDlPoint == 4 && entityInPolygon == OnlyOutPolygon:
+		case r.pNum >= 3 && r.lNum == 0 && r.maxDlPoint == 4 && entityInPolygon == OnlyOutPolygon:
 			r.relationshipSymbol = RLA20
 
-		case r.pNum == 2 && r.lNum == 1 && r.maxDlLine == 6 && pointInPolygon == OnlyOutPolygon:
-			r.relationshipSymbol = RLA4
-		case r.pNum == 2 && r.lNum == 1 && r.maxDlLine == 6 && pointInPolygon == OnlyInPolygon:
-			r.relationshipSymbol = RLA6
-		case r.pNum == 2 && r.lNum == 1 && r.maxDlLine == 6 && pointInPolygon == BothPolygon:
-			r.relationshipSymbol = RLA12
-		case r.pNum == 2 && r.lNum == 1 && r.maxDlLine == 4:
-			r.relationshipSymbol = RLA24
-		case r.pNum == 2 && r.lNum == 1 && r.maxDlLine == 5 && entityInPolygon == OnlyOutPolygon:
-			r.relationshipSymbol = RLA26
-		case r.pNum == 2 && r.lNum == 1 && r.maxDlLine == 5 && pointInPolygon == OnlyInPolygon:
-			r.relationshipSymbol = RLA30
-
-		case r.pNum == 3 && r.lNum == 1 && r.maxDlLine == 6 && r.maxDlPoint == 4 && pointInPolygon == OnlyOutPolygon:
-			r.relationshipSymbol = RLA10
-		case r.pNum == 3 && r.lNum == 1 && r.maxDlLine == 6 && r.maxDlPoint == 4 && pointInPolygon == OnlyInPolygon:
-			r.relationshipSymbol = RLA11
-		case r.pNum == 3 && r.lNum == 1 && r.maxDlLine == 6 && r.maxDlPoint == 3:
-			r.relationshipSymbol = RLA18
-		case r.pNum == 3 && r.lNum == 1 && r.maxDlLine == 5 && r.maxDlPoint == 3:
-			r.relationshipSymbol = RLA25
-		case r.pNum == 3 && r.lNum == 1 && r.maxDlLine == 5 && r.maxDlPoint == 3:
-			r.relationshipSymbol = RLA27
-		case r.pNum == 3 && r.lNum == 1 && r.maxDlLine == 5 && r.maxDlPoint == 4 && pointInPolygon == OnlyOutPolygon:
-			r.relationshipSymbol = RLA29
-		case r.pNum == 3 && r.lNum == 1 && r.maxDlLine == 5 && r.maxDlPoint == 4 && pointInPolygon == OnlyInPolygon:
-			r.relationshipSymbol = RLA31
-
-		case r.pNum == 4 && r.lNum == 1 && r.maxDlLine == 6:
-			r.relationshipSymbol = RLA17
-		case r.pNum == 4 && r.lNum == 1 && r.maxDlLine == 5:
-			r.relationshipSymbol = RLA28
 		}
 
 	}

@@ -1,7 +1,6 @@
 package matrix
 
 import (
-	"reflect"
 	"testing"
 )
 
@@ -18,7 +17,7 @@ func TestLineMatrix_Bound(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.l.Bound(); !reflect.DeepEqual(got, tt.want) {
+			if got := tt.l.Bound(); !got.Equals(tt.want) {
 				t.Errorf("LineMatrix.Bound() = %v, want %v", got, tt.want)
 			}
 		})

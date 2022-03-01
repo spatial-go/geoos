@@ -44,7 +44,7 @@ func (c Collection) IsEmpty() bool {
 }
 
 // Bound returns a bound around the Collection.
-func (c Collection) Bound() []Matrix {
+func (c Collection) Bound() Bound {
 	if len(c) == 0 {
 		return []Matrix{}
 	}

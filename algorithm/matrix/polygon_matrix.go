@@ -33,7 +33,7 @@ func (p PolygonMatrix) IsEmpty() bool {
 }
 
 // Bound returns a bound around the polygon.
-func (p PolygonMatrix) Bound() []Matrix {
+func (p PolygonMatrix) Bound() Bound {
 	if len(p) == 0 {
 		return []Matrix{}
 	}
@@ -62,7 +62,7 @@ func (m MultiPolygonMatrix) IsEmpty() bool {
 }
 
 // Bound returns a bound around the multi-polygon.
-func (m MultiPolygonMatrix) Bound() []Matrix {
+func (m MultiPolygonMatrix) Bound() Bound {
 	if len(m) == 0 {
 		return []Matrix{}
 	}
@@ -197,4 +197,40 @@ func (m MultiPolygonMatrix) Filter(f Filter) Steric {
 		_ = PolygonMatrix(v).Filter(f)
 	}
 	return m
+}
+
+// IsRectangle returns true if  the polygon is rectangle.
+func (p PolygonMatrix) IsRectangle() bool {
+
+	if p.IsEmpty() || len(p) > 1 {
+		return false
+	}
+	if len(p[0]) != 5 {
+		return false
+	}
+	// check vertices have correct values
+	for i := 0; i < 5; i++ {
+		x := p[0][i][0]
+		if !(x == p.Bound()[0][0] || x == p.Bound()[1][1]) {
+			return false
+		}
+		y := p[0][i][1]
+		if !(y == p.Bound()[0][1] || y == p.Bound()[1][1]) {
+			return false
+		}
+	}
+
+	// check vertices are in right order
+	for i := 0; i < 4; i++ {
+		x0 := p[0][i][0]
+		y0 := p[0][i][1]
+		x1 := p[0][i+1][0]
+		y1 := p[0][i+1][1]
+		xChanged := x0 != x1
+		yChanged := y0 != y1
+		if xChanged == yChanged {
+			return false
+		}
+	}
+	return true
 }
