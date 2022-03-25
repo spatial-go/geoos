@@ -87,7 +87,7 @@ func TestAlgorithm_Buffer(t *testing.T) {
 func TestAlgorithm_Centroid(t *testing.T) {
 	const multipoint = `MULTIPOINT ( -1 0, -1 2, -1 3, -1 4, -1 7, 0 1, 0 3, 1 1, 2 0, 6 0, 7 8, 9 8, 10 6 )`
 	geometry, _ := wkt.UnmarshalString(multipoint)
-	const pointresult = `SRID=104326;POINT(2.3076923076923075 3.3076923076923075)`
+	const pointresult = `POINT(2.3076923076923075 3.3076923076923075)`
 
 	type args struct {
 		g space.Geometry
@@ -334,7 +334,7 @@ func TestAlgorithm_Snap(t *testing.T) {
 
 func TestAlgorithm_UniquePoints(t *testing.T) {
 	const polygon = `POLYGON((0 0, 6 0, 6 6, 0 6, 0 0))`
-	const multipoint = `SRID=104326;MULTIPOINT((0 0),(6 0),(6 6),(0 6))`
+	const multipoint = `MULTIPOINT((0 0),(6 0),(6 6),(0 6))`
 
 	poly, _ := wkt.UnmarshalString(polygon)
 

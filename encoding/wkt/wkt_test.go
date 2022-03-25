@@ -17,7 +17,7 @@ func TestMarshalString(t *testing.T) {
 		want string
 	}{
 		{name: "marshal string", args: args{space.LineString{{50, 100}, {50, 200}}},
-			want: "SRID=104326;LINESTRING(50 100,50 200)",
+			want: "LINESTRING(50 100,50 200)",
 		},
 		{name: "marshal string coord", args: args{geomCoord},
 			want: "SRID=4326;LINESTRING(50 100,50 200)",
