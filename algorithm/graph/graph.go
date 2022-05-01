@@ -34,6 +34,12 @@ type Graph interface {
 	// Edges Returns edges.
 	Edges() []map[int]int
 
+	// Degree Returns degree of node.
+	Degree(index int) int
+
+	// Connected Returns degree of node.
+	Connected(index int) int
+
 	// AddNode add a node.
 	AddNode(n *Node)
 
@@ -278,6 +284,27 @@ func (g *MatrixGraph) Nodes() []*Node {
 // Edges Returns edges.
 func (g *MatrixGraph) Edges() []map[int]int {
 	return g.edges
+}
+
+// Degree Returns degree of node.
+func (g *MatrixGraph) Degree(index int) int {
+	return len(g.Edges()[index])
+}
+
+// Connected Returns num Connected of node.
+func (g *MatrixGraph) Connected(index int) int {
+	switch g.Nodes()[index].NodeType {
+	case PNode:
+		if g.Degree(index) == 0 {
+			return 0
+		}
+		return 1
+	default:
+		if g.Degree(index) == 2 {
+			return 2
+		}
+		return 1
+	}
 }
 
 // Union  Computes the Union of two Graph.

@@ -7,52 +7,25 @@ import (
 	"github.com/spatial-go/geoos/algorithm/relate"
 )
 
-// relation Symbol
-const (
-	Disjoint = iota + 1
-	Touch
-	Cross
-	Within
-	Overlap
-	Equal
-	Contain
-	Cover
-	CoveredBy
-)
-
-// edge cost
-const (
-	PointPoint = PNode + PNode
-	PointLine  = PNode + LNode
-	PointCLine = PNode + CNode
-	PointPoly  = PNode + ANode
-
-	LineLine  = LNode + LNode
-	LineCLine = LNode + CNode
-	LinePoly  = LNode + ANode
-)
-
-// RelationshipByStructure  be used during the relate computation.
-type RelationshipByStructure struct {
+// RelationshipByDegrees  be used during the relate computation.
+type RelationshipByDegrees struct {
 	// The operation args into an array so they can be accessed by index
 	Arg                    []matrix.Steric // the arg(s) of the operation
 	graph                  []Graph
 	gIntersection, gUnion  Graph
 	IM                     *matrix.IntersectionMatrix
-	relationshipSymbol     int
-	maxDlPoint, sumDlPoint int
-	maxDlLine              int
 	degrees                []int
 	haveIntersectionVertex []int
+	boundary               []matrix.Collection
 
-	//nPoint number of point node, nLine number of line node, nCompositeLine number of CompositeLine node,
-	nPoint, nLine, nCompositeLine int
-	IsClosed                      []bool
+	//nPoint number of point node, nLine number of line node
+	nPoint, nLine int
+	IsClosed      []bool
 }
 
 // ComputeIM IntersectionMatrix Gets the IntersectionMatrix for the spatial relationship
 // between the input geometries.
-func (r *RelationshipByStructure) ComputeIM() *matrix.IntersectionMatrix {
+func (r *RelationshipByDegrees) ComputeIM() *matrix.IntersectionMatrix {
 	for i, v := range r.Arg {
 		r.graph[i], _ = GenerateGraph(v)
 	}
@@ -78,6 +51,12 @@ func (r *RelationshipByStructure) ComputeIM() *matrix.IntersectionMatrix {
 		} else {
 			r.degrees = make([]int, r.gIntersection.Order())
 			r.haveIntersectionVertex = []int{0, 0}
+			r.boundary = make([]matrix.Collection, 2)
+			for j, v := range r.Arg {
+				if boundary, err := v.Boundary(); err == nil {
+					r.boundary[j] = boundary.(matrix.Collection)
+				}
+			}
 			r.handleNode()
 		}
 	}
@@ -103,101 +82,51 @@ func (r *RelationshipByStructure) ComputeIM() *matrix.IntersectionMatrix {
 		inputRing = 2
 	}
 
-	r.IM.SetString(RelateStringsTransposeByRing(RelateStrings[r.relationshipSymbol], inputRing))
+	IMTransposeByRing(r.IM, inputRing)
 	return r.IM
 }
 
-func (r *RelationshipByStructure) handleNode() {
+func (r *RelationshipByDegrees) handleNode() {
 
 	for i, n := range r.gIntersection.Nodes() {
-		r.degrees[i] = r.gUnion.Degree(n.Index)
 		if n.NodeType == PNode {
+			imNode, _ := r.gUnion.Node(n)
+			r.degrees[i] = r.gUnion.Degree(imNode.Index)
 			r.nPoint++
-			for j, v := range r.Arg {
-				if boundary, err := v.Boundary(); err == nil {
-					for _, b := range boundary.(matrix.Collection) {
-						if n.Value.Equals(b) || n.Reverse.Equals(b) {
-							r.haveIntersectionVertex[j]++
-						}
+			for j, v := range r.boundary {
+				for _, b := range v {
+					if n.Value.Equals(b) || n.Reverse.Equals(b) {
+						r.haveIntersectionVertex[j]++
 					}
 				}
 			}
-			indexUnion, _ := r.gUnion.NodeIndex(n)
-			dl := 0
-			for _, v := range r.gUnion.Edges()[indexUnion] {
-				if v == PointLine {
-					dl++
-				}
-			}
-			if dl > r.maxDlPoint {
-				r.maxDlPoint = dl
-			}
-			r.sumDlPoint += dl
 		}
+
 		if n.NodeType == LNode {
 			r.nLine++
-			indexUnion, _ := r.gUnion.NodeIndex(n)
-			var pIndex []int
-			var maxDlPoints = []int{0, 0}
-
-			for k, v := range r.gUnion.Edges()[indexUnion] {
-				if v == PointLine {
-					pIndex = append(pIndex, k)
-				}
-			}
-			for j, index := range pIndex {
-				for _, v := range r.gUnion.Edges()[index] {
-					if v == PointLine {
-						maxDlPoints[j]++
-					}
-				}
-			}
-
-			dl := 0
-			switch {
-			case maxDlPoints[0]+maxDlPoints[1] == 2:
-				dl = 1
-			case maxDlPoints[0]+maxDlPoints[1] == 3:
-				dl = 2
-			case maxDlPoints[0] == 2 && maxDlPoints[1] == 2:
-				dl = 4
-			case maxDlPoints[0]+maxDlPoints[1] == 4:
-				dl = 3
-			case maxDlPoints[0]+maxDlPoints[1] == 5:
-				dl = 5
-			case maxDlPoints[0]+maxDlPoints[1] == 6:
-				dl = 6
-			}
-
-			if r.maxDlLine < dl {
-				r.maxDlLine = dl
-			}
-		}
-		if n.NodeType == CNode {
-			r.nCompositeLine++
 		}
 	}
 }
 
-func (r *RelationshipByStructure) matrixIM(p matrix.Matrix, RelateType int) {
+func (r *RelationshipByDegrees) matrixIM(p matrix.Matrix, RelateType int) {
 	switch RelateType {
 	case Equal:
-		r.relationshipSymbol = RPP2
+		r.IM.SetString(RelateStrings[RPP2])
 	case Disjoint:
 		switch m := r.Arg[1].(type) {
 		case matrix.Matrix:
-			r.relationshipSymbol = RPP1
+			r.IM.SetString(RelateStrings[RPP1])
 		case matrix.LineMatrix:
 			if m.IsClosed() {
 				r.IsClosed[1] = true
 			}
-			r.relationshipSymbol = RPL1
+			r.IM.SetString(RelateStrings[RPL1])
 		case matrix.PolygonMatrix:
 			pointInPolygon, _ := IsInPolygon(p, m)
 			if pointInPolygon == OnlyInPolygon {
-				r.relationshipSymbol = RPA2
+				r.IM.SetString(RelateStrings[RPA2])
 			} else {
-				r.relationshipSymbol = RPA1
+				r.IM.SetString(RelateStrings[RPA1])
 			}
 		}
 	default:
@@ -207,33 +136,33 @@ func (r *RelationshipByStructure) matrixIM(p matrix.Matrix, RelateType int) {
 				r.IsClosed[1] = true
 			}
 			if r.degrees[0] >= 2 {
-				r.relationshipSymbol = RPL2
+				r.IM.SetString(RelateStrings[RPL2])
 			} else {
-				r.relationshipSymbol = RPL3
+				r.IM.SetString(RelateStrings[RPL3])
 			}
 		case matrix.PolygonMatrix:
-			r.relationshipSymbol = RPA3
+			r.IM.SetString(RelateStrings[RPA3])
 		}
 	}
 }
 
-func (r *RelationshipByStructure) lineIM(l matrix.LineMatrix, RelateType int) {
+func (r *RelationshipByDegrees) lineIM(l matrix.LineMatrix, RelateType int) {
 	switch RelateType {
 	case Equal:
-		r.relationshipSymbol = RLL25
+		r.IM.SetString(RelateStrings[RLL25])
 	case Disjoint:
 		switch m := r.Arg[1].(type) {
 		case matrix.LineMatrix:
 			if m.IsClosed() {
 				r.IsClosed[1] = true
 			}
-			r.relationshipSymbol = RLL1
+			r.IM.SetString(RelateStrings[RLL1])
 		case matrix.PolygonMatrix:
 			pointInPolygon, _ := IsInPolygon(l, m)
 			if pointInPolygon == OnlyInPolygon {
-				r.relationshipSymbol = RLA2
+				r.IM.SetString(RelateStrings[RLA2])
 			} else {
-				r.relationshipSymbol = RLA1
+				r.IM.SetString(RelateStrings[RLA1])
 			}
 		}
 	default:
@@ -242,45 +171,45 @@ func (r *RelationshipByStructure) lineIM(l matrix.LineMatrix, RelateType int) {
 			if m.IsClosed() {
 				r.IsClosed[1] = true
 			}
-			r.lineAnalyse(DefaultInPolygon, DefaultInPolygon)
+			r.lineAndLineAnalyse(DefaultInPolygon, DefaultInPolygon)
 		case matrix.PolygonMatrix:
 			pointInPolygon, entityInPolygon := IsInPolygon(l, m)
-			r.lineAnalyse(pointInPolygon, entityInPolygon)
+			r.lineAndPolygonAnalyse(pointInPolygon, entityInPolygon)
 		}
 
 	}
 }
 
-func (r *RelationshipByStructure) polygonIM(p matrix.PolygonMatrix, RelateType int) {
+func (r *RelationshipByDegrees) polygonIM(p matrix.PolygonMatrix, RelateType int) {
 	switch RelateType {
 	case Equal:
-		r.relationshipSymbol = RAA9
+		r.IM.SetString(RelateStrings[RAA9])
 	case Disjoint:
 		switch r.Arg[1].(type) {
 		case matrix.PolygonMatrix:
 			poly := r.Arg[1].(matrix.PolygonMatrix)
 			if relate.InPolygon(p[0][0], poly[0]) {
-				r.relationshipSymbol = RAA6
+				r.IM.SetString(RelateStrings[RAA6])
 				for i := 1; i < len(poly); i++ {
 					if relate.InPolygon(p[0][0], poly[i]) {
-						r.relationshipSymbol = RAA1
+						r.IM.SetString(RelateStrings[RAA1])
 					}
 				}
 				return
 			}
 			if relate.InPolygon(poly[0][0], p[0]) {
-				r.relationshipSymbol = RAA5
+				r.IM.SetString(RelateStrings[RAA5])
 				for i := 1; i < len(p); i++ {
 					if relate.InPolygon(poly[0][0], p[i]) {
-						r.relationshipSymbol = RAA1
+						r.IM.SetString(RelateStrings[RAA1])
 					}
 				}
 				return
 			}
-			r.relationshipSymbol = RAA1
+			r.IM.SetString(RelateStrings[RAA1])
 		}
 	default:
 		pointInPolygon, entityInPolygon := IsInPolygon(p, r.Arg[1].(matrix.PolygonMatrix))
-		r.polygonAnalyse(pointInPolygon, entityInPolygon)
+		r.polygonTwoAnalyse(pointInPolygon, entityInPolygon)
 	}
 }
