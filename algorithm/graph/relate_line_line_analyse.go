@@ -2,9 +2,7 @@
 
 package graph
 
-import (
-	"math"
-)
+import "math"
 
 func (r *RelationshipByDegrees) lineAndLineAnalyse(pointInPolygon, entityInPolygon int) {
 	switch r.nLine {
@@ -168,7 +166,7 @@ func (r *RelationshipByDegrees) numsOfBoundaryIM() (int, int) {
 
 func calcMaxDegrees(degs ...int) (int, int) {
 	maxVal := 0
-	minVal := math.MaxInt
+	minVal := math.MaxInt32
 	for _, v := range degs {
 		if maxVal < v {
 			maxVal = v
