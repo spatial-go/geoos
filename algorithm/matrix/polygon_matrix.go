@@ -22,6 +22,21 @@ func (p PolygonMatrix) BoundaryDimensions() int {
 	return 1
 }
 
+// Boundary returns the closure of the combinatorial boundary of this Polygon.
+func (p PolygonMatrix) Boundary() (Steric, error) {
+	if p.IsEmpty() {
+		return Collection{}, nil
+	}
+	if len(p) <= 1 {
+		return Collection{LineMatrix(p[0])}, nil
+	}
+	rings := Collection{}
+	for _, v := range p {
+		rings = append(rings, LineMatrix(v))
+	}
+	return rings, nil
+}
+
 // Nums num of polygon matrix
 func (p PolygonMatrix) Nums() int {
 	return 1
@@ -49,6 +64,20 @@ func (m MultiPolygonMatrix) Dimensions() int {
 // of a geometry with the Exterior.
 func (m MultiPolygonMatrix) BoundaryDimensions() int {
 	return 1
+}
+
+// Boundary returns the closure of the combinatorial boundary of this Polygon.
+func (m MultiPolygonMatrix) Boundary() (Steric, error) {
+	if m.IsEmpty() {
+		return Collection{}, nil
+	}
+	rings := Collection{}
+	for _, v := range m {
+		if r, err := PolygonMatrix(v).Boundary(); err == nil {
+			rings = append(rings, r.(Collection)...)
+		}
+	}
+	return rings, nil
 }
 
 // Nums num of polygon matrix

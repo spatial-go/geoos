@@ -2,6 +2,8 @@
 
 package graph
 
+import "github.com/spatial-go/geoos/algorithm/matrix"
+
 // Relate explain
 const (
 	RPP1 = iota
@@ -48,6 +50,8 @@ const (
 	RLL31
 	RLL32
 	RLL33
+	RLL34
+	RLL35
 
 	RLA1
 	RLA2
@@ -107,12 +111,12 @@ var (
 		// line line
 		// num 8
 		"FF1FF0102", "0F1FF0102", "1F1FF0102", "F01FF0102", "F01FF0102",
-		"001FF0102", "001FF0102", "1F10F0102", "1F10FF102", "1FF0FF102",
+		"001FF0102", "001FF01F2", "1F10F0102", "1F10FF102", "1FF0FF102",
 		"F010FF102", "F010F0102", "F010F0102", "0010FF102", "0010F0102",
 		"0010F0102", "1010FF102", "1010F0102", "1010FF102", "FF1F0F102",
 		"FF1F00102", "0F1F0F102", "0F1F00102", "1F1F0F102", "1FFF0F102",
 		"1F1F00102", "F01F00102", "001F00102", "1F100F102", "1FF00F102",
-		"F0100F102", "00100F102", "10100F102",
+		"F0100F102", "00100F102", "10100F102", "FF10F0102", "0F10FF102",
 
 		// line polygon
 		// num 41
@@ -159,4 +163,32 @@ func RelateStringsTransposeByRing(rs string, inputType int) string {
 		rsb[7] = 'F'
 	}
 	return string(rsb)
+}
+
+// IMTransposeByRing line relate to ring relate
+// Model definition: boundary of point is nil,   boundary of  line is boundary,two point
+// boundary of  ring is  nil, boundary of  polygon is  ring
+// interior is Except boundary
+// exterior exterior boundary and interior
+func IMTransposeByRing(im *matrix.IntersectionMatrix, inputType int) *matrix.IntersectionMatrix {
+	if inputType < 1 {
+		return im
+	}
+	switch inputType {
+	case 1: // A is ring
+		im.Set(1, 0, -1)
+		im.Set(1, 1, -1)
+		im.Set(1, 2, -1)
+	case 2: // B is ring
+		im.Set(0, 1, -1)
+		im.Set(1, 1, -1)
+		im.Set(2, 1, -1)
+	case 3: // A and B is ring
+		im.Set(1, 0, -1)
+		im.Set(1, 1, -1)
+		im.Set(1, 2, -1)
+		im.Set(0, 1, -1)
+		im.Set(2, 1, -1)
+	}
+	return im
 }

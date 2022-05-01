@@ -5,6 +5,7 @@ import (
 	"math"
 
 	"github.com/spatial-go/geoos/algorithm/calc"
+	"github.com/spatial-go/geoos/space/spaceerr"
 )
 
 // LineMatrix is a two-dimensional matrix.
@@ -22,6 +23,15 @@ func (l LineMatrix) BoundaryDimensions() int {
 		return calc.ImFalse
 	}
 	return 0
+}
+
+// Boundary returns the closure of the combinatorial boundary of this LineMatrix.
+// The boundary of a lineal geometry is always a zero-dimensional geometry (which may be empty).
+func (l LineMatrix) Boundary() (Steric, error) {
+	if l.IsClosed() {
+		return nil, spaceerr.ErrBoundBeNil
+	}
+	return Collection{Matrix(l[0]), Matrix(l[len(l)-1])}, nil
 }
 
 // IsClosed Returns TRUE if the LINESTRING's start and end points are coincident.

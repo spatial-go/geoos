@@ -4,6 +4,7 @@ package matrix
 import (
 	"math"
 
+	"github.com/spatial-go/geoos/algorithm"
 	"github.com/spatial-go/geoos/algorithm/calc"
 )
 
@@ -31,6 +32,11 @@ func (c Collection) BoundaryDimensions() int {
 		}
 	}
 	return dimension
+}
+
+// Boundary returns the closure of the combinatorial boundary of this Collection.
+func (c Collection) Boundary() (Steric, error) {
+	return nil, algorithm.ErrNotSupportCollection
 }
 
 // Nums ...

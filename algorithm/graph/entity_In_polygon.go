@@ -9,11 +9,14 @@ import (
 
 // in or out polygon.
 const (
+	PartInPolygon    = 4
 	OnlyInPolygon    = 3
 	OnlyInLine       = 2
 	OnlyOutPolygon   = -1
+	PartOutPolygon   = -2
 	DefaultInPolygon = 0
 	BothPolygon      = 1
+	IncludePolygon   = -3
 )
 
 // IsInPolygon returns true if Steric point and entity is inside pg  .
@@ -51,7 +54,7 @@ func IsInPolygon(arg matrix.Steric, poly matrix.PolygonMatrix) (int, int) {
 		pointInPolygon, entityInPolygon = lineInPolygon(matrix.LineMatrix(m[0]), poly)
 		if entityInPolygon == OnlyOutPolygon {
 			if _, v := lineInPolygon(matrix.LineMatrix(poly[0]), m); v == OnlyInPolygon {
-				entityInPolygon = BothPolygon
+				entityInPolygon = IncludePolygon
 			}
 		}
 	}
@@ -62,34 +65,44 @@ func IsInPolygon(arg matrix.Steric, poly matrix.PolygonMatrix) (int, int) {
 func lineInPolygon(m matrix.LineMatrix, poly matrix.PolygonMatrix) (int, int) {
 	pointInPolygon := DefaultInPolygon
 	entityInPolygon := DefaultInPolygon
+	if b, err := m.Boundary(); err == nil {
+		for _, p := range b.(matrix.Collection) {
+			pInPolygon := OnlyOutPolygon
+			if inShell, onShell := pointInRing(p.(matrix.Matrix), poly[0]); inShell {
+				pInPolygon = OnlyInPolygon
+				for i := 1; i < len(poly); i++ {
+					if inHoles, onHoles := pointInRing(p.(matrix.Matrix), poly[i]); inHoles {
+						pInPolygon = OnlyOutPolygon
+						break
+					} else if onHoles {
+						pInPolygon = OnlyInLine
+						break
+					}
+				}
+			} else if onShell {
+				pInPolygon = OnlyInLine
+			}
+			pointInPolygon = calcInPolygon(pointInPolygon, pInPolygon)
+		}
+	}
 	for _, p := range m {
-		pInPolygon := OnlyOutPolygon
 		lInPolygon := OnlyOutPolygon
 		if inShell, onShell := pointInRing(p, poly[0]); inShell {
-			pInPolygon = OnlyInPolygon
 			lInPolygon = OnlyInPolygon
 
 			for i := 1; i < len(poly); i++ {
 				if inHoles, onHoles := pointInRing(p, poly[i]); inHoles {
-					pInPolygon = OnlyOutPolygon
 					lInPolygon = OnlyOutPolygon
 
 					break
 				} else if onHoles {
-					pInPolygon = OnlyInLine
 					lInPolygon = entityInPolygon
 					break
 				}
 			}
 		} else if onShell {
-			pInPolygon = OnlyInLine
 			lInPolygon = entityInPolygon
 		}
-
-		if entityInPolygon == OnlyInPolygon {
-			break
-		}
-		pointInPolygon = calcInPolygon(pointInPolygon, pInPolygon)
 		entityInPolygon = calcInPolygon(entityInPolygon, lInPolygon)
 	}
 	return pointInPolygon, entityInPolygon
@@ -115,11 +128,15 @@ func calcInPolygon(old, new int) int {
 	case OnlyInPolygon:
 		if new == OnlyInPolygon {
 			return new
+		} else if new == OnlyInLine {
+			return PartInPolygon
 		}
 		return BothPolygon
 	case OnlyOutPolygon:
 		if new == OnlyOutPolygon {
 			return new
+		} else if new == OnlyInLine {
+			return PartOutPolygon
 		}
 		return BothPolygon
 	case BothPolygon:
@@ -127,8 +144,22 @@ func calcInPolygon(old, new int) int {
 	case OnlyInLine:
 		if new == OnlyInLine {
 			return new
+		} else if new == OnlyInPolygon {
+			return PartInPolygon
+		} else if new == OnlyOutPolygon {
+			return PartOutPolygon
 		}
-		return BothPolygon
+		return PartOutPolygon
+	case PartOutPolygon:
+		if new == OnlyInPolygon {
+			return BothPolygon
+		}
+		return PartOutPolygon
+	case PartInPolygon:
+		if new == OnlyOutPolygon {
+			return BothPolygon
+		}
+		return PartInPolygon
 	}
 	return DefaultInPolygon
 }

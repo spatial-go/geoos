@@ -15,6 +15,10 @@ type Steric interface {
 
 	BoundaryDimensions() int
 
+	// Boundary returns the closure of the combinatorial boundary of this Steric.
+	// The boundary of a lineal geometry is always a zero-dimensional geometry (which may be empty).
+	Boundary() (Steric, error)
+
 	// Num of geometries
 	Nums() int
 
@@ -121,6 +125,11 @@ func (m Matrix) Dimensions() int {
 // of a geometry with the Exterior.
 func (m Matrix) BoundaryDimensions() int {
 	return calc.ImFalse
+}
+
+// Boundary returns the closure of the combinatorial boundary of this Matrix.
+func (m Matrix) Boundary() (Steric, error) {
+	return nil, algorithm.ErrBoundBeNil
 }
 
 // Nums num of matrix
