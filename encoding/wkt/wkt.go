@@ -36,7 +36,11 @@ func wkt(buf *bytes.Buffer, geometry space.Geometry) {
 		buf.Write([]byte(``))
 		return
 	}
-	_, _ = fmt.Fprintf(buf, "SRID=%v;", geometry.CoordinateSystem())
+	switch geometry.(type) {
+	case *space.GeometryValid:
+		_, _ = fmt.Fprintf(buf, "SRID=%v;", geometry.CoordinateSystem())
+	}
+
 	geom := geometry.Geom()
 	switch geom.GeoJSONType() {
 	case space.TypePoint:
