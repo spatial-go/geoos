@@ -34,7 +34,7 @@ type Graph interface {
 	// Edges Returns edges.
 	Edges() []map[int]int
 
-	// Degree Returns degree of node.
+	// Degree Returns degrees(num Connected) of node.
 	Degree(index int) int
 
 	// Connected Returns degree of node.
