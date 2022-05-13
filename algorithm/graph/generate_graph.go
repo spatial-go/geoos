@@ -192,6 +192,10 @@ func matrixAndLineHandle(m1 matrix.Matrix, m2 matrix.LineMatrix, g1, g2 Graph) e
 func lineAndLineHandle(m1, m2 matrix.LineMatrix, g1, g2 Graph) error {
 	g := []Graph{g1, g2}
 	corrNodes := IntersectLine(m1, m2)
+	if len(corrNodes[0]) > 0 || len(corrNodes[1]) > 0 {
+		g1.Nodes()[0].Stat = false
+		g2.Nodes()[0].Stat = false
+	}
 	for i, corrs := range corrNodes {
 		for _, corr := range corrs {
 			node := &Node{Value: corr.InterNode, NodeType: PNode}
@@ -214,6 +218,9 @@ func lineAndPolygonHandle(m1 matrix.LineMatrix, m2 matrix.PolygonMatrix, g1, g2 
 		gNum := g1
 		if i > 0 {
 			gNum = g2
+		}
+		if len(corrs) > 0 {
+			gNum.Nodes()[0].Stat = false
 		}
 		startNode, endNode := &Node{}, &Node{}
 		startNodeLine, endNodeLine := &Node{}, &Node{}
@@ -265,6 +272,9 @@ func polygonAndPolygonHandle(m1, m2 matrix.PolygonMatrix, g1, g2 Graph) error {
 	g := []Graph{g1, g2}
 	twoCorrNodes := IntersectPolygons(m1, m2)
 	for i, corrNodes := range twoCorrNodes {
+		if len(corrNodes) > 0 && len(corrNodes[0]) > 0 {
+			g[i].Nodes()[0].Stat = false
+		}
 		for k, corrs := range corrNodes {
 			startNode, endNode := &Node{}, &Node{}
 			startNodeLine, endNodeLine := &Node{}, &Node{}

@@ -1,6 +1,6 @@
-// package graph ...
+// package de9im ...
 
-package graph
+package de9im
 
 import "math"
 
@@ -148,6 +148,9 @@ func (r *RelationshipByDegrees) calcBoundaryIM() {
 
 func (r *RelationshipByDegrees) numsOfBoundaryIM() (int, int) {
 	aNums, bNums := 0, 0
+	if r.boundary[0] == nil || r.boundary[1] == nil {
+		return aNums, bNums
+	}
 	if r.boundary[0][0].Equals(r.boundary[1][0]) || r.boundary[0][0].Equals(r.boundary[1][1]) ||
 		r.boundary[0][1].Equals(r.boundary[1][0]) || r.boundary[0][1].Equals(r.boundary[1][1]) {
 		aNums, bNums = 1, 1

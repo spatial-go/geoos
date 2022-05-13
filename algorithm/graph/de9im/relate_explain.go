@@ -1,8 +1,6 @@
-// package graph ...
+// package de9im ...
 
-package graph
-
-import "github.com/spatial-go/geoos/algorithm/matrix"
+package de9im
 
 // Relate explain
 const (
@@ -135,60 +133,3 @@ var (
 		"212F11FF2",
 	}
 )
-
-// RelateStringsTransposeByRing line relate to ring relate
-// Model definition: boundary of point is nil,   boundary of  line is boundary,two point
-// boundary of  ring is  nil, boundary of  polygon is  ring
-// interior is Except boundary
-// exterior exterior boundary and interior
-func RelateStringsTransposeByRing(rs string, inputType int) string {
-	if inputType < 1 {
-		return rs
-	}
-	rsb := []byte(rs)
-	switch inputType {
-	case 1: // A is ring
-		rsb[3] = 'F'
-		rsb[4] = 'F'
-		rsb[5] = 'F'
-	case 2: // B is ring
-		rsb[1] = 'F'
-		rsb[4] = 'F'
-		rsb[7] = 'F'
-	case 3: // A and B is ring
-		rsb[1] = 'F'
-		rsb[3] = 'F'
-		rsb[4] = 'F'
-		rsb[5] = 'F'
-		rsb[7] = 'F'
-	}
-	return string(rsb)
-}
-
-// IMTransposeByRing line relate to ring relate
-// Model definition: boundary of point is nil,   boundary of  line is boundary,two point
-// boundary of  ring is  nil, boundary of  polygon is  ring
-// interior is Except boundary
-// exterior exterior boundary and interior
-func IMTransposeByRing(im *matrix.IntersectionMatrix, inputType int) *matrix.IntersectionMatrix {
-	if inputType < 1 {
-		return im
-	}
-	switch inputType {
-	case 1: // A is ring
-		im.Set(1, 0, -1)
-		im.Set(1, 1, -1)
-		im.Set(1, 2, -1)
-	case 2: // B is ring
-		im.Set(0, 1, -1)
-		im.Set(1, 1, -1)
-		im.Set(2, 1, -1)
-	case 3: // A and B is ring
-		im.Set(1, 0, -1)
-		im.Set(1, 1, -1)
-		im.Set(1, 2, -1)
-		im.Set(0, 1, -1)
-		im.Set(2, 1, -1)
-	}
-	return im
-}

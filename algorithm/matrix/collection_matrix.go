@@ -88,6 +88,28 @@ func (c Collection) Equals(ms Steric) bool {
 	return false
 }
 
+// Proximity returns true if the Steric represents the Proximity Geometry or vector.
+func (c Collection) Proximity(ms Steric) bool {
+	if mm, ok := ms.(Collection); ok {
+		// If one is nil, the other must also be nil.
+		if (mm == nil) != (c == nil) {
+			return false
+		}
+
+		if len(mm) != len(c) {
+			return false
+		}
+
+		for i := range mm {
+			if !c[i].Equals(mm[i]) {
+				return false
+			}
+		}
+		return true
+	}
+	return false
+}
+
 // EqualsExact returns  true if the two Collection are equalexact
 func (c Collection) EqualsExact(ms Steric, tolerance float64) bool {
 	if mm, ok := ms.(Collection); ok {

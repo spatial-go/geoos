@@ -8,6 +8,9 @@ import (
 	"github.com/spatial-go/geoos/algorithm/calc"
 )
 
+// DefaultTolerance ...
+const DefaultTolerance = 0.000000001
+
 // Steric is the interface implemented by other Steric objects
 type Steric interface {
 	// e.g. 0d, 1d, 2d
@@ -22,12 +25,15 @@ type Steric interface {
 	// Num of geometries
 	Nums() int
 
-	// Equals returns true if the Geometry represents the same Geometry or vector.
+	// Equals returns true if the Steric represents the same Geometry or vector.
 	Equals(s Steric) bool
 
-	// EqualsExact Returns true if the two Geometries are exactly equal,
+	// Proximity returns true if the Steric represents the Proximity Geometry or vector.
+	Proximity(s Steric) bool
+
+	// EqualsExact Returns true if the two Steric are exactly equal,
 	// up to a specified distance tolerance.
-	// Two Geometries are exactly equal within a distance tolerance
+	// Two Steric are exactly equal within a distance tolerance
 	EqualsExact(g Steric, tolerance float64) bool
 
 	// IsEmpty returns true if the Matrix is empty.
@@ -190,6 +196,11 @@ func (m Matrix) Equals(ms Steric) bool {
 		return true
 	}
 	return false
+}
+
+// Proximity returns true if the Steric represents the Proximity Geometry or vector.
+func (m Matrix) Proximity(ms Steric) bool {
+	return m.EqualsExact(ms, DefaultTolerance)
 }
 
 // EqualsExact returns  true if the two Matrix are equalexact

@@ -1,8 +1,9 @@
-// package graph ...
+// package de9im ...
 
-package graph
+package de9im
 
 import (
+	"github.com/spatial-go/geoos/algorithm/graph"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/relate"
 )
@@ -11,8 +12,8 @@ import (
 type RelationshipByDegrees struct {
 	// The operation args into an array so they can be accessed by index
 	Arg                    []matrix.Steric // the arg(s) of the operation
-	graph                  []Graph
-	gIntersection, gUnion  Graph
+	graph                  []graph.Graph
+	gIntersection, gUnion  graph.Graph
 	IM                     *matrix.IntersectionMatrix
 	degrees                []int
 	haveIntersectionVertex []int
@@ -27,10 +28,10 @@ type RelationshipByDegrees struct {
 // between the input geometries.
 func (r *RelationshipByDegrees) ComputeIM() *matrix.IntersectionMatrix {
 	for i, v := range r.Arg {
-		r.graph[i], _ = GenerateGraph(v)
+		r.graph[i], _ = graph.GenerateGraph(v)
 	}
 
-	if err := IntersectionHandle(r.Arg[0], r.Arg[1], r.graph[0], r.graph[1]); err != nil {
+	if err := graph.IntersectionHandle(r.Arg[0], r.Arg[1], r.graph[0], r.graph[1]); err != nil {
 		return r.IM
 	}
 
@@ -89,7 +90,7 @@ func (r *RelationshipByDegrees) ComputeIM() *matrix.IntersectionMatrix {
 func (r *RelationshipByDegrees) handleNode() {
 
 	for i, n := range r.gIntersection.Nodes() {
-		if n.NodeType == PNode {
+		if n.NodeType == graph.PNode {
 			imNode, _ := r.gUnion.Node(n)
 			r.degrees[i] = r.gUnion.Degree(imNode.Index)
 			r.nPoint++
@@ -102,7 +103,7 @@ func (r *RelationshipByDegrees) handleNode() {
 			}
 		}
 
-		if n.NodeType == LNode {
+		if n.NodeType == graph.LNode {
 			r.nLine++
 		}
 	}

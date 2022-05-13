@@ -1,6 +1,6 @@
-// package graph ...
+// package de9im ...
 
-package graph
+package de9im
 
 func (r *RelationshipByDegrees) lineAndPolygonAnalyse(pointInPolygon, entityInPolygon int) {
 	switch r.nLine {
@@ -225,6 +225,9 @@ func (r *RelationshipByDegrees) lineAndPolygonAnalyse(pointInPolygon, entityInPo
 					r.IM.Set(1, 2, -1)
 					if entityInPolygon == OnlyInPolygon {
 						r.IM.Set(0, 0, 1)
+						r.IM.Set(0, 2, -1)
+					} else if entityInPolygon == DefaultInPolygon {
+						r.IM.Set(0, 0, -1)
 						r.IM.Set(0, 2, -1)
 					} else {
 						r.IM.Set(0, 0, -1)

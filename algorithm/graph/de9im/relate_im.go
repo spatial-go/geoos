@@ -1,8 +1,9 @@
-// package graph ...
+// package de9im ...
 
-package graph
+package de9im
 
 import (
+	"github.com/spatial-go/geoos/algorithm/graph"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 )
 
@@ -22,9 +23,9 @@ func GetRelationship(f Relatelgorithm, arg []matrix.Steric) Relationship {
 func withDegrees(arg []matrix.Steric) Relationship {
 	return &RelationshipByDegrees{
 		Arg:           arg,
-		graph:         []Graph{&MatrixGraph{}, &MatrixGraph{}},
-		gIntersection: &MatrixGraph{},
-		gUnion:        &MatrixGraph{},
+		graph:         []graph.Graph{&graph.MatrixGraph{}, &graph.MatrixGraph{}},
+		gIntersection: &graph.MatrixGraph{},
+		gUnion:        &graph.MatrixGraph{},
 		IM:            matrix.IntersectionMatrixDefault(),
 		IsClosed:      []bool{false, false},
 	}
@@ -33,9 +34,9 @@ func withDegrees(arg []matrix.Steric) Relationship {
 func withStructure(arg []matrix.Steric) Relationship {
 	return &RelationshipByStructure{
 		Arg:           arg,
-		graph:         []Graph{&MatrixGraph{}, &MatrixGraph{}},
-		gIntersection: &MatrixGraph{},
-		gUnion:        &MatrixGraph{},
+		graph:         []graph.Graph{&graph.MatrixGraph{}, &graph.MatrixGraph{}},
+		gIntersection: &graph.MatrixGraph{},
+		gUnion:        &graph.MatrixGraph{},
 		IM:            matrix.IntersectionMatrixDefault(),
 		maxDlPoint:    0,
 		sumDlPoint:    0,

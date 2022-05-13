@@ -1,6 +1,6 @@
-// package graph ...
+// package de9im ...
 
-package graph
+package de9im
 
 import "testing"
 

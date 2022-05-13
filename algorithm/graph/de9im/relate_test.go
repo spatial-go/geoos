@@ -1,6 +1,6 @@
-// package graph ...
+// package de9im ...
 
-package graph
+package de9im
 
 import (
 	"testing"
@@ -12,9 +12,9 @@ import (
 
 func TestRelate(t *testing.T) {
 
-	for _, tt := range graphtests.TestSData {
+	for _, tt := range graphtests.TestRelateData {
 		if !geoos.GeoosTestTag &&
-			tt.Name != "linelinef1c" {
+			tt.Name != "LinePoly 6" {
 			continue
 		}
 

@@ -6,8 +6,8 @@ import (
 	"github.com/spatial-go/geoos/algorithm/matrix"
 )
 
-// TestSData ...
-var TestSData = []struct {
+// TestRelateData ...
+var TestRelateData = []struct {
 	Name    string
 	Args    []matrix.Steric
 	Want    string
@@ -43,7 +43,7 @@ var TestSData = []struct {
 	{"LinePoly 3", []matrix.Steric{matrix.LineMatrix{{3, 3}, {3, 4}}, matrix.PolygonMatrix{{{3.5, 3.5}, {3.5, 4.5}, {4.5, 4.5}, {4.5, 3.5}, {3.5, 3.5}}}}, "FF1FF0212", false},
 	{"LinePoly 4", []matrix.Steric{matrix.LineMatrix{{3, 3}, {3, 4}}, matrix.PolygonMatrix{{{5, 5}, {5, 6}, {6, 6}, {6, 5}, {5, 5}}}}, "FF1FF0212", false},
 	{"LinePoly 5", []matrix.Steric{matrix.LineMatrix{{3, 3}, {3, 4}}, matrix.PolygonMatrix{{{3, 3}, {3, 4}, {4, 4}, {4, 3}, {3, 3}}}}, "F1FF0F212", false},
-
+	{"LinePoly 6", []matrix.Steric{matrix.LineMatrix{{5, 9}, {1, 9}, {1, 1}}, matrix.PolygonMatrix{{{1, 1}, {9, 1}, {9, 9}, {1, 9}, {1, 1}}}}, "F1FF0F212", false},
 	{"PolyPoly 1", []matrix.Steric{matrix.PolygonMatrix{{{3, 3}, {3, 4}, {4, 4}, {4, 3}, {3, 3}}},
 		matrix.PolygonMatrix{{{2, 2}, {5, 2}, {5, 5}, {2, 5}, {2, 2}},
 			{{2.5, 2.5}, {4.5, 2.5}, {4.5, 4.5}, {2.5, 4.5}, {2.5, 2.5}}},

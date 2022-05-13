@@ -129,6 +129,28 @@ func (p PolygonMatrix) Equals(ms Steric) bool {
 	return false
 }
 
+// Proximity returns true if the Steric represents the Proximity Geometry or vector.
+func (p PolygonMatrix) Proximity(ms Steric) bool {
+	if mm, ok := ms.(PolygonMatrix); ok {
+		// If one is nil, the other must also be nil.
+		if (mm == nil) != (p == nil) {
+			return false
+		}
+
+		if len(mm) != len(p) {
+			return false
+		}
+
+		for i := range mm {
+			if !LineMatrix(p[i]).Proximity(LineMatrix(mm[i])) {
+				return false
+			}
+		}
+		return true
+	}
+	return false
+}
+
 // EqualsExact returns  true if the two Matrix are equalexact
 func (p PolygonMatrix) EqualsExact(ms Steric, tolerance float64) bool {
 	if mm, ok := ms.(PolygonMatrix); ok {
@@ -165,6 +187,27 @@ func (m MultiPolygonMatrix) Equals(ms Steric) bool {
 
 		for i := range mm {
 			if !PolygonMatrix(m[i]).Equals(PolygonMatrix(mm[i])) {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+// Proximity returns true if the Steric represents the Proximity Geometry or vector.
+func (m MultiPolygonMatrix) Proximity(ms Steric) bool {
+	if mm, ok := ms.(MultiPolygonMatrix); ok {
+		// If one is nil, the other must also be nil.
+		if (mm == nil) != (m == nil) {
+			return false
+		}
+
+		if len(mm) != len(m) {
+			return false
+		}
+
+		for i := range mm {
+			if !PolygonMatrix(m[i]).Proximity(PolygonMatrix(mm[i])) {
 				return false
 			}
 		}

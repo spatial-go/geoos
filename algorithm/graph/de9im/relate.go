@@ -1,8 +1,9 @@
-// package graph ...
+// package de9im ...
 
-package graph
+package de9im
 
 import (
+	"github.com/spatial-go/geoos/algorithm/graph"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/relate"
 )
@@ -20,24 +21,12 @@ const (
 	CoveredBy
 )
 
-// edge cost
-const (
-	PointPoint = PNode + PNode
-	PointLine  = PNode + LNode
-	PointCLine = PNode + CNode
-	PointPoly  = PNode + ANode
-
-	LineLine  = LNode + LNode
-	LineCLine = LNode + CNode
-	LinePoly  = LNode + ANode
-)
-
 // RelationshipByStructure  be used during the relate computation.
 type RelationshipByStructure struct {
 	// The operation args into an array so they can be accessed by index
 	Arg                    []matrix.Steric // the arg(s) of the operation
-	graph                  []Graph
-	gIntersection, gUnion  Graph
+	graph                  []graph.Graph
+	gIntersection, gUnion  graph.Graph
 	IM                     *matrix.IntersectionMatrix
 	relationshipSymbol     int
 	maxDlPoint, sumDlPoint int
@@ -54,10 +43,10 @@ type RelationshipByStructure struct {
 // between the input geometries.
 func (r *RelationshipByStructure) ComputeIM() *matrix.IntersectionMatrix {
 	for i, v := range r.Arg {
-		r.graph[i], _ = GenerateGraph(v)
+		r.graph[i], _ = graph.GenerateGraph(v)
 	}
 
-	if err := IntersectionHandle(r.Arg[0], r.Arg[1], r.graph[0], r.graph[1]); err != nil {
+	if err := graph.IntersectionHandle(r.Arg[0], r.Arg[1], r.graph[0], r.graph[1]); err != nil {
 		return r.IM
 	}
 
@@ -111,7 +100,7 @@ func (r *RelationshipByStructure) handleNode() {
 
 	for i, n := range r.gIntersection.Nodes() {
 		r.degrees[i] = r.gUnion.Degree(n.Index)
-		if n.NodeType == PNode {
+		if n.NodeType == graph.PNode {
 			r.nPoint++
 			for j, v := range r.Arg {
 				if boundary, err := v.Boundary(); err == nil {
@@ -125,7 +114,7 @@ func (r *RelationshipByStructure) handleNode() {
 			indexUnion, _ := r.gUnion.NodeIndex(n)
 			dl := 0
 			for _, v := range r.gUnion.Edges()[indexUnion] {
-				if v == PointLine {
+				if v == graph.PointLine {
 					dl++
 				}
 			}
@@ -134,20 +123,20 @@ func (r *RelationshipByStructure) handleNode() {
 			}
 			r.sumDlPoint += dl
 		}
-		if n.NodeType == LNode {
+		if n.NodeType == graph.LNode {
 			r.nLine++
 			indexUnion, _ := r.gUnion.NodeIndex(n)
 			var pIndex []int
 			var maxDlPoints = []int{0, 0}
 
 			for k, v := range r.gUnion.Edges()[indexUnion] {
-				if v == PointLine {
+				if v == graph.PointLine {
 					pIndex = append(pIndex, k)
 				}
 			}
 			for j, index := range pIndex {
 				for _, v := range r.gUnion.Edges()[index] {
-					if v == PointLine {
+					if v == graph.PointLine {
 						maxDlPoints[j]++
 					}
 				}
@@ -173,7 +162,7 @@ func (r *RelationshipByStructure) handleNode() {
 				r.maxDlLine = dl
 			}
 		}
-		if n.NodeType == CNode {
+		if n.NodeType == graph.CNode {
 			r.nCompositeLine++
 		}
 	}
@@ -283,4 +272,61 @@ func (r *RelationshipByStructure) polygonIM(p matrix.PolygonMatrix, RelateType i
 		pointInPolygon, entityInPolygon := IsInPolygon(p, r.Arg[1].(matrix.PolygonMatrix))
 		r.polygonAnalyse(pointInPolygon, entityInPolygon)
 	}
+}
+
+// RelateStringsTransposeByRing line relate to ring relate
+// Model definition: boundary of point is nil,   boundary of  line is boundary,two point
+// boundary of  ring is  nil, boundary of  polygon is  ring
+// interior is Except boundary
+// exterior exterior boundary and interior
+func RelateStringsTransposeByRing(rs string, inputType int) string {
+	if inputType < 1 {
+		return rs
+	}
+	rsb := []byte(rs)
+	switch inputType {
+	case 1: // A is ring
+		rsb[3] = 'F'
+		rsb[4] = 'F'
+		rsb[5] = 'F'
+	case 2: // B is ring
+		rsb[1] = 'F'
+		rsb[4] = 'F'
+		rsb[7] = 'F'
+	case 3: // A and B is ring
+		rsb[1] = 'F'
+		rsb[3] = 'F'
+		rsb[4] = 'F'
+		rsb[5] = 'F'
+		rsb[7] = 'F'
+	}
+	return string(rsb)
+}
+
+// IMTransposeByRing line relate to ring relate
+// Model definition: boundary of point is nil,   boundary of  line is boundary,two point
+// boundary of  ring is  nil, boundary of  polygon is  ring
+// interior is Except boundary
+// exterior exterior boundary and interior
+func IMTransposeByRing(im *matrix.IntersectionMatrix, inputType int) *matrix.IntersectionMatrix {
+	if inputType < 1 {
+		return im
+	}
+	switch inputType {
+	case 1: // A is ring
+		im.Set(1, 0, -1)
+		im.Set(1, 1, -1)
+		im.Set(1, 2, -1)
+	case 2: // B is ring
+		im.Set(0, 1, -1)
+		im.Set(1, 1, -1)
+		im.Set(2, 1, -1)
+	case 3: // A and B is ring
+		im.Set(1, 0, -1)
+		im.Set(1, 1, -1)
+		im.Set(1, 2, -1)
+		im.Set(0, 1, -1)
+		im.Set(2, 1, -1)
+	}
+	return im
 }

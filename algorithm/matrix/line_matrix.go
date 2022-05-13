@@ -97,6 +97,34 @@ func (l LineMatrix) Equals(ms Steric) bool {
 	return false
 }
 
+// Proximity returns true if the Steric represents the Proximity Geometry or vector.
+func (l LineMatrix) Proximity(ms Steric) bool {
+	if mm, ok := ms.(LineMatrix); ok {
+		// If one is nil, the other must also be nil.
+		if (mm == nil) != (l == nil) {
+			return false
+		}
+
+		if len(mm) != len(l) {
+			return false
+		}
+
+		for i := range mm {
+			havePoint := false
+			for _, v := range l {
+				if Matrix(v).Proximity(Matrix(mm[i])) {
+					havePoint = true
+				}
+			}
+			if !havePoint {
+				return false
+			}
+		}
+		return true
+	}
+	return false
+}
+
 // EqualsExact returns  true if the two Matrix are equalexact
 func (l LineMatrix) EqualsExact(ms Steric, tolerance float64) bool {
 	if mm, ok := ms.(LineMatrix); ok {

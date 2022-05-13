@@ -31,6 +31,10 @@ func (ii *IntersectionCorrelation) ProcessIntersections(
 	if ii.isEquals == 0 {
 		if e0.Equals(e1) {
 			ii.isEquals = 1
+			// if  edge is closed, return
+			if e0.IsClosed() {
+				return
+			}
 			inr0 := &IntersectionNodeResult{0, 1, relate.IntersectionPoint{Matrix: matrix.Matrix(ii.Edge[0]), IsCollinear: true},
 				matrix.LineSegment{P0: ii.Edge[0], P1: ii.Edge[1]}, matrix.LineSegment{P0: ii.Edge[0], P1: ii.Edge[1]}, ii.Edge1}
 			ii.result0 = append(ii.result0, inr0)
