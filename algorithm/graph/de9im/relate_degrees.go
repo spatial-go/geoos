@@ -3,6 +3,7 @@
 package de9im
 
 import (
+	"github.com/spatial-go/geoos/algorithm/calc"
 	"github.com/spatial-go/geoos/algorithm/graph"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/relate"
@@ -11,8 +12,7 @@ import (
 // RelationshipByDegrees  be used during the relate computation.
 type RelationshipByDegrees struct {
 	// The operation args into an array so they can be accessed by index
-	Arg                    []matrix.Steric // the arg(s) of the operation
-	graph                  []graph.Graph
+	*graph.Clip
 	gIntersection, gUnion  graph.Graph
 	IM                     *matrix.IntersectionMatrix
 	degrees                []int
@@ -27,24 +27,17 @@ type RelationshipByDegrees struct {
 // ComputeIM IntersectionMatrix Gets the IntersectionMatrix for the spatial relationship
 // between the input geometries.
 func (r *RelationshipByDegrees) ComputeIM() *matrix.IntersectionMatrix {
-	for i, v := range r.Arg {
-		r.graph[i], _ = graph.GenerateGraph(v)
-	}
-
-	if err := graph.IntersectionHandle(r.Arg[0], r.Arg[1], r.graph[0], r.graph[1]); err != nil {
-		return r.IM
-	}
 
 	var err error
-	if r.gIntersection, err = r.graph[0].Intersection(r.graph[1]); err != nil {
+	if r.gIntersection, err = r.Intersection(); err != nil {
 		return r.IM
 	}
-	if r.gUnion, err = r.graph[0].Union(r.graph[1]); err != nil {
+	if r.gUnion, err = r.Union(); err != nil {
 		return r.IM
 	}
 
 	relateType := 0
-	if r.Arg[0].Equals(r.Arg[1]) {
+	if r.Arg[0].Proximity(r.Arg[1]) {
 		relateType = Equal
 	} else {
 		if r.gIntersection.Order() == 0 {
@@ -96,7 +89,7 @@ func (r *RelationshipByDegrees) handleNode() {
 			r.nPoint++
 			for j, v := range r.boundary {
 				for _, b := range v {
-					if n.Value.Equals(b) || n.Reverse.Equals(b) {
+					if n.Value.EqualsExact(b, calc.DefaultTolerance) || n.Reverse.EqualsExact(b, calc.DefaultTolerance) {
 						r.haveIntersectionVertex[j]++
 					}
 				}

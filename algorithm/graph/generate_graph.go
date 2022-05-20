@@ -4,6 +4,7 @@ package graph
 
 import (
 	"github.com/spatial-go/geoos/algorithm"
+	"github.com/spatial-go/geoos/algorithm/calc"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/relate"
 )
@@ -243,18 +244,18 @@ func lineAndPolygonHandle(m1 matrix.LineMatrix, m2 matrix.PolygonMatrix, g1, g2 
 			gNum.AddEdge(node, nodeLine)
 		}
 		if i == 0 && m1.IsClosed() {
-			if startNode.Value != nil && startNode.Value.Equals(matrix.Matrix(m1[0])) {
+			if startNode.Value != nil && startNode.Value.EqualsExact(matrix.Matrix(m1[0]), calc.DefaultTolerance) {
 				gNum.AddEdge(startNode, endNodeLine)
 			}
-			if endNode.Value != nil && endNode.Value.Equals(matrix.Matrix(m1[len(m1)-1])) {
+			if endNode.Value != nil && endNode.Value.EqualsExact(matrix.Matrix(m1[len(m1)-1]), calc.DefaultTolerance) {
 				gNum.AddEdge(endNode, startNodeLine)
 			}
 		}
 		if i > 0 {
-			if startNode.Value != nil && startNode.Value.Equals(matrix.Matrix(m2[i-1][0])) {
+			if startNode.Value != nil && startNode.Value.EqualsExact(matrix.Matrix(m2[i-1][0]), calc.DefaultTolerance) {
 				gNum.AddEdge(startNode, endNodeLine)
 			}
-			if endNode.Value != nil && endNode.Value.Equals(matrix.Matrix(m2[i-1][len(m2[i-1])-1])) {
+			if endNode.Value != nil && endNode.Value.EqualsExact(matrix.Matrix(m2[i-1][len(m2[i-1])-1]), calc.DefaultTolerance) {
 				gNum.AddEdge(endNode, startNodeLine)
 			}
 		}
@@ -303,10 +304,10 @@ func polygonAndPolygonHandle(m1, m2 matrix.PolygonMatrix, g1, g2 Graph) error {
 			} else {
 				m = m2
 			}
-			if startNode.Value != nil && startNode.Value.Equals(matrix.Matrix(m[k][0])) {
+			if startNode.Value != nil && startNode.Value.EqualsExact(matrix.Matrix(m[k][0]), calc.DefaultTolerance) {
 				g[i].AddEdge(startNode, endNodeLine)
 			}
-			if endNode.Value != nil && endNode.Value.Equals(matrix.Matrix(m[k][len(m[k])-1])) {
+			if endNode.Value != nil && endNode.Value.EqualsExact(matrix.Matrix(m[k][len(m[k])-1]), calc.DefaultTolerance) {
 				g[i].AddEdge(endNode, startNodeLine)
 			}
 

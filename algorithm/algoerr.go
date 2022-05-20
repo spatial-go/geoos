@@ -42,6 +42,9 @@ var ErrWrongExponent = fmt.Errorf("Exponent out of bounds")
 // ErrComputeOffsetZero ...
 var ErrComputeOffsetZero = fmt.Errorf("Cannot compute offset from zero-length line segment")
 
+// ErrWrongLink ...
+var ErrWrongLink = fmt.Errorf("Cannot link lines")
+
 // ErrBoundBeNil ...
 var ErrBoundBeNil = fmt.Errorf("boundary should be nil")
 

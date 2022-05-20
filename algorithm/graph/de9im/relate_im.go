@@ -7,8 +7,11 @@ import (
 	"github.com/spatial-go/geoos/algorithm/matrix"
 )
 
-// Relatelgorithm  the entity be used during the relate computation.
-type Relatelgorithm func(arg []matrix.Steric) Relationship
+// RelateAlgorithm  the entity be used during the relate computation.
+type RelateAlgorithm func(arg []matrix.Steric) Relationship
+
+// RelateClipAlgorithm  the entity be used during the relate computation.
+type RelateClipAlgorithm func(clip *graph.Clip) Relationship
 
 // Relationship  be used during the relate computation.
 type Relationship interface {
@@ -16,14 +19,18 @@ type Relationship interface {
 }
 
 // GetRelationship returns  algorithm by new Algorithm.
-func GetRelationship(f Relatelgorithm, arg []matrix.Steric) Relationship {
+func GetRelationship(f RelateAlgorithm, arg []matrix.Steric) Relationship {
 	return f(arg)
 }
 
-func withDegrees(arg []matrix.Steric) Relationship {
+// GetRelationshipByClip returns  algorithm by new Algorithm.
+func GetRelationshipByClip(f RelateClipAlgorithm, clip *graph.Clip) Relationship {
+	return f(clip)
+}
+
+func withDegreesAndClip(clip *graph.Clip) Relationship {
 	return &RelationshipByDegrees{
-		Arg:           arg,
-		graph:         []graph.Graph{&graph.MatrixGraph{}, &graph.MatrixGraph{}},
+		Clip:          clip,
 		gIntersection: &graph.MatrixGraph{},
 		gUnion:        &graph.MatrixGraph{},
 		IM:            matrix.IntersectionMatrixDefault(),
@@ -31,10 +38,19 @@ func withDegrees(arg []matrix.Steric) Relationship {
 	}
 }
 
+func withDegrees(arg []matrix.Steric) Relationship {
+	clip := graph.ClipHandle(arg[0], arg[1])
+	return withDegreesAndClip(clip)
+}
+
 func withStructure(arg []matrix.Steric) Relationship {
+	clip := graph.ClipHandle(arg[0], arg[1])
+	return withStructureAndClip(clip)
+}
+
+func withStructureAndClip(clip *graph.Clip) Relationship {
 	return &RelationshipByStructure{
-		Arg:           arg,
-		graph:         []graph.Graph{&graph.MatrixGraph{}, &graph.MatrixGraph{}},
+		Clip:          clip,
 		gIntersection: &graph.MatrixGraph{},
 		gUnion:        &graph.MatrixGraph{},
 		IM:            matrix.IntersectionMatrixDefault(),
@@ -59,9 +75,17 @@ func IM(m0, m1 matrix.Steric) *matrix.IntersectionMatrix {
 	return IMByRelationship(m0, m1, withDegrees)
 }
 
+// IMByClip Gets the relate  for the spatial relationship
+// between the input geometries.
+func IMByClip(clip *graph.Clip) *matrix.IntersectionMatrix {
+	rs := GetRelationshipByClip(withDegreesAndClip, clip)
+	im := rs.ComputeIM()
+	return im
+}
+
 // IMByRelationship Gets the relate  for the spatial relationship
 // between the input geometries.
-func IMByRelationship(m0, m1 matrix.Steric, f Relatelgorithm) *matrix.IntersectionMatrix {
+func IMByRelationship(m0, m1 matrix.Steric, f RelateAlgorithm) *matrix.IntersectionMatrix {
 	arg := []matrix.Steric{m0, m1}
 	if m0.Dimensions() > m1.Dimensions() {
 		arg = []matrix.Steric{m1, m0}

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/spatial-go/geoos/algorithm/calc"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/relate"
 )
@@ -29,7 +30,7 @@ func (ii *IntersectionCorrelation) ProcessIntersections(
 		return
 	}
 	if ii.isEquals == 0 {
-		if e0.Equals(e1) {
+		if e0.EqualsExact(e1, calc.DefaultTolerance) {
 			ii.isEquals = 1
 			// if  edge is closed, return
 			if e0.IsClosed() {

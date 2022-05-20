@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"sync"
 
+	"github.com/spatial-go/geoos/algorithm/calc"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 )
 
@@ -88,6 +89,9 @@ type Graph interface {
 	// Equals returns the true if g==g1.
 	Equals(g1 Graph) bool
 
+	// Proximity returns true if  if g-g1<DefaultTolerance.
+	Proximity(g1 Graph) bool
+
 	// Union  Computes the Union of two Graph.
 	Union(graph Graph) (Graph, error)
 
@@ -118,6 +122,25 @@ type Node struct {
 	NodeType int
 }
 
+// Equals returns the true if  n==other.
+func (n *Node) Equals(other *Node) bool {
+	return n.EqualsExact(other, 0)
+}
+
+// Proximity returns true if  if  n-other<DefaultTolerance.
+func (n *Node) Proximity(other *Node) bool {
+	return n.EqualsExact(other, calc.DefaultTolerance)
+}
+
+// EqualsExact returns the true if n-other<tolerance.
+func (n *Node) EqualsExact(other *Node, tolerance float64) bool {
+	if !n.Value.EqualsExact(other.Value, tolerance) &&
+		!n.Reverse.EqualsExact(other.Value, tolerance) {
+		return false
+	}
+	return true
+}
+
 // MatrixGraph represents a graph with a geometry
 // of vertices and weighted edges that can be added or removed.
 // The implementation uses hash maps to associate each vertex in the graph with
@@ -140,12 +163,21 @@ func (g *MatrixGraph) String() string {
 
 // Equals returns the true if g==g1.
 func (g *MatrixGraph) Equals(g1 Graph) bool {
+	return g.EqualsExact(g1, 0)
+}
+
+// Proximity returns true if  if g-g1<DefaultTolerance.
+func (g *MatrixGraph) Proximity(g1 Graph) bool {
+	return g.EqualsExact(g1, calc.DefaultTolerance)
+}
+
+// EqualsExact returns the true if g-g1<tolerance.
+func (g *MatrixGraph) EqualsExact(g1 Graph, tolerance float64) bool {
 	if g1.Order() != g.Order() {
 		return false
 	}
 	for i := 0; i < g1.Order(); i++ {
-		if !g.Nodes()[i].Value.Equals(g1.Nodes()[i].Value) &&
-			!g.Nodes()[i].Reverse.Equals(g1.Nodes()[i].Value) {
+		if !g.Nodes()[i].EqualsExact(g1.Nodes()[i], tolerance) {
 			return false
 		}
 	}
@@ -170,7 +202,7 @@ func (g *MatrixGraph) AddNodeType(n *Node, nodeType int) {
 	g.lock.Lock()
 	defer g.lock.Unlock()
 	for _, node := range g.nodes {
-		if n.Value.Equals(node.Value) || n.Value.Equals(node.Reverse) {
+		if node.Proximity(n) {
 			if !node.Stat {
 				node.Stat = true
 			}
@@ -214,8 +246,7 @@ func (g *MatrixGraph) DeleteNode(n *Node) {
 // Node tells if there is an node .
 func (g *MatrixGraph) Node(n *Node) (*Node, bool) {
 	for _, node := range g.nodes {
-		if n.Value.Equals(node.Value) && node.Stat ||
-			n.Value.Equals(node.Reverse) && node.Stat {
+		if node.Proximity(n) && node.Stat {
 			return node, true
 		}
 	}

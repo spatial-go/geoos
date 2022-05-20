@@ -21,9 +21,9 @@ func (p *LineClipping) Union() (matrix.Steric, error) {
 	if ps, ok := p.Subject.(matrix.LineMatrix); ok {
 		switch pc := p.Clipping.(type) {
 		case matrix.Matrix:
-			return Union(pc, ps), nil
+			return Union(pc, ps)
 		case matrix.LineMatrix:
-			gu, _ := ClipHandle(ps, pc).Union()
+			gu, _ := graph.ClipHandle(ps, pc).Union()
 			return graph.GenerateSteric(gu)
 		case matrix.PolygonMatrix:
 			switch im := de9im.IM(ps, pc); {
@@ -33,7 +33,7 @@ func (p *LineClipping) Union() (matrix.Steric, error) {
 				return pc, nil
 			}
 
-			gu, _ := ClipHandle(ps, pc).Union()
+			gu, _ := graph.ClipHandle(ps, pc).Union()
 			return graph.GenerateSteric(gu)
 		}
 	}
@@ -50,7 +50,7 @@ func (p *LineClipping) Intersection() (matrix.Steric, error) {
 		case matrix.Matrix:
 			return Intersection(pc, ps)
 		case matrix.LineMatrix:
-			gi, _ := ClipHandle(ps, pc).Intersection()
+			gi, _ := graph.ClipHandle(ps, pc).Intersection()
 			return graph.GenerateSteric(gi)
 		case matrix.PolygonMatrix:
 			switch im := de9im.IM(ps, pc); {
@@ -59,7 +59,7 @@ func (p *LineClipping) Intersection() (matrix.Steric, error) {
 			case im.IsCoveredBy():
 				return ps, nil
 			}
-			gu, _ := ClipHandle(ps, pc).Union()
+			gu, _ := graph.ClipHandle(ps, pc).Union()
 			for _, v := range gu.Nodes() {
 				switch im := de9im.IM(v.Value, pc); {
 				case !im.IsWithin() || v.Value.Equals(ps):
@@ -85,7 +85,7 @@ func (p *LineClipping) Difference() (matrix.Steric, error) {
 		case matrix.Matrix:
 			return ps, nil
 		case matrix.LineMatrix:
-			gd, _ := ClipHandle(ps, pc).Difference()
+			gd, _ := graph.ClipHandle(ps, pc).Difference()
 			return graph.GenerateSteric(gd)
 
 			// var err error

@@ -5,13 +5,17 @@ import (
 	"github.com/spatial-go/geoos/algorithm/graph"
 	"github.com/spatial-go/geoos/algorithm/graph/de9im"
 	"github.com/spatial-go/geoos/algorithm/matrix"
-	"github.com/spatial-go/geoos/algorithm/overlay"
+	"github.com/spatial-go/geoos/algorithm/measure"
+	"github.com/spatial-go/geoos/space"
 )
+
+const dir = "../graphtests/"
 
 // PolygonClipping  Computes the overlay of two geometries,either or both of which may be nil.
 type PolygonClipping struct {
 	*PointClipping
-	subjectPlane, clippingPlane *overlay.Plane
+	clip, shellClip *graph.Clip
+	polys           []matrix.PolygonMatrix
 }
 
 // Union  Computes the Union of two geometries,either or both of which may be nil.
@@ -22,9 +26,14 @@ func (p *PolygonClipping) Union() (matrix.Steric, error) {
 	if ps, ok := p.Subject.(matrix.PolygonMatrix); ok {
 		switch pc := p.Clipping.(type) {
 		case matrix.Matrix, matrix.LineMatrix:
-			return Union(pc, ps), nil
+			return Union(pc, ps)
 		case matrix.PolygonMatrix:
-			switch im := de9im.IM(ps, pc); {
+			p.clip = graph.ClipHandle(ps, pc)
+			if len(ps) == 1 && len(pc) == 1 {
+				p.shellClip = p.clip
+			}
+
+			switch im := de9im.IMByClip(p.clip); {
 			case im.IsCovers():
 				return ps, nil
 			case im.IsCoveredBy():
@@ -36,13 +45,52 @@ func (p *PolygonClipping) Union() (matrix.Steric, error) {
 					return matrix.Collection{ps, pc}, nil
 				}
 			}
-
-			result := matrix.PolygonMatrix{shellUnion(matrix.PolygonMatrix{ps[0]}, matrix.PolygonMatrix{pc[0]})}
+			if shells, err := p.shellUnion(matrix.PolygonMatrix{ps[0]}, matrix.PolygonMatrix{pc[0]}); err == nil {
+				p.shellsHandle(shells)
+			} else {
+				return nil, err
+			}
 			for i := 1; i < len(pc); i++ {
-				result = append(result, holeUnion(matrix.PolygonMatrix{ps[0]}, matrix.PolygonMatrix{pc[i]}))
+				if im := de9im.IM(matrix.PolygonMatrix{pc[i]}, ps); im.IsCoveredBy() {
+					continue
+				}
+				if holes, err := holeUnion(matrix.PolygonMatrix{ps[0]}, matrix.PolygonMatrix{pc[i]}); err == nil {
+					if holes != nil {
+						p.holesHandle(holes)
+					}
+				} else {
+					return nil, err
+				}
 			}
 			for i := 1; i < len(ps); i++ {
-				result = append(result, holeUnion(matrix.PolygonMatrix{pc[0]}, matrix.PolygonMatrix{ps[i]}))
+				if im := de9im.IM(matrix.PolygonMatrix{ps[i]}, pc); im.IsCoveredBy() {
+					continue
+				}
+				if holes, err := holeUnion(matrix.PolygonMatrix{pc[0]}, matrix.PolygonMatrix{ps[i]}); err == nil {
+					if holes != nil {
+						p.holesHandle(holes)
+					}
+				} else {
+					return nil, err
+				}
+			}
+			return p.Result()
+		case matrix.Collection:
+			result := matrix.Collection{}
+			IsUnion := false
+			for _, v := range pc {
+				un, err := Union(ps, v)
+
+				if _, ok := un.(matrix.Collection); ok || err != nil {
+					result = append(result, v)
+				} else {
+					IsUnion = true
+					result = append(result, un)
+				}
+
+			}
+			if !IsUnion {
+				result = append(result, ps)
 			}
 			return result, nil
 		}
@@ -69,8 +117,12 @@ func (p *PolygonClipping) Intersection() (matrix.Steric, error) {
 				return matrix.PolygonMatrix{}, nil
 			}
 
-			result := matrix.PolygonMatrix{edgeIntersection(ps, pc.(matrix.PolygonMatrix))}
-			return result, nil
+			if shells, err := edgeIntersection(ps, pc.(matrix.PolygonMatrix)); err == nil {
+				p.shellsHandle(shells)
+			} else {
+				return nil, err
+			}
+			return p.Result()
 		}
 	}
 	return nil, algorithm.ErrNotMatchType
@@ -109,14 +161,34 @@ func (p *PolygonClipping) Difference() (matrix.Steric, error) {
 
 			}
 
-			result := matrix.PolygonMatrix{edgeDifference(matrix.PolygonMatrix{ps[0]}, matrix.PolygonMatrix{pc[0]})}
+			if shells, err := edgeDifference(matrix.PolygonMatrix{ps[0]}, matrix.PolygonMatrix{pc[0]}); err == nil {
+				p.shellsHandle(shells)
+			} else {
+				return nil, err
+			}
+
 			for i := 1; i < len(pc); i++ {
-				result = append(result, edgeDifference(matrix.PolygonMatrix{ps[0]}, matrix.PolygonMatrix{pc[i]}))
+				if im := de9im.IM(matrix.PolygonMatrix{pc[i]}, ps); im.IsCoveredBy() {
+					continue
+				}
+				if holes, err := edgeDifference(matrix.PolygonMatrix{ps[0]}, matrix.PolygonMatrix{pc[i]}); err == nil {
+					p.holesHandle(holes)
+				} else {
+					return nil, algorithm.ErrWrongLink
+				}
 			}
 			for i := 1; i < len(ps); i++ {
-				result = append(result, edgeDifference(matrix.PolygonMatrix{pc[0]}, matrix.PolygonMatrix{ps[i]}))
+				if im := de9im.IM(matrix.PolygonMatrix{ps[i]}, pc); im.IsCoveredBy() {
+					p.holesHandle([]matrix.LineMatrix{ps[i]})
+				} else {
+					if holes, err := edgeDifference(matrix.PolygonMatrix{pc[0]}, matrix.PolygonMatrix{ps[i]}); err == nil {
+						p.holesHandle(holes)
+					} else {
+						return nil, algorithm.ErrWrongLink
+					}
+				}
 			}
-			return result, nil
+			return p.Result()
 		}
 	}
 	return nil, algorithm.ErrNotMatchType
@@ -147,57 +219,109 @@ func (p *PolygonClipping) SymDifference() (matrix.Steric, error) {
 	case 1:
 		return result[0], nil
 	default:
-		return Union(result[0], result[1]), nil
+		return Union(result[0], result[1])
 	}
 }
 
 // shellUnion union shell of two polygonal geometries.
-func shellUnion(ps, pc matrix.PolygonMatrix) matrix.LineMatrix {
-	clip := ClipHandle(ps, pc)
+func (p *PolygonClipping) shellUnion(ps, pc matrix.PolygonMatrix) ([]matrix.LineMatrix, error) {
+
+	if p.shellClip == nil {
+		p.shellClip = graph.ClipHandle(ps, pc)
+	}
+	switch im := de9im.IMByClip(p.shellClip); {
+	case im.IsCovers():
+		return []matrix.LineMatrix{ps[0]}, nil
+	case im.IsCoveredBy():
+		return []matrix.LineMatrix{pc[0]}, nil
+	}
+
+	clip := p.shellClip
 	gu, _ := clip.Union()
+	gi, _ := clip.Intersection()
+	guNodes := gu.Nodes()
+
+	geom := space.Collection{}
+	for _, v := range gu.Nodes() {
+		geom = append(geom, space.TransGeometry(v.Value))
+	}
+	writeGeom(dir+"data_union_graph.geojson", geom)
+
+	for _, v := range guNodes {
+		if v.NodeType == graph.PNode {
+			gu.DeleteNode(v)
+			continue
+		}
+		if _, ok := gi.Node(v); !ok {
+			psDe9im := de9im.IM(v.Value, ps)
+
+			if psDe9im.IsWithin() {
+				gu.DeleteNode(v)
+				continue
+			}
+
+			pcDe9im := de9im.IM(v.Value, pc)
+			if pcDe9im.IsWithin() {
+				gu.DeleteNode(v)
+				continue
+			}
+			if psDe9im.IsCoveredBy() && pcDe9im.IsCoveredBy() {
+				gu.DeleteNode(v)
+				continue
+			}
+		} else {
+			gu.DeleteNode(v)
+		}
+	}
+	geom = space.Collection{}
+	for _, v := range gu.Nodes() {
+		geom = append(geom, space.TransGeometry(v.Value))
+	}
+	writeGeom(dir+"data_link.geojson", geom)
+	return link(gu, gi)
+}
+
+// holeUnion union holes of two polygonal geometries.
+func holeUnion(ps, pc matrix.PolygonMatrix) ([]matrix.LineMatrix, error) {
+
+	switch im := de9im.IM(ps, pc); {
+	case im.IsCovers():
+		return nil, nil
+	case im.IsCoveredBy():
+		return nil, nil
+	case !im.IsIntersects():
+		return []matrix.LineMatrix{pc[0]}, nil
+	default:
+		if ok, _ := im.Matches("FF**0****"); ok {
+			return []matrix.LineMatrix{pc[0]}, nil
+		}
+	}
+	clip := graph.ClipHandle(ps, pc)
+	gu, _ := clip.Union()
+	gi, _ := clip.Intersection()
 	guNodes := gu.Nodes()
 	for _, v := range guNodes {
 		if v.NodeType == graph.PNode {
 			gu.DeleteNode(v)
+			continue
 		}
 		psDe9im := de9im.IM(v.Value, ps)
 		pcDe9im := de9im.IM(v.Value, pc)
 		if psDe9im.IsWithin() {
 			gu.DeleteNode(v)
 		}
-		if pcDe9im.IsWithin() {
-			gu.DeleteNode(v)
-		}
-		if psDe9im.IsCoveredBy() && pcDe9im.IsCoveredBy() {
+		if !pcDe9im.IsCoveredBy() {
 			gu.DeleteNode(v)
 		}
 	}
-	return link(gu)
-}
-
-// holeUnion union holes of two polygonal geometries.
-func holeUnion(ps, pc matrix.PolygonMatrix) matrix.LineMatrix {
-	clip := ClipHandle(ps, pc)
-	gu, _ := clip.Union()
-	guNodes := gu.Nodes()
-	for _, v := range guNodes {
-		if v.NodeType == graph.PNode {
-			gu.DeleteNode(v)
-		}
-		if de9im.IM(v.Value, ps).IsWithin() {
-			gu.DeleteNode(v)
-		}
-		if !de9im.IM(v.Value, pc).IsCoveredBy() {
-			gu.DeleteNode(v)
-		}
-	}
-	return link(gu)
+	return link(gu, gi)
 }
 
 // edgeDifference difference edge two polygonal geometries.
-func edgeDifference(ps, pc matrix.PolygonMatrix) matrix.LineMatrix {
-	clip := ClipHandle(ps, pc)
+func edgeDifference(ps, pc matrix.PolygonMatrix) ([]matrix.LineMatrix, error) {
+	clip := graph.ClipHandle(ps, pc)
 	gu, _ := clip.Union()
+	gi, _ := clip.Intersection()
 	guNodes := gu.Nodes()
 	for _, v := range guNodes {
 		if v.NodeType == graph.PNode {
@@ -215,12 +339,12 @@ func edgeDifference(ps, pc matrix.PolygonMatrix) matrix.LineMatrix {
 			gu.DeleteNode(v)
 		}
 	}
-	return link(gu)
+	return link(gu, gi)
 }
 
 // edgeIntersection intersection edge two polygonal geometries.
-func edgeIntersection(ps, pc matrix.PolygonMatrix) matrix.LineMatrix {
-	clip := ClipHandle(ps, pc)
+func edgeIntersection(ps, pc matrix.PolygonMatrix) ([]matrix.LineMatrix, error) {
+	clip := graph.ClipHandle(ps, pc)
 	gu, _ := clip.Union()
 	guNodes := gu.Nodes()
 	gi := &graph.MatrixGraph{}
@@ -240,54 +364,68 @@ func edgeIntersection(ps, pc matrix.PolygonMatrix) matrix.LineMatrix {
 			gi.AddNode(v)
 		}
 	}
-	return link(gi)
+	return link(gi, nil)
 }
 
-// link returns edge by link nodes
-func link(g graph.Graph) (result matrix.LineMatrix) {
-	result = matrix.LineMatrix{}
+// Result returns result.
+func (p *PolygonClipping) Result() (matrix.Steric, error) {
+	if len(p.polys) > 1 {
+		result := matrix.Collection{}
+		for _, poly := range p.polys {
+			result = append(result, poly)
+		}
+		return result, nil
+	}
+	return p.polys[0], nil
+}
 
-	for {
-		guNodes := g.Nodes()
-		for _, v := range guNodes {
-			if v.NodeType == graph.CNode || v.NodeType == graph.LNode {
-				line := v.Value.(matrix.LineMatrix)
-				startPoint := matrix.Matrix(line[0])
-				lastPoint := matrix.Matrix(line[len(line)-1])
-				if len(result) == 0 {
-					for _, point := range line {
-						result = append(result, point)
-					}
-					g.DeleteNode(v)
-					break
-				} else {
-					if matrix.Matrix(result[len(result)-1]).Equals(startPoint) {
-						for i, point := range line {
-							if i == 0 {
-								continue
-							}
-							result = append(result, point)
-						}
-						g.DeleteNode(v)
-						break
-					}
-					if matrix.Matrix(result[len(result)-1]).Equals(lastPoint) {
-						for i, point := range line.Reverse() {
-							if i == 0 {
-								continue
-							}
-							result = append(result, point)
-						}
-						g.DeleteNode(v)
-						break
-					}
-				}
-
+func (p *PolygonClipping) shellsHandle(shells []matrix.LineMatrix) {
+	p.polys = []matrix.PolygonMatrix{}
+	switch len(shells) {
+	case 0:
+		//TODO
+	case 1:
+		p.polys = append(p.polys, matrix.PolygonMatrix{shells[0]})
+	default:
+		maxAreas := 0.0
+		maxIndex := 0
+		for i, v := range shells {
+			if area := measure.Area(v); area > float64(maxAreas) {
+				maxAreas = area
+				maxIndex = i
 			}
 		}
-		if result.IsClosed() {
-			break
+
+		maxShell := matrix.PolygonMatrix{shells[maxIndex]}
+		for i, v := range shells {
+			if i == maxIndex {
+				continue
+			}
+			switch im := de9im.IM(matrix.PolygonMatrix{v}, maxShell); {
+			case im.IsCoveredBy():
+				maxShell = append(maxShell, v)
+			default:
+				p.polys = append(p.polys, matrix.PolygonMatrix{v})
+			}
+		}
+		p.polys = append(p.polys, maxShell)
+	}
+}
+
+func (p *PolygonClipping) holesHandle(holes []matrix.LineMatrix) {
+	switch len(p.polys) {
+	case 0:
+		//TODO
+	case 1:
+		for _, v := range holes {
+			p.polys[0] = append(p.polys[0], v)
+		}
+	default:
+		for i := range p.polys {
+			//TODO
+			for _, v := range holes {
+				p.polys[i] = append(p.polys[i], v)
+			}
 		}
 	}
-	return result
 }

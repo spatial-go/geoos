@@ -24,8 +24,7 @@ const (
 // RelationshipByStructure  be used during the relate computation.
 type RelationshipByStructure struct {
 	// The operation args into an array so they can be accessed by index
-	Arg                    []matrix.Steric // the arg(s) of the operation
-	graph                  []graph.Graph
+	*graph.Clip
 	gIntersection, gUnion  graph.Graph
 	IM                     *matrix.IntersectionMatrix
 	relationshipSymbol     int
@@ -42,24 +41,18 @@ type RelationshipByStructure struct {
 // ComputeIM IntersectionMatrix Gets the IntersectionMatrix for the spatial relationship
 // between the input geometries.
 func (r *RelationshipByStructure) ComputeIM() *matrix.IntersectionMatrix {
-	for i, v := range r.Arg {
-		r.graph[i], _ = graph.GenerateGraph(v)
-	}
-
-	if err := graph.IntersectionHandle(r.Arg[0], r.Arg[1], r.graph[0], r.graph[1]); err != nil {
-		return r.IM
-	}
 
 	var err error
-	if r.gIntersection, err = r.graph[0].Intersection(r.graph[1]); err != nil {
+	if r.gIntersection, err = r.Intersection(); err != nil {
 		return r.IM
 	}
-	if r.gUnion, err = r.graph[0].Union(r.graph[1]); err != nil {
+	if r.gUnion, err = r.Union(); err != nil {
 		return r.IM
 	}
 
 	relateType := 0
-	if r.Arg[0].Equals(r.Arg[1]) {
+	// TODO Proximity Greedy Algorithm
+	if r.Arg[0].Proximity(r.Arg[1]) {
 		relateType = Equal
 	} else {
 		if r.gIntersection.Order() == 0 {

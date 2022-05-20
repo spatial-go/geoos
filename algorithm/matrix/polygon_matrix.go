@@ -190,8 +190,10 @@ func (m MultiPolygonMatrix) Equals(ms Steric) bool {
 				return false
 			}
 		}
+		return true
 	}
-	return true
+	return false
+
 }
 
 // Proximity returns true if the Steric represents the Proximity Geometry or vector.
@@ -211,8 +213,9 @@ func (m MultiPolygonMatrix) Proximity(ms Steric) bool {
 				return false
 			}
 		}
+		return true
 	}
-	return true
+	return false
 }
 
 // EqualsExact returns  true if the two Matrix are equalexact

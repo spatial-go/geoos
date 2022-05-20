@@ -80,7 +80,7 @@ func (t *Transformer) transformRing(geom matrix.LineMatrix, parent matrix.Steric
 		}
 		return ml
 	}
-	return nil
+	return geom
 }
 
 func (t *Transformer) transformPolygon(geom matrix.PolygonMatrix, parent matrix.Steric) matrix.Steric {
@@ -217,7 +217,19 @@ func (d *DPTransformer) transformPolygon(geom matrix.PolygonMatrix, parent matri
 	if geom.IsEmpty() {
 		return nil
 	}
-	rawGeom := d.Transformer.transformPolygon(geom, parent)
+
+	rawGeom := matrix.PolygonMatrix{}
+	for i, v := range geom {
+		line := d.transformRing(v, geom)
+		if line == nil || line.IsEmpty() {
+			if i == 0 {
+				return nil
+			}
+			continue
+		}
+		rawGeom = append(rawGeom, line.(matrix.LineMatrix))
+	}
+
 	// don't try and correct if the parent is going to do this
 	if _, ok := parent.(matrix.MultiPolygonMatrix); ok {
 		return rawGeom
@@ -228,7 +240,7 @@ func (d *DPTransformer) transformPolygon(geom matrix.PolygonMatrix, parent matri
 // Simplifies a LinearRing.  If the simplification results in a degenerate ring, remove the component.
 func (d *DPTransformer) transformRing(geom matrix.LineMatrix, parent matrix.Steric) matrix.Steric {
 	if _, ok := parent.(matrix.PolygonMatrix); ok {
-		simpResult := d.Transformer.transformRing(geom, parent)
+		simpResult := d.transformLine(geom, parent)
 		return simpResult
 	}
 	return geom

@@ -114,9 +114,22 @@ func (l LineMatrix) Proximity(ms Steric) bool {
 			for _, v := range l {
 				if Matrix(v).Proximity(Matrix(mm[i])) {
 					havePoint = true
+					break
 				}
 			}
 			if !havePoint {
+				for i := range mm {
+					havePointReverse := false
+					for _, v := range l.Reverse() {
+						if Matrix(v).Proximity(Matrix(mm[i])) {
+							havePointReverse = true
+							break
+						}
+					}
+					if !havePointReverse {
+						return false
+					}
+				}
 				return false
 			}
 		}

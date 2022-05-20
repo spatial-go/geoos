@@ -16,7 +16,27 @@ const (
 	// MaxClosingSegLenFactor Factor which determines how short closing segs can be for round buffers
 	MaxClosingSegLenFactor = 80
 
-	AccuracyFloat = 1.0e-11
+	// DecimalPlaces ...
+	DecimalPlaces = "%.10f"
+
+	// DefaultTolerance6 ...
+	DefaultTolerance6 = 1.0e-6
+
+	// DefaultTolerance7 ...
+	DefaultTolerance7 = 1.0e-7
+
+	// DefaultTolerance8 ...
+	DefaultTolerance8 = 1.0e-8
+
+	// DefaultTolerance9 ...
+	DefaultTolerance9 = 1.0e-9
+
+	// DefaultTolerance10 ...
+	DefaultTolerance10 = 1.0e-10
+
+	AccuracyFloat = DefaultTolerance9
+
+	DefaultTolerance = AccuracyFloat
 )
 
 // const  Defined constant variable overlay parameters.

@@ -2,7 +2,11 @@
 
 package de9im
 
-import "math"
+import (
+	"math"
+
+	"github.com/spatial-go/geoos/algorithm/calc"
+)
 
 func (r *RelationshipByDegrees) lineAndLineAnalyse(pointInPolygon, entityInPolygon int) {
 	switch r.nLine {
@@ -151,17 +155,23 @@ func (r *RelationshipByDegrees) numsOfBoundaryIM() (int, int) {
 	if r.boundary[0] == nil || r.boundary[1] == nil {
 		return aNums, bNums
 	}
-	if r.boundary[0][0].Equals(r.boundary[1][0]) || r.boundary[0][0].Equals(r.boundary[1][1]) ||
-		r.boundary[0][1].Equals(r.boundary[1][0]) || r.boundary[0][1].Equals(r.boundary[1][1]) {
+	if r.boundary[0][0].EqualsExact(r.boundary[1][0], calc.DefaultTolerance) ||
+		r.boundary[0][0].EqualsExact(r.boundary[1][1], calc.DefaultTolerance) ||
+		r.boundary[0][1].EqualsExact(r.boundary[1][0], calc.DefaultTolerance) ||
+		r.boundary[0][1].EqualsExact(r.boundary[1][1], calc.DefaultTolerance) {
 		aNums, bNums = 1, 1
 	}
-	if (r.boundary[0][0].Equals(r.boundary[1][0]) || r.boundary[0][0].Equals(r.boundary[1][1])) &&
-		(r.boundary[0][1].Equals(r.boundary[1][0]) || r.boundary[0][1].Equals(r.boundary[1][1])) {
+	if (r.boundary[0][0].EqualsExact(r.boundary[1][0], calc.DefaultTolerance) ||
+		r.boundary[0][0].EqualsExact(r.boundary[1][1], calc.DefaultTolerance)) &&
+		(r.boundary[0][1].EqualsExact(r.boundary[1][0], calc.DefaultTolerance) ||
+			r.boundary[0][1].EqualsExact(r.boundary[1][1], calc.DefaultTolerance)) {
 		aNums = 2
 	}
 
-	if (r.boundary[1][0].Equals(r.boundary[0][0]) || r.boundary[1][0].Equals(r.boundary[0][1])) &&
-		(r.boundary[1][1].Equals(r.boundary[0][0]) || r.boundary[1][1].Equals(r.boundary[0][1])) {
+	if (r.boundary[1][0].EqualsExact(r.boundary[0][0], calc.DefaultTolerance) ||
+		r.boundary[1][0].EqualsExact(r.boundary[0][1], calc.DefaultTolerance)) &&
+		(r.boundary[1][1].EqualsExact(r.boundary[0][0], calc.DefaultTolerance) ||
+			r.boundary[1][1].EqualsExact(r.boundary[0][1], calc.DefaultTolerance)) {
 		bNums = 2
 	}
 	return aNums, bNums
