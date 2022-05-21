@@ -3,6 +3,7 @@ package clipping
 import (
 	"os"
 
+	"github.com/spatial-go/geoos"
 	"github.com/spatial-go/geoos/algorithm"
 	"github.com/spatial-go/geoos/algorithm/calc"
 	"github.com/spatial-go/geoos/algorithm/graph"
@@ -118,14 +119,16 @@ func link(gu, gi graph.Graph) (results []matrix.LineMatrix, err error) {
 				result = matrix.LineMatrix{}
 				continue
 			}
-			geom := space.Collection{}
-			for _, v := range guNodes {
-				geom = append(geom, space.TransGeometry(v.Value))
+			if !geoos.GeoosTestTag {
+				geom := space.Collection{}
+				for _, v := range guNodes {
+					geom = append(geom, space.TransGeometry(v.Value))
+				}
+				for _, v := range giNodes {
+					geom = append(geom, space.TransGeometry(v.Value))
+				}
+				writeGeom(dir+"data_link.geojson", geom)
 			}
-			for _, v := range giNodes {
-				geom = append(geom, space.TransGeometry(v.Value))
-			}
-			writeGeom(dir+"data_link.geojson", geom)
 			return nil, algorithm.ErrWrongLink
 		}
 		lenBeUsed = len(beUsed)

@@ -1,6 +1,7 @@
 package clipping
 
 import (
+	"github.com/spatial-go/geoos"
 	"github.com/spatial-go/geoos/algorithm"
 	"github.com/spatial-go/geoos/algorithm/graph"
 	"github.com/spatial-go/geoos/algorithm/graph/de9im"
@@ -241,12 +242,13 @@ func (p *PolygonClipping) shellUnion(ps, pc matrix.PolygonMatrix) ([]matrix.Line
 	gi, _ := clip.Intersection()
 	guNodes := gu.Nodes()
 
-	geom := space.Collection{}
-	for _, v := range gu.Nodes() {
-		geom = append(geom, space.TransGeometry(v.Value))
+	if !geoos.GeoosTestTag {
+		geom := space.Collection{}
+		for _, v := range gu.Nodes() {
+			geom = append(geom, space.TransGeometry(v.Value))
+		}
+		writeGeom(dir+"data_union_graph.geojson", geom)
 	}
-	writeGeom(dir+"data_union_graph.geojson", geom)
-
 	for _, v := range guNodes {
 		if v.NodeType == graph.PNode {
 			gu.DeleteNode(v)
@@ -273,11 +275,13 @@ func (p *PolygonClipping) shellUnion(ps, pc matrix.PolygonMatrix) ([]matrix.Line
 			gu.DeleteNode(v)
 		}
 	}
-	geom = space.Collection{}
-	for _, v := range gu.Nodes() {
-		geom = append(geom, space.TransGeometry(v.Value))
+	if !geoos.GeoosTestTag {
+		geom := space.Collection{}
+		for _, v := range gu.Nodes() {
+			geom = append(geom, space.TransGeometry(v.Value))
+		}
+		writeGeom(dir+"data_link.geojson", geom)
 	}
-	writeGeom(dir+"data_link.geojson", geom)
 	return link(gu, gi)
 }
 
@@ -375,8 +379,11 @@ func (p *PolygonClipping) Result() (matrix.Steric, error) {
 			result = append(result, poly)
 		}
 		return result, nil
+	} else if len(p.polys) == 1 {
+		return p.polys[0], nil
+	} else {
+		return nil, nil
 	}
-	return p.polys[0], nil
 }
 
 func (p *PolygonClipping) shellsHandle(shells []matrix.LineMatrix) {

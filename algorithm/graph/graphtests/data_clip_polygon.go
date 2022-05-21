@@ -230,6 +230,12 @@ var TestsPolygonUnion = []TestCaseMore{
 	},
 		[]matrix.Steric{
 			matrix.PolygonMatrix{{{0, 0}, {10, 0}, {5, 10}, {10, 10}, {5, 15}, {5, 10}, {0, 10}, {0, 0}}}}, false},
+	{"poly x1", []matrix.Steric{
+		matrix.PolygonMatrix{{{1, 1}, {2, 1}, {5, 1}, {5, 2}, {2, 2}, {1, 2}, {1, 1}}},
+		matrix.PolygonMatrix{{{2, 1}, {5, 1}, {5, 2}, {2, 2}, {2, 1}}},
+	},
+		[]matrix.Steric{
+			matrix.PolygonMatrix{{{1, 1}, {2, 1}, {5, 1}, {5, 2}, {2, 2}, {1, 2}, {1, 1}}}}, false},
 }
 
 // TestsPolygonDifference ...

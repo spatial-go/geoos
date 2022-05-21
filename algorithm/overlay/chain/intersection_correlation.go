@@ -149,17 +149,9 @@ func (ipl IntersectionNodeOfLine) Less(i, j int) bool {
 		if line.P0 == nil {
 			return false
 		}
-		if tes, _ := line.P0.Compare(line.P1); tes > 0 {
-			if ipl[i].InterNode.Matrix[0] == ipl[j].InterNode.Matrix[0] {
-				return ipl[i].InterNode.Matrix[1] < ipl[j].InterNode.Matrix[1]
-			}
-			return ipl[i].InterNode.Matrix[0] < ipl[j].InterNode.Matrix[0]
+		if tes, err := line.P0.Compare(line.P1); err == nil {
+			return ipl[i].InterNode.Compare(&ipl[j].InterNode, tes)
 		}
-		if ipl[i].InterNode.Matrix[0] == ipl[j].InterNode.Matrix[0] {
-			return ipl[i].InterNode.Matrix[1] > ipl[j].InterNode.Matrix[1]
-		}
-		return ipl[i].InterNode.Matrix[0] > ipl[j].InterNode.Matrix[0]
-
 	}
 	return ipl[i].Pos < ipl[j].Pos
 }

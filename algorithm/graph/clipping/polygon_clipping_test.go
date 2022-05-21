@@ -45,7 +45,7 @@ func TestPolygonClipping_Union(t *testing.T) {
 
 	for _, tt := range graphtests.TestsPolygonUnion {
 		if !geoos.GeoosTestTag &&
-			tt.Name != "poly poly_xx" {
+			tt.Name != "poly x1" {
 			continue
 		}
 		t.Run(tt.Name, func(t *testing.T) {
@@ -141,10 +141,10 @@ func TestLargePolygonClipping_UnaryUnion(t *testing.T) {
 	i := 0
 	for j, p := range graphtests.Tianjian {
 		i = j
-		m[i] = simplify.Simplify(matrix.PolygonMatrix(p), 0.006).(matrix.PolygonMatrix)
+		m[i] = simplify.Simplify(matrix.PolygonMatrix(p), 0.008).(matrix.PolygonMatrix)
 	}
 	for j, p := range graphtests.Hebei {
-		m[i+j+1] = simplify.Simplify(matrix.PolygonMatrix(p), 0.006).(matrix.PolygonMatrix)
+		m[i+j+1] = simplify.Simplify(matrix.PolygonMatrix(p), 0.008).(matrix.PolygonMatrix)
 	}
 	got, err := UnaryUnion(m)
 	if (err != nil) != false {

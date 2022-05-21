@@ -28,6 +28,32 @@ func (ip *IntersectionPoint) Y() float64 {
 	return ip.Matrix[1]
 }
 
+// Compare Returns Compare of  IntersectionPoint.
+func (ip *IntersectionPoint) Compare(other *IntersectionPoint, tes int) bool {
+	if tes > 0 {
+		if ip.X() == other.X() {
+			if ip.Y() == other.Y() {
+				if other.IsCollinear {
+					ip.IsCollinear = true
+				}
+				return false
+			}
+			return ip.Y() < other.Y()
+		}
+		return ip.X() < other.X()
+	}
+	if ip.X() == other.X() {
+		if ip.Y() == other.Y() {
+			if other.IsCollinear {
+				ip.IsCollinear = true
+			}
+			return false
+		}
+		return ip.Y() > other.Y()
+	}
+	return ip.X() > other.X()
+}
+
 // IntersectionPointLine overlay point array.
 type IntersectionPointLine []IntersectionPoint
 
