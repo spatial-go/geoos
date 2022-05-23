@@ -19,7 +19,15 @@ const (
 	Geobuf
 )
 
-// Encode Returns string of that encode geometry  by codeType..
+// Encoder defines encoder for encoding and decoding into Go structs using the geometries.
+type Encoder interface {
+	// Encode Returns string of that encode geometry  by codeType.
+	Encode(g space.Geometry, codeType int) []byte
+	// Decode Returns geometry of that decode string by codeType.
+	Decode(s []byte, codeType int) (space.Geometry, error)
+}
+
+// Encode Returns string of that encode geometry  by codeType.
 func Encode(g space.Geometry, codeType int) []byte {
 	//TODO
 	switch codeType {
