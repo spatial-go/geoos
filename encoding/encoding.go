@@ -22,49 +22,51 @@ const (
 // Encoder defines encoder for encoding and decoding into Go structs using the geometries.
 type Encoder interface {
 	// Encode Returns string of that encode geometry  by codeType.
-	Encode(g space.Geometry, codeType int) []byte
+	Encode(g space.Geometry) []byte
 	// Decode Returns geometry of that decode string by codeType.
-	Decode(s []byte, codeType int) (space.Geometry, error)
+	Decode(s []byte) (space.Geometry, error)
+}
+
+type BaseEncode struct {
+}
+
+// Encode Returns string of that encode geometry  by codeType.
+func (e *BaseEncode) Encode(g space.Geometry) []byte {
+	return []byte{}
+}
+
+// Decode Returns geometry of that decode string by codeType.
+func (e *BaseEncode) Decode(s []byte) (space.Geometry, error) {
+	return nil, nil
 }
 
 // Encode Returns string of that encode geometry  by codeType.
 func Encode(g space.Geometry, codeType int) []byte {
-	//TODO
-	switch codeType {
-	case WKT:
-		return []byte(wkt.MarshalString(g))
-	case WKB:
-		s, _ := wkb.GeomToWKBHexStr(g)
-		return []byte(s)
-	case GeoJSON:
-		g := &geojson.Geometry{Coordinates: g}
-		data, _ := g.MarshalJSON()
-		return data
-	case GeoCSV:
-		return geocsv.Encode(g)
-	case Geobuf:
-		return geobuf.Encode(g)
-	default:
-		return []byte{}
-	}
+	encode := getEncoder(codeType)
+	return encode.Encode(g)
 }
 
 // Decode Returns geometry of that decode string by codeType.
 func Decode(s []byte, codeType int) (space.Geometry, error) {
-	// TODO
+	encode := getEncoder(codeType)
+	return encode.Decode(s)
+}
+
+func getEncoder(codeType int) Encoder {
+	var encode Encoder
 	switch codeType {
 	case WKT:
-		return wkt.UnmarshalString(string(s))
+		encode = &wkt.WKTEncoder{}
 	case WKB:
-		return wkb.GeomFromWKBHexStr(string(s))
+		encode = &wkb.WKBEncoder{}
 	case GeoJSON:
-		geom, err := geojson.UnmarshalGeometry(s)
-		return geom.Geometry(), err
+		encode = &geojson.GeojsonEncoder{}
 	case GeoCSV:
-		return geocsv.Decode(s)
+		encode = &geocsv.GeocsvEncoder{}
 	case Geobuf:
-		return geobuf.Decode(s)
+		encode = &geobuf.GeobufEncoder{}
 	default:
-		return nil, nil
+		encode = &BaseEncode{}
 	}
+	return encode
 }

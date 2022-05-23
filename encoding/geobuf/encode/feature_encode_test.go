@@ -1,6 +1,7 @@
 package encode
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/spatial-go/geoos/encoding/geobuf/decode"
@@ -52,6 +53,8 @@ func TestEncodeFeature(t *testing.T) {
 	}
 	feature := Encode(f)
 	t.Log(feature)
+	fmt.Printf("%T,%v", feature, feature)
 	fe := decode.Decode(feature)
 	t.Log(fe)
+	fmt.Printf("%T,%v", fe, fe)
 }
