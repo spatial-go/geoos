@@ -1,5 +1,4 @@
-// package graphtests ...
-
+// package graphtests  is include test datas.
 package graphtests
 
 import (

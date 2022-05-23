@@ -7,12 +7,12 @@ import (
 	"github.com/spatial-go/geoos/algorithm/relate"
 )
 
-// PointClipping  Computes the overlay of two geometries,either or both of which may be nil.
+// PointClipping  Computes the overlay of two geometries.
 type PointClipping struct {
 	Subject, Clipping matrix.Steric
 }
 
-// Union  Computes the Union of two geometries,either or both of which may be nil.
+// Union  Computes the Union of two geometries, if one is encountered.
 func (p *PointClipping) Union() (matrix.Steric, error) {
 	if res, ok := p.unionCheck(); !ok {
 		return res, nil
@@ -133,7 +133,7 @@ func (p *PointClipping) SymDifference() (matrix.Steric, error) {
 	return result, nil
 }
 
-// unionCheck  Computes the Union of two geometries,either or both of which may be null.
+// unionCheck  check  two geometries for union.
 func (p *PointClipping) unionCheck() (matrix.Steric, bool) {
 
 	if p.Subject == nil && p.Clipping == nil {
@@ -150,7 +150,7 @@ func (p *PointClipping) unionCheck() (matrix.Steric, bool) {
 	return nil, true
 }
 
-// intersectionCheck  Computes the Union of two geometries,either or both of which may be null.
+// intersectionCheck  check  two geometries for intersection.
 func (p *PointClipping) intersectionCheck() (matrix.Steric, bool) {
 
 	if p.Subject == nil && p.Clipping == nil {
@@ -167,7 +167,7 @@ func (p *PointClipping) intersectionCheck() (matrix.Steric, bool) {
 	return nil, true
 }
 
-// differenceCheck  Computes the Union of two geometries,either or both of which may be null.
+// differenceCheck check  two geometries for difference.
 func (p *PointClipping) differenceCheck() (matrix.Steric, bool) {
 
 	if p.Subject == nil && p.Clipping == nil {

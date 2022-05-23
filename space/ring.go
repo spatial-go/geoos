@@ -71,7 +71,7 @@ func (r Ring) ToMatrix() matrix.Steric {
 
 // IsEmpty returns true if the Geometry is empty.
 func (r Ring) IsEmpty() bool {
-	return r == nil || len(r) == 0
+	return len(r) == 0
 }
 
 // Distance returns distance Between the two Geometry.

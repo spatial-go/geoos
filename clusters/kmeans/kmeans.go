@@ -1,3 +1,8 @@
+// Package kmeans clusters incoming points into clusters with params (eps, minPoints)
+// K-Means performs the division of objects into clusters that share similarities and
+// are dissimilar to the objects belonging to another cluster. The term ‘K’ is a number.
+// You need to tell the system how many clusters you need to create.
+// For example, K = 2 refers to two clusters.
 package kmeans
 
 import (

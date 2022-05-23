@@ -34,7 +34,7 @@ func (l LineMatrix) Boundary() (Steric, error) {
 	return Collection{Matrix(l[0]), Matrix(l[len(l)-1])}, nil
 }
 
-// IsClosed Returns TRUE if the LINESTRING's start and end points are coincident.
+// IsClosed Returns TRUE if the line's start and end points are coincident.
 // For Polyhedral Surfaces, reports if the surface is areal (open) or IsC (closed).
 func (l LineMatrix) IsClosed() bool {
 	if l.IsEmpty() {
@@ -50,7 +50,7 @@ func (l LineMatrix) Nums() int {
 
 // IsEmpty returns true if the Matrix is empty.
 func (l LineMatrix) IsEmpty() bool {
-	return l == nil || len(l) == 0
+	return len(l) == 0
 }
 
 // Bound returns a rect around the line string. Uses rectangular coordinates.

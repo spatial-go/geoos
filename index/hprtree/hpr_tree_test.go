@@ -2,6 +2,7 @@ package hprtree
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"testing"
 
@@ -31,7 +32,9 @@ func buildTree() *HPRTree {
 		matrix.Matrix{3, 2},
 	}
 	for i := 0; i < len(ms); i++ {
-		indexTree.Insert(envelope.Matrix(ms[i].(matrix.Matrix)), ms[i])
+		if err := indexTree.Insert(envelope.Matrix(ms[i].(matrix.Matrix)), ms[i]); err != nil {
+			log.Println(err)
+		}
 	}
 	return indexTree
 }
@@ -68,7 +71,7 @@ func TestHPRTree_Insert(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			h := indexTree
-			h.Insert(tt.args.itemEnv, tt.args.item)
+			_ = h.Insert(tt.args.itemEnv, tt.args.item)
 			if got := h.Size(); got != tt.want {
 				t.Errorf("HPRTree.Size() = %v, want %v", got, tt.want)
 			}
@@ -112,7 +115,7 @@ func TestHPRTree_QueryVisitor(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			h := indexTree
-			h.QueryVisitor(tt.args.searchEnv, tt.args.visitor)
+			_ = h.QueryVisitor(tt.args.searchEnv, tt.args.visitor)
 			if len(tt.args.visitor.Items().([]interface{})) <= 0 {
 				t.Errorf("HPRTree.Query() = %v, want %v", len(tt.args.visitor.Items().([]interface{})), ">0")
 			}

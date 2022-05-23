@@ -1,6 +1,8 @@
 package simplify
 
 import (
+	"log"
+
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/matrix/envelope"
 	"github.com/spatial-go/geoos/index"
@@ -24,7 +26,9 @@ func (l *LineSegmentIndex) Add(line matrix.LineMatrix) {
 
 // AddSegment add a LineSegment.
 func (l *LineSegmentIndex) AddSegment(seg *matrix.LineSegment) {
-	l.index.Insert(envelope.TwoMatrix(seg.P0, seg.P1), seg)
+	if err := l.index.Insert(envelope.TwoMatrix(seg.P0, seg.P1), seg); err != nil {
+		log.Println(err)
+	}
 }
 
 // Remove remove a TaggedLineSegment.
@@ -37,8 +41,11 @@ func (l *LineSegmentIndex) Query(querySeg *matrix.LineSegment) []*matrix.LineSeg
 	env := envelope.TwoMatrix(querySeg.P0, querySeg.P1)
 
 	visitor := &index.LineSegmentVisitor{QuerySeg: querySeg}
-	l.index.QueryVisitor(env, visitor)
-	itemsFound := visitor.Items()
-
-	return itemsFound.([]*matrix.LineSegment)
+	if err := l.index.QueryVisitor(env, visitor); err != nil {
+		log.Println(err)
+		return nil
+	} else {
+		itemsFound := visitor.Items()
+		return itemsFound.([]*matrix.LineSegment)
+	}
 }

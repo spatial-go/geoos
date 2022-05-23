@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/spatial-go/geoos/geobuf/proto"
+	"github.com/spatial-go/geoos/encoding/geobuf/proto"
 )
 
 // EncodeIntID ...

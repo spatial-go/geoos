@@ -12,14 +12,14 @@ import (
 
 const dir = "../graphtests/"
 
-// PolygonClipping  Computes the overlay of two geometries,either or both of which may be nil.
+// PolygonClipping  Computes the overlay of two geometries.
 type PolygonClipping struct {
 	*PointClipping
 	clip, shellClip *graph.Clip
 	polys           []matrix.PolygonMatrix
 }
 
-// Union  Computes the Union of two geometries,either or both of which may be nil.
+// Union  Computes the Union of two geometries, if one is encountered.
 func (p *PolygonClipping) Union() (matrix.Steric, error) {
 	if res, ok := p.unionCheck(); !ok {
 		return res, nil

@@ -72,7 +72,7 @@ func (c *CurveBuilder) RingCurve(pts matrix.LineMatrix, distance float64, side i
 // <br>Left: Location.EXTERIOR
 // <br>Right: Location.INTERIOR
 func (c *CurveBuilder) AddCurve(pts matrix.LineMatrix, leftLoc, rightLoc int) {
-	// don't add null or trivial curves
+	// don't add nil or trivial curves
 	if pts == nil || len(pts) < 2 {
 		return
 	}

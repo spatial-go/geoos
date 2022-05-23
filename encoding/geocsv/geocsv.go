@@ -9,8 +9,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/spatial-go/geoos/encoding/geojson"
 	"github.com/spatial-go/geoos/encoding/wkt"
-	"github.com/spatial-go/geoos/geojson"
 	"github.com/spatial-go/geoos/space"
 	"github.com/spatial-go/geoos/utils"
 	"golang.org/x/text/encoding/simplifiedchinese"

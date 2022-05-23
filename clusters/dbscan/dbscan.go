@@ -1,3 +1,4 @@
+// Package dbscan clusters incoming points into clusters with params (eps, minPoints).
 package dbscan
 
 import (

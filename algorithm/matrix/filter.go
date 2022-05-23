@@ -13,10 +13,10 @@ type Filter interface {
 	// Filter  Performs an operation with the provided .
 	Filter(matrix Matrix)
 
-	// Matrixes ...
+	// Matrixes Returns matrixes.
 	Matrixes() []Matrix
 
-	// Clear ...
+	// Clear  clear matrixes.
 	Clear()
 }
 

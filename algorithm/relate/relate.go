@@ -1,3 +1,5 @@
+// Package relate the  criteria  for  judging  the  various
+// topological relations between points, line and surface entities in DE-9IM model are given.
 package relate
 
 import (

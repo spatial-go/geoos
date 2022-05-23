@@ -1,6 +1,9 @@
+// Package hprtree  a hprtree is a spatial index structure .
+// This is a static R-tree which is packed by using the Hilbert ordering of the tree items.
 package hprtree
 
 import (
+	"log"
 	"math"
 	"sort"
 
@@ -62,7 +65,9 @@ func (h *HPRTree) Query(searchEnv *envelope.Envelope) interface{} {
 	}
 
 	visitor := &index.ArrayVisitor{}
-	h.QueryVisitor(searchEnv, visitor)
+	if err := h.QueryVisitor(searchEnv, visitor); err != nil {
+		log.Println(err)
+	}
 	return visitor.Items
 }
 
@@ -144,7 +149,7 @@ func (h *HPRTree) queryItems(blockStart int, searchEnv *envelope.Envelope, visit
 }
 
 // isIntersectsEnv Tests whether two envelopes intersect.
-// Avoids the null check in {@link Envelope#intersects(Envelope)}.
+// Avoids the nil check in.
 func (h *HPRTree) isIntersectsEnv(env1, env2 *envelope.Envelope) bool {
 	return !(env2.MinX > env1.MaxX ||
 		env2.MaxX < env1.MinX ||
@@ -256,9 +261,10 @@ func (h *HPRTree) updateNodeBounds(nodeIndex int, minX, minY, maxX, maxY float64
 	}
 }
 
-func (h *HPRTree) getNodeEnvelope(i int) *envelope.Envelope {
-	return envelope.FourFloat(h.nodeBounds[i], h.nodeBounds[i+1], h.nodeBounds[i+2], h.nodeBounds[i+3])
-}
+//TODO
+// func (h *HPRTree) getNodeEnvelope(i int) *envelope.Envelope {
+// 	return envelope.FourFloat(h.nodeBounds[i], h.nodeBounds[i+1], h.nodeBounds[i+2], h.nodeBounds[i+3])
+// }
 
 func (h *HPRTree) computeLayerIndices(itemSize, nodeCapacity int) []int {
 	layerIndexList := []int{}
@@ -272,14 +278,8 @@ func (h *HPRTree) computeLayerIndices(itemSize, nodeCapacity int) []int {
 	return layerIndexList
 }
 
-/**
- * Computes the number of blocks (nodes) required to
- * cover a given number of children.
- *
- * @param nChild
- * @param nodeCapacity
- * @return the number of nodes needed to cover the children
- */
+// numNodesToCover Computes the number of blocks (nodes) required to
+// cover a given number of children.
 func (h *HPRTree) numNodesToCover(nChild, nodeCapacity int) int {
 	mult := nChild / nodeCapacity
 	total := mult * nodeCapacity
@@ -290,22 +290,19 @@ func (h *HPRTree) numNodesToCover(nChild, nodeCapacity int) int {
 	return mult + 1
 }
 
-/**
- * Gets the extents of the internal index nodes
- *
- * @return a list of the internal node extents
- */
-func (h *HPRTree) getBounds() []*envelope.Envelope {
-	numNodes := len(h.nodeBounds) / 4
-	bounds := make([]*envelope.Envelope, numNodes)
-	// create from largest to smallest
-	for i := numNodes - 1; i >= 0; i-- {
-		boundIndex := 4 * i
-		bounds[i] = envelope.FourFloat(h.nodeBounds[boundIndex], h.nodeBounds[boundIndex+2],
-			h.nodeBounds[boundIndex+1], h.nodeBounds[boundIndex+3])
-	}
-	return bounds
-}
+//TODO
+//getBounds return a list of the internal node extents
+// func (h *HPRTree) getBounds() []*envelope.Envelope {
+// 	numNodes := len(h.nodeBounds) / 4
+// 	bounds := make([]*envelope.Envelope, numNodes)
+// 	// create from largest to smallest
+// 	for i := numNodes - 1; i >= 0; i-- {
+// 		boundIndex := 4 * i
+// 		bounds[i] = envelope.FourFloat(h.nodeBounds[boundIndex], h.nodeBounds[boundIndex+2],
+// 			h.nodeBounds[boundIndex+1], h.nodeBounds[boundIndex+3])
+// 	}
+// 	return bounds
+// }
 
 func (h *HPRTree) sortItems() {
 	comp := &ItemComparator{items: h.Items, encoder: NewHilbertEncoder(HilbertLevel, h.totalExtent)}

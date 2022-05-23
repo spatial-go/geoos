@@ -95,10 +95,7 @@ func (ii *IntersectionCorrelation) ProcessIntersections(
 
 // IsDone Always process all intersections
 func (ii *IntersectionCorrelation) IsDone() bool {
-	if ii.isEquals == 1 {
-		return true
-	}
-	return false
+	return ii.isEquals == 1
 }
 
 // Result returns result.

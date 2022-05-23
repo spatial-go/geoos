@@ -104,7 +104,7 @@ func (mp MultiPoint) ToPointArray() (pa []Point) {
 
 // IsEmpty returns true if the Geometry is empty.
 func (mp MultiPoint) IsEmpty() bool {
-	return mp == nil || len(mp) == 0
+	return len(mp) == 0
 }
 
 // Distance returns distance Between the two Geometry.

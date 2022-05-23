@@ -1,3 +1,5 @@
+// Package clipping the spatial geometric operation and reconstruction between entities is realized.
+// a method for spatial geometry operation by update geometric relation graph.
 package clipping
 
 import (
@@ -14,25 +16,7 @@ func UnaryUnion(matrix4 matrix.Steric) (result matrix.Steric, err error) {
 	return nil, algorithm.ErrUnknownType(matrix4)
 }
 
-// unaryUnionByHalf returns Unions a section of a list using a recursive binary union on each half of the section.
-func unaryUnionByHalf(matrix4 matrix.Collection, start, end int) (result matrix.Steric, err error) {
-	if matrix4 == nil {
-		return nil, nil
-	}
-	if end-start <= 1 {
-		result, err = Union(matrix4[start], nil)
-	} else if end-start == 2 {
-		result, err = Union(matrix4[start], matrix4[start+1])
-	} else {
-		mid := (end + start) / 2
-		g0, _ := unaryUnionByHalf(matrix4, start, mid)
-		g1, _ := unaryUnionByHalf(matrix4, mid, end)
-		result, err = Union(g0, g1)
-	}
-	return
-}
-
-// Union  Computes the Union of two geometries,either or both of which may be null.
+// Union  Computes the Union of two geometries, if one is encountered.
 func Union(m0, m1 matrix.Steric) (result matrix.Steric, err error) {
 	switch m := m0.(type) {
 	case matrix.Matrix:
@@ -69,7 +53,7 @@ func Union(m0, m1 matrix.Steric) (result matrix.Steric, err error) {
 	return result, err
 }
 
-// Intersection  Computes the Intersection of two geometries,either or both of which may be null.
+// Intersection  Computes the Intersection of two geometries,either or both of which may be nil.
 func Intersection(m0, m1 matrix.Steric) (matrix.Steric, error) {
 	switch m := m0.(type) {
 	case matrix.Matrix:
@@ -125,10 +109,6 @@ func Difference(m0, m1 matrix.Steric) (matrix.Steric, error) {
 		var err error
 		newLine := &LineClipping{PointClipping: &PointClipping{Subject: m, Clipping: m1}}
 		if result, err := newLine.Difference(); err == nil {
-
-			// if len(result.(matrix.Collection)) == 1 {
-			// 	return result.(matrix.Collection)[0], nil
-			// }
 			return result, nil
 		}
 		return nil, err
@@ -139,4 +119,22 @@ func Difference(m0, m1 matrix.Steric) (matrix.Steric, error) {
 		return nil, algorithm.ErrNotSupportCollection
 
 	}
+}
+
+// unaryUnionByHalf returns Unions a section of a list using a recursive binary union on each half of the section.
+func unaryUnionByHalf(matrix4 matrix.Collection, start, end int) (result matrix.Steric, err error) {
+	if matrix4 == nil {
+		return nil, nil
+	}
+	if end-start <= 1 {
+		result, err = Union(matrix4[start], nil)
+	} else if end-start == 2 {
+		result, err = Union(matrix4[start], matrix4[start+1])
+	} else {
+		mid := (end + start) / 2
+		g0, _ := unaryUnionByHalf(matrix4, start, mid)
+		g1, _ := unaryUnionByHalf(matrix4, mid, end)
+		result, err = Union(g0, g1)
+	}
+	return
 }

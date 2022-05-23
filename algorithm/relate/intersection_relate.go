@@ -80,13 +80,13 @@ func Intersection(aStart, aEnd, bStart, bEnd matrix.Matrix) (mark bool, ips Inte
 		ip := matrix.Matrix{x, y}
 
 		// check if point belongs to segment
-		ina, isVexA := InLine(ip, aStart, aEnd)
-		inb, inVexB := InLine(ip, bStart, bEnd)
-		if ina && inb {
+		ina, _ := InLine(ip, aStart, aEnd)
+		if inb, _ := InLine(ip, bStart, bEnd); ina && inb {
 			isIntersectionPoint := true
-			if isVexA && inVexB {
-				//isIntersectionPoint = false  //todo
-			}
+			//todo
+			// if isVexA && inVexB {
+			// 	//isIntersectionPoint = false
+			// }
 			isOriginal := false
 			if ip.Equals(aStart) || ip.Equals(aEnd) || ip.Equals(bStart) || ip.Equals(bEnd) {
 				isOriginal = true

@@ -142,7 +142,7 @@ func (m Matrix) Nums() int {
 
 // IsEmpty returns true if the Matrix is empty.
 func (m Matrix) IsEmpty() bool {
-	return m == nil || len(m) == 0
+	return len(m) == 0
 }
 
 // Bound returns a single point bound of the point.

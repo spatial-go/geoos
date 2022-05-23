@@ -1,9 +1,8 @@
-// Package wkb is for decoding ESRI's Well Known Binary (WKB) format
-// specification at https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry#Well-known_binary
 package wkb
 
 import (
 	"io"
+	"log"
 	"math"
 
 	"github.com/spatial-go/geoos/space"
@@ -88,10 +87,14 @@ func (e *EWKBEncoder) writeGeometryType(geometryType uint32) {
 	}
 	buf := make([]byte, 4)
 	e.order.PutUint32(buf, uint32(typeInt))
-	e.w.Write(buf)
+	if _, err := e.w.Write(buf); err != nil {
+		log.Println(err)
+	}
 	if e.Srid != 0 {
 		e.order.PutUint32(buf, e.Srid)
-		e.w.Write(buf)
+		if _, err := e.w.Write(buf); err != nil {
+			log.Println(err)
+		}
 	}
 }
 func (e *EWKBEncoder) writePoint(p space.Point) (err error) {

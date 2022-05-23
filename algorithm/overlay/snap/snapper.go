@@ -1,3 +1,5 @@
+// Package snap Snaps the vertices and segments of a  Geometry's vertices  to another Geometry's vertices.
+// Snap two geometries together with a given tolerance.
 package snap
 
 import "github.com/spatial-go/geoos/algorithm/matrix"

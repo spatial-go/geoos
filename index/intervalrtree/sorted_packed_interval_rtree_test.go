@@ -3,6 +3,7 @@ package intervalrtree
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"testing"
 
@@ -32,7 +33,9 @@ func buildTree() *SortedPackedIntervalRTree {
 		matrix.Matrix{3, 2},
 	}
 	for i := 0; i < len(ms); i++ {
-		indexTree.Insert(envelope.Matrix(ms[i].(matrix.Matrix)), ms[i])
+		if err := indexTree.Insert(envelope.Matrix(ms[i].(matrix.Matrix)), ms[i]); err != nil {
+			log.Println(err)
+		}
 	}
 	return indexTree
 }

@@ -18,7 +18,7 @@ func TestMain(m *testing.M) {
 	segs := lineMatrix.ToLineArray()
 	for i := 0; i < len(segs); i++ {
 		seg := segs[i]
-		indexTree.Insert(envelope.TwoMatrix(seg.P0, seg.P1), seg)
+		_ = indexTree.Insert(envelope.TwoMatrix(seg.P0, seg.P1), seg)
 	}
 	fmt.Println("test start")
 	code := m.Run()
@@ -47,7 +47,7 @@ func TestQuadtree_Insert(t *testing.T) {
 				}
 			}()
 			q := indexTree
-			q.Insert(tt.args.itemEnv, tt.args.item)
+			_ = q.Insert(tt.args.itemEnv, tt.args.item)
 		})
 	}
 }

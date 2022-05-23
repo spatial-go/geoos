@@ -1,8 +1,8 @@
 package encode
 
 import (
-	"github.com/spatial-go/geoos/geobuf/proto"
-	"github.com/spatial-go/geoos/geojson"
+	"github.com/spatial-go/geoos/encoding/geobuf/proto"
+	"github.com/spatial-go/geoos/encoding/geojson"
 )
 
 // FeatureCollection ...

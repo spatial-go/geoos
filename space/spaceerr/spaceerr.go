@@ -1,3 +1,4 @@
+// Package spaceerr A representation of error.
 package spaceerr
 
 import (
@@ -30,10 +31,5 @@ var ErrBoundBeNil = fmt.Errorf("boundary should be nil")
 
 // ErrorUsageFunc create new ErrorUsageFunc by object.
 func ErrorUsageFunc(obj ...interface{}) error {
-	return fmt.Errorf("Wrong usage function :%v", obj...)
-}
-
-// Error create new error by object.
-func Error(str string, obj ...interface{}) error {
-	return fmt.Errorf(str, obj...)
+	return fmt.Errorf("Wrong usage function :%v", obj)
 }

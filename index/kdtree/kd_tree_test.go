@@ -83,8 +83,7 @@ func TestKdTree_QueryVisitor(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			k := indexTree
 			visitor := &BestMatchVisitor{Matrix: matrix.Matrix{3, 2}, tolerance: 3}
-			k.QueryVisitor(tt.args.queryEnv, visitor)
-			if visitor == nil {
+			if err := k.QueryVisitor(tt.args.queryEnv, visitor); err != nil {
 				t.Errorf("KdTree.QueryVisitor() = %v, want %v", visitor, "not nil")
 			}
 		})

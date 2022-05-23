@@ -50,7 +50,7 @@ func (p *Parser) Parse() (space.Geometry, error) {
 
 	case Srid:
 		if srid == 0 {
-			srid, err = p.parseSrid()
+			srid, _ = p.parseSrid()
 		}
 		geom, err = p.Parse()
 	default:

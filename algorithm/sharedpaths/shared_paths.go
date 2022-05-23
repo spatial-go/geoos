@@ -1,3 +1,4 @@
+// Package sharedpaths Computer returns a collection containing paths shared by the two input geometries.
 package sharedpaths
 
 import (

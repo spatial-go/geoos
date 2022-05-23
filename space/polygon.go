@@ -145,7 +145,7 @@ func (p Polygon) ToRingArray() (r []Ring) {
 
 // IsEmpty returns true if the Geometry is empty.
 func (p Polygon) IsEmpty() bool {
-	return p == nil || len(p) == 0
+	return len(p) == 0
 }
 
 // Distance returns distance Between the two Geometry.

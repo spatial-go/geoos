@@ -1,3 +1,5 @@
+// Package grid is used to generate grid data.
+// include square and hexagon.
 package grid
 
 import (

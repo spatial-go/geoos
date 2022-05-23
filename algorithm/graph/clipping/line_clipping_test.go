@@ -8,10 +8,6 @@ import (
 	"github.com/spatial-go/geoos/algorithm/graph/graphtests"
 )
 
-type fields struct {
-	PointClipping *PointClipping
-}
-
 func TestLineClipping_Union(t *testing.T) {
 	for _, tt := range graphtests.TestsLineUnion {
 		if !geoos.GeoosTestTag &&

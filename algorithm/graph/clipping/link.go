@@ -1,6 +1,7 @@
 package clipping
 
 import (
+	"log"
 	"os"
 
 	"github.com/spatial-go/geoos"
@@ -8,7 +9,8 @@ import (
 	"github.com/spatial-go/geoos/algorithm/calc"
 	"github.com/spatial-go/geoos/algorithm/graph"
 	"github.com/spatial-go/geoos/algorithm/matrix"
-	"github.com/spatial-go/geoos/geojson"
+	"github.com/spatial-go/geoos/encoding/geojson"
+
 	"github.com/spatial-go/geoos/space"
 )
 
@@ -34,9 +36,7 @@ func link(gu, gi graph.Graph) (results []matrix.LineMatrix, err error) {
 				lastPoint := matrix.Matrix(line[len(line)-1])
 				if len(result) == 0 {
 					if beUsed[j] < 1 {
-						for _, point := range line {
-							result = append(result, point)
-						}
+						result = append(result, line...)
 						beUsed[j] = 1
 						break
 					}
@@ -138,9 +138,11 @@ func link(gu, gi graph.Graph) (results []matrix.LineMatrix, err error) {
 
 func writeGeom(filename string, geom space.Geometry) {
 	data, _ := geojson.NewGeometry(geom).MarshalJSON()
-	file, err := os.Create(filename)
-	file.WriteString(
-		`{
+	if file, err := os.Create(filename); err != nil {
+		log.Println(err)
+	} else {
+		if _, err := file.WriteString(
+			`{
 		"type": "FeatureCollection",
 		"crs": {
 			"type": "name",
@@ -153,14 +155,14 @@ func writeGeom(filename string, geom space.Geometry) {
 				"_id": "qVxKbM",
 				"type": "Feature",
 				"geometry": `,
-	)
-	file.Write(data)
-	file.WriteString(
-		` }
+		); err != nil {
+			log.Println(err)
+		}
+		_, _ = file.Write(data)
+		_, _ = file.WriteString(
+			` }
 		]
 		}`,
-	)
-	if err != nil {
-		panic(err)
+		)
 	}
 }

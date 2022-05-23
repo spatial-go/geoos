@@ -46,7 +46,7 @@ func (c Collection) Nums() int {
 
 // IsEmpty returns true if the Matrix is empty.
 func (c Collection) IsEmpty() bool {
-	return c == nil || len(c) == 0
+	return len(c) == 0
 }
 
 // Bound returns a bound around the Collection.

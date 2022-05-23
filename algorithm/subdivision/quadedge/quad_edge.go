@@ -1,3 +1,4 @@
+// Package subdivision a topological subdivision of quadeges, to support creating triangulations and Voronoi diagrams.
 package quadedge
 
 import (

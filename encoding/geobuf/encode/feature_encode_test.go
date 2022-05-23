@@ -1,9 +1,10 @@
 package encode
 
 import (
-	"github.com/spatial-go/geoos/geobuf/decode"
-	"github.com/spatial-go/geoos/geojson"
 	"testing"
+
+	"github.com/spatial-go/geoos/encoding/geobuf/decode"
+	"github.com/spatial-go/geoos/encoding/geojson"
 )
 
 func TestEncodeFeature(t *testing.T) {

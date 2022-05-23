@@ -27,7 +27,7 @@ func IntersectLine(m1, m2 matrix.LineMatrix) chain.CorrelationNodeResult {
 	return nil
 }
 
-// createCorrelationNode ...
+// createCorrelationNode handle intersection lines.
 func createCorrelationNode(result chain.IntersectionNodeOfLine, edge matrix.LineMatrix) []*chain.IntersectionCorrelationNode {
 	lines := []matrix.LineMatrix{}
 	totalIps := 0
@@ -36,7 +36,7 @@ func createCorrelationNode(result chain.IntersectionNodeOfLine, edge matrix.Line
 
 	correlationNode := matrix.LineMatrix{}
 
-	endNode := &chain.IntersectionNodeResult{}
+	var endNode *chain.IntersectionNodeResult
 
 	for i := 0; i < len(result); i++ {
 		r0 := result[i]

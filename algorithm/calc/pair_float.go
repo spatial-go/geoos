@@ -1,3 +1,4 @@
+// Package calc methods and parameters be realized ouble precision calculation.
 package calc
 
 // const Defined constant variable  calc parameter

@@ -8,12 +8,12 @@ import (
 	"github.com/spatial-go/geoos/algorithm/overlay/chain"
 )
 
-// LineClipping  Computes the overlay of two geometries,either or both of which may be nil.
+// LineClipping  Computes the overlay of two geometries.
 type LineClipping struct {
 	*PointClipping
 }
 
-// Union  Computes the Union of two geometries,either or both of which may be nil.
+// Union  Computes the Union of two geometries, if one is encountered.
 func (p *LineClipping) Union() (matrix.Steric, error) {
 	if res, ok := p.unionCheck(); !ok {
 		return res, nil

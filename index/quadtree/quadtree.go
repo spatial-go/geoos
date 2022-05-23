@@ -3,6 +3,8 @@
 package quadtree
 
 import (
+	"log"
+
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/matrix/envelope"
 	"github.com/spatial-go/geoos/index"
@@ -93,7 +95,9 @@ func (q *Quadtree) Remove(itemEnv *envelope.Envelope, item interface{}) bool {
 // Query Queries the tree and returns items which may lie in the given search envelope.
 func (q *Quadtree) Query(searchEnv *envelope.Envelope) interface{} {
 	visitor := &index.ArrayVisitor{}
-	q.QueryVisitor(searchEnv, visitor)
+	if err := q.QueryVisitor(searchEnv, visitor); err != nil {
+		log.Println(err)
+	}
 	return visitor.Items()
 }
 

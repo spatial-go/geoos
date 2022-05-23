@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"reflect"
 
-	"github.com/spatial-go/geoos/geobuf/proto"
+	"github.com/spatial-go/geoos/encoding/geobuf/proto"
 )
 
 // EncodeValue ...

@@ -44,17 +44,11 @@ func (h *HilbertEncoder) encode(env *envelope.Envelope) int {
 	return encode(h.level, x, y)
 }
 
-/**
- * Encodes a point (x,y)
- * in the range of the the Hilbert curve at a given level
- * as the index of the point along the curve.
- * The index will lie in the range [0, 2<sup>level + 1</sup>].
- *
- * @param level the level of the Hilbert curve
- * @param x the x ordinate of the point
- * @param y the y ordinate of the point
- * @return the index of the point along the Hilbert curve
- */
+// Encodes a point (x,y)
+//   in the range of the the Hilbert curve at a given level
+//   as the index of the point along the curve.
+//   The index will lie in the range [0, 2<sup>level + 1</sup>].
+// Returns the index of the point along the Hilbert curve
 func encode(level, x, y int) int {
 	// Fast Hilbert curve algorithm by http://threadlocalmutex.com/
 	// Ported from C++ https://github.com/rawrunprotected/hilbert_curves (public

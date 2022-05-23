@@ -221,7 +221,7 @@ func (d *DPTransformer) transformPolygon(geom matrix.PolygonMatrix, parent matri
 	rawGeom := matrix.PolygonMatrix{}
 	for i, v := range geom {
 		line := d.transformRing(v, geom)
-		if line == nil || line.IsEmpty() {
+		if line.IsEmpty() {
 			if i == 0 {
 				return nil
 			}

@@ -250,16 +250,14 @@ func PointInPolygon(point matrix.Matrix, poly matrix.LineMatrix) bool {
 	pointNum := len(poly)
 	intersectCount := 0 //cross points count of x
 	precision := 2e-10
-	p1 := matrix.Matrix{} //neighbour bound vertices
-	p2 := matrix.Matrix{}
 	p := point
 
-	p1 = poly[0] //left vertex
+	p1 := poly[0] //left vertex
 	for i := 0; i < pointNum; i++ {
 		if p[1] == p1[1] && p[0] == p1[0] {
 			return true
 		}
-		p2 = poly[i%pointNum]
+		p2 := poly[i%pointNum]
 		if p[1] < math.Min(p1[1], p2[1]) || p[1] > math.Max(p1[1], p2[1]) {
 			p1 = p2
 			continue //next ray left point
@@ -301,11 +299,5 @@ func PointInPolygon(point matrix.Matrix, poly matrix.LineMatrix) bool {
 		}
 		p1 = p2 //next ray left point
 	}
-	if intersectCount%2 == 0 {
-
-		return false
-	}
-
-	return true
-
+	return intersectCount%2 != 0
 }

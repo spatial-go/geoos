@@ -109,18 +109,19 @@ func (l *Lexer) scanToLowerWord(r rune) string {
 	return buf.String()
 }
 
-// scanInt scan a string representing a int
-func (l *Lexer) scanInt(r rune) string {
-	var buf bytes.Buffer
-	buf.WriteRune(r)
-	r = l.read()
-	for beginFloat(r) {
-		buf.WriteRune(r)
-		r = l.read()
-	}
-	l.unread()
-	return buf.String()
-}
+//TODO
+// // scanInt scan a string representing a int
+// func (l *Lexer) scanInt(r rune) string {
+// 	var buf bytes.Buffer
+// 	buf.WriteRune(r)
+// 	r = l.read()
+// 	for beginFloat(r) {
+// 		buf.WriteRune(r)
+// 		r = l.read()
+// 	}
+// 	l.unread()
+// 	return buf.String()
+// }
 
 // scanFloat scan a string representing a float
 func (l *Lexer) scanFloat(r rune) string {
@@ -192,9 +193,10 @@ func (l *Lexer) scanToken() (Token, error) {
 	}
 }
 
-func beginInt(r rune) bool {
-	return unicode.IsNumber(r)
-}
+//TODO
+// func beginInt(r rune) bool {
+// 	return unicode.IsNumber(r)
+// }
 
 func beginFloat(r rune) bool {
 	return r == '-' || r == '.' || unicode.IsNumber(r)

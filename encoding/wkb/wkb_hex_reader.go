@@ -1,5 +1,3 @@
-// Package wkb is for decoding ESRI's Well Known Binary (WKB) format
-// specification at https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry#Well-known_binary
 package wkb
 
 import (
@@ -143,9 +141,10 @@ func HexToBytes(hex string) []byte {
 
 	for i := 0; i < byteLen; i++ {
 		i2 := 2 * i
-		if i2+1 > len(hex) {
-			//throw new IllegalArgumentException("Hex string has odd length");
-		}
+		//TODO
+		// if i2+1 > len(hex) {
+		// 	//throw new IllegalArgumentException("Hex string has odd length");
+		// }
 
 		nib1 := hexToInt(hex[i2])
 		nib0 := hexToInt(hex[i2+1])
@@ -157,8 +156,5 @@ func HexToBytes(hex string) []byte {
 
 func hexToInt(hex byte) uint64 {
 	nib, _ := strconv.ParseUint(string(hex), 16, 32)
-	if nib < 0 {
-		return 0
-	}
 	return nib
 }

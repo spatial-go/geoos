@@ -1,8 +1,8 @@
 package encode
 
 import (
-	"github.com/spatial-go/geoos/geobuf/utils"
-	"github.com/spatial-go/geoos/geojson"
+	"github.com/spatial-go/geoos/encoding/geobuf/utils"
+	"github.com/spatial-go/geoos/encoding/geojson"
 	geoos "github.com/spatial-go/geoos/space"
 )
 

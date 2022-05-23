@@ -41,7 +41,7 @@ func TestVoronoi_GetResult(t *testing.T) {
 			}
 			gotCollection := space.Collection{}
 			for _, pm := range got {
-				if pm == nil || len(pm) == 0 {
+				if len(pm) == 0 {
 					continue
 				}
 				gotCollection = append(gotCollection, space.Polygon{pm[0]})

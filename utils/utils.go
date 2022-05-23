@@ -1,3 +1,4 @@
+// Package utils A functions of utils.
 package utils
 
 import (
