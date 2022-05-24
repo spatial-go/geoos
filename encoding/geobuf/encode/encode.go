@@ -1,13 +1,13 @@
 package encode
 
 import (
-	"github.com/spatial-go/geoos/encoding/geobuf/proto"
+	"github.com/spatial-go/geoos/encoding/geobuf/protogeo"
 	"github.com/spatial-go/geoos/encoding/geobuf/utils"
 	"github.com/spatial-go/geoos/encoding/geojson"
 )
 
 // Encode ...
-func Encode(obj interface{}) *proto.Data {
+func Encode(obj interface{}) *protogeo.Data {
 	data, err := WithOptions(obj, FromAnalysis(obj))
 	if err != nil {
 		panic(err)
@@ -16,7 +16,7 @@ func Encode(obj interface{}) *proto.Data {
 }
 
 // WithOptions ...
-func WithOptions(obj interface{}, opts ...EncodingOption) (*proto.Data, error) {
+func WithOptions(obj interface{}, opts ...EncodingOption) (*protogeo.Data, error) {
 	cfg := &EncodingConfig{
 		Dimension: 2,
 		Precision: 100,
@@ -26,10 +26,10 @@ func WithOptions(obj interface{}, opts ...EncodingOption) (*proto.Data, error) {
 		opt(cfg)
 	}
 
-	data := &proto.Data{
+	data := &protogeo.Data{
 		Keys:       cfg.Keys.Keys(),
 		Dimensions: uint32(cfg.Dimension),
-		Precision:  utils.EncodePrecision(cfg.Dimension),
+		Precision:  utils.EncodePrecision(cfg.Precision),
 	}
 
 	switch t := obj.(type) {
@@ -38,7 +38,7 @@ func WithOptions(obj interface{}, opts ...EncodingOption) (*proto.Data, error) {
 		if err != nil {
 			return nil, err
 		}
-		data.DataType = &proto.Data_FeatureCollection_{
+		data.DataType = &protogeo.Data_FeatureCollection_{
 			FeatureCollection: collection,
 		}
 	case *geojson.Feature:
@@ -46,11 +46,11 @@ func WithOptions(obj interface{}, opts ...EncodingOption) (*proto.Data, error) {
 		if err != nil {
 			return nil, err
 		}
-		data.DataType = &proto.Data_Feature_{
+		data.DataType = &protogeo.Data_Feature_{
 			Feature: feature,
 		}
 	case *geojson.Geometry:
-		data.DataType = &proto.Data_Geometry_{
+		data.DataType = &protogeo.Data_Geometry_{
 			Geometry: Geometry(t, cfg),
 		}
 	}

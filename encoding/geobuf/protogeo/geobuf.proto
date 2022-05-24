@@ -1,6 +1,6 @@
 syntax = "proto3";
 package geobuf;
-option go_package = "./proto";
+option go_package = "./protogeo";
 
 message Data {
     repeated string keys = 1; // global arrays of unique keys

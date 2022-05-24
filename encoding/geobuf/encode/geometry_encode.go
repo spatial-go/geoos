@@ -1,48 +1,48 @@
 package encode
 
 import (
-	"github.com/spatial-go/geoos/encoding/geobuf/proto"
+	"github.com/spatial-go/geoos/encoding/geobuf/protogeo"
 	math "github.com/spatial-go/geoos/encoding/geobuf/utils"
 	"github.com/spatial-go/geoos/encoding/geojson"
 	geoos "github.com/spatial-go/geoos/space"
 )
 
 // Geometry ...
-func Geometry(g *geojson.Geometry, cfg *EncodingConfig) *proto.Data_Geometry {
+func Geometry(g *geojson.Geometry, cfg *EncodingConfig) *protogeo.Data_Geometry {
 	switch g.Type {
 	case geoos.TypePoint:
 		p := g.Coordinates.(geoos.Point)
-		return &proto.Data_Geometry{
-			Type:   proto.Data_Geometry_POINT,
+		return &protogeo.Data_Geometry{
+			Type:   protogeo.Data_Geometry_POINT,
 			Coords: translateCoords(cfg.Precision, p[:]),
 		}
 	case geoos.TypeLineString:
 		p := g.Coordinates.(geoos.LineString)
-		return &proto.Data_Geometry{
-			Type:   proto.Data_Geometry_LINESTRING,
+		return &protogeo.Data_Geometry{
+			Type:   protogeo.Data_Geometry_LINESTRING,
 			Coords: translateLine(cfg.Precision, cfg.Dimension, p, false),
 		}
 	case geoos.TypeMultiLineString:
 		p := g.Coordinates.(geoos.MultiLineString)
 		coords, lengths := translateMultiLine(cfg.Precision, cfg.Dimension, p)
-		return &proto.Data_Geometry{
-			Type:    proto.Data_Geometry_MULTILINESTRING,
+		return &protogeo.Data_Geometry{
+			Type:    protogeo.Data_Geometry_MULTILINESTRING,
 			Coords:  coords,
 			Lengths: lengths,
 		}
 	case geoos.TypePolygon:
 		p := g.Coordinates.(geoos.Polygon)
 		coords, lengths := translateMultiRing(cfg.Precision, cfg.Dimension, p)
-		return &proto.Data_Geometry{
-			Type:    proto.Data_Geometry_POLYGON,
+		return &protogeo.Data_Geometry{
+			Type:    protogeo.Data_Geometry_POLYGON,
 			Coords:  coords,
 			Lengths: lengths,
 		}
 	case geoos.TypeMultiPolygon:
 		p := []geoos.Polygon(g.Coordinates.(geoos.MultiPolygon))
 		coords, lengths := translateMultiPolygon(cfg.Precision, cfg.Dimension, p)
-		return &proto.Data_Geometry{
-			Type:    proto.Data_Geometry_MULTIPOLYGON,
+		return &protogeo.Data_Geometry{
+			Type:    protogeo.Data_Geometry_MULTIPOLYGON,
 			Coords:  coords,
 			Lengths: lengths,
 		}

@@ -4,7 +4,7 @@
 // 	protoc        v3.10.1
 // source: geobuf.proto
 
-package proto
+package protogeo
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"

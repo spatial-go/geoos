@@ -2,26 +2,26 @@ package decode
 
 import (
 	"github.com/spatial-go/geoos/algorithm/matrix"
-	"github.com/spatial-go/geoos/encoding/geobuf/proto"
+	"github.com/spatial-go/geoos/encoding/geobuf/protogeo"
 	math "github.com/spatial-go/geoos/encoding/geobuf/utils"
 	"github.com/spatial-go/geoos/encoding/geojson"
 	geoos "github.com/spatial-go/geoos/space"
 )
 
 // Geometry ...
-func Geometry(geo *proto.Data_Geometry, precision, dimensions uint32) *geojson.Geometry {
+func Geometry(geo *protogeo.Data_Geometry, precision, dimensions uint32) *geojson.Geometry {
 	switch geo.Type {
-	case proto.Data_Geometry_POINT:
+	case protogeo.Data_Geometry_POINT:
 		return geojson.NewGeometry(makePoint(geo.Coords, precision))
-	case proto.Data_Geometry_MULTIPOINT:
+	case protogeo.Data_Geometry_MULTIPOINT:
 		return geojson.NewGeometry(makeMultiPoint(geo.Coords, precision, dimensions))
-	case proto.Data_Geometry_LINESTRING:
+	case protogeo.Data_Geometry_LINESTRING:
 		return geojson.NewGeometry(makeLineString(geo.Coords, precision, dimensions))
-	case proto.Data_Geometry_MULTILINESTRING:
+	case protogeo.Data_Geometry_MULTILINESTRING:
 		return geojson.NewGeometry(makeMultiLineString(geo.Lengths, geo.Coords, precision, dimensions))
-	case proto.Data_Geometry_POLYGON:
+	case protogeo.Data_Geometry_POLYGON:
 		return geojson.NewGeometry(makePolygon(geo.Lengths, geo.Coords, precision, dimensions))
-	case proto.Data_Geometry_MULTIPOLYGON:
+	case protogeo.Data_Geometry_MULTIPOLYGON:
 		return geojson.NewGeometry(makeMultiPolygon(geo.Lengths, geo.Coords, precision, dimensions))
 	}
 	return &geojson.Geometry{}

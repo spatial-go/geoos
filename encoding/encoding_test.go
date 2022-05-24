@@ -37,13 +37,13 @@ func TestEncode(t *testing.T) {
 		},
 		{name: "geobuf Point0",
 			args: args{space.Point{116.310066223145, 40.0425491333008}, Geobuf},
-			want: []byte("dimensions:2  precision:1  geometry:{}"),
+			want: []byte{16, 2, 24, 9, 50, 14, 26, 12, 222, 144, 246, 201, 226, 6, 154, 190, 198, 171, 170, 2},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := Encode(tt.args.g, tt.args.codeType); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Encode() = %v, want %v", string(got), string(tt.want))
+				t.Errorf("Encode() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -84,7 +84,7 @@ func TestDecode(t *testing.T) {
 				space.Point{116.31, 40.04}},
 		},
 		{name: "geobuf string", args: args{
-			[]byte("{\"type\":\"Point\",\"coordinates\":[116.310066223145,40.0425491333008]}"), Geobuf},
+			[]byte{16, 2, 24, 9, 50, 14, 26, 12, 222, 144, 246, 201, 226, 6, 154, 190, 198, 171, 170, 2}, Geobuf},
 			want: space.Point{116.310066223145, 40.0425491333008},
 		},
 	}
@@ -137,7 +137,7 @@ func TestRead(t *testing.T) {
 				space.Point{116.31, 40.04}},
 		},
 		{name: "geobuf string", args: args{
-			[]byte("{\"type\":\"Point\",\"coordinates\":[116.310066223145,40.0425491333008]}"), Geobuf},
+			[]byte{16, 2, 24, 9, 50, 14, 26, 12, 222, 144, 246, 201, 226, 6, 154, 190, 198, 171, 170, 2}, Geobuf},
 			want: space.Point{116.310066223145, 40.0425491333008},
 		},
 	}
@@ -186,7 +186,7 @@ func TestWrite(t *testing.T) {
 		},
 		{name: "geobuf Point0",
 			args: args{space.Point{116.310066223145, 40.0425491333008}, Geobuf},
-			want: []byte("dimensions:2  precision:1  geometry:{}"),
+			want: []byte{16, 2, 24, 9, 50, 14, 26, 12, 222, 144, 246, 201, 226, 6, 154, 190, 198, 171, 170, 2},
 		},
 	}
 	for _, tt := range tests {
@@ -197,7 +197,7 @@ func TestWrite(t *testing.T) {
 				return
 			}
 			if gotW := buf.String(); gotW != string(tt.want) {
-				t.Errorf("Write()%T = %v, want %v", gotW, gotW, string(tt.want))
+				t.Errorf("Write()%T = %v, want %v", buf, buf, tt.want)
 			}
 		})
 	}

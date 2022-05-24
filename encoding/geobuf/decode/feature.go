@@ -1,13 +1,13 @@
 package decode
 
 import (
-	"github.com/spatial-go/geoos/encoding/geobuf/proto"
+	"github.com/spatial-go/geoos/encoding/geobuf/protogeo"
 	"github.com/spatial-go/geoos/encoding/geojson"
 	geoos "github.com/spatial-go/geoos/space"
 )
 
 // Feature ...
-func Feature(data *proto.Data, feature *proto.Data_Feature) *geojson.Feature {
+func Feature(data *protogeo.Data, feature *protogeo.Data_Feature) *geojson.Feature {
 	geo := feature.Geometry
 	decodedGeo := Geometry(geo, data.Precision, data.Dimensions)
 	var geoFeature *geojson.Feature
@@ -29,24 +29,24 @@ func Feature(data *proto.Data, feature *proto.Data_Feature) *geojson.Feature {
 		valIdx := feature.Properties[i+1]
 		val := feature.Values[valIdx]
 		switch actualVal := val.ValueType.(type) {
-		case *proto.Data_Value_BoolValue:
+		case *protogeo.Data_Value_BoolValue:
 			geoFeature.Properties[data.Keys[keyIdx]] = actualVal.BoolValue
-		case *proto.Data_Value_DoubleValue:
+		case *protogeo.Data_Value_DoubleValue:
 			geoFeature.Properties[data.Keys[keyIdx]] = actualVal.DoubleValue
-		case *proto.Data_Value_StringValue:
+		case *protogeo.Data_Value_StringValue:
 			geoFeature.Properties[data.Keys[keyIdx]] = actualVal.StringValue
-		case *proto.Data_Value_PosIntValue:
+		case *protogeo.Data_Value_PosIntValue:
 			geoFeature.Properties[data.Keys[keyIdx]] = uint(actualVal.PosIntValue)
-		case *proto.Data_Value_NegIntValue:
+		case *protogeo.Data_Value_NegIntValue:
 			geoFeature.Properties[data.Keys[keyIdx]] = int(actualVal.NegIntValue) * -1
-		case *proto.Data_Value_JsonValue:
+		case *protogeo.Data_Value_JsonValue:
 			geoFeature.Properties[data.Keys[keyIdx]] = actualVal.JsonValue
 		}
 	}
 	switch id := feature.IdType.(type) {
-	case *proto.Data_Feature_Id:
+	case *protogeo.Data_Feature_Id:
 		geoFeature.ID = id.Id
-	case *proto.Data_Feature_IntId:
+	case *protogeo.Data_Feature_IntId:
 		geoFeature.ID = id.IntId
 	}
 	return geoFeature

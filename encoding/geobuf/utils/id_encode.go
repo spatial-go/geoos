@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/spatial-go/geoos/encoding/geobuf/proto"
+	"github.com/spatial-go/geoos/encoding/geobuf/protogeo"
 )
 
 // EncodeIntID ...
-func EncodeIntID(id interface{}) (*proto.Data_Feature_IntId, error) {
+func EncodeIntID(id interface{}) (*protogeo.Data_Feature_IntId, error) {
 	switch t := id.(type) {
 	case int:
 		return encodeIntID(int64(t)), nil
@@ -34,7 +34,7 @@ func EncodeIntID(id interface{}) (*proto.Data_Feature_IntId, error) {
 }
 
 // EncodeID ...
-func EncodeID(id interface{}) (*proto.Data_Feature_Id, error) {
+func EncodeID(id interface{}) (*protogeo.Data_Feature_Id, error) {
 	switch t := id.(type) {
 	case string:
 		return encodeID(t), nil
@@ -49,14 +49,14 @@ func EncodeID(id interface{}) (*proto.Data_Feature_Id, error) {
 	}
 }
 
-func encodeIntID(id int64) *proto.Data_Feature_IntId {
-	return &proto.Data_Feature_IntId{
+func encodeIntID(id int64) *protogeo.Data_Feature_IntId {
+	return &protogeo.Data_Feature_IntId{
 		IntId: id,
 	}
 }
 
-func encodeID(id string) *proto.Data_Feature_Id {
-	return &proto.Data_Feature_Id{
+func encodeID(id string) *protogeo.Data_Feature_Id {
+	return &protogeo.Data_Feature_Id{
 		Id: id,
 	}
 }
