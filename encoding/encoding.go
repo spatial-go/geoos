@@ -2,6 +2,8 @@
 package encoding
 
 import (
+	"io"
+
 	"github.com/spatial-go/geoos/encoding/geobuf"
 	"github.com/spatial-go/geoos/encoding/geocsv"
 	"github.com/spatial-go/geoos/encoding/geojson"
@@ -21,23 +23,22 @@ const (
 
 // Encoder defines encoder for encoding and decoding into Go structs using the geometries.
 type Encoder interface {
-	// Encode Returns string of that encode geometry  by codeType.
+	// Encode Returns string of that encode geometry.
 	Encode(g space.Geometry) []byte
-	// Decode Returns geometry of that decode string by codeType.
+	// Decode Returns geometry of that decode string.
 	Decode(s []byte) (space.Geometry, error)
-}
 
-type BaseEncode struct {
-}
+	// Read Returns geometry from reader.
+	Read(r io.Reader) (space.Geometry, error)
 
-// Encode Returns string of that encode geometry  by codeType.
-func (e *BaseEncode) Encode(g space.Geometry) []byte {
-	return []byte{}
-}
+	// Write write geometry to writer.
+	Write(w io.Writer, g space.Geometry) error
 
-// Decode Returns geometry of that decode string by codeType.
-func (e *BaseEncode) Decode(s []byte) (space.Geometry, error) {
-	return nil, nil
+	// Read Returns geometry from reader.
+	ReadGeoJSON(r io.Reader) (*geojson.FeatureCollection, error)
+
+	// Write write geometry to writer.
+	WriteGeoJSON(w io.Writer, g *geojson.FeatureCollection) error
 }
 
 // Encode Returns string of that encode geometry  by codeType.
@@ -50,6 +51,30 @@ func Encode(g space.Geometry, codeType int) []byte {
 func Decode(s []byte, codeType int) (space.Geometry, error) {
 	encode := getEncoder(codeType)
 	return encode.Decode(s)
+}
+
+// Write write geometry to writer.  by codeType.
+func Write(w io.Writer, g space.Geometry, codeType int) error {
+	encode := getEncoder(codeType)
+	return encode.Write(w, g)
+}
+
+// Read Returns geometry from reader by codeType.
+func Read(r io.Reader, codeType int) (space.Geometry, error) {
+	encode := getEncoder(codeType)
+	return encode.Read(r)
+}
+
+// WriteGeoJSON write geometry to writer  by codeType.
+func WriteGeoJSON(w io.Writer, g *geojson.FeatureCollection, codeType int) error {
+	encode := getEncoder(codeType)
+	return encode.WriteGeoJSON(w, g)
+}
+
+// ReadGeoJSON Returns geometry from reader by codeType.
+func ReadGeoJSON(r io.Reader, codeType int) (*geojson.FeatureCollection, error) {
+	encode := getEncoder(codeType)
+	return encode.ReadGeoJSON(r)
 }
 
 func getEncoder(codeType int) Encoder {
@@ -66,7 +91,7 @@ func getEncoder(codeType int) Encoder {
 	case Geobuf:
 		encode = &geobuf.GeobufEncoder{}
 	default:
-		encode = &BaseEncode{}
+		encode = &geojson.BaseEncoder{}
 	}
 	return encode
 }
