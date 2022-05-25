@@ -9,8 +9,7 @@ import (
 	"github.com/spatial-go/geoos/algorithm/calc"
 	"github.com/spatial-go/geoos/algorithm/graph"
 	"github.com/spatial-go/geoos/algorithm/matrix"
-	"github.com/spatial-go/geoos/encoding/geojson"
-
+	"github.com/spatial-go/geoos/geoencoding/geojson"
 	"github.com/spatial-go/geoos/space"
 )
 

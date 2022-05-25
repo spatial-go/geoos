@@ -198,11 +198,11 @@ func isSortedOnDim(dim int, nodes []int, pts pointSlice) bool {
 		return true
 	}
 	prev := pts[nodes[0]][dim]
-	for _, n := range nodes {
-		if pts[n][dim] < prev {
+	for i := 0; i < len(nodes); i++ {
+		if pts[nodes[i]][dim] < prev {
 			return false
 		}
-		prev = pts[n][dim]
+		prev = pts[nodes[i]][dim]
 	}
 	return true
 }

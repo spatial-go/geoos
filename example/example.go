@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/spatial-go/geoos/encoding/geojson"
-	"github.com/spatial-go/geoos/encoding/wkt"
+	"github.com/spatial-go/geoos/geoencoding/geojson"
+	"github.com/spatial-go/geoos/geoencoding/wkt"
 	"github.com/spatial-go/geoos/planar"
 	"github.com/spatial-go/geoos/space"
 )

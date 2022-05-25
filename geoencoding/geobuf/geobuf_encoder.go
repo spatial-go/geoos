@@ -3,10 +3,10 @@ package geobuf
 import (
 	"io"
 
-	"github.com/spatial-go/geoos/encoding/geobuf/decode"
-	"github.com/spatial-go/geoos/encoding/geobuf/encode"
-	"github.com/spatial-go/geoos/encoding/geobuf/protogeo"
-	"github.com/spatial-go/geoos/encoding/geojson"
+	"github.com/spatial-go/geoos/geoencoding/geobuf/decode"
+	"github.com/spatial-go/geoos/geoencoding/geobuf/encode"
+	"github.com/spatial-go/geoos/geoencoding/geobuf/protogeo"
+	"github.com/spatial-go/geoos/geoencoding/geojson"
 	"github.com/spatial-go/geoos/space"
 	"google.golang.org/protobuf/proto"
 )

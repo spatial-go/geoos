@@ -1,14 +1,14 @@
-// Package encoding  is a library for encoding and decoding into Go structs using the geometries.
-package encoding
+// Package geoencoding  is a library for encoding and decoding into Go structs using the geometries.
+package geoencoding
 
 import (
 	"io"
 
-	"github.com/spatial-go/geoos/encoding/geobuf"
-	"github.com/spatial-go/geoos/encoding/geocsv"
-	"github.com/spatial-go/geoos/encoding/geojson"
-	"github.com/spatial-go/geoos/encoding/wkb"
-	"github.com/spatial-go/geoos/encoding/wkt"
+	"github.com/spatial-go/geoos/geoencoding/geobuf"
+	"github.com/spatial-go/geoos/geoencoding/geocsv"
+	"github.com/spatial-go/geoos/geoencoding/geojson"
+	"github.com/spatial-go/geoos/geoencoding/wkb"
+	"github.com/spatial-go/geoos/geoencoding/wkt"
 	"github.com/spatial-go/geoos/space"
 )
 
