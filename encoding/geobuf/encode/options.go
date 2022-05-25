@@ -1,16 +1,16 @@
 package encode
 
 import (
-	"github.com/spatial-go/geoos/encoding/geobuf/utils"
+	"github.com/spatial-go/geoos/encoding/geobuf/protogeo"
 	"github.com/spatial-go/geoos/encoding/geojson"
-	geoos "github.com/spatial-go/geoos/space"
+	"github.com/spatial-go/geoos/space"
 )
 
 // EncodingConfig ...
 type EncodingConfig struct {
 	Dimension uint
 	Precision uint
-	Keys      utils.KeyStore
+	Keys      protogeo.KeyStore
 }
 
 // EncodingOption ...
@@ -19,7 +19,7 @@ type EncodingOption func(o *EncodingConfig)
 // WithPrecision ...
 func WithPrecision(precision uint) EncodingOption {
 	return func(o *EncodingConfig) {
-		o.Precision = uint(utils.DecodePrecision(uint32(precision)))
+		o.Precision = uint(protogeo.DecodePrecision(uint32(precision)))
 	}
 }
 
@@ -31,7 +31,7 @@ func WithDimension(dimension uint) EncodingOption {
 }
 
 // WithKeyStore ...
-func WithKeyStore(store utils.KeyStore) EncodingOption {
+func WithKeyStore(store protogeo.KeyStore) EncodingOption {
 	return func(o *EncodingConfig) {
 		o.Keys = store
 	}
@@ -58,34 +58,34 @@ func analyze(obj interface{}, opts *EncodingConfig) {
 		}
 	case *geojson.Geometry:
 		switch t.Type {
-		case geoos.TypePoint:
-			updatePrecision(t.Coordinates.(geoos.Point), opts)
-		case geoos.TypeMultiPoint:
-			coords := t.Coordinates.(geoos.MultiPoint)
+		case space.TypePoint:
+			updatePrecision(t.Coordinates.(space.Point), opts)
+		case space.TypeMultiPoint:
+			coords := t.Coordinates.(space.MultiPoint)
 			for _, coord := range coords {
 				updatePrecision(coord, opts)
 			}
-		case geoos.TypeLineString:
-			coords := t.Coordinates.(geoos.LineString)
+		case space.TypeLineString:
+			coords := t.Coordinates.(space.LineString)
 			for _, coord := range coords {
 				updatePrecision(coord, opts)
 			}
-		case geoos.TypeMultiLineString:
-			lines := t.Coordinates.(geoos.MultiLineString)
+		case space.TypeMultiLineString:
+			lines := t.Coordinates.(space.MultiLineString)
 			for _, line := range lines {
 				for _, coord := range line {
 					updatePrecision(coord, opts)
 				}
 			}
-		case geoos.TypePolygon:
-			lines := t.Coordinates.(geoos.Polygon)
+		case space.TypePolygon:
+			lines := t.Coordinates.(space.Polygon)
 			for _, line := range lines {
 				for _, coord := range line {
 					updatePrecision(coord, opts)
 				}
 			}
-		case geoos.TypeMultiPolygon:
-			polygons := t.Coordinates.(geoos.MultiPolygon)
+		case space.TypeMultiPolygon:
+			polygons := t.Coordinates.(space.MultiPolygon)
 			for _, rings := range polygons {
 				for _, ring := range rings {
 					for _, coord := range ring {
@@ -98,9 +98,9 @@ func analyze(obj interface{}, opts *EncodingConfig) {
 
 }
 
-func updatePrecision(point geoos.Point, opt *EncodingConfig) {
+func updatePrecision(point space.Point, opt *EncodingConfig) {
 	for _, val := range point {
-		e := utils.GetPrecision(val)
+		e := protogeo.GetPrecision(val)
 		if e > opt.Precision {
 			opt.Precision = e
 		}

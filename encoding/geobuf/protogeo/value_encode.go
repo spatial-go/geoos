@@ -1,19 +1,17 @@
-package utils
+package protogeo
 
 import (
 	"encoding/json"
 	"reflect"
-
-	"github.com/spatial-go/geoos/encoding/geobuf/protogeo"
 )
 
 // EncodeValue ...
-func EncodeValue(val interface{}) (*protogeo.Data_Value, error) {
+func EncodeValue(val interface{}) (*Data_Value, error) {
 	v := reflect.ValueOf(val)
 	return encodeValue(v, val)
 }
 
-func encodeValue(v reflect.Value, val interface{}) (*protogeo.Data_Value, error) {
+func encodeValue(v reflect.Value, val interface{}) (*Data_Value, error) {
 	switch v.Kind() {
 	case reflect.Bool:
 		return encodeBool(v.Bool())
@@ -36,50 +34,50 @@ func encodeValue(v reflect.Value, val interface{}) (*protogeo.Data_Value, error)
 	}
 }
 
-func encodeInt(val uint64, positive bool) (*protogeo.Data_Value, error) {
+func encodeInt(val uint64, positive bool) (*Data_Value, error) {
 	if positive {
-		return &protogeo.Data_Value{
-			ValueType: &protogeo.Data_Value_PosIntValue{
+		return &Data_Value{
+			ValueType: &Data_Value_PosIntValue{
 				PosIntValue: val,
 			},
 		}, nil
 	}
 
-	return &protogeo.Data_Value{
-		ValueType: &protogeo.Data_Value_NegIntValue{
+	return &Data_Value{
+		ValueType: &Data_Value_NegIntValue{
 			NegIntValue: val,
 		},
 	}, nil
 }
 
-func encodeDouble(val float64) (*protogeo.Data_Value, error) {
-	return &protogeo.Data_Value{
-		ValueType: &protogeo.Data_Value_DoubleValue{
+func encodeDouble(val float64) (*Data_Value, error) {
+	return &Data_Value{
+		ValueType: &Data_Value_DoubleValue{
 			DoubleValue: val,
 		},
 	}, nil
 }
 
-func encodeString(val string) (*protogeo.Data_Value, error) {
-	return &protogeo.Data_Value{
-		ValueType: &protogeo.Data_Value_StringValue{
+func encodeString(val string) (*Data_Value, error) {
+	return &Data_Value{
+		ValueType: &Data_Value_StringValue{
 			StringValue: val,
 		},
 	}, nil
 }
 
-func encodeBool(val bool) (*protogeo.Data_Value, error) {
-	return &protogeo.Data_Value{
-		ValueType: &protogeo.Data_Value_BoolValue{
+func encodeBool(val bool) (*Data_Value, error) {
+	return &Data_Value{
+		ValueType: &Data_Value_BoolValue{
 			BoolValue: val,
 		},
 	}, nil
 }
 
-func encodeJSON(val interface{}) (*protogeo.Data_Value, error) {
+func encodeJSON(val interface{}) (*Data_Value, error) {
 	encoded, err := json.Marshal(val)
-	return &protogeo.Data_Value{
-		ValueType: &protogeo.Data_Value_JsonValue{
+	return &Data_Value{
+		ValueType: &Data_Value_JsonValue{
 			JsonValue: string(encoded),
 		},
 	}, err

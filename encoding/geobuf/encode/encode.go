@@ -2,7 +2,6 @@ package encode
 
 import (
 	"github.com/spatial-go/geoos/encoding/geobuf/protogeo"
-	"github.com/spatial-go/geoos/encoding/geobuf/utils"
 	"github.com/spatial-go/geoos/encoding/geojson"
 )
 
@@ -20,7 +19,7 @@ func WithOptions(obj interface{}, opts ...EncodingOption) (*protogeo.Data, error
 	cfg := &EncodingConfig{
 		Dimension: 2,
 		Precision: 100,
-		Keys:      utils.NewKeyStore(),
+		Keys:      protogeo.NewKeyStore(),
 	}
 	for _, opt := range opts {
 		opt(cfg)
@@ -29,7 +28,7 @@ func WithOptions(obj interface{}, opts ...EncodingOption) (*protogeo.Data, error
 	data := &protogeo.Data{
 		Keys:       cfg.Keys.Keys(),
 		Dimensions: uint32(cfg.Dimension),
-		Precision:  utils.EncodePrecision(cfg.Precision),
+		Precision:  protogeo.EncodePrecision(cfg.Precision),
 	}
 
 	switch t := obj.(type) {

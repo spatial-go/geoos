@@ -2,44 +2,43 @@ package encode
 
 import (
 	"github.com/spatial-go/geoos/encoding/geobuf/protogeo"
-	math "github.com/spatial-go/geoos/encoding/geobuf/utils"
 	"github.com/spatial-go/geoos/encoding/geojson"
-	geoos "github.com/spatial-go/geoos/space"
+	"github.com/spatial-go/geoos/space"
 )
 
 // Geometry ...
 func Geometry(g *geojson.Geometry, cfg *EncodingConfig) *protogeo.Data_Geometry {
 	switch g.Type {
-	case geoos.TypePoint:
-		p := g.Coordinates.(geoos.Point)
+	case space.TypePoint:
+		p := g.Coordinates.(space.Point)
 		return &protogeo.Data_Geometry{
 			Type:   protogeo.Data_Geometry_POINT,
 			Coords: translateCoords(cfg.Precision, p[:]),
 		}
-	case geoos.TypeLineString:
-		p := g.Coordinates.(geoos.LineString)
+	case space.TypeLineString:
+		p := g.Coordinates.(space.LineString)
 		return &protogeo.Data_Geometry{
 			Type:   protogeo.Data_Geometry_LINESTRING,
 			Coords: translateLine(cfg.Precision, cfg.Dimension, p, false),
 		}
-	case geoos.TypeMultiLineString:
-		p := g.Coordinates.(geoos.MultiLineString)
+	case space.TypeMultiLineString:
+		p := g.Coordinates.(space.MultiLineString)
 		coords, lengths := translateMultiLine(cfg.Precision, cfg.Dimension, p)
 		return &protogeo.Data_Geometry{
 			Type:    protogeo.Data_Geometry_MULTILINESTRING,
 			Coords:  coords,
 			Lengths: lengths,
 		}
-	case geoos.TypePolygon:
-		p := g.Coordinates.(geoos.Polygon)
+	case space.TypePolygon:
+		p := g.Coordinates.(space.Polygon)
 		coords, lengths := translateMultiRing(cfg.Precision, cfg.Dimension, p)
 		return &protogeo.Data_Geometry{
 			Type:    protogeo.Data_Geometry_POLYGON,
 			Coords:  coords,
 			Lengths: lengths,
 		}
-	case geoos.TypeMultiPolygon:
-		p := []geoos.Polygon(g.Coordinates.(geoos.MultiPolygon))
+	case space.TypeMultiPolygon:
+		p := []space.Polygon(g.Coordinates.(space.MultiPolygon))
 		coords, lengths := translateMultiPolygon(cfg.Precision, cfg.Dimension, p)
 		return &protogeo.Data_Geometry{
 			Type:    protogeo.Data_Geometry_MULTIPOLYGON,
@@ -50,7 +49,7 @@ func Geometry(g *geojson.Geometry, cfg *EncodingConfig) *protogeo.Data_Geometry 
 	return nil
 }
 
-func translateMultiLine(e uint, dim uint, lines []geoos.LineString) ([]int64, []uint32) {
+func translateMultiLine(e uint, dim uint, lines []space.LineString) ([]int64, []uint32) {
 	lengths := make([]uint32, len(lines))
 	coords := []int64{}
 
@@ -61,7 +60,7 @@ func translateMultiLine(e uint, dim uint, lines []geoos.LineString) ([]int64, []
 	return coords, lengths
 }
 
-func translateMultiPolygon(e uint, dim uint, polygons []geoos.Polygon) ([]int64, []uint32) {
+func translateMultiPolygon(e uint, dim uint, polygons []space.Polygon) ([]int64, []uint32) {
 	lengths := []uint32{uint32(len(polygons))}
 	coords := []int64{}
 	for _, rings := range polygons {
@@ -73,7 +72,7 @@ func translateMultiPolygon(e uint, dim uint, polygons []geoos.Polygon) ([]int64,
 	return coords, lengths
 }
 
-func translateMultiRing(e uint, dim uint, lines geoos.Polygon) ([]int64, []uint32) {
+func translateMultiRing(e uint, dim uint, lines space.Polygon) ([]int64, []uint32) {
 	lengths := make([]uint32, len(lines))
 	coords := []int64{}
 	for i, line := range lines {
@@ -84,12 +83,12 @@ func translateMultiRing(e uint, dim uint, lines geoos.Polygon) ([]int64, []uint3
 	return coords, lengths
 }
 
-func translateLine(precision uint, dim uint, points geoos.LineString, isClosed bool) []int64 {
+func translateLine(precision uint, dim uint, points space.LineString, isClosed bool) []int64 {
 	sums := make([]int64, dim)
 	ret := make([]int64, len(points)*int(dim))
 	for i, point := range points {
 		for j, p := range point {
-			n := math.IntWithPrecision(p, precision) - sums[j]
+			n := protogeo.IntWithPrecision(p, precision) - sums[j]
 			ret[(int(dim)*i)+j] = n
 			sums[j] = sums[j] + n
 		}
@@ -105,7 +104,7 @@ func translateLine(precision uint, dim uint, points geoos.LineString, isClosed b
 func translateCoords(precision uint, point []float64) []int64 {
 	ret := make([]int64, len(point))
 	for i, p := range point {
-		ret[i] = math.IntWithPrecision(p, precision)
+		ret[i] = protogeo.IntWithPrecision(p, precision)
 	}
 	return ret
 }

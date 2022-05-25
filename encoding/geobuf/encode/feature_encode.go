@@ -2,7 +2,6 @@ package encode
 
 import (
 	"github.com/spatial-go/geoos/encoding/geobuf/protogeo"
-	"github.com/spatial-go/geoos/encoding/geobuf/utils"
 	"github.com/spatial-go/geoos/encoding/geojson"
 )
 
@@ -15,14 +14,14 @@ func Feature(feature *geojson.Feature, cfg *EncodingConfig) (protoFeature *proto
 	if err != nil {
 		return
 	}
-	id, err := utils.EncodeID(feature.ID)
+	id, err := protogeo.EncodeID(feature.ID)
 	protoFeature = &protogeo.Data_Feature{
 		Geometry: geo,
 	}
 	if err == nil {
 		protoFeature.IdType = id
 	} else {
-		newID, newErr := utils.EncodeID(feature.ID)
+		newID, newErr := protogeo.EncodeID(feature.ID)
 		if newErr != nil {
 			return nil, newErr
 		}
@@ -31,7 +30,7 @@ func Feature(feature *geojson.Feature, cfg *EncodingConfig) (protoFeature *proto
 	properties := make([]uint32, 0, 2*len(feature.Properties))
 	values := make([]*protogeo.Data_Value, 0, len(feature.Properties))
 	for key, val := range feature.Properties {
-		encoded, err2 := utils.EncodeValue(val)
+		encoded, err2 := protogeo.EncodeValue(val)
 		if err2 != nil {
 			return
 		}
