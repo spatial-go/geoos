@@ -156,10 +156,8 @@ func (im *IntersectionMatrix) IsEquals(dimensionOfGeometryA, dimensionOfGeometry
 }
 
 // IsOverlaps Tests if this matrix matches
-// <UL>
-//    <LI><tt>[T*T***T**]</tt> (for two points or two surfaces)
-//    <LI><tt>[1*T***T**]</tt> (for two curves)
-// </UL>.
+//   [T*T***T**](for two points or two surfaces)
+//   [1*T***T**] (for two curves)
 func (im *IntersectionMatrix) IsOverlaps(dimensionOfGeometryA, dimensionOfGeometryB int) bool {
 	if (dimensionOfGeometryA == calc.ImP && dimensionOfGeometryB == calc.ImP) ||
 		(dimensionOfGeometryA == calc.ImA && dimensionOfGeometryB == calc.ImA) {
@@ -222,8 +220,8 @@ func (im *IntersectionMatrix) SetAtLeast(row, column, minimumDimensionValue int)
 	}
 }
 
-// SetAtLeastIfValid If row &gt;= 0 and column &gt;= 0, changes the specified element to minimumDimensionValue
-// if the element is less. Does nothing if row &lt;0 or column &lt; 0.
+// SetAtLeastIfValid If row >= 0 and column >= 0, changes the specified element to minimumDimensionValue
+// if the element is less. Does nothing if row <0 or column < 0.
 func (im *IntersectionMatrix) SetAtLeastIfValid(row, column, minimumDimensionValue int) {
 	if row >= 0 && column >= 0 {
 		im.SetAtLeast(row, column, minimumDimensionValue)

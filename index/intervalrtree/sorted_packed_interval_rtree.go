@@ -1,7 +1,8 @@
-// Package intervalrtree Contains structs to implement an R-tree index for one-dimensional intervals.
+// Package intervalrtree a tree is an R-tree index for one-dimensional intervals.
 package intervalrtree
 
 import (
+	"log"
 	"sort"
 
 	"github.com/spatial-go/geoos/algorithm/matrix/envelope"
@@ -59,18 +60,16 @@ func (s *SortedPackedIntervalRTree) buildTree() Node {
 
 	// now group nodes into blocks of two and build tree up recursively
 	src := s.leaves
-	var dest, temp LeafNodes = make(LeafNodes, 1), make(LeafNodes, 1)
-
-	for true {
+	var dest LeafNodes = make(LeafNodes, 1)
+	for {
 		s.buildLevel(src, dest)
 		if len(dest) == 1 {
 			return dest[0]
 		}
-		temp = src
+		temp := src
 		src = dest
 		dest = temp
 	}
-	return nil
 }
 
 func (s *SortedPackedIntervalRTree) buildLevel(src, dest LeafNodes) {
@@ -92,7 +91,9 @@ func (s *SortedPackedIntervalRTree) buildLevel(src, dest LeafNodes) {
 // Query Search for intervals in the index which intersect the given closed interval and apply the visitor to them.
 func (s *SortedPackedIntervalRTree) Query(queryEnv *envelope.Envelope) interface{} {
 	visitor := &index.ArrayVisitor{}
-	s.QueryVisitor(queryEnv, visitor)
+	if err := s.QueryVisitor(queryEnv, visitor); err != nil {
+		log.Println(err)
+	}
 	return visitor.Items()
 }
 
@@ -129,10 +130,7 @@ func (l LeafNodes) Less(i, j int) bool {
 
 	mid1 := (l[i].Min() + l[i].Max()) / 2
 	mid2 := (l[j].Min() + l[j].Max()) / 2
-	if mid1 < mid2 {
-		return true
-	}
-	return false
+	return mid1 < mid2
 }
 
 // Swap ...

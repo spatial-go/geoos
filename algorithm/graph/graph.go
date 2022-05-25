@@ -1,4 +1,4 @@
-// package graph ...
+// package graph the graph to describe the hierarchical relationship between geometric objects.
 
 package graph
 
@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"sync"
 
+	"github.com/spatial-go/geoos/algorithm/calc"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 )
 
@@ -21,6 +22,18 @@ const (
 	DefaultCost = 1
 )
 
+// edge cost
+const (
+	PointPoint = PNode + PNode
+	PointLine  = PNode + LNode
+	PointCLine = PNode + CNode
+	PointPoly  = PNode + ANode
+
+	LineLine  = LNode + LNode
+	LineCLine = LNode + CNode
+	LinePoly  = LNode + ANode
+)
+
 // Graph represents a graph with a geometry
 // of vertices and weighted edges that can be added or removed.
 // The implementation uses hash maps to associate each vertex in the graph with
@@ -33,6 +46,12 @@ type Graph interface {
 
 	// Edges Returns edges.
 	Edges() []map[int]int
+
+	// Degree Returns degrees(num Connected) of node.
+	Degree(index int) int
+
+	// Connected Returns degree of node.
+	Connected(index int) int
 
 	// AddNode add a node.
 	AddNode(n *Node)
@@ -58,6 +77,9 @@ type Graph interface {
 	// NodeIndex tells if there is an node index.
 	NodeIndex(n *Node) (int, bool)
 
+	// NodeByIndex tells if there is an node by index.
+	NodeByIndex(index int) (*Node, bool)
+
 	// Edge tells if there is an edge from n1 to n2.
 	Edge(n1, n2 *Node) bool
 
@@ -66,6 +88,9 @@ type Graph interface {
 
 	// Equals returns the true if g==g1.
 	Equals(g1 Graph) bool
+
+	// Proximity returns true if  if g-g1<DefaultTolerance.
+	Proximity(g1 Graph) bool
 
 	// Union  Computes the Union of two Graph.
 	Union(graph Graph) (Graph, error)
@@ -92,9 +117,28 @@ type Node struct {
 	Index    int
 	Value    matrix.Steric
 	Reverse  matrix.Steric
-	stat     bool
+	Stat     bool
 	inGraph  bool
 	NodeType int
+}
+
+// Equals returns the true if  n==other.
+func (n *Node) Equals(other *Node) bool {
+	return n.EqualsExact(other, 0)
+}
+
+// Proximity returns true if  if  n-other<DefaultTolerance.
+func (n *Node) Proximity(other *Node) bool {
+	return n.EqualsExact(other, calc.DefaultTolerance)
+}
+
+// EqualsExact returns the true if n-other<tolerance.
+func (n *Node) EqualsExact(other *Node, tolerance float64) bool {
+	if !n.Value.EqualsExact(other.Value, tolerance) &&
+		!n.Reverse.EqualsExact(other.Value, tolerance) {
+		return false
+	}
+	return true
 }
 
 // MatrixGraph represents a graph with a geometry
@@ -112,29 +156,36 @@ type MatrixGraph struct {
 func (g *MatrixGraph) String() string {
 	str := ""
 	for i, v := range g.nodes {
-		str += fmt.Sprintf("node %v: %v", i, v.Value)
+		str += fmt.Sprintf("node %v: %v  %v\t", i, v.Value, v.Stat)
 	}
-	return fmt.Sprintf("Nodes:%v\nEdges%v", str, g.edges)
+	return fmt.Sprintf("Nodes:%v\nEdges%v\t", str, g.edges)
 }
 
 // Equals returns the true if g==g1.
 func (g *MatrixGraph) Equals(g1 Graph) bool {
+	return g.EqualsExact(g1, 0)
+}
+
+// Proximity returns true if  if g-g1<DefaultTolerance.
+func (g *MatrixGraph) Proximity(g1 Graph) bool {
+	return g.EqualsExact(g1, calc.DefaultTolerance)
+}
+
+// EqualsExact returns the true if g-g1<tolerance.
+func (g *MatrixGraph) EqualsExact(g1 Graph, tolerance float64) bool {
 	if g1.Order() != g.Order() {
 		return false
 	}
 	for i := 0; i < g1.Order(); i++ {
-		if g.Nodes()[i].stat {
-			if !g.Nodes()[i].Value.Equals(g1.Nodes()[i].Value) &&
-				!g.Nodes()[i].Reverse.Equals(g1.Nodes()[i].Value) {
-				return false
-			}
+		if !g.Nodes()[i].EqualsExact(g1.Nodes()[i], tolerance) {
+			return false
 		}
 	}
 	for i := 0; i < g1.Order(); i++ {
-		if g.Nodes()[i].stat {
-			if !reflect.DeepEqual(g.Edges()[i], g1.Edges()[i]) {
-				return false
-			}
+		index1, index2 := g.Nodes()[i].Index, g1.Nodes()[i].Index
+		map1, map2 := g.Edges()[index1], g1.Edges()[index2]
+		if !reflect.DeepEqual(map1, map2) {
+			return false
 		}
 	}
 
@@ -151,13 +202,16 @@ func (g *MatrixGraph) AddNodeType(n *Node, nodeType int) {
 	g.lock.Lock()
 	defer g.lock.Unlock()
 	for _, node := range g.nodes {
-		if n.Value.Equals(node.Value) || n.Value.Equals(node.Reverse) {
+		if node.Proximity(n) {
+			if !node.Stat {
+				node.Stat = true
+			}
 			return
 		}
 	}
 	var node *Node
 	if n.inGraph {
-		node = &Node{Index: 0, Value: n.Value, Reverse: n.Reverse, stat: true, inGraph: true, NodeType: nodeType}
+		node = &Node{Index: 0, Value: n.Value, Reverse: n.Reverse, Stat: true, inGraph: true, NodeType: nodeType}
 	} else {
 		node = n
 	}
@@ -171,7 +225,7 @@ func (g *MatrixGraph) AddNodeType(n *Node, nodeType int) {
 		n.Reverse = n.Value
 	}
 	node.Index = len(g.nodes)
-	node.stat = true
+	node.Stat = true
 	node.inGraph = true
 	g.nodes = append(g.nodes, node)
 	edges := make(map[int]int)
@@ -183,7 +237,7 @@ func (g *MatrixGraph) DeleteNode(n *Node) {
 	g.lock.Lock()
 	defer g.lock.Unlock()
 
-	g.nodes[n.Index].stat = false
+	g.nodes[n.Index].Stat = false
 	for k := range g.edges[n.Index] {
 		g.DeleteEdgeByIndex(k, n.Index)
 	}
@@ -192,8 +246,7 @@ func (g *MatrixGraph) DeleteNode(n *Node) {
 // Node tells if there is an node .
 func (g *MatrixGraph) Node(n *Node) (*Node, bool) {
 	for _, node := range g.nodes {
-		if n.Value.Equals(node.Value) && node.stat ||
-			n.Value.Equals(node.Reverse) && node.stat {
+		if node.Proximity(n) && node.Stat {
 			return node, true
 		}
 	}
@@ -206,6 +259,16 @@ func (g *MatrixGraph) NodeIndex(n *Node) (int, bool) {
 		return node.Index, true
 	}
 	return -1, false
+}
+
+// NodeByIndex tells if there is an node by index.
+func (g *MatrixGraph) NodeByIndex(index int) (*Node, bool) {
+	node := g.nodes[index]
+	if node.Stat {
+		return node, true
+	}
+
+	return nil, false
 }
 
 // AddEdge add a edge.
@@ -263,7 +326,7 @@ func (g *MatrixGraph) Edge(n1, n2 *Node) bool {
 func (g *MatrixGraph) Order() int {
 	num := 0
 	for _, v := range g.nodes {
-		if v.stat {
+		if v.Stat {
 			num++
 		}
 	}
@@ -272,7 +335,13 @@ func (g *MatrixGraph) Order() int {
 
 // Nodes Returns nodes.
 func (g *MatrixGraph) Nodes() []*Node {
-	return g.nodes
+	nodes := []*Node{}
+	for _, v := range g.nodes {
+		if v.Stat {
+			nodes = append(nodes, v)
+		}
+	}
+	return nodes
 }
 
 // Edges Returns edges.
@@ -280,24 +349,48 @@ func (g *MatrixGraph) Edges() []map[int]int {
 	return g.edges
 }
 
+// Degree Returns degree of node.
+func (g *MatrixGraph) Degree(index int) int {
+	return len(g.Edges()[index])
+}
+
+// Connected Returns num Connected of node.
+func (g *MatrixGraph) Connected(index int) int {
+	if node, ok := g.NodeByIndex(index); ok {
+		switch node.NodeType {
+		case PNode:
+			if g.Degree(index) == 0 {
+				return 0
+			}
+			return 1
+		default:
+			if g.Degree(index) == 2 {
+				return 2
+			}
+			return 1
+		}
+	}
+	return 0
+}
+
 // Union  Computes the Union of two Graph.
 func (g *MatrixGraph) Union(graph Graph) (Graph, error) {
 	gUnion := &MatrixGraph{}
 	for _, node := range g.Nodes() {
-		if node.stat {
+		if node.Stat {
 			gUnion.AddNode(node)
 		}
 	}
 	for _, node := range graph.Nodes() {
-		if node.stat {
+		if node.Stat {
 			if _, ok := g.Node(node); !ok {
 				gUnion.AddNode(node)
 			}
 		}
 	}
 	for _, node := range gUnion.nodes {
-		if !node.stat {
-			break
+		if !node.Stat {
+			continue
 		}
 		if i1, ok1 := g.NodeIndex(node); ok1 {
 			for k, v := range g.edges[i1] {
@@ -308,8 +401,9 @@ func (g *MatrixGraph) Union(graph Graph) (Graph, error) {
 
 		if i2, ok2 := graph.NodeIndex(node); ok2 {
 			for k, v := range graph.Edges()[i2] {
-				gNode := graph.Nodes()[k]
-				gUnion.AddEdgeCost(node, gNode, v)
+				if gNode, ok := graph.NodeByIndex(k); ok {
+					gUnion.AddEdgeCost(node, gNode, v)
+				}
 			}
 		}
 	}
@@ -323,31 +417,22 @@ func (g *MatrixGraph) Union(graph Graph) (Graph, error) {
 func (g *MatrixGraph) Difference(graph Graph) (Graph, error) {
 	gDiff := &MatrixGraph{}
 	for _, node := range g.Nodes() {
-		if !node.stat {
-			break
+		if !node.Stat {
+			continue
 		}
 		gDiff.AddNode(node)
 	}
 
 	for _, node := range gDiff.nodes {
+		if !node.Stat {
+			continue
+		}
 		i1, _ := g.NodeIndex(node)
-		if i2, ok := graph.NodeIndex(node); ok {
-			numEdge := 0
-			for k, v := range g.edges[i1] {
-				gNode := g.nodes[k]
-				if index2, ok := graph.NodeIndex(gNode); ok {
-					if graph.Edges()[i2][index2] < DefaultCost {
-						gDiff.AddEdgeCost(node, gNode, v)
-						numEdge++
-					}
-				}
-			}
-			if numEdge == 0 {
-				node.stat = false
-			}
+		if _, ok := graph.NodeIndex(node); ok {
+			node.Stat = false
 		} else {
 			for k, v := range g.edges[i1] {
-				gNode := graph.Nodes()[k]
+				gNode := g.nodes[k]
 				gDiff.AddEdgeCost(node, gNode, v)
 			}
 		}
@@ -382,6 +467,9 @@ func (g *MatrixGraph) Intersection(graph Graph) (Graph, error) {
 	}
 
 	for _, node := range gIntersect.nodes {
+		if !node.Stat {
+			continue
+		}
 		if i1, ok1 := g.NodeIndex(node); ok1 {
 			i2, _ := graph.NodeIndex(node)
 			if g.edges == nil || g.edges[i1] == nil {

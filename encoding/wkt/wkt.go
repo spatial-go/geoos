@@ -1,3 +1,5 @@
+// Package wkt is for decoding  Well Known Text (WKT) format specification
+// at https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry#Well-known_binary
 package wkt
 
 import (
@@ -11,7 +13,7 @@ import (
 // UnmarshalString encode to geom
 func UnmarshalString(s string) (space.Geometry, error) {
 	p := Parser{NewLexer(strings.NewReader(s))}
-	geom, err := p.Parse()
+	geom, _ := p.Parse()
 
 	t, err := p.scanToken()
 	if err != nil {

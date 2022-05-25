@@ -1,7 +1,9 @@
-// Package kdtree Contains classes which implement a k-D tree index over 2-D point data.
+// Package kdtree A tree is a k-D tree index over 2-D point data.
 package kdtree
 
 import (
+	"log"
+
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/matrix/envelope"
 	"github.com/spatial-go/geoos/algorithm/measure"
@@ -49,10 +51,7 @@ func (k *KdTree) ToMatrixes(kdnodes []*KdNode, includeRepeated bool) []matrix.Ma
 
 // IsEmpty Tests whether the index contains any items.
 func (k *KdTree) IsEmpty() bool {
-	if k.root == nil {
-		return true
-	}
-	return false
+	return k.root == nil
 }
 
 // InsertNoData Inserts a new point in the kd-tree, with no data.
@@ -100,7 +99,9 @@ func (k *KdTree) Insert(env *envelope.Envelope, data interface{}) error {
 //  existing node.
 func (k *KdTree) FindBestMatchNode(p matrix.Matrix) *KdNode {
 	visitor := &BestMatchVisitor{Matrix: p, tolerance: k.tolerance}
-	k.QueryVisitor(visitor.QueryEnvelope(), visitor)
+	if err := k.QueryVisitor(visitor.QueryEnvelope(), visitor); err != nil {
+		log.Println(err)
+	}
 	return visitor.MatchNode
 }
 
@@ -176,13 +177,17 @@ func (k *KdTree) QueryNode(currentNode *KdNode,
 
 	// search is computed via in-order traversal
 	if searchLeft {
-		k.QueryNode(currentNode.Left, queryEnv, !odd, visitor)
+		if err := k.QueryNode(currentNode.Left, queryEnv, !odd, visitor); err != nil {
+			log.Println(err)
+		}
 	}
 	if queryEnv.Contains(envelope.Matrix(currentNode.Matrix)) {
 		visitor.VisitItem(currentNode)
 	}
 	if searchRight {
-		k.QueryNode(currentNode.Right, queryEnv, !odd, visitor)
+		if err := k.QueryNode(currentNode.Right, queryEnv, !odd, visitor); err != nil {
+			log.Println(err)
+		}
 	}
 	return nil
 }
@@ -220,7 +225,9 @@ func (k *KdTree) QueryVisitor(queryEnv *envelope.Envelope, visitor index.ItemVis
 // Query  Performs a range search of the points in the index.
 func (k *KdTree) Query(qEnv *envelope.Envelope) interface{} {
 	bmv := &BestMatchVisitor{}
-	k.QueryVisitor(qEnv, bmv)
+	if err := k.QueryVisitor(qEnv, bmv); err != nil {
+		log.Println(err)
+	}
 
 	return bmv.MatchNode
 }

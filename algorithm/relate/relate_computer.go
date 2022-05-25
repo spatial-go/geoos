@@ -86,7 +86,8 @@ func (r *Computer) computeProperIntersectionIM(im *matrix.IntersectionMatrix) {
 	}
 }
 
+//TODO
 //  updateIM update the IM with the sum of the IMs for each component
-func (r *Computer) updateIM(im *matrix.IntersectionMatrix) {
-	//TODO
-}
+// func (r *Computer) updateIM(im *matrix.IntersectionMatrix) {
+// 	//TODO
+// }

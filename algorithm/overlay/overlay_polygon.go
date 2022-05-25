@@ -237,14 +237,15 @@ func (p *PolygonOverlay) Weiler() (enteringPoints, exitingPoints []Vertex) {
 			mark, ips :=
 				relate.Intersection(v.Start.Matrix, v.End.Matrix, vClip.Start.Matrix, vClip.End.Matrix)
 			for _, ip := range ips {
-				if ip.IsCollinear {
-					//continue //TODO
-				}
-				inV, _ := relate.InLineVertex(ip.Matrix, matrix.LineMatrix{v.Start.Matrix, v.End.Matrix})
-				inVClip, _ := relate.InLineVertex(ip.Matrix, matrix.LineMatrix{vClip.Start.Matrix, vClip.End.Matrix})
-				if inV && inVClip {
-					//continue //TODO
-				}
+				//TODO
+				// if ip.IsCollinear {
+				// 	//continue
+				// }
+				// inV, _ := relate.InLineVertex(ip.Matrix, matrix.LineMatrix{v.Start.Matrix, v.End.Matrix})
+				// inVClip, _ := relate.InLineVertex(ip.Matrix, matrix.LineMatrix{vClip.Start.Matrix, vClip.End.Matrix})
+				// if inV && inVClip {
+				// 	//continue //TODO
+				// }
 				if !ip.IsIntersectionPoint {
 					continue
 				}

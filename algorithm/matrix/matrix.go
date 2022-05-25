@@ -15,15 +15,22 @@ type Steric interface {
 
 	BoundaryDimensions() int
 
+	// Boundary returns the closure of the combinatorial boundary of this Steric.
+	// The boundary of a lineal geometry is always a zero-dimensional geometry (which may be empty).
+	Boundary() (Steric, error)
+
 	// Num of geometries
 	Nums() int
 
-	// Equals returns true if the Geometry represents the same Geometry or vector.
+	// Equals returns true if the Steric represents the same Geometry or vector.
 	Equals(s Steric) bool
 
-	// EqualsExact Returns true if the two Geometries are exactly equal,
+	// Proximity returns true if the Steric represents the Proximity Geometry or vector.
+	Proximity(s Steric) bool
+
+	// EqualsExact Returns true if the two Steric are exactly equal,
 	// up to a specified distance tolerance.
-	// Two Geometries are exactly equal within a distance tolerance
+	// Two Steric are exactly equal within a distance tolerance
 	EqualsExact(g Steric, tolerance float64) bool
 
 	// IsEmpty returns true if the Matrix is empty.
@@ -123,6 +130,11 @@ func (m Matrix) BoundaryDimensions() int {
 	return calc.ImFalse
 }
 
+// Boundary returns the closure of the combinatorial boundary of this Matrix.
+func (m Matrix) Boundary() (Steric, error) {
+	return nil, algorithm.ErrBoundBeNil
+}
+
 // Nums num of matrix
 func (m Matrix) Nums() int {
 	return 1
@@ -130,7 +142,7 @@ func (m Matrix) Nums() int {
 
 // IsEmpty returns true if the Matrix is empty.
 func (m Matrix) IsEmpty() bool {
-	return m == nil || len(m) == 0
+	return len(m) == 0
 }
 
 // Bound returns a single point bound of the point.
@@ -181,6 +193,11 @@ func (m Matrix) Equals(ms Steric) bool {
 		return true
 	}
 	return false
+}
+
+// Proximity returns true if the Steric represents the Proximity Geometry or vector.
+func (m Matrix) Proximity(ms Steric) bool {
+	return m.EqualsExact(ms, calc.DefaultTolerance)
 }
 
 // EqualsExact returns  true if the two Matrix are equalexact

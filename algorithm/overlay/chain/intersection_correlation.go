@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/spatial-go/geoos/algorithm/calc"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/relate"
 )
@@ -29,8 +30,12 @@ func (ii *IntersectionCorrelation) ProcessIntersections(
 		return
 	}
 	if ii.isEquals == 0 {
-		if e0.Equals(e1) {
+		if e0.EqualsExact(e1, calc.DefaultTolerance) {
 			ii.isEquals = 1
+			// if  edge is closed, return
+			if e0.IsClosed() {
+				return
+			}
 			inr0 := &IntersectionNodeResult{0, 1, relate.IntersectionPoint{Matrix: matrix.Matrix(ii.Edge[0]), IsCollinear: true},
 				matrix.LineSegment{P0: ii.Edge[0], P1: ii.Edge[1]}, matrix.LineSegment{P0: ii.Edge[0], P1: ii.Edge[1]}, ii.Edge1}
 			ii.result0 = append(ii.result0, inr0)
@@ -90,10 +95,7 @@ func (ii *IntersectionCorrelation) ProcessIntersections(
 
 // IsDone Always process all intersections
 func (ii *IntersectionCorrelation) IsDone() bool {
-	if ii.isEquals == 1 {
-		return true
-	}
-	return false
+	return ii.isEquals == 1
 }
 
 // Result returns result.
@@ -144,17 +146,9 @@ func (ipl IntersectionNodeOfLine) Less(i, j int) bool {
 		if line.P0 == nil {
 			return false
 		}
-		if tes, _ := line.P0.Compare(line.P1); tes > 0 {
-			if ipl[i].InterNode.Matrix[0] == ipl[j].InterNode.Matrix[0] {
-				return ipl[i].InterNode.Matrix[1] < ipl[j].InterNode.Matrix[1]
-			}
-			return ipl[i].InterNode.Matrix[0] < ipl[j].InterNode.Matrix[0]
+		if tes, err := line.P0.Compare(line.P1); err == nil {
+			return ipl[i].InterNode.Compare(&ipl[j].InterNode, tes)
 		}
-		if ipl[i].InterNode.Matrix[0] == ipl[j].InterNode.Matrix[0] {
-			return ipl[i].InterNode.Matrix[1] > ipl[j].InterNode.Matrix[1]
-		}
-		return ipl[i].InterNode.Matrix[0] > ipl[j].InterNode.Matrix[0]
-
 	}
 	return ipl[i].Pos < ipl[j].Pos
 }

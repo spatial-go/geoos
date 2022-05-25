@@ -4,6 +4,7 @@ package matrix
 import (
 	"math"
 
+	"github.com/spatial-go/geoos/algorithm"
 	"github.com/spatial-go/geoos/algorithm/calc"
 )
 
@@ -33,6 +34,11 @@ func (c Collection) BoundaryDimensions() int {
 	return dimension
 }
 
+// Boundary returns the closure of the combinatorial boundary of this Collection.
+func (c Collection) Boundary() (Steric, error) {
+	return nil, algorithm.ErrNotSupportCollection
+}
+
 // Nums ...
 func (c Collection) Nums() int {
 	return len(c)
@@ -40,7 +46,7 @@ func (c Collection) Nums() int {
 
 // IsEmpty returns true if the Matrix is empty.
 func (c Collection) IsEmpty() bool {
-	return c == nil || len(c) == 0
+	return len(c) == 0
 }
 
 // Bound returns a bound around the Collection.
@@ -62,6 +68,28 @@ func (c Collection) Bound() Bound {
 
 // Equals returns  true if the two Collection are equal
 func (c Collection) Equals(ms Steric) bool {
+	if mm, ok := ms.(Collection); ok {
+		// If one is nil, the other must also be nil.
+		if (mm == nil) != (c == nil) {
+			return false
+		}
+
+		if len(mm) != len(c) {
+			return false
+		}
+
+		for i := range mm {
+			if !c[i].Equals(mm[i]) {
+				return false
+			}
+		}
+		return true
+	}
+	return false
+}
+
+// Proximity returns true if the Steric represents the Proximity Geometry or vector.
+func (c Collection) Proximity(ms Steric) bool {
 	if mm, ok := ms.(Collection); ok {
 		// If one is nil, the other must also be nil.
 		if (mm == nil) != (c == nil) {

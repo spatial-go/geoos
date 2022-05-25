@@ -13,7 +13,7 @@ func LineMerge(ml matrix.Collection) matrix.Collection {
 		for j := i + 1; j < len(ml); j++ {
 			if mlMerge, ok := MergeLine(ml, i, j); ok {
 				ml = mlMerge
-				i--
+				// i--
 				return LineMerge(ml)
 			}
 		}
@@ -69,10 +69,10 @@ func MergeLine(ml matrix.Collection, i, j int) (matrix.Collection, bool) {
 						if i > 0 {
 							result = append(result, ml[:i])
 						}
-						if temp1 != nil && len(temp1) > 0 {
+						if len(temp1) > 0 {
 							result = append(result, temp1)
 						}
-						if temp2 != nil && len(temp2) > 0 {
+						if len(temp2) > 0 {
 							result = append(result, temp2)
 						}
 						result = append(result, r1)
@@ -82,10 +82,10 @@ func MergeLine(ml matrix.Collection, i, j int) (matrix.Collection, bool) {
 						if j > 0 {
 							result = append(result, ml[:j])
 						}
-						if temp1 != nil && len(temp1) > 0 {
+						if len(temp1) > 0 {
 							result = append(result, temp1)
 						}
-						if temp2 != nil && len(temp2) > 0 {
+						if len(temp2) > 0 {
 							result = append(result, temp2)
 						}
 						result = append(result, r1)
@@ -101,10 +101,10 @@ func MergeLine(ml matrix.Collection, i, j int) (matrix.Collection, bool) {
 						if i > 0 {
 							result = append(result, ml[:i])
 						}
-						if temp1 != nil && len(temp1) > 0 {
+						if len(temp1) > 0 {
 							result = append(result, temp1)
 						}
-						if temp2 != nil && len(temp2) > 0 {
+						if len(temp2) > 0 {
 							result = append(result, temp2)
 						}
 						result = append(result, r1)
@@ -114,10 +114,10 @@ func MergeLine(ml matrix.Collection, i, j int) (matrix.Collection, bool) {
 						if j > 0 {
 							result = append(result, ml[:j])
 						}
-						if temp1 != nil && len(temp1) > 0 {
+						if len(temp1) > 0 {
 							result = append(result, temp1)
 						}
-						if temp2 != nil && len(temp2) > 0 {
+						if len(temp2) > 0 {
 							result = append(result, temp2)
 						}
 						result = append(result, r1)

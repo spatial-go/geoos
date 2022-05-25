@@ -122,7 +122,7 @@ func (ls LineString) ToLineArray() (lines []Line) {
 
 // IsEmpty returns true if the Geometry is empty.
 func (ls LineString) IsEmpty() bool {
-	return ls == nil || len(ls) == 0
+	return len(ls) == 0
 }
 
 // Distance returns distance Between the two Geometry.

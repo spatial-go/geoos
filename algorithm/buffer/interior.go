@@ -218,7 +218,7 @@ func (ip *InteriorPointArea) Width() float64 {
 
 // process Compute the interior point.
 func (ip *InteriorPointArea) process(polygon matrix.PolygonMatrix) {
-	// This results in returning a null Coordinate
+	// This results in returning a nil Coordinate
 	if polygon.IsEmpty() {
 		return
 	}

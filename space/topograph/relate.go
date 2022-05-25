@@ -1,7 +1,7 @@
 package topograph
 
 import (
-	"github.com/spatial-go/geoos/algorithm/graph"
+	"github.com/spatial-go/geoos/algorithm/graph/de9im"
 	"github.com/spatial-go/geoos/space"
 )
 
@@ -13,7 +13,7 @@ type Topograph struct {
 // Relate Computes the  Intersection Matrix for the spatial relationship
 // between two geometries, using the default (OGC SFS) Boundary Node Rule
 func (t *Topograph) Relate(A, B space.Geometry) (string, error) {
-	return graph.Relate(A.ToMatrix(), B.ToMatrix()), nil
+	return de9im.Relate(A.ToMatrix(), B.ToMatrix()), nil
 
 }
 
@@ -25,7 +25,7 @@ func (t *Topograph) Within(A, B space.Geometry) (bool, error) {
 	if isSure {
 		return isAInB, nil
 	}
-	im := graph.IM(A.ToMatrix(), B.ToMatrix())
+	im := de9im.IM(A.ToMatrix(), B.ToMatrix())
 	return im.IsWithin(), nil
 }
 
@@ -40,7 +40,7 @@ func (t *Topograph) Contains(A, B space.Geometry) (bool, error) {
 	if isSure {
 		return isAInB, nil
 	}
-	im := graph.IM(A.ToMatrix(), B.ToMatrix())
+	im := de9im.IM(A.ToMatrix(), B.ToMatrix())
 	return im.IsContains(), nil
 }
 
@@ -50,7 +50,7 @@ func (t *Topograph) Covers(A, B space.Geometry) (bool, error) {
 	if isSure {
 		return isAInB, nil
 	}
-	im := graph.IM(A.ToMatrix(), B.ToMatrix())
+	im := de9im.IM(A.ToMatrix(), B.ToMatrix())
 	return im.IsCovers(), nil
 }
 
@@ -60,7 +60,7 @@ func (t *Topograph) CoveredBy(A, B space.Geometry) (bool, error) {
 	if isSure {
 		return isAInB, nil
 	}
-	im := graph.IM(A.ToMatrix(), B.ToMatrix())
+	im := de9im.IM(A.ToMatrix(), B.ToMatrix())
 	return im.IsCoveredBy(), nil
 }
 
@@ -78,7 +78,7 @@ func (t *Topograph) Crosses(A, B space.Geometry) (bool, error) {
 	if !intersectBound {
 		return false, nil
 	}
-	im := graph.IM(A.ToMatrix(), B.ToMatrix())
+	im := de9im.IM(A.ToMatrix(), B.ToMatrix())
 	return im.IsCrosses(A.Dimensions(), B.Dimensions()), nil
 }
 
@@ -86,7 +86,7 @@ func (t *Topograph) Crosses(A, B space.Geometry) (bool, error) {
 // If any of the aforementioned returns true, then the geometries are not spatially disjoint.
 // Disjoint implies false for spatial intersection.
 func (t *Topograph) Disjoint(A, B space.Geometry) (bool, error) {
-	im := graph.IM(A.ToMatrix(), B.ToMatrix())
+	im := de9im.IM(A.ToMatrix(), B.ToMatrix())
 	return im.IsDisjoint(), nil
 }
 
@@ -99,7 +99,7 @@ func (t *Topograph) Intersects(A, B space.Geometry) (bool, error) {
 	if !intersectBound {
 		return false, nil
 	}
-	im := graph.IM(A.ToMatrix(), B.ToMatrix())
+	im := de9im.IM(A.ToMatrix(), B.ToMatrix())
 	return im.IsIntersects(), nil
 }
 
@@ -107,14 +107,14 @@ func (t *Topograph) Intersects(A, B space.Geometry) (bool, error) {
 // The ouches relation applies to all Area/Area, Line/Line, Line/Area, Point/Area and Point/Line pairs of relationships,
 // but not to the Point/Point pair.
 func (t *Topograph) Touches(A, B space.Geometry) (bool, error) {
-	im := graph.IM(A.ToMatrix(), B.ToMatrix())
+	im := de9im.IM(A.ToMatrix(), B.ToMatrix())
 	return im.IsTouches(A.Dimensions(), B.Dimensions()), nil
 }
 
 // Overlaps returns TRUE if the Geometries "spatially overlap".
 // By that we mean they intersect, but one does not completely contain another.
 func (t *Topograph) Overlaps(A, B space.Geometry) (bool, error) {
-	im := graph.IM(A.ToMatrix(), B.ToMatrix())
+	im := de9im.IM(A.ToMatrix(), B.ToMatrix())
 	return im.IsOverlaps(A.Dimensions(), B.Dimensions()), nil
 }
 

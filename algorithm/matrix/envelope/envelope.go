@@ -1,3 +1,4 @@
+// Package envelope Defines a rectangular region of the 2D coordinate plane.
 package envelope
 
 import (
@@ -10,11 +11,9 @@ import (
 
 // Envelope Defines a rectangular region of the 2D coordinate plane.
 //  It is often used to represent the bounding box of a  Geometry,
-//  <p>
 //  Envelopes support infinite or half-infinite regions, by using the values of
 //  Double.POSITIVE_INFINITY and Double.NEGATIVE_INFINITY.
 //  Envelope objects may have a null value.
-//  <p>
 //  When Envelope objects are created or initialized,
 //  the supplies extent values are automatically sorted into the correct order.
 type Envelope struct {

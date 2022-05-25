@@ -140,7 +140,7 @@ func (c Collection) Area() (float64, error) {
 
 // IsEmpty returns true if the Geometry is empty.
 func (c Collection) IsEmpty() bool {
-	return c == nil || len(c) == 0
+	return len(c) == 0
 }
 
 // SpheroidDistance returns  spheroid distance Between the two Geometry.

@@ -1,9 +1,6 @@
 package dbscan
 
 // This code is heavily based on https://godoc.org/code.google.com/p/eaburns/kdtree
-//
-// Original code is under New BSD License.
-// Author: Ethan Burns <burns.ethan@gmail.com>
 
 import (
 	"sort"

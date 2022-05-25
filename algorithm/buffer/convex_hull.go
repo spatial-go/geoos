@@ -258,7 +258,7 @@ func (c *ConvexHullComputer) cleanRing(ms []matrix.Matrix) []matrix.Matrix {
 		if currentMatrix.Equals(nextMatrix) {
 			continue
 		}
-		if previousDistinctMatrix != nil && len(previousDistinctMatrix) > 1 &&
+		if len(previousDistinctMatrix) > 1 &&
 			c.isBetween(previousDistinctMatrix, currentMatrix, nextMatrix) {
 			continue
 		}

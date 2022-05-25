@@ -2,6 +2,7 @@ package planar
 
 import (
 	"github.com/spatial-go/geoos/algorithm"
+	"github.com/spatial-go/geoos/algorithm/graph/clipping"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/overlay"
 	"github.com/spatial-go/geoos/algorithm/sharedpaths"
@@ -18,7 +19,7 @@ func (g *megrezAlgorithm) Difference(geom1, geom2 space.Geometry) (space.Geometr
 		return nil, algorithm.ErrNotMatchType
 	}
 	var err error
-	if result, err := overlay.Difference(geom1.ToMatrix(), geom2.ToMatrix()); err == nil {
+	if result, err := clipping.Difference(geom1.ToMatrix(), geom2.ToMatrix()); err == nil {
 		return space.TransGeometry(result), nil
 	}
 	return nil, err
@@ -26,30 +27,10 @@ func (g *megrezAlgorithm) Difference(geom1, geom2 space.Geometry) (space.Geometr
 
 // Intersection returns a geometry that represents the point set intersection of the Geometries.
 func (g *megrezAlgorithm) Intersection(geom1, geom2 space.Geometry) (intersectGeom space.Geometry, intersectErr error) {
-	switch geom1.GeoJSONType() {
-	case space.TypePoint:
-		over := &overlay.PointOverlay{Subject: geom1.ToMatrix(), Clipping: geom2.ToMatrix()}
-		if result, err := over.Intersection(); err == nil {
-			intersectGeom = space.TransGeometry(result)
-		} else {
-			intersectErr = err
-		}
-	case space.TypeLineString:
-		over := &overlay.LineOverlay{PointOverlay: &overlay.PointOverlay{Subject: geom1.ToMatrix(), Clipping: geom2.ToMatrix()}}
-		if result, err := over.Intersection(); err == nil {
-			intersectGeom = space.TransGeometry(result)
-		} else {
-			intersectErr = err
-		}
-	case space.TypePolygon:
-		over := &overlay.PolygonOverlay{PointOverlay: &overlay.PointOverlay{Subject: geom1.ToMatrix(), Clipping: geom2.ToMatrix()}}
-		if result, err := over.Intersection(); err == nil {
-			intersectGeom = space.TransGeometry(result)
-		} else {
-			intersectErr = err
-		}
-	default:
-		intersectErr = algorithm.ErrNotMatchType
+	if result, err := clipping.Intersection(geom1.ToMatrix(), geom2.ToMatrix()); err == nil {
+		intersectGeom = space.TransGeometry(result)
+	} else {
+		intersectErr = err
 	}
 	return
 }
@@ -98,7 +79,7 @@ func (g *megrezAlgorithm) SymDifference(geom1, geom2 space.Geometry) (space.Geom
 		return nil, algorithm.ErrNotMatchType
 	}
 	var err error
-	if result, err := overlay.SymDifference(geom1.ToMatrix(), geom2.ToMatrix()); err == nil {
+	if result, err := clipping.SymDifference(geom1.ToMatrix(), geom2.ToMatrix()); err == nil {
 		return space.TransGeometry(result), nil
 	}
 	return nil, err
@@ -108,7 +89,7 @@ func (g *megrezAlgorithm) SymDifference(geom1, geom2 space.Geometry) (space.Geom
 // between the components of a geometrycollection
 func (g *megrezAlgorithm) UnaryUnion(geom space.Geometry) (space.Geometry, error) {
 	if geom.GeoJSONType() == space.TypeMultiPolygon {
-		result := overlay.UnaryUnion(geom.ToMatrix())
+		result, _ := clipping.UnaryUnion(geom.ToMatrix())
 		return space.TransGeometry(result), nil
 	}
 	return nil, ErrNotPolygon
@@ -116,6 +97,6 @@ func (g *megrezAlgorithm) UnaryUnion(geom space.Geometry) (space.Geometry, error
 
 // Union returns a new geometry representing all points in this geometry and the other.
 func (g *megrezAlgorithm) Union(geom1, geom2 space.Geometry) (space.Geometry, error) {
-	result := overlay.Union(geom1.ToMatrix(), geom2.ToMatrix())
-	return space.TransGeometry(result), nil
+	result, err := clipping.Union(geom1.ToMatrix(), geom2.ToMatrix())
+	return space.TransGeometry(result), err
 }

@@ -3,7 +3,10 @@
 package graph
 
 import (
+	"log"
+
 	"github.com/spatial-go/geoos/algorithm"
+	"github.com/spatial-go/geoos/algorithm/calc"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/relate"
 )
@@ -27,15 +30,15 @@ func GenerateGraph(m matrix.Steric) (Graph, error) {
 	return g, nil
 }
 
-// GenerateGraphCollection create graph with matrix.
+// GenerateGraphCollection create graph with collection.
 func GenerateGraphCollection(m matrix.Steric) ([]Graph, error) {
 
 	switch mType := m.(type) {
 	case matrix.Collection:
-		gc := []Graph{}
-		for _, v := range mType {
+		gc := make([]Graph, len(mType))
+		for i, v := range mType {
 			if g, err := GenerateGraph(v); err == nil {
-				gc = append(gc, g)
+				gc[i] = g
 			}
 		}
 	default:
@@ -45,7 +48,7 @@ func GenerateGraphCollection(m matrix.Steric) ([]Graph, error) {
 	return nil, algorithm.ErrNotMatchType
 }
 
-// lineCreateGraph create graph with matrix.
+// lineCreateGraph create graph with line.
 func lineCreateGraph(m matrix.LineMatrix) (Graph, error) {
 	g := &MatrixGraph{}
 
@@ -55,7 +58,7 @@ func lineCreateGraph(m matrix.LineMatrix) (Graph, error) {
 	return g, nil
 }
 
-// polyCreateGraph create graph with matrix.
+// polyCreateGraph create graph with polygon.
 func polyCreateGraph(m matrix.PolygonMatrix) (Graph, error) {
 	g := &MatrixGraph{}
 
@@ -82,13 +85,15 @@ func IntersectionHandle(m1, m2 matrix.Steric, g1, g2 Graph) error {
 	}
 }
 
-// polyIntersectionHandle handle graph with m1 and m2.
+// polyIntersectionHandle handle graph with m1 polygon and m2.
 func polyIntersectionHandle(m1 matrix.PolygonMatrix, m2 matrix.Steric, g1, g2 Graph) error {
 
 	switch m2Type := m2.(type) {
 	case matrix.Matrix:
 		for _, l := range m1 {
-			matrixAndLineHandle(m2Type, l, g2, g1)
+			if err := matrixAndLineHandle(m2Type, l, g2, g1); err != nil {
+				log.Println(err)
+			}
 		}
 		return nil
 	case matrix.LineMatrix:
@@ -102,7 +107,7 @@ func polyIntersectionHandle(m1 matrix.PolygonMatrix, m2 matrix.Steric, g1, g2 Gr
 	}
 }
 
-// lineIntersectionHandle handle graph with m1 and m2.
+// lineIntersectionHandle handle graph with m1 line and m2.
 func lineIntersectionHandle(m1 matrix.LineMatrix, m2 matrix.Steric, g1, g2 Graph) error {
 
 	switch m2Type := m2.(type) {
@@ -119,7 +124,7 @@ func lineIntersectionHandle(m1 matrix.LineMatrix, m2 matrix.Steric, g1, g2 Graph
 	}
 }
 
-// matrixIntersectionHandle handle graph with m1 and m2.
+// matrixIntersectionHandle handle graph with m1 matrix and m2.
 func matrixIntersectionHandle(m1 matrix.Matrix, m2 matrix.Steric, g1, g2 Graph) error {
 
 	switch m2Type := m2.(type) {
@@ -129,7 +134,9 @@ func matrixIntersectionHandle(m1 matrix.Matrix, m2 matrix.Steric, g1, g2 Graph) 
 		return matrixAndLineHandle(m1, m2Type, g1, g2)
 	case matrix.PolygonMatrix:
 		for _, l := range m2Type {
-			matrixAndLineHandle(m1, l, g1, g2)
+			if err := matrixAndLineHandle(m1, l, g1, g2); err != nil {
+				log.Println(err)
+			}
 		}
 		return nil
 	case matrix.Collection:
@@ -140,7 +147,8 @@ func matrixIntersectionHandle(m1 matrix.Matrix, m2 matrix.Steric, g1, g2 Graph) 
 }
 
 // matrixIntersectionHandle handle graph with m1 and m2.
-func matrixAndLineHandle(m1 matrix.Matrix, m2 matrix.LineMatrix, g1, g2 Graph) error {
+func matrixAndLineHandle(m1 matrix.Matrix, m2 matrix.LineMatrix, _, g2 Graph) error {
+
 	if m1.Equals(matrix.Matrix(m2[0])) || m1.Equals(matrix.Matrix(m2[len(m2)-1])) {
 		node := &Node{Value: m1, NodeType: PNode}
 		g2.AddNode(node)
@@ -192,6 +200,10 @@ func matrixAndLineHandle(m1 matrix.Matrix, m2 matrix.LineMatrix, g1, g2 Graph) e
 func lineAndLineHandle(m1, m2 matrix.LineMatrix, g1, g2 Graph) error {
 	g := []Graph{g1, g2}
 	corrNodes := IntersectLine(m1, m2)
+	if len(corrNodes[0]) > 0 || len(corrNodes[1]) > 0 {
+		g1.Nodes()[0].Stat = false
+		g2.Nodes()[0].Stat = false
+	}
 	for i, corrs := range corrNodes {
 		for _, corr := range corrs {
 			node := &Node{Value: corr.InterNode, NodeType: PNode}
@@ -215,6 +227,9 @@ func lineAndPolygonHandle(m1 matrix.LineMatrix, m2 matrix.PolygonMatrix, g1, g2 
 		if i > 0 {
 			gNum = g2
 		}
+		if len(corrs) > 0 {
+			gNum.Nodes()[0].Stat = false
+		}
 		startNode, endNode := &Node{}, &Node{}
 		startNodeLine, endNodeLine := &Node{}, &Node{}
 		for j, corr := range corrs {
@@ -236,18 +251,18 @@ func lineAndPolygonHandle(m1 matrix.LineMatrix, m2 matrix.PolygonMatrix, g1, g2 
 			gNum.AddEdge(node, nodeLine)
 		}
 		if i == 0 && m1.IsClosed() {
-			if startNode.Value != nil && startNode.Value.Equals(matrix.Matrix(m1[0])) {
+			if startNode.Value != nil && startNode.Value.EqualsExact(matrix.Matrix(m1[0]), calc.DefaultTolerance) {
 				gNum.AddEdge(startNode, endNodeLine)
 			}
-			if endNode.Value != nil && endNode.Value.Equals(matrix.Matrix(m1[len(m1)-1])) {
+			if endNode.Value != nil && endNode.Value.EqualsExact(matrix.Matrix(m1[len(m1)-1]), calc.DefaultTolerance) {
 				gNum.AddEdge(endNode, startNodeLine)
 			}
 		}
 		if i > 0 {
-			if startNode.Value != nil && startNode.Value.Equals(matrix.Matrix(m2[i-1][0])) {
+			if startNode.Value != nil && startNode.Value.EqualsExact(matrix.Matrix(m2[i-1][0]), calc.DefaultTolerance) {
 				gNum.AddEdge(startNode, endNodeLine)
 			}
-			if endNode.Value != nil && endNode.Value.Equals(matrix.Matrix(m2[i-1][len(m2[i-1])-1])) {
+			if endNode.Value != nil && endNode.Value.EqualsExact(matrix.Matrix(m2[i-1][len(m2[i-1])-1]), calc.DefaultTolerance) {
 				gNum.AddEdge(endNode, startNodeLine)
 			}
 		}
@@ -265,6 +280,9 @@ func polygonAndPolygonHandle(m1, m2 matrix.PolygonMatrix, g1, g2 Graph) error {
 	g := []Graph{g1, g2}
 	twoCorrNodes := IntersectPolygons(m1, m2)
 	for i, corrNodes := range twoCorrNodes {
+		if len(corrNodes) > 0 && len(corrNodes[0]) > 0 {
+			g[i].Nodes()[0].Stat = false
+		}
 		for k, corrs := range corrNodes {
 			startNode, endNode := &Node{}, &Node{}
 			startNodeLine, endNodeLine := &Node{}, &Node{}
@@ -287,16 +305,16 @@ func polygonAndPolygonHandle(m1, m2 matrix.PolygonMatrix, g1, g2 Graph) error {
 					g[i].AddEdge(node, nodeLine)
 				}
 			}
-			m := matrix.PolygonMatrix{}
+			var m matrix.PolygonMatrix
 			if i == 0 {
 				m = m1
 			} else {
 				m = m2
 			}
-			if startNode.Value != nil && startNode.Value.Equals(matrix.Matrix(m[k][0])) {
+			if startNode.Value != nil && startNode.Value.EqualsExact(matrix.Matrix(m[k][0]), calc.DefaultTolerance) {
 				g[i].AddEdge(startNode, endNodeLine)
 			}
-			if endNode.Value != nil && endNode.Value.Equals(matrix.Matrix(m[k][len(m[k])-1])) {
+			if endNode.Value != nil && endNode.Value.EqualsExact(matrix.Matrix(m[k][len(m[k])-1]), calc.DefaultTolerance) {
 				g[i].AddEdge(endNode, startNodeLine)
 			}
 

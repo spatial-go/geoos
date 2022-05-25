@@ -29,6 +29,6 @@ func (d *DouglasPeuckerSimplifier) getResultGeometry() matrix.Steric {
 		return d.inputGeom
 	}
 
-	result, _ := (&DPTransformer{&Transformer{}, d.isEnsureValidTopology, d.distanceTolerance}).Transform(d.inputGeom)
+	result, _ := (&DPTransformer{&Transformer{d.inputGeom, true, false}, d.isEnsureValidTopology, d.distanceTolerance}).Transform(d.inputGeom)
 	return result
 }

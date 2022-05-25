@@ -12,9 +12,9 @@ type IntersectionCollinear struct {
 	Intersections relate.IntersectionPointLine
 	Edge          matrix.LineMatrix
 
-	result   matrix.Collection
-	line     matrix.LineMatrix
-	startPos int
+	result matrix.Collection
+	line   matrix.LineMatrix
+	//startPos int
 }
 
 // ProcessIntersections This method is called by clients  to process intersections for two segments being intersected.

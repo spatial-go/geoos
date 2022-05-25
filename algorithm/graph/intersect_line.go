@@ -2,6 +2,7 @@
 package graph
 
 import (
+	"github.com/spatial-go/geoos/algorithm/calc"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/overlay/chain"
 )
@@ -26,7 +27,7 @@ func IntersectLine(m1, m2 matrix.LineMatrix) chain.CorrelationNodeResult {
 	return nil
 }
 
-// createCorrelationNode ...
+// createCorrelationNode handle intersection lines.
 func createCorrelationNode(result chain.IntersectionNodeOfLine, edge matrix.LineMatrix) []*chain.IntersectionCorrelationNode {
 	lines := []matrix.LineMatrix{}
 	totalIps := 0
@@ -35,7 +36,7 @@ func createCorrelationNode(result chain.IntersectionNodeOfLine, edge matrix.Line
 
 	correlationNode := matrix.LineMatrix{}
 
-	endNode := &chain.IntersectionNodeResult{}
+	var endNode *chain.IntersectionNodeResult
 
 	for i := 0; i < len(result); i++ {
 		r0 := result[i]
@@ -51,7 +52,8 @@ func createCorrelationNode(result chain.IntersectionNodeOfLine, edge matrix.Line
 		if i == result.Len()-1 {
 			for j := pos[0]; j < len(edge); j++ {
 				if len(correlationNode) == 0 ||
-					!matrix.Matrix(correlationNode[len(correlationNode)-1]).Equals(matrix.Matrix(edge[j])) {
+					!matrix.Matrix(correlationNode[len(correlationNode)-1]).
+						EqualsExact(matrix.Matrix(edge[j]), calc.DefaultTolerance) {
 					correlationNode = append(correlationNode, edge[j])
 				}
 			}
@@ -69,7 +71,9 @@ func writeIntersectionCorrelationNode(ips chain.IntersectionNodeOfLine, lines []
 
 	for i := 0; i < len(ips); i++ {
 
-		if i > 0 && ips[i].InterNode.Matrix.Equals(ips[i].Line.P1) && i < len(ips)-1 {
+		if i > 0 && ips[i].InterNode.Matrix.
+			EqualsExact(ips[i].Line.P1, calc.DefaultTolerance) &&
+			i < len(ips)-1 {
 			if ips[i+1].Pos == ips[i].End && ips[i+1].InterNode.IsCollinear {
 				lines[i+1] = append(lines[i], lines[i+1]...)
 				lines[i+1] = lines[i+1].Filter(&matrix.UniqueArrayFilter{}).(matrix.LineMatrix)
@@ -80,7 +84,8 @@ func writeIntersectionCorrelationNode(ips chain.IntersectionNodeOfLine, lines []
 			}
 		}
 		if i > 0 {
-			if !matrix.Matrix(lines[i][0]).Equals(matrix.Matrix(lines[i][len(lines[i])-1])) {
+			if !matrix.Matrix(lines[i][0]).
+				EqualsExact(matrix.Matrix(lines[i][len(lines[i])-1]), calc.DefaultTolerance) {
 				if ip.InterNode.Matrix == nil {
 					ip = ips[i-1]
 				}
@@ -89,13 +94,15 @@ func writeIntersectionCorrelationNode(ips chain.IntersectionNodeOfLine, lines []
 				ip = &chain.IntersectionNodeResult{}
 			}
 		}
-		if !matrix.Matrix(lines[i][0]).Equals(matrix.Matrix(lines[i][len(lines[i])-1])) {
+		if !matrix.Matrix(lines[i][0]).
+			EqualsExact(matrix.Matrix(lines[i][len(lines[i])-1]), calc.DefaultTolerance) {
 			resultCorr = append(resultCorr,
 				&chain.IntersectionCorrelationNode{InterNode: ips[i].InterNode.Matrix, CorrelationNode: lines[i]})
 		}
 
 		if i == len(ips)-1 {
-			if !matrix.Matrix(lines[i+1][0]).Equals(matrix.Matrix(lines[i+1][len(lines[i+1])-1])) {
+			if !matrix.Matrix(lines[i+1][0]).
+				EqualsExact(matrix.Matrix(lines[i+1][len(lines[i+1])-1]), calc.DefaultTolerance) {
 				resultCorr = append(resultCorr,
 					&chain.IntersectionCorrelationNode{InterNode: ips[i].InterNode.Matrix, CorrelationNode: lines[i+1]})
 			}
@@ -112,11 +119,14 @@ func writeLineNode(pos [2]int, correlationNode, edge matrix.LineMatrix, endNode 
 	lines []matrix.LineMatrix, ips chain.IntersectionNodeOfLine) ([]matrix.LineMatrix, chain.IntersectionNodeOfLine) {
 	for j := pos[0]; j <= pos[1]; j++ {
 		if len(correlationNode) == 0 ||
-			!matrix.Matrix(correlationNode[len(correlationNode)-1]).Equals(matrix.Matrix(edge[j])) {
+			!matrix.Matrix(correlationNode[len(correlationNode)-1]).
+				EqualsExact(matrix.Matrix(edge[j]), calc.DefaultTolerance) {
 			correlationNode = append(correlationNode, edge[j])
 		}
 	}
-	if len(correlationNode) == 1 || !matrix.Matrix(correlationNode[len(correlationNode)-1]).Equals(endNode.InterNode.Matrix) {
+	if len(correlationNode) == 1 ||
+		!matrix.Matrix(correlationNode[len(correlationNode)-1]).
+			EqualsExact(endNode.InterNode.Matrix, calc.DefaultTolerance) {
 		correlationNode = append(correlationNode, endNode.InterNode.Matrix)
 	}
 	lines = append(lines, correlationNode)

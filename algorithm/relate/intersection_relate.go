@@ -80,13 +80,13 @@ func Intersection(aStart, aEnd, bStart, bEnd matrix.Matrix) (mark bool, ips Inte
 		ip := matrix.Matrix{x, y}
 
 		// check if point belongs to segment
-		ina, isVexA := InLine(ip, aStart, aEnd)
-		inb, inVexB := InLine(ip, bStart, bEnd)
-		if ina && inb {
+		ina, _ := InLine(ip, aStart, aEnd)
+		if inb, _ := InLine(ip, bStart, bEnd); ina && inb {
 			isIntersectionPoint := true
-			if isVexA && inVexB {
-				//isIntersectionPoint = false  //todo
-			}
+			//todo
+			// if isVexA && inVexB {
+			// 	//isIntersectionPoint = false
+			// }
 			isOriginal := false
 			if ip.Equals(aStart) || ip.Equals(aEnd) || ip.Equals(bStart) || ip.Equals(bEnd) {
 				isOriginal = true
@@ -111,14 +111,14 @@ func InLine(spot, a, b matrix.Matrix) (in bool, isVertex bool) {
 	// x := spot[0] <= math.Max(a[0], b[0]) && spot[0] >= math.Min(a[0], b[0])
 	// y := spot[1] <= math.Max(a[1], b[1]) && spot[1] >= math.Min(a[1], b[1])
 
-	if spot.Equals(a) || spot.Equals(b) {
+	if spot.EqualsExact(a, 2*calc.AccuracyFloat) || spot.EqualsExact(b, 2*calc.AccuracyFloat) {
 		return true, true
 	}
 	ax := (spot[0] - a[0]) * (a[1] - b[1])
 	bx := (a[0] - b[0]) * (spot[1] - a[1])
-	if math.Abs(ax-bx) < calc.AccuracyFloat &&
-		(spot[0]+calc.AccuracyFloat >= math.Min(a[0], b[0]) && spot[0]-calc.AccuracyFloat <= math.Max(a[0], b[0])) &&
-		(spot[1]+calc.AccuracyFloat >= math.Min(a[1], b[1]) && spot[1]-calc.AccuracyFloat <= math.Max(a[1], b[1])) {
+	if math.Abs(ax-bx) < 2*calc.AccuracyFloat &&
+		(spot[0]+2*calc.AccuracyFloat >= math.Min(a[0], b[0]) && spot[0]-2*calc.AccuracyFloat <= math.Max(a[0], b[0])) &&
+		(spot[1]+2*calc.AccuracyFloat >= math.Min(a[1], b[1]) && spot[1]-2*calc.AccuracyFloat <= math.Max(a[1], b[1])) {
 		return true, false
 	}
 	return false, false
@@ -127,7 +127,7 @@ func InLine(spot, a, b matrix.Matrix) (in bool, isVertex bool) {
 // InLineVertex returns true if spot in LineVertex,false else..
 func InLineVertex(spot matrix.Matrix, matr matrix.LineMatrix) (bool, bool) {
 	for i, v := range matr {
-		if spot.Equals(matrix.Matrix(v)) {
+		if spot.EqualsExact(matrix.Matrix(v), 2*calc.AccuracyFloat) {
 			if i == 0 || i == len(matr)-1 {
 				return true, true
 			}

@@ -1,3 +1,5 @@
+// Package space A representation of a linear vector geometry.
+// include point line ring polygon multipoint multiline multrpolygon collection bound.
 package space
 
 import (
@@ -111,7 +113,7 @@ func (p Point) Area() (float64, error) {
 
 // IsEmpty returns true if the Geometry is empty.
 func (p Point) IsEmpty() bool {
-	return p == nil || len(p) == 0
+	return len(p) == 0
 }
 
 // Distance returns distance Between the two Geometry.

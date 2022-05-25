@@ -106,7 +106,7 @@ func (mp MultiPolygon) Area() (float64, error) {
 
 // IsEmpty returns true if the Geometry is empty.
 func (mp MultiPolygon) IsEmpty() bool {
-	return mp == nil || len(mp) == 0
+	return len(mp) == 0
 }
 
 // Distance returns distance Between the two Geometry.

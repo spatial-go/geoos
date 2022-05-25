@@ -1,3 +1,4 @@
+// Package subdivision a topological subdivision to support creating triangulations and Voronoi diagrams.
 package subdivision
 
 import (

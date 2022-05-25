@@ -17,20 +17,20 @@ const EdgeCoincidenceTolFactor = 1000
 type Subdivision struct {
 	tolerance                float64
 	edgeCoincidenceTolerance float64
-	quadEdge                 *QuadEdge
-	quadEdgeList             []*QuadEdge
-	startingEdge             *QuadEdge
-	frameEnv                 *envelope.Envelope
-	frameVertex              []matrix.Matrix
-	locator                  Locator
-	triEdges                 []*QuadEdge
-	visitedKey               int
+	//quadEdge                 *QuadEdge
+	quadEdgeList []*QuadEdge
+	startingEdge *QuadEdge
+	frameEnv     *envelope.Envelope
+	frameVertex  []matrix.Matrix
+	locator      Locator
+	triEdges     []*QuadEdge
+	visitedKey   int
 }
 
 // NewQuadEdgeSubdivision ...
 func NewQuadEdgeSubdivision(env *envelope.Envelope, tolerance float64) *Subdivision {
 	q := &Subdivision{}
-	q.triEdges = make([]*QuadEdge, 3, 3)
+	q.triEdges = make([]*QuadEdge, 3)
 	q.tolerance = tolerance
 	q.edgeCoincidenceTolerance = tolerance / EdgeCoincidenceTolFactor
 	q.createFrame(env)
@@ -43,14 +43,14 @@ func (q *Subdivision) createFrame(env *envelope.Envelope) {
 	var (
 		deltaX = env.Width()
 		deltaY = env.Height()
-		offset = 0.0
+		offset float64
 	)
 	if deltaX > deltaY {
 		offset = deltaX * 10.0
 	} else {
 		offset = deltaY * 10.0
 	}
-	q.frameVertex = make([]matrix.Matrix, 3, 3)
+	q.frameVertex = make([]matrix.Matrix, 3)
 	q.frameVertex[0] = matrix.Matrix{(env.MaxX + env.MinX) / 2.0, env.MaxY + offset}
 	q.frameVertex[1] = matrix.Matrix{env.MinX - offset, env.MinY - offset}
 	q.frameVertex[2] = matrix.Matrix{env.MaxX + offset, env.MinY - offset}
@@ -145,34 +145,35 @@ func (q *Subdivision) IsFrameVertex(v matrix.Matrix) bool {
 	return false
 }
 
-func (q *Subdivision) getPrimaryEdges(includeFrame bool) []*QuadEdge {
-	q.visitedKey++
+//TODO
+// func (q *Subdivision) getPrimaryEdges(includeFrame bool) []*QuadEdge {
+// 	q.visitedKey++
 
-	var (
-		edges        = make([]*QuadEdge, 0, 0)
-		edgeStack    = utils.NewStack()
-		visitedEdges = make(map[*QuadEdge]struct{})
-	)
-	edgeStack.Push(q.startingEdge)
+// 	var (
+// 		edges        = make([]*QuadEdge, 0, 0)
+// 		edgeStack    = utils.NewStack()
+// 		visitedEdges = make(map[*QuadEdge]struct{})
+// 	)
+// 	edgeStack.Push(q.startingEdge)
 
-	for !edgeStack.Empty() {
-		edge := edgeStack.Pop().(*QuadEdge)
-		if _, found := visitedEdges[edge]; !found {
-			priQE := edge.Primary()
+// 	for !edgeStack.Empty() {
+// 		edge := edgeStack.Pop().(*QuadEdge)
+// 		if _, found := visitedEdges[edge]; !found {
+// 			priQE := edge.Primary()
 
-			if includeFrame || !q.IsFrameEdge(priQE) {
-				edges = append(edges, priQE)
-			}
+// 			if includeFrame || !q.IsFrameEdge(priQE) {
+// 				edges = append(edges, priQE)
+// 			}
 
-			edgeStack.Push(edge.ONext())
-			edgeStack.Push(edge.Sym().ONext())
+// 			edgeStack.Push(edge.ONext())
+// 			edgeStack.Push(edge.Sym().ONext())
 
-			visitedEdges[edge] = struct{}{}
-			visitedEdges[edge.Sym()] = struct{}{}
-		}
-	}
-	return edges
-}
+// 			visitedEdges[edge] = struct{}{}
+// 			visitedEdges[edge.Sym()] = struct{}{}
+// 		}
+// 	}
+// 	return edges
+// }
 
 // IsFrameEdge whether a QuadEdge is an edge incident on a frame triangle vertex
 func (q *Subdivision) IsFrameEdge(e *QuadEdge) bool {

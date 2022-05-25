@@ -139,8 +139,7 @@ func (e *Encoder) Encode(geom space.Geometry) error {
 		geom = g.ToPolygon()
 	}
 
-	var b []byte
-	b = []byte{byte(e.order)}
+	b := []byte{byte(e.order)}
 
 	_, err := e.w.Write(b)
 	if err != nil {

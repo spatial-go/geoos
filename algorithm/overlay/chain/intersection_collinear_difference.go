@@ -33,7 +33,7 @@ func (ii *IntersectionCollinearDifference) ProcessIntersections(
 		var mono *MonotoneChain
 		var edge matrix.LineMatrix
 		var line matrix.LineMatrix
-		var startPos = 0
+		var startPos int
 		monoNum := 0
 		for _, v := range ii.mono {
 			if segIndex0 >= v.Start && segIndex0 < v.End && v.Context.(bool) {

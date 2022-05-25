@@ -5,6 +5,7 @@ import (
 	"math"
 
 	"github.com/spatial-go/geoos/algorithm/calc"
+	"github.com/spatial-go/geoos/space/spaceerr"
 )
 
 // LineMatrix is a two-dimensional matrix.
@@ -24,7 +25,16 @@ func (l LineMatrix) BoundaryDimensions() int {
 	return 0
 }
 
-// IsClosed Returns TRUE if the LINESTRING's start and end points are coincident.
+// Boundary returns the closure of the combinatorial boundary of this LineMatrix.
+// The boundary of a lineal geometry is always a zero-dimensional geometry (which may be empty).
+func (l LineMatrix) Boundary() (Steric, error) {
+	if l.IsClosed() {
+		return nil, spaceerr.ErrBoundBeNil
+	}
+	return Collection{Matrix(l[0]), Matrix(l[len(l)-1])}, nil
+}
+
+// IsClosed Returns TRUE if the line's start and end points are coincident.
 // For Polyhedral Surfaces, reports if the surface is areal (open) or IsC (closed).
 func (l LineMatrix) IsClosed() bool {
 	if l.IsEmpty() {
@@ -40,7 +50,7 @@ func (l LineMatrix) Nums() int {
 
 // IsEmpty returns true if the Matrix is empty.
 func (l LineMatrix) IsEmpty() bool {
-	return l == nil || len(l) == 0
+	return len(l) == 0
 }
 
 // Bound returns a rect around the line string. Uses rectangular coordinates.
@@ -79,6 +89,47 @@ func (l LineMatrix) Equals(ms Steric) bool {
 
 		for i := range mm {
 			if !Matrix(l[i]).Equals(Matrix(mm[i])) {
+				return false
+			}
+		}
+		return true
+	}
+	return false
+}
+
+// Proximity returns true if the Steric represents the Proximity Geometry or vector.
+func (l LineMatrix) Proximity(ms Steric) bool {
+	if mm, ok := ms.(LineMatrix); ok {
+		// If one is nil, the other must also be nil.
+		if (mm == nil) != (l == nil) {
+			return false
+		}
+
+		if len(mm) != len(l) {
+			return false
+		}
+
+		for i := range mm {
+			havePoint := false
+			for _, v := range l {
+				if Matrix(v).Proximity(Matrix(mm[i])) {
+					havePoint = true
+					break
+				}
+			}
+			if !havePoint {
+				for i := range mm {
+					havePointReverse := false
+					for _, v := range l.Reverse() {
+						if Matrix(v).Proximity(Matrix(mm[i])) {
+							havePointReverse = true
+							break
+						}
+					}
+					if !havePointReverse {
+						return false
+					}
+				}
 				return false
 			}
 		}
