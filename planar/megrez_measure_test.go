@@ -3,7 +3,7 @@ package planar
 import (
 	"testing"
 
-	"github.com/spatial-go/geoos/encoding/wkt"
+	"github.com/spatial-go/geoos/geoencoding/wkt"
 	"github.com/spatial-go/geoos/space"
 )
 

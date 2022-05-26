@@ -5,7 +5,7 @@ import (
 
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/matrix/envelope"
-	"github.com/spatial-go/geoos/encoding/wkt"
+	"github.com/spatial-go/geoos/geoencoding/wkt"
 	"github.com/spatial-go/geoos/space"
 )
 

@@ -1,5 +1,10 @@
 # Change Log
-
+## [1.1.0] - 2022-05-26
+### 新增
+- Optimize the topological relation algorithm and geometric operation algorithm of geometry, 
+ and improve the performance of calculation
+- The encoding and decoding methods of geoencoding are standardized, and the encoder interface is realized
+- Added support for coordinate system
 ## [1.0.4] - 2021-12-31
 ### Added
 - Delaunay triangle method and Voronoi diagram

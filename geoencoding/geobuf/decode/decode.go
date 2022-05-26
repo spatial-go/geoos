@@ -1,8 +1,8 @@
 package decode
 
 import (
-	"github.com/spatial-go/geoos/encoding/geobuf/protogeo"
-	"github.com/spatial-go/geoos/encoding/geojson"
+	"github.com/spatial-go/geoos/geoencoding/geobuf/protogeo"
+	"github.com/spatial-go/geoos/geoencoding/geojson"
 )
 
 // Decode ...

@@ -2,6 +2,8 @@ package geojson
 
 import (
 	"io"
+	"log"
+	"strings"
 
 	"github.com/spatial-go/geoos/space"
 )
@@ -19,6 +21,26 @@ func (e *GeojsonEncoder) Encode(g space.Geometry) []byte {
 
 // Decode Returns geometry of that decode string by codeType.
 func (e *GeojsonEncoder) Decode(s []byte) (space.Geometry, error) {
+	if strings.Contains(string(s[9:20]), "FeatureCollection") {
+		if colls, err := UnmarshalFeatureCollection(s); err != nil {
+			log.Println(err)
+			return nil, err
+		} else {
+			geom := space.Collection{}
+			for _, v := range colls.Features {
+				geom = append(geom, v.Geometry.Geometry())
+			}
+			return geom, nil
+		}
+	} else if strings.Contains(string(s[9:20]), "Feature") {
+		if feat, err := UnmarshalFeature(s); err != nil {
+			log.Println(err)
+			return nil, err
+		} else {
+			geom := feat.Geometry.Geometry()
+			return geom, nil
+		}
+	}
 	geom, err := UnmarshalGeometry(s)
 	return geom.Geometry(), err
 }

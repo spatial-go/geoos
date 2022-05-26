@@ -3,7 +3,7 @@ package wkb
 import (
 	"io"
 
-	"github.com/spatial-go/geoos/encoding/geojson"
+	"github.com/spatial-go/geoos/geoencoding/geojson"
 	"github.com/spatial-go/geoos/space"
 )
 

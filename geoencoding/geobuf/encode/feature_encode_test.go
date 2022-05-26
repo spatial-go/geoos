@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/spatial-go/geoos/encoding/geobuf/decode"
-	"github.com/spatial-go/geoos/encoding/geojson"
+	"github.com/spatial-go/geoos/geoencoding/geobuf/decode"
+	"github.com/spatial-go/geoos/geoencoding/geojson"
 )
 
 func TestEncodeFeature(t *testing.T) {

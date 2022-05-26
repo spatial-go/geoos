@@ -6,7 +6,7 @@ import (
 	"io"
 	"log"
 
-	"github.com/spatial-go/geoos/encoding/geojson"
+	"github.com/spatial-go/geoos/geoencoding/geojson"
 	"github.com/spatial-go/geoos/space"
 )
 
@@ -45,13 +45,9 @@ func (e *GeocsvEncoder) Decode(s []byte) (space.Geometry, error) {
 		if len(gc.headers) != 4 {
 			log.Printf("length of headers is wrong")
 		}
-		if len(gc.rows) != 4 {
-			log.Printf("length of rows is wrong")
-		}
+
 		features := gc.ToGeoJSON()
-		if len(features.Features) != 4 {
-			log.Printf("length of features is wrong")
-		}
+
 		coll := make(space.Collection, len(features.Features))
 		for i, f := range features.Features {
 			coll[i] = f.Geometry.Coordinates.(space.Point)

@@ -85,7 +85,7 @@ func GeometryToFeatureCollection(geom space.Geometry) *FeatureCollection {
 	switch geom.GeoJSONType() {
 	case space.TypeCollection:
 		features := []*Feature{}
-		for _, v := range geom.(space.Collection) {
+		for _, v := range geom.Geom().(space.Collection) {
 			geometry := NewGeometry(v)
 			feature := NewFeature(*geometry)
 			features = append(features, feature)
@@ -94,7 +94,7 @@ func GeometryToFeatureCollection(geom space.Geometry) *FeatureCollection {
 	default:
 		features := []*Feature{}
 
-		geometry := NewGeometry(geom)
+		geometry := NewGeometry(geom.Geom())
 		feature := NewFeature(*geometry)
 		features = append(features, feature)
 		fc.Features = features
