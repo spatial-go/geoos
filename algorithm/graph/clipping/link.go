@@ -9,6 +9,7 @@ import (
 	"github.com/spatial-go/geoos/algorithm/calc"
 	"github.com/spatial-go/geoos/algorithm/graph"
 	"github.com/spatial-go/geoos/algorithm/matrix"
+	"github.com/spatial-go/geoos/geoencoding"
 	"github.com/spatial-go/geoos/geoencoding/geojson"
 	"github.com/spatial-go/geoos/space"
 )
@@ -136,32 +137,14 @@ func link(gu, gi graph.Graph) (results []matrix.LineMatrix, err error) {
 }
 
 func writeGeom(filename string, geom space.Geometry) {
-	data, _ := geojson.NewGeometry(geom).MarshalJSON()
+
 	if file, err := os.Create(filename); err != nil {
 		log.Println(err)
 	} else {
-		if _, err := file.WriteString(
-			`{
-		"type": "FeatureCollection",
-		"crs": {
-			"type": "name",
-			"properties": {
-				"name": "bd09"
-			}
-		},
-		"features": [
-			{
-				"_id": "qVxKbM",
-				"type": "Feature",
-				"geometry": `,
-		); err != nil {
+		defer file.Close()
+
+		if err := geoencoding.WriteGeoJSON(file, geojson.GeometryToFeatureCollection(geom), geoencoding.GeoJSON); err != nil {
 			log.Println(err)
 		}
-		_, _ = file.Write(data)
-		_, _ = file.WriteString(
-			` }
-		]
-		}`,
-		)
 	}
 }

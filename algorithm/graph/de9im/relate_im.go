@@ -3,7 +3,6 @@
 // the method of graph operation and geometric calculation to deduce
 // the specific topological relations among entities by analyzing the structure of points and line
 // vertices  and  the  combination  of  points  and  lines
-
 package de9im
 
 import (
