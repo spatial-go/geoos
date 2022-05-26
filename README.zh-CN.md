@@ -42,29 +42,11 @@ func main() {
     fmt.Printf(e.Error())
   }
   fmt.Printf("%f", area)
-  // get result 4.0
-
-  rawJSON := []byte(`
-  { "type": "FeatureCollection",
-  "features": [
-    { "type": "Feature",
-    "geometry": {"type": "Point", "coordinates": [102.0, 0.5]},
-    "properties": {"prop0": "value0"}
-    }
-  ]
-  }`)
-
-  fc := geojson.NewFeatureCollection()
-  _ = json.Unmarshal(rawJSON, &fc)
-  println("%p", fc)
-
-  // Geometry will be unmarshalled into the correct geo.Geometry type.
-  point := fc.Features[0].Geometry.(geoos.Point)
-  println("%p", &point)
-
 }
 
 ```
+Example: geoencoding 
+[example_encoding.go](https://github.com/spatial-go/geoos/example/example_encoding.go)
 
 ## 维护者
 
