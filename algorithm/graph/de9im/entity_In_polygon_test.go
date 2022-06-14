@@ -81,3 +81,28 @@ func Test_pointInRing(t *testing.T) {
 		})
 	}
 }
+
+func Test_rayIntersectsSegment(t *testing.T) {
+	type args struct {
+		p matrix.Matrix
+		a matrix.Matrix
+		b matrix.Matrix
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{"rayIntersectsSegment", args{matrix.Matrix{6.0, 7.0}, matrix.Matrix{6.0, 5.0}, matrix.Matrix{8.0, 5.0}}, false},
+		{"rayIntersectsSegment", args{matrix.Matrix{6, 4}, matrix.Matrix{6, 5}, matrix.Matrix{8, 5}}, false},
+		{"rayIntersectsSegment", args{matrix.Matrix{6, 7}, matrix.Matrix{6, 5}, matrix.Matrix{7, 8}}, true},
+		{"rayIntersectsSegment", args{matrix.Matrix{7, 7}, matrix.Matrix{6, 5}, matrix.Matrix{7, 8}}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := rayIntersectsSegment(tt.args.p, tt.args.a, tt.args.b); got != tt.want {
+				t.Errorf("rayIntersectsSegment() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

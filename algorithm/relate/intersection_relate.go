@@ -139,9 +139,9 @@ func InLineVertex(spot matrix.Matrix, matr matrix.LineMatrix) (bool, bool) {
 
 // InLineMatrix returns true if spot in LineMatrix,false else..
 func InLineMatrix(spot matrix.Matrix, matr matrix.LineMatrix) bool {
-	lines := matr.ToLineArray()
-	for _, line := range lines {
-		if in, _ := InLine(spot, line.P0, line.P1); in {
+	//lines := matr.ToLineArray()
+	for i := 0; i < len(matr)-1; i++ {
+		if in, _ := InLine(spot, matr[i], matr[i+1]); in {
 			return true
 		}
 	}
