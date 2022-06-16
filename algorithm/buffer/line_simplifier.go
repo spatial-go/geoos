@@ -2,6 +2,7 @@ package buffer
 
 import (
 	"math"
+	"math/big"
 
 	"github.com/spatial-go/geoos/algorithm/calc"
 	"github.com/spatial-go/geoos/algorithm/matrix"
@@ -160,15 +161,17 @@ func (l *LineSimplifier) orientationIndex(p1x, p1y,
 	if index <= 1 {
 		return index
 	}
-	// normalize coordinates
-	dx1 := (&calc.PairFloat{Hi: p2x, Lo: 0.0}).SelfAdd(-p1x, 0.0)
-	dy1 := (&calc.PairFloat{Hi: p2y, Lo: 0.0}).SelfAdd(-p1y, 0.0)
-	dx2 := (&calc.PairFloat{Hi: qx, Lo: 0.0}).SelfAdd(-p2x, 0.0)
-	dy2 := (&calc.PairFloat{Hi: qy, Lo: 0.0}).SelfAdd(-p2y, 0.0)
-	dy11 := dy1.SelfMultiply(dx2.Hi, dx2.Lo)
+	// // normalize coordinates
+	// dx1 := (&calc.PairFloat{Hi: p2x, Lo: 0.0}).SelfAdd(-p1x, 0.0)
+	// dy1 := (&calc.PairFloat{Hi: p2y, Lo: 0.0}).SelfAdd(-p1y, 0.0)
+	// dx2 := (&calc.PairFloat{Hi: qx, Lo: 0.0}).SelfAdd(-p2x, 0.0)
+	// dy2 := (&calc.PairFloat{Hi: qy, Lo: 0.0}).SelfAdd(-p2y, 0.0)
+	// dy11 := dy1.SelfMultiply(dx2.Hi, dx2.Lo)
 
-	// sign of determinant - unrolled for performance
-	return dx1.SelfMultiply(dy2.Hi, dy2.Lo).SelfSubtract(dy11.Hi, dy11.Lo).Signum()
+	// // sign of determinant - unrolled for performance
+	// return dx1.SelfMultiply(dy2.Hi, dy2.Lo).SelfSubtract(dy11.Hi, dy11.Lo).Signum()
+
+	return new(big.Float).SetFloat64((p2x-p1x)*(qy-p2y) - (p2y-p1y)*(qx-p2x)).Sign()
 }
 
 // orientationIndexFilter A filter for computing the orientation index of three coordinates.

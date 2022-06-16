@@ -62,6 +62,9 @@ func lineCreateGraph(m matrix.LineMatrix) (Graph, error) {
 func polyCreateGraph(m matrix.PolygonMatrix) (Graph, error) {
 	g := &MatrixGraph{}
 
+	g.nodes = make([]*Node, 0, len(m)/2)
+	g.edges = make([]map[int]int, 0, len(m)/2)
+
 	node := &Node{Value: m, NodeType: ANode}
 	g.AddNode(node)
 
