@@ -1,12 +1,25 @@
 package topological
 
 import (
+	"sync"
+
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/relate"
 	"github.com/spatial-go/geoos/space"
 	"github.com/spatial-go/geoos/space/spaceerr"
 	"github.com/spatial-go/geoos/space/topograph"
 )
+
+var topog topograph.Relationship
+var once sync.Once
+
+// NewTopological returns Relationship that is Topological.
+func NewTopological() topograph.Relationship {
+	once.Do(func() {
+		topog = &Topological{}
+	})
+	return topog
+}
 
 // Topological Computes the Intersection Matrix for the spatial relationship
 // between two geometries ,  using the default (OGC SFS) Boundary Node Rule
