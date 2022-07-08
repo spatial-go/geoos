@@ -36,14 +36,5 @@ func Quadrant(p0, p1 matrix.Matrix) (int, error) {
 	if p1[0] == p0[0] && p1[1] == p0[1] {
 		return 0, algorithm.ErrQuadrant
 	}
-	if p1[0] >= p0[0] {
-		if p1[1] >= p0[1] {
-			return NE, nil
-		}
-		return SE, nil
-	}
-	if p1[1] >= p0[1] {
-		return NW, nil
-	}
-	return SW, nil
+	return QuadrantFloat(p1[0]-p0[0], p1[1]-p0[1])
 }

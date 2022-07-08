@@ -88,13 +88,14 @@ func FourFloat(x1, x2, y1, y2 float64) *Envelope {
 // TwoMatrix  Creates an Envelope for a region defined by two matrix.
 func TwoMatrix(p1, p2 matrix.Matrix) *Envelope {
 	el := &Envelope{}
-	el.initXY(p1[0], p2[0], p1[1], p2[1])
+	el.initXY(math.Min(p1[0], p2[0]), math.Max(p1[0], p2[0]), math.Min(p1[1], p2[1]), math.Max(p1[1], p2[1]))
 	return el
 }
 
 // MatrixList Creates an Envelope from a matrix list
 func MatrixList(ps []matrix.Matrix) *Envelope {
 	el := &Envelope{}
+	el.SetToNil()
 	for _, p := range ps {
 		el.ExpandToIncludeMatrix(p)
 	}
@@ -104,6 +105,7 @@ func MatrixList(ps []matrix.Matrix) *Envelope {
 // PolygonMatrixList Creates an Envelope from a polygon matrix list
 func PolygonMatrixList(ps []matrix.PolygonMatrix) *Envelope {
 	el := &Envelope{}
+	el.SetToNil()
 	for _, polygon := range ps {
 		for _, part := range polygon {
 			for _, p := range part {
