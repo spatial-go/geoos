@@ -135,6 +135,78 @@ func link(gu, gi graph.Graph) (results []matrix.LineMatrix, err error) {
 	return results, nil
 }
 
+func linkmerge(gu graph.Graph) (results []matrix.LineMatrix, err error) {
+	results = []matrix.LineMatrix{}
+	result := matrix.LineMatrix{}
+
+	guNodes := gu.Nodes()
+	beUsed := map[int]int{}
+	currentNode := 0
+	for {
+		for j, v := range guNodes {
+			if v.NodeType == graph.CNode || v.NodeType == graph.LNode {
+				line := v.Value.(matrix.LineMatrix)
+				startPoint := matrix.Matrix(line[0])
+				lastPoint := matrix.Matrix(line[len(line)-1])
+				if len(result) == 0 {
+					if beUsed[j] < 1 {
+						result = append(result, line...)
+						beUsed[j] = 1
+						currentNode = j
+						break
+					}
+				} else {
+					if matrix.Matrix(result[len(result)-1]).EqualsExact(startPoint, calc.DefaultTolerance*4) && beUsed[j] < 1 {
+						for i, point := range line {
+							if i == 0 {
+								continue
+							}
+							result = append(result, point)
+						}
+						beUsed[j] = 1
+						currentNode = j
+						break
+					}
+					if matrix.Matrix(result[len(result)-1]).EqualsExact(lastPoint, calc.DefaultTolerance*4) && beUsed[j] < 1 {
+						for i, point := range line.Reverse() {
+							if i == 0 {
+								continue
+							}
+							result = append(result, point)
+						}
+						beUsed[j] = 1
+						currentNode = j
+						break
+					}
+				}
+			}
+			currentNode = j
+		}
+
+		if len(result) > 0 && currentNode < len(guNodes)-1 {
+			continue
+		} else if len(result) > 0 && currentNode >= len(guNodes)-1 {
+			results = append(results, result)
+			result = matrix.LineMatrix{}
+			continue
+		}
+
+		if currentNode >= len(guNodes)-1 {
+			for j, v := range guNodes {
+				if v.NodeType == graph.CNode || v.NodeType == graph.LNode {
+					if beUsed[j] != 1 {
+						line := v.Value.(matrix.LineMatrix)
+						results = append(results, line)
+					}
+				}
+			}
+			break
+		}
+
+	}
+	return results, nil
+}
+
 func writeGeom(filename string, geom space.Geometry) {
 	data, _ := geojson.NewGeometry(geom).MarshalJSON()
 	if file, err := os.Create(filename); err != nil {

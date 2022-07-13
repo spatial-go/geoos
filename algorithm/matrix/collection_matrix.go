@@ -11,6 +11,14 @@ import (
 // A Collection is a collection of sterices that is also a Steric.
 type Collection []Steric
 
+func CollectionFromMultiLineMatrix(ml []LineMatrix) Collection {
+	coll := make(Collection, len(ml))
+	for i, v := range ml {
+		coll[i] = v
+	}
+	return coll
+}
+
 // Dimensions returns the max of the dimensions of the collection.
 func (c Collection) Dimensions() int {
 	max := -1

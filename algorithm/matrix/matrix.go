@@ -265,14 +265,6 @@ func TransMatrixes(inputGeom Steric) []Matrix {
 	}
 }
 
-// LineArray returns the LineArray
-func LineArray(l LineMatrix) (lines []*LineSegment) {
-	for i := 0; i < len(l)-1; i++ {
-		lines = append(lines, &LineSegment{Matrix(l[i]), Matrix(l[i+1])})
-	}
-	return
-}
-
 // compile time checks
 var (
 	_ Steric = Matrix{}

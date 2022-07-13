@@ -22,7 +22,7 @@ func GenerateGraph(m matrix.Steric) (Graph, error) {
 	case matrix.PolygonMatrix:
 		return polyCreateGraph(mType)
 	case matrix.Collection:
-		return nil, algorithm.ErrNotGraphCollection
+		return collCreateGraph(mType)
 	default:
 		return nil, algorithm.ErrNotMatchType
 
@@ -71,6 +71,28 @@ func polyCreateGraph(m matrix.PolygonMatrix) (Graph, error) {
 	return g, nil
 }
 
+// collCreateGraph create graph with polygon.
+func collCreateGraph(coll matrix.Collection) (Graph, error) {
+	g := &MatrixGraph{}
+	for _, m := range coll {
+		var nodeType int
+		switch m.(type) {
+		case matrix.Matrix:
+			nodeType = PNode
+		case matrix.LineMatrix:
+			nodeType = CNode
+		case matrix.PolygonMatrix:
+			nodeType = ANode
+		default:
+			nodeType = ANode
+		}
+		node := &Node{Value: m, NodeType: nodeType}
+		g.AddNode(node)
+
+	}
+	return g, nil
+}
+
 // IntersectionHandle handle graph with m1 and m2.
 func IntersectionHandle(m1, m2 matrix.Steric, g1, g2 Graph) error {
 	switch m1Type := m1.(type) {
@@ -81,7 +103,7 @@ func IntersectionHandle(m1, m2 matrix.Steric, g1, g2 Graph) error {
 	case matrix.PolygonMatrix:
 		return polyIntersectionHandle(m1Type, m2, g1, g2)
 	case matrix.Collection:
-		return algorithm.ErrNotGraphCollection
+		return collIntersectionHandle(m1Type, m2, g1, g2)
 	default:
 		return algorithm.ErrNotMatchType
 
@@ -104,10 +126,25 @@ func polyIntersectionHandle(m1 matrix.PolygonMatrix, m2 matrix.Steric, g1, g2 Gr
 	case matrix.PolygonMatrix:
 		return polygonAndPolygonHandle(m1, m2Type, g1, g2)
 	case matrix.Collection:
-		return algorithm.ErrNotGraphCollection
+		return collIntersectionHandle(m2Type, m1, g2, g1)
 	default:
 		return algorithm.ErrNotMatchType
 	}
+}
+
+// collIntersectionHandle handle graph with m1 polygon and m2.
+func collIntersectionHandle(m1 matrix.Collection, m2 matrix.Steric, g1, g2 Graph) error {
+	for _, m := range m1 {
+		switch mType := m.(type) {
+		case matrix.Matrix:
+			_ = matrixIntersectionHandle(mType, m2, g1, g2)
+		case matrix.LineMatrix:
+			_ = lineIntersectionHandle(mType, m2, g1, g2)
+		case matrix.PolygonMatrix:
+			_ = polyIntersectionHandle(mType, m2, g1, g2)
+		}
+	}
+	return nil
 }
 
 // lineIntersectionHandle handle graph with m1 line and m2.
@@ -121,7 +158,7 @@ func lineIntersectionHandle(m1 matrix.LineMatrix, m2 matrix.Steric, g1, g2 Graph
 	case matrix.PolygonMatrix:
 		return lineAndPolygonHandle(m1, m2Type, g1, g2)
 	case matrix.Collection:
-		return algorithm.ErrNotGraphCollection
+		return collIntersectionHandle(m2Type, m1, g2, g1)
 	default:
 		return algorithm.ErrNotMatchType
 	}
@@ -143,7 +180,7 @@ func matrixIntersectionHandle(m1 matrix.Matrix, m2 matrix.Steric, g1, g2 Graph) 
 		}
 		return nil
 	case matrix.Collection:
-		return algorithm.ErrNotGraphCollection
+		return collIntersectionHandle(m2Type, m1, g2, g1)
 	default:
 		return algorithm.ErrNotMatchType
 	}

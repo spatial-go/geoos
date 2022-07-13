@@ -62,3 +62,11 @@ func (l *LineSegment) PointAlongOffset(segmentLengthFraction, offsetDistance flo
 	coord[1] = offsetY
 	return coord, nil
 }
+
+// LineArray returns the LineArray
+func LineArray(l LineMatrix) (lines []*LineSegment) {
+	for i := 0; i < len(l)-1; i++ {
+		lines = append(lines, &LineSegment{Matrix(l[i]), Matrix(l[i+1])})
+	}
+	return
+}
