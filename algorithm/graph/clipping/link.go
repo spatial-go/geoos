@@ -140,10 +140,6 @@ func linkmerge(gu, gi graph.Graph) (results []matrix.LineMatrix, err error) {
 	result := matrix.LineMatrix{}
 
 	guNodes := gu.Nodes()
-	// giNodes := []*graph.Node{}
-	// if gi != nil {
-	// 	giNodes = gi.Nodes()
-	// }
 	beUsed := map[int]int{}
 	currentNode := 0
 	for {
@@ -188,35 +184,6 @@ func linkmerge(gu, gi graph.Graph) (results []matrix.LineMatrix, err error) {
 		}
 
 		if len(result) > 0 && currentNode < len(guNodes)-1 {
-			// giUsed := 0
-			// for _, v := range giNodes {
-			// 	if v.NodeType == graph.CNode || v.NodeType == graph.LNode {
-			// 		line := v.Value.(matrix.LineMatrix)
-			// 		startPoint := matrix.Matrix(line[0])
-			// 		lastPoint := matrix.Matrix(line[len(line)-1])
-
-			// 		if matrix.Matrix(result[len(result)-1]).EqualsExact(startPoint, calc.DefaultTolerance*4) {
-			// 			for i, point := range line {
-			// 				if i == 0 {
-			// 					continue
-			// 				}
-			// 				result = append(result, point)
-			// 			}
-			// 			giUsed++
-			// 			break
-			// 		}
-			// 		if matrix.Matrix(result[len(result)-1]).EqualsExact(lastPoint, calc.DefaultTolerance*4) {
-			// 			for i, point := range line.Reverse() {
-			// 				if i == 0 {
-			// 					continue
-			// 				}
-			// 				result = append(result, point)
-			// 			}
-			// 			giUsed++
-			// 			break
-			// 		}
-			// 	}
-			// }
 			continue
 		} else if len(result) > 0 && currentNode >= len(guNodes)-1 {
 			results = append(results, result)
