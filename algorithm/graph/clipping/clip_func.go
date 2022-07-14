@@ -176,7 +176,8 @@ func mergeByHalf(matrix4 []matrix.LineMatrix, start, end int) (result []matrix.L
 func merge(ps, pc []matrix.LineMatrix) (result []matrix.LineMatrix, err error) {
 	cs := matrix.CollectionFromMultiLineMatrix(ps)
 	cc := matrix.CollectionFromMultiLineMatrix(pc)
-	clip := graph.ClipHandle(cs, cc)
+	clip := graph.MergeHandle(cs, cc)
 	gu, _ := clip.Union()
-	return linkmerge(gu)
+	gi, _ := clip.Intersection()
+	return linkmerge(gu, gi)
 }
