@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/spatial-go/geoos/geoencoding/geojson"
 	"github.com/spatial-go/geoos/space"
 )
 
@@ -197,6 +198,151 @@ func TestWrite(t *testing.T) {
 			}
 			if gotW := buf.String(); gotW != string(tt.want) {
 				t.Errorf("Write()%T = %v, want %v", buf, buf, tt.want)
+			}
+		})
+	}
+}
+
+func TestReadGeoJSON(t *testing.T) {
+	type args struct {
+		b        []byte
+		codeType int
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *geojson.FeatureCollection
+		wantErr bool
+	}{
+		{name: "geojson string", args: args{
+			[]byte(`{"type": "FeatureCollection",
+			"features": [
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "MultiPolygon",
+						"coordinates": [
+							[
+								
+								[
+									113.25094290192146,
+									22.420572852340314
+								],
+								[
+									113.19425990189126,
+									22.467313981848253
+								],
+								[
+									113.19322990256966,
+									22.469693937260413
+								],
+								[
+									113.19803690263932,
+									22.471279907877356
+								],
+								[
+									113.20524690238221,
+									22.46715598456933
+								],
+								[
+									113.25094290192146,
+									22.420572852340314
+								]
+								
+							]
+						]
+					}
+				}
+			]
+		}`), GeoJSON},
+			want:    nil,
+			wantErr: true,
+		},
+		{name: "geojson string", args: args{
+			[]byte(`{"type": "FeatureCollection",
+			"features": [
+				{
+					"type": "Feature",
+					"geometry": {
+						"type": "Polygon",
+						"coordinates": [
+							[
+								
+								[
+									113.25094290192146,
+									22.420572852340314
+								],
+								[
+									113.19425990189126,
+									22.467313981848253
+								],
+								[
+									113.19322990256966,
+									22.469693937260413
+								],
+								[
+									113.19803690263932,
+									22.471279907877356
+								],
+								[
+									113.20524690238221,
+									22.46715598456933
+								]
+								
+							]
+						]
+					}
+				}
+			]
+		}`), GeoJSON},
+			want: &geojson.FeatureCollection{Type: "FeatureCollection", BBox: geojson.BBox{}, Features: []*geojson.Feature{}},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			buf := new(bytes.Buffer)
+			buf.Write(tt.args.b)
+			got, err := ReadGeoJSON(buf, tt.args.codeType)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ReadGeoJSON() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if (got != nil && tt.want != nil) && !reflect.DeepEqual(got.Type, tt.want.Type) {
+				t.Errorf("ReadGeoJSON() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestWriteGeoJSON(t *testing.T) {
+	type args struct {
+		b        []byte
+		codeType int
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantW   string
+		wantErr bool
+	}{
+		{name: "geojson string", args: args{
+			[]byte(`{"type": "FeatureCollection","features": [{"type": "Feature","geometry": {"type": "Polygon","coordinates": [[[113.25094290192146,22.420572852340314],[113.19425990189126,22.467313981848253],[113.19322990256966,22.469693937260413],[113.19803690263932,22.471279907877356],[113.20524690238221,22.46715598456933]]]}}]}`), GeoJSON},
+			wantW: `{"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[113.25094290192146,22.420572852340314],[113.19425990189126,22.467313981848253],[113.19322990256966,22.469693937260413],[113.19803690263932,22.471279907877356],[113.20524690238221,22.46715598456933],[113.25094290192146,22.420572852340314]]]},"properties":null}]}`,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			buf := new(bytes.Buffer)
+			buf.Write(tt.args.b)
+			fc, _ := ReadGeoJSON(buf, tt.args.codeType)
+
+			w := &bytes.Buffer{}
+			if err := WriteGeoJSON(w, fc, tt.args.codeType); (err != nil) != tt.wantErr {
+				t.Errorf("WriteGeoJSON() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if gotW := w.String(); gotW != tt.wantW {
+				t.Errorf("WriteGeoJSON() = \n%v, want \n%v", gotW, tt.wantW)
 			}
 		})
 	}

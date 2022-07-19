@@ -243,7 +243,15 @@ func (ls LineString) IsRing() bool {
 
 // IsValid returns true if the  geometry is valid.
 func (ls LineString) IsValid() bool {
-	return len(ls) >= 1
+	if ls.IsEmpty() {
+		return false
+	}
+	for _, v := range ls {
+		if !Point(v).IsValid() {
+			return false
+		}
+	}
+	return true
 }
 
 // CoordinateSystem return Coordinate System.
