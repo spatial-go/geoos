@@ -136,7 +136,7 @@ func link(gu, gi graph.Graph) (results []matrix.LineMatrix, err error) {
 	return results, nil
 }
 
-func linkmerge(gu, gi graph.Graph) (results []matrix.LineMatrix, err error) {
+func linkmerge(gu graph.Graph) (results []matrix.LineMatrix, err error) {
 	results = []matrix.LineMatrix{}
 	result := matrix.LineMatrix{}
 
