@@ -1,3 +1,4 @@
+// Package encode is a library for decoding geobuf into Go structs using
 package decode
 
 import (

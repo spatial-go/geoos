@@ -1,5 +1,4 @@
 // Package overlay the spatial geometric operation and reconstruction between entities is realized.
-
 package overlay
 
 import (

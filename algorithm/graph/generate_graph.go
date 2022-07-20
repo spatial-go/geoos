@@ -1,5 +1,3 @@
-// package graph ...
-
 package graph
 
 import (
