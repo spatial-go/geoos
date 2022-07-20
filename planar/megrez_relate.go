@@ -72,3 +72,11 @@ func (g *megrezAlgorithm) Touches(A, B space.Geometry) (bool, error) {
 func (g *megrezAlgorithm) Within(A, B space.Geometry) (bool, error) {
 	return g.topog.Within(A, B)
 }
+
+// Adjacency returns TRUE if the only line in common between A and B lie in the union of the boundaries of A and B.
+// The Adjacency relation applies to all Area/Area, Line/Line, Line/Area, Point/Area and Point/Line pairs of relationships,
+// but not to the Point/Point pair.
+func (g *megrezAlgorithm) Adjacency(A, B space.Geometry) (bool, error) {
+	// TODO: Add Adjacency.
+	return false, nil
+}
