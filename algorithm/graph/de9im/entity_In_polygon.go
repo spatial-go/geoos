@@ -198,16 +198,16 @@ func InPolygon(point matrix.Matrix, poly matrix.LineMatrix) bool {
 // Currently the compiler in lines the function by default.
 func rayIntersectsSegment(p, a, b matrix.Matrix) bool {
 
-	// c := (b[0]-a[0])*(p[1]-a[1])/(b[1]-a[1]) + a[0]
+	////c := (b[0]-a[0])*(p[1]-a[1])/(b[1]-a[1]) + a[0]
 	ax := calc.ValueOf(b[0]).Subtract(a[0], 0)
 	bx := calc.ValueOf(p[1]).Subtract(a[1], 0)
 	by := calc.ValueOf(b[1]).Subtract(a[1], 0)
 	cc := ax.MultiplyPair(bx).DividePair(by).Add(a[0], 0).Value()
-
-	// return (a[1] > p[1]) != (b[1] > p[1]) && math.Abs(p[0]-c) < calc.AccuracyFloat*-1
-
 	return (a[1] > p[1]) != (b[1] > p[1]) &&
 		p[0] < cc
+
+	// return (a[1] > p[1]) != (b[1] > p[1]) &&
+	// 	p[0] < (b[0]-a[0])*(p[1]-a[1])/(b[1]-a[1])+a[0]
 }
 
 //OddEvenFill:

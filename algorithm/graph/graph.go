@@ -133,11 +133,11 @@ func (n *Node) Proximity(other *Node) bool {
 
 // EqualsExact returns the true if n-other<tolerance.
 func (n *Node) EqualsExact(other *Node, tolerance float64) bool {
-	if !n.Value.EqualsExact(other.Value, tolerance) &&
-		!n.Reverse.EqualsExact(other.Value, tolerance) {
-		return false
+	if n.Value.EqualsExact(other.Value, tolerance) ||
+		n.Reverse.EqualsExact(other.Value, tolerance) {
+		return true
 	}
-	return true
+	return false
 }
 
 // MatrixGraph represents a graph with a geometry
