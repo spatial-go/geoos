@@ -3,6 +3,7 @@ package de9im
 import (
 	"testing"
 
+	"github.com/spatial-go/geoos"
 	"github.com/spatial-go/geoos/algorithm/graph/graphtests"
 	"github.com/spatial-go/geoos/algorithm/matrix/envelope"
 )
@@ -10,8 +11,8 @@ import (
 func TestRelate(t *testing.T) {
 
 	for _, tt := range graphtests.TestRelateData {
-		if //!geoos.GeoosTestTag &&
-		tt.Name != "LinePoly 6" {
+		if !geoos.GeoosTestTag &&
+			tt.Name != "LinePoly 6" {
 			continue
 		}
 

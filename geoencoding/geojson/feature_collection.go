@@ -6,6 +6,8 @@ package geojson
 import (
 	"encoding/json"
 	"fmt"
+
+	"github.com/spatial-go/geoos/space"
 )
 
 const featureCollection = "FeatureCollection"
@@ -49,6 +51,15 @@ func (fc FeatureCollection) MarshalJSON() ([]byte, error) {
 	return json.Marshal(c)
 }
 
+// String returns string.
+func (fc *FeatureCollection) String() string {
+	if buf, err := fc.MarshalJSON(); err == nil {
+		return string(buf)
+	} else {
+		return err.Error()
+	}
+}
+
 // UnmarshalFeatureCollection decodes the data into a GeoJSON feature collection.
 // Alternately one can call json.Unmarshal(fc) directly for the same result.
 func UnmarshalFeatureCollection(data []byte) (*FeatureCollection, error) {
@@ -60,6 +71,19 @@ func UnmarshalFeatureCollection(data []byte) (*FeatureCollection, error) {
 
 	if fc.Type != featureCollection {
 		return nil, fmt.Errorf("geojson: not a feature collection: type=%s", fc.Type)
+	}
+	for _, v := range fc.Features {
+		if poly, ok := v.Geometry.Geometry().(space.Polygon); ok {
+			for i, ring := range poly {
+				if !space.Ring(ring).IsClosed() {
+					poly[i] = append(ring, ring[0])
+				}
+
+			}
+		}
+		if !v.Geometry.Geometry().IsValid() {
+			return nil, ErrInvalidGeometry
+		}
 	}
 
 	return fc, nil

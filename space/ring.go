@@ -179,7 +179,7 @@ func (r Ring) IsRing() bool {
 
 // IsValid returns true if the  geometry is valid.
 func (r Ring) IsValid() bool {
-	return (!r.IsEmpty()) && r.IsRing()
+	return LineString(r).IsValid() && (!r.IsEmpty()) && r.IsRing()
 }
 
 // CoordinateSystem return Coordinate System.

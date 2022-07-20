@@ -251,15 +251,15 @@ func (d *PairFloat) Signum() int {
 	return 0
 }
 
-// Sqr Returns the square of this value.
-func (d *PairFloat) Sqr() *PairFloat {
+// Pow2 Returns the square of this value.
+func (d *PairFloat) Pow2() *PairFloat {
 	return d.MultiplyPair(d)
 }
 
-// SelfSqr Squares this object.
+// SelfPow2 Squares this object.
 // To prevent altering constants,
 // this method must only be used on values known to be newly created.
-func (d *PairFloat) SelfSqr() *PairFloat {
+func (d *PairFloat) SelfPow2() *PairFloat {
 	return d.SelfMultiplyPair(d)
 }
 

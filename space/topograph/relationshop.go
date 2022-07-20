@@ -30,14 +30,6 @@ func NewTopograph() Relationship {
 	return topog
 }
 
-// NewTopological returns Relationship that is Topograph.
-func NewTopological() Relationship {
-	once.Do(func() {
-		topog = &Topograph{}
-	})
-	return topog
-}
-
 // Relationship Computes the Intersection Matrix for the spatial relationship
 // between two geometries
 type Relationship interface {

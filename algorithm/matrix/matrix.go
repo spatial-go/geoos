@@ -213,10 +213,17 @@ func (m Matrix) EqualsExact(ms Steric, tolerance float64) bool {
 		}
 
 		if tolerance == 0 {
-			return m.Equals(ms)
+			return m.Equals(mm)
 		}
 
-		return math.Sqrt((m[0]-mm[0])*(m[0]-mm[0])+(m[1]-mm[1])*(m[1]-mm[1])) <= tolerance
+		if m[0]-mm[0] == 0 && m[1]-mm[1] == 0 {
+			return true
+		}
+
+		if m[0]-mm[0] > tolerance || m[1]-mm[1] > tolerance {
+			return false
+		}
+		return math.Hypot((m[0]-mm[0]), (m[1]-mm[1])) <= tolerance
 	}
 	return false
 }
@@ -256,14 +263,6 @@ func TransMatrixes(inputGeom Steric) []Matrix {
 	default:
 		return []Matrix{}
 	}
-}
-
-// LineArray returns the LineArray
-func LineArray(l LineMatrix) (lines []*LineSegment) {
-	for i := 0; i < len(l)-1; i++ {
-		lines = append(lines, &LineSegment{Matrix(l[i]), Matrix(l[i+1])})
-	}
-	return
 }
 
 // compile time checks

@@ -4,6 +4,7 @@ package clipping
 
 import (
 	"github.com/spatial-go/geoos/algorithm"
+	"github.com/spatial-go/geoos/algorithm/graph"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 )
 
@@ -137,4 +138,46 @@ func unaryUnionByHalf(matrix4 matrix.Collection, start, end int) (result matrix.
 		result, err = Union(g0, g1)
 	}
 	return
+}
+
+// LineMerge returns a Geometry containing the LineMerges.
+//	or an empty atomic geometry, or an empty GEOMETRYCOLLECTION
+func LineMerge(ml matrix.Collection) ([]matrix.LineMatrix, error) {
+	lines := make([]matrix.LineMatrix, len(ml))
+	for i, v := range ml {
+		if line, ok := v.(matrix.LineMatrix); ok {
+			lines[i] = line
+		} else {
+			return nil, algorithm.ErrUnknownType(ml)
+		}
+	}
+
+	return mergeByHalf(lines, 0, len(lines))
+}
+
+// mergeByHalf returns Unions a section of a list using a recursive binary union on each half of the section.
+func mergeByHalf(matrix4 []matrix.LineMatrix, start, end int) (result []matrix.LineMatrix, err error) {
+	if matrix4 == nil {
+		return nil, nil
+	}
+	if end-start <= 1 {
+		result, err = merge([]matrix.LineMatrix{matrix4[start]}, nil)
+	} else if end-start == 2 {
+		result, err = merge([]matrix.LineMatrix{matrix4[start]}, []matrix.LineMatrix{matrix4[start+1]})
+	} else {
+		mid := (end + start) / 2
+		g0, _ := mergeByHalf(matrix4, start, mid)
+		g1, _ := mergeByHalf(matrix4, mid, end)
+		result, err = merge(g0, g1)
+	}
+	return
+}
+
+func merge(ps, pc []matrix.LineMatrix) (result []matrix.LineMatrix, err error) {
+	cs := matrix.CollectionFromMultiLineMatrix(ps)
+	cc := matrix.CollectionFromMultiLineMatrix(pc)
+	clip := graph.MergeHandle(cs, cc)
+	gu, _ := clip.Union()
+	gi, _ := clip.Intersection()
+	return linkmerge(gu, gi)
 }

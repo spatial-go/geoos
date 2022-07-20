@@ -226,6 +226,7 @@ func (g *MatrixGraph) AddNodeType(n *Node, nodeType int) {
 	node.Index = len(g.nodes)
 	node.Stat = true
 	node.inGraph = true
+
 	g.nodes = append(g.nodes, node)
 	edges := make(map[int]int)
 	g.edges = append(g.edges, edges)
@@ -375,6 +376,9 @@ func (g *MatrixGraph) Connected(index int) int {
 // Union  Computes the Union of two Graph.
 func (g *MatrixGraph) Union(graph Graph) (Graph, error) {
 	gUnion := &MatrixGraph{}
+	gUnion.nodes = make([]*Node, 0, g.Order()+graph.Order())
+	gUnion.edges = make([]map[int]int, 0, g.Order()+graph.Order())
+
 	for _, node := range g.Nodes() {
 		if node.Stat {
 			gUnion.AddNode(node)
@@ -415,6 +419,9 @@ func (g *MatrixGraph) Union(graph Graph) (Graph, error) {
 // One can think of this as GraphA - Intersection(A,B).
 func (g *MatrixGraph) Difference(graph Graph) (Graph, error) {
 	gDiff := &MatrixGraph{}
+	gDiff.nodes = make([]*Node, 0, g.Order())
+	gDiff.edges = make([]map[int]int, 0, g.Order())
+
 	for _, node := range g.Nodes() {
 		if !node.Stat {
 			continue
@@ -459,6 +466,9 @@ func (g *MatrixGraph) SymDifference(graph Graph) (Graph, error) {
 // Intersection  Computes the Intersection of two Graph.
 func (g *MatrixGraph) Intersection(graph Graph) (Graph, error) {
 	gIntersect := &MatrixGraph{}
+	gIntersect.nodes = make([]*Node, 0, (g.Order()+graph.Order())/2)
+	gIntersect.edges = make([]map[int]int, 0, (g.Order()+graph.Order())/2)
+
 	for _, node := range g.Nodes() {
 		if _, ok := graph.Node(node); ok {
 			gIntersect.AddNode(node)
