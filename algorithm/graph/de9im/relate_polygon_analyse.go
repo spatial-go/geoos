@@ -1,5 +1,3 @@
-// package de9im ...
-
 package de9im
 
 func (r *RelationshipByDegrees) polygonTwoAnalyse(pointInPolygon, entityInPolygon int) {

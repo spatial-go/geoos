@@ -1,3 +1,4 @@
+//Package topograph the topological relations between points, line and surface entities in DE-9IM model are given.
 package topograph
 
 import (
