@@ -178,6 +178,5 @@ func merge(ps, pc []matrix.LineMatrix) (result []matrix.LineMatrix, err error) {
 	cc := matrix.CollectionFromMultiLineMatrix(pc)
 	clip := graph.MergeHandle(cs, cc)
 	gu, _ := clip.Union()
-	gi, _ := clip.Intersection()
-	return linkmerge(gu, gi)
+	return linkmerge(gu)
 }

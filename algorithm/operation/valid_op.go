@@ -4,6 +4,8 @@ package operation
 import (
 	"container/ring"
 
+	"github.com/spatial-go/geoos/algorithm/calc"
+	"github.com/spatial-go/geoos/algorithm/graph/de9im"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/relate"
 )
@@ -94,8 +96,8 @@ func (el *ValidOP) isSimpleLine(matr matrix.LineMatrix) bool {
 					_, ips := relate.IntersectionLineSegment(line1, line2)
 					isIPoint := true
 					for _, ip := range ips {
-						if !ip.EqualsExact(lines[0].P0, 0.000001) &&
-							!ip.EqualsExact(lines[numLine-1].P1, 0.000001) {
+						if !ip.EqualsExact(lines[0].P0, calc.DefaultTolerance) &&
+							!ip.EqualsExact(lines[numLine-1].P1, calc.DefaultTolerance) {
 							isIPoint = false
 						}
 					}
@@ -108,4 +110,110 @@ func (el *ValidOP) isSimpleLine(matr matrix.LineMatrix) bool {
 		}
 	}
 	return true
+}
+
+// CorrectPolygonMatrixSelfIntersect correct self intersect for polygon.
+func CorrectPolygonMatrixSelfIntersect(ms matrix.Steric) matrix.Steric {
+	if p, ok := ms.(matrix.PolygonMatrix); ok {
+		if p.IsEmpty() {
+			return p
+		}
+		shell := matrix.LineMatrix(p[0])
+		if shell.IsEmpty() {
+			return p
+		}
+
+		if !shell.IsClosed() {
+			shell = append(shell, shell[0])
+		}
+		mulitPoly := matrix.Collection{}
+		for {
+			if res, ok := CorrectRingSelfIntersect(shell); ok {
+				mulitPoly = append(mulitPoly, matrix.PolygonMatrix{res[0]})
+				shell = res[1]
+			} else {
+				mulitPoly = append(mulitPoly, matrix.PolygonMatrix{shell})
+				break
+			}
+		}
+		if mulitPoly.IsEmpty() {
+			return p
+		}
+		for _, s := range mulitPoly {
+			poly := s.(matrix.PolygonMatrix)
+			for i := 1; i < len(p); i++ {
+				if de9im.IM(poly, matrix.LineMatrix(p[i])).IsCovers() {
+					poly = append(poly, matrix.LineMatrix(p[i]))
+				}
+			}
+		}
+		return mulitPoly
+	}
+	return ms
+}
+
+// CorrectRingSelfIntersect correct self intersect for ring.
+func CorrectRingSelfIntersect(shell matrix.LineMatrix) ([]matrix.LineMatrix, bool) {
+	numShell := len(shell)
+	result := make([]matrix.LineMatrix, 2)
+	for i := 0; i < numShell-1; i++ {
+		for j := 0; j < numShell-1; j++ {
+			if i == j || j-i == 1 || i-j == 1 {
+				continue
+			}
+			selfip := relate.IntersectionPoint{}
+			if ok, ips := relate.IntersectionLineSegment(&matrix.LineSegment{P0: shell[i], P1: shell[i+1]},
+				&matrix.LineSegment{P0: shell[j], P1: shell[j+1]}); ok {
+				if (i == 0 && j == numShell-2) ||
+					(j == 0 && i == numShell-2) {
+					isIPoint := true
+					for _, ip := range ips {
+						if !ip.EqualsExact(matrix.Matrix(shell[0]), calc.DefaultTolerance) &&
+							!ip.EqualsExact(matrix.Matrix(shell[numShell-1]), calc.DefaultTolerance) {
+							isIPoint = false
+							selfip = ip
+						}
+					}
+					if isIPoint {
+						continue
+					}
+				}
+				first := 0
+				second := 0
+				if i < j {
+					first, second = i, j
+				} else {
+					first, second = j, i
+				}
+				if selfip.Matrix == nil {
+					selfip = ips[0]
+				}
+				if selfip.EqualsExact(matrix.Matrix(shell[first]), calc.DefaultTolerance) {
+					result[0] = append(result[0], shell[:first]...)
+					result[1] = append(result[1], shell[first:second+1]...)
+				} else if selfip.EqualsExact(matrix.Matrix(shell[first+1]), calc.DefaultTolerance) {
+					result[0] = append(result[0], shell[:first+1]...)
+					result[1] = append(result[1], shell[first+1:second+1]...)
+				} else {
+					result[0] = append(result[0], shell[:first]...)
+					result[0] = append(result[0], selfip.Matrix)
+					result[1] = append(result[1], selfip.Matrix)
+					result[1] = append(result[1], shell[first+1:second+1]...)
+				}
+				if selfip.EqualsExact(matrix.Matrix(shell[second]), calc.DefaultTolerance) {
+					result[0] = append(result[0], shell[second:]...)
+				} else if selfip.EqualsExact(matrix.Matrix(shell[second+1]), calc.DefaultTolerance) {
+					result[0] = append(result[0], shell[second+1:]...)
+					result[1] = append(result[1], shell[second+1])
+				} else {
+					result[0] = append(result[0], selfip.Matrix)
+					result[0] = append(result[0], shell[second+1:]...)
+					result[1] = append(result[1], selfip.Matrix)
+				}
+
+				return result, true
+			}
+		}
+	}
+	return nil, false
 }
