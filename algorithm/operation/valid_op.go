@@ -112,7 +112,7 @@ func (el *ValidOP) isSimpleLine(matr matrix.LineMatrix) bool {
 	return true
 }
 
-// CorrectPolygonMatrixSelfIntersect correct self intersect for ring polygon.
+// CorrectPolygonMatrixSelfIntersect correct self intersect for polygon.
 func CorrectPolygonMatrixSelfIntersect(ms matrix.Steric) matrix.Steric {
 	if p, ok := ms.(matrix.PolygonMatrix); ok {
 		if p.IsEmpty() {
