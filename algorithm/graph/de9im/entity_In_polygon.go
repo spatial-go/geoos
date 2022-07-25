@@ -53,7 +53,7 @@ func IsInPolygon(arg matrix.Steric, poly matrix.PolygonMatrix) (int, int) {
 		pointInPolygon, entityInPolygon = lineInPolygon(m, poly)
 	case matrix.PolygonMatrix:
 		pointInPolygon, entityInPolygon = lineInPolygon(matrix.LineMatrix(m[0]), poly)
-		if entityInPolygon == OnlyOutPolygon {
+		if entityInPolygon == OnlyOutPolygon || entityInPolygon == PartOutPolygon {
 			if _, v := lineInPolygon(matrix.LineMatrix(poly[0]), m); v == OnlyInPolygon {
 				entityInPolygon = IncludePolygon
 			}
@@ -87,7 +87,7 @@ func lineInPolygon(m matrix.LineMatrix, poly matrix.PolygonMatrix) (int, int) {
 		}
 	}
 	for _, p := range m {
-		lInPolygon := OnlyOutPolygon
+		lInPolygon := 0
 		if inShell, onShell := pointInRing(p, poly[0]); inShell {
 			lInPolygon = OnlyInPolygon
 
@@ -103,8 +103,15 @@ func lineInPolygon(m matrix.LineMatrix, poly matrix.PolygonMatrix) (int, int) {
 			}
 		} else if onShell {
 			lInPolygon = entityInPolygon
+		} else {
+			lInPolygon = OnlyOutPolygon
 		}
 		entityInPolygon = calcInPolygon(entityInPolygon, lInPolygon)
+	}
+	if entityInPolygon == OnlyOutPolygon {
+		if relate.IsIntersectionEdge(m, poly[0]) {
+			entityInPolygon = PartOutPolygon
+		}
 	}
 	// if entityInPolygon == DefaultInPolygon {
 	// 	entityInPolygon = pointInPolygon

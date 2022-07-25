@@ -16,7 +16,7 @@ func (r *RelationshipByDegrees) polygonTwoAnalyse(pointInPolygon, entityInPolygo
 				r.IM.Set(2, 2, 2)
 				r.IM.Set(2, 1, 1)
 				r.IM.Set(2, 0, 2)
-			case OnlyOutPolygon:
+			case OnlyOutPolygon, PartOutPolygon:
 				r.IM.Set(0, 0, -1)
 				r.IM.Set(0, 1, -1)
 				r.IM.Set(0, 2, 2)

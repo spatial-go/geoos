@@ -104,3 +104,32 @@ func Test_rayIntersectsSegment(t *testing.T) {
 		})
 	}
 }
+
+func TestIsInPolygon(t *testing.T) {
+	type args struct {
+		arg  matrix.Steric
+		poly matrix.PolygonMatrix
+	}
+	tests := []struct {
+		name  string
+		args  args
+		want  int
+		want1 int
+	}{
+		{"test line poly0", args{matrix.LineMatrix{{0.5, 1.5}, {2.5, 1.5}}, matrix.PolygonMatrix{{{1, 1}, {2, 1}, {2, 2}, {1, 2}, {1, 1}}}}, OnlyOutPolygon, PartOutPolygon},
+		{"test line poly1", args{matrix.LineMatrix{{0.5, 1.5}, {1, 1.5}}, matrix.PolygonMatrix{{{1, 1}, {2, 1}, {2, 2}, {1, 2}, {1, 1}}}}, PartOutPolygon, PartOutPolygon},
+		{"test line poly2", args{matrix.LineMatrix{{1, 1.5}, {2, 1.5}}, matrix.PolygonMatrix{{{1, 1}, {2, 1}, {2, 2}, {1, 2}, {1, 1}}}}, OnlyInLine, DefaultInPolygon},
+		{"test line poly3", args{matrix.LineMatrix{{2, 1.5}, {2.5, 1.5}}, matrix.PolygonMatrix{{{1, 1}, {2, 1}, {2, 2}, {1, 2}, {1, 1}}}}, PartOutPolygon, PartOutPolygon},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, got1 := IsInPolygon(tt.args.arg, tt.args.poly)
+			if got != tt.want {
+				t.Errorf("IsInPolygon() got = %v, want %v", got, tt.want)
+			}
+			if got1 != tt.want1 {
+				t.Errorf("IsInPolygon() got1 = %v, want %v", got1, tt.want1)
+			}
+		})
+	}
+}

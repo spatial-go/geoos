@@ -80,6 +80,9 @@ func (r *RelationshipByDegrees) lineAndPolygonAnalyse(pointInPolygon, entityInPo
 				case OnlyOutPolygon:
 					r.IM.Set(0, 0, -1)
 					r.IM.Set(0, 2, 1)
+				case DefaultInPolygon:
+					r.IM.Set(0, 0, 1)
+					r.IM.Set(0, 2, -1)
 				}
 			}
 		default:
@@ -131,7 +134,7 @@ func (r *RelationshipByDegrees) lineAndPolygonAnalyse(pointInPolygon, entityInPo
 			r.IM.Set(1, 0, 0)
 			r.IM.Set(1, 2, 0)
 		default:
-			r.IM.Set(1, 0, 0)
+			r.IM.Set(1, 0, -1)
 		}
 		switch entityInPolygon {
 		case OnlyInPolygon:
