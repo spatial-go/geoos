@@ -225,6 +225,16 @@ func (mp MultiPoint) IsValid() bool {
 	return true
 }
 
+// IsCorrect returns true if the geometry struct is Correct.
+func (mp MultiPoint) IsCorrect() bool {
+	for _, v := range mp {
+		if !v.IsCorrect() {
+			return false
+		}
+	}
+	return true
+}
+
 // CoordinateSystem return Coordinate System.
 func (mp MultiPoint) CoordinateSystem() int {
 	return defaultCoordinateSystem()

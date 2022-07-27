@@ -177,9 +177,14 @@ func (r Ring) IsRing() bool {
 	return LineString(r).IsRing()
 }
 
-// IsValid returns true if the  geometry is valid.
+// IsValid returns true if the geometry is valid.
 func (r Ring) IsValid() bool {
 	return LineString(r).IsValid() && (!r.IsEmpty()) && r.IsRing()
+}
+
+// IsCorrect returns true if the geometry struct is Correct.
+func (r Ring) IsCorrect() bool {
+	return LineString(r).IsCorrect() && (!r.IsEmpty())
 }
 
 // CoordinateSystem return Coordinate System.

@@ -303,6 +303,11 @@ func (b Bound) IsValid() bool {
 	return b.Min.IsValid() && b.Max.IsValid()
 }
 
+// IsCorrect returns true if the geometry struct is Correct.
+func (b Bound) IsCorrect() bool {
+	return b.Min.IsCorrect() && b.Max.IsCorrect()
+}
+
 // CoordinateSystem return Coordinate System.
 func (b Bound) CoordinateSystem() int {
 	return defaultCoordinateSystem()

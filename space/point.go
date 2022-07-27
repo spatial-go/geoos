@@ -222,6 +222,11 @@ func (p Point) IsRing() bool {
 
 // IsValid returns true if the  geometry is valid.
 func (p Point) IsValid() bool {
+	return p.IsCorrect()
+}
+
+// IsCorrect returns true if the geometry struct is Correct.
+func (p Point) IsCorrect() bool {
 	return len(p) >= 2
 }
 
