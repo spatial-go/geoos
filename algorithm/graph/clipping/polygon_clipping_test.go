@@ -15,7 +15,7 @@ func TestPolygonClipping_Intersection(t *testing.T) {
 
 	for _, tt := range graphtests.TestsPolygonIntersecation {
 		if !geoos.GeoosTestTag &&
-			tt.Name != "poly poly3" {
+			tt.Name != "poly poly5" {
 			continue
 		}
 		t.Run(tt.Name, func(t *testing.T) {
@@ -25,6 +25,10 @@ func TestPolygonClipping_Intersection(t *testing.T) {
 			got, err := p.Intersection()
 			if (err != nil) != tt.WantErr {
 				t.Errorf("PolygonClipping.Intersection() %v error = %v, wantErr %v", tt.Name, err, tt.WantErr)
+				return
+			}
+			if got == nil {
+				t.Errorf("PolygonClipping.Intersection()%v = %v, \nwant %v type %T, want %T", tt.Name, got, tt.Want, got, tt.Want)
 				return
 			}
 			if !got.Proximity(tt.Want) {
@@ -45,7 +49,7 @@ func TestPolygonClipping_Union(t *testing.T) {
 
 	for _, tt := range graphtests.TestsPolygonUnion {
 		if !geoos.GeoosTestTag &&
-			tt.Name != "poly x1" {
+			tt.Name != "poly poly02" {
 			continue
 		}
 		t.Run(tt.Name, func(t *testing.T) {
@@ -55,6 +59,10 @@ func TestPolygonClipping_Union(t *testing.T) {
 			got, err := p.Union()
 			if (err != nil) != tt.WantErr {
 				t.Errorf("PolygonClipping.Union() %v error = %v, wantErr %v", tt.Name, err, tt.WantErr)
+				return
+			}
+			if got == nil {
+				t.Errorf("PolygonClipping.Union()%v = %v, \nwant %v", tt.Name, got, tt.Want)
 				return
 			}
 			isEqual := got.Proximity(tt.Want[0])

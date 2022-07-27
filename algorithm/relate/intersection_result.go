@@ -74,7 +74,13 @@ func (ips IntersectionPointLine) Len() int {
 
 // Less ...
 func (ips IntersectionPointLine) Less(i, j int) bool {
+	if ips[i].Matrix.Proximity(ips[j].Matrix) {
+		return ips[i].IsCollinear
+	}
 	if ips[i].Matrix[0] == ips[j].Matrix[0] {
+		if ips[i].Matrix[1] == ips[j].Matrix[1] {
+			return ips[i].IsCollinear
+		}
 		return ips[i].Matrix[1] < ips[j].Matrix[1]
 	}
 	return ips[i].Matrix[0] < ips[j].Matrix[0]

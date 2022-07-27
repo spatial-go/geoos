@@ -204,6 +204,9 @@ func TestTopological_Touches(t *testing.T) {
 		{"Touches 0", args{space.Point{2, 2}, space.LineString{{1, 1}, {3, 3}}}, false, false},
 		{"Touches 1",
 			args{space.Polygon{{{1, 1}, {5, 1}, {5, 2}, {1, 2}, {1, 1}}},
+				space.Polygon{{{2, 1}, {5, 1}, {5, 2}, {2, 2}, {2, 1}}}}, false, false},
+		{"Touches 2",
+			args{space.Polygon{{{1, 1}, {2, 1}, {2, 2}, {1, 2}, {1, 1}}},
 				space.Polygon{{{2, 1}, {5, 1}, {5, 2}, {2, 2}, {2, 1}}}}, true, false},
 	}
 	for _, tt := range tests {

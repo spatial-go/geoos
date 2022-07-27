@@ -12,7 +12,7 @@ func TestRelate(t *testing.T) {
 
 	for _, tt := range graphtests.TestRelateData {
 		if !geoos.GeoosTestTag &&
-			tt.Name != "test line poly0" {
+			tt.Name != "test line poly4" {
 			continue
 		}
 

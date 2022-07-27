@@ -106,4 +106,22 @@ var TestRelateData = []struct {
 				{117.62308032712902, 39.340634137974595}, {117.60388060798783, 39.340634137974595}, {117.60388060798783, 39.35142233161234}}},
 		}, "F1FF0F212", false},
 	{"test line poly0", []matrix.Steric{matrix.LineMatrix{{1, 1.5}, {2, 1.5}}, matrix.PolygonMatrix{{{1, 1}, {2, 1}, {2, 2}, {1, 2}, {1, 1}}}}, "1FFF0F212", false},
+	{"test line poly1", []matrix.Steric{matrix.LineMatrix{{5, 10}, {5, 15}, {15, 15}, {15, 5}, {10, 5}}, matrix.PolygonMatrix{{{0, 0}, {10, 0}, {10, 10}, {0, 10}, {0, 0}}}}, "FF1F0F212", false},
+	{"test line poly2", []matrix.Steric{matrix.LineMatrix{{5, 10}, {5, 9}}, matrix.PolygonMatrix{{{0, 0}, {10, 0}, {10, 10}, {0, 10}, {0, 0}},
+		{{1, 1}, {9, 1}, {9, 9}, {1, 9}, {1, 1}}}}, "1FFF0F212", false},
+	{"test line poly3", []matrix.Steric{matrix.LineMatrix{{0, 0}, {10, 0}, {10, 5}}, matrix.PolygonMatrix{{{0, 0}, {0, 10}, {10, 10}, {10, 0}, {0, 0}}}}, "F1FF0F212", false},
+	{"test poly poly0", []matrix.Steric{matrix.PolygonMatrix{{{1, 1}, {5, 1}, {5, 2}, {1, 2}, {1, 1}}}, matrix.PolygonMatrix{{{2, 1}, {5, 1}, {5, 2}, {2, 2}, {2, 1}}}}, "212F11FF2", false},
+
+	{"test line poly4", []matrix.Steric{
+		matrix.LineMatrix{{111.96859688870948, 38.44363360825604},
+			{111.7096710205078, 38.39441521865825},
+			{111.8671003424276, 38.22285924285058},
+		},
+		matrix.PolygonMatrix{{{112.01248168945312, 38.4519755295767},
+			{111.7096710205078, 38.39441521865825},
+			{111.90948486328125, 38.176671418717746},
+			{112.01248168945312, 38.4519755295767}}}},
+		"F1FF0F212",
+		false,
+	},
 }

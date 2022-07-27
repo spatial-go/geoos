@@ -35,7 +35,7 @@ func IsInPolygon(arg matrix.Steric, poly matrix.PolygonMatrix) (int, int) {
 
 	switch m := arg.(type) {
 	case matrix.Matrix:
-		if in, on := pointInRing(m, poly[0]); in {
+		if in := pointInRing(m, poly[0]); in == OnlyInPolygon {
 			pointInPolygon = OnlyInPolygon
 			for i := 1; i < len(poly); i++ {
 				if relate.InPolygon(m, poly[i]) {
@@ -43,7 +43,7 @@ func IsInPolygon(arg matrix.Steric, poly matrix.PolygonMatrix) (int, int) {
 					break
 				}
 			}
-		} else if on {
+		} else if in == OnlyInLine {
 			pointInPolygon = OnlyInLine
 		} else {
 			pointInPolygon = OnlyOutPolygon
@@ -54,7 +54,7 @@ func IsInPolygon(arg matrix.Steric, poly matrix.PolygonMatrix) (int, int) {
 	case matrix.PolygonMatrix:
 		pointInPolygon, entityInPolygon = lineInPolygon(matrix.LineMatrix(m[0]), poly)
 		if entityInPolygon == OnlyOutPolygon || entityInPolygon == PartOutPolygon {
-			if _, v := lineInPolygon(matrix.LineMatrix(poly[0]), m); v == OnlyInPolygon {
+			if _, v := lineInPolygon(matrix.LineMatrix(poly[0]), m); v == OnlyInPolygon || v == PartInPolygon {
 				entityInPolygon = IncludePolygon
 			}
 		}
@@ -66,70 +66,109 @@ func IsInPolygon(arg matrix.Steric, poly matrix.PolygonMatrix) (int, int) {
 func lineInPolygon(m matrix.LineMatrix, poly matrix.PolygonMatrix) (int, int) {
 	pointInPolygon := DefaultInPolygon
 	entityInPolygon := DefaultInPolygon
-	if b, err := m.Boundary(); err == nil {
-		for _, p := range b.(matrix.Collection) {
-			pInPolygon := OnlyOutPolygon
-			if inShell, onShell := pointInRing(p.(matrix.Matrix), poly[0]); inShell {
-				pInPolygon = OnlyInPolygon
-				for i := 1; i < len(poly); i++ {
-					if inHoles, onHoles := pointInRing(p.(matrix.Matrix), poly[i]); inHoles {
-						pInPolygon = OnlyOutPolygon
-						break
-					} else if onHoles {
-						pInPolygon = OnlyInLine
-						break
-					}
-				}
-			} else if onShell {
-				pInPolygon = OnlyInLine
-			}
-			pointInPolygon = calcInPolygon(pointInPolygon, pInPolygon)
-		}
-	}
+
 	for _, p := range m {
+		pInPolygon := OnlyOutPolygon
+		if inShell := pointInRing(matrix.Matrix(p), poly[0]); inShell == OnlyInPolygon {
+			pInPolygon = OnlyInPolygon
+			for i := 1; i < len(poly); i++ {
+				if inHoles := pointInRing(matrix.Matrix(p), poly[i]); inHoles == OnlyInPolygon {
+					pInPolygon = OnlyOutPolygon
+					break
+				} else if inHoles == OnlyInLine {
+					pInPolygon = OnlyInLine
+					break
+				}
+			}
+		} else if inShell == OnlyInLine {
+			pInPolygon = OnlyInLine
+		}
+		pointInPolygon = calcInPolygon(pointInPolygon, pInPolygon)
+	}
+
+	for _, l := range m.ToLineArray() {
 		lInPolygon := 0
-		if inShell, onShell := pointInRing(p, poly[0]); inShell {
+		if inShell := lineSegmentfInRing(l, poly[0]); inShell == OnlyInPolygon {
 			lInPolygon = OnlyInPolygon
 
 			for i := 1; i < len(poly); i++ {
-				if inHoles, onHoles := pointInRing(p, poly[i]); inHoles {
+				if inHoles := lineSegmentfInRing(l, poly[i]); inHoles == OnlyInPolygon {
 					lInPolygon = OnlyOutPolygon
-
 					break
-				} else if onHoles {
-					lInPolygon = entityInPolygon
+				} else if inHoles == OnlyInLine {
+					lInPolygon = OnlyInLine
 					break
 				}
 			}
-		} else if onShell {
-			lInPolygon = entityInPolygon
 		} else {
-			lInPolygon = OnlyOutPolygon
+			lInPolygon = inShell
 		}
 		entityInPolygon = calcInPolygon(entityInPolygon, lInPolygon)
 	}
-	if entityInPolygon == OnlyOutPolygon {
-		if relate.IsIntersectionEdge(m, poly[0]) {
-			entityInPolygon = PartOutPolygon
-		}
-	}
-	// if entityInPolygon == DefaultInPolygon {
-	// 	entityInPolygon = pointInPolygon
-	// }
+
 	return pointInPolygon, entityInPolygon
 }
 
-func pointInRing(p matrix.Matrix, r matrix.LineMatrix) (bool, bool) {
+func pointInRing(p matrix.Matrix, r matrix.LineMatrix) int {
 	if !r.IsClosed() {
-		return false, false
+		return DefaultInPolygon
 	}
 	if relate.InLineMatrix(p, r) {
-		return false, true
+		return OnlyInLine
 	}
 	if InPolygon(p, r) {
-		return true, false
+		return OnlyInPolygon
 	}
-	return false, false
+	return OnlyOutPolygon
+}
+
+func lineSegmentfInRing(l *matrix.LineSegment, r matrix.LineMatrix) int {
+	if !r.IsClosed() {
+		return DefaultInPolygon
+	}
+	p0InPolygon, p1InPolygon := 0, 0
+	if relate.InLineMatrix(l.P0, r) {
+		p0InPolygon = OnlyInLine
+	} else {
+		if InPolygon(l.P0, r) {
+			p0InPolygon = OnlyInPolygon
+		} else {
+			p0InPolygon = OnlyOutPolygon
+		}
+	}
+	if relate.InLineMatrix(l.P1, r) {
+		p1InPolygon = OnlyInLine
+	} else {
+		if InPolygon(l.P1, r) {
+			p1InPolygon = OnlyInPolygon
+		} else {
+			p1InPolygon = OnlyOutPolygon
+		}
+	}
+	switch {
+	case p0InPolygon == OnlyInLine && p1InPolygon == OnlyInLine:
+		_, ips := relate.IntersectionEdge(matrix.LineMatrix{l.P0, l.P1}, r)
+		isCollinear := true
+		for _, ip := range ips {
+			if !ip.IsCollinear {
+				isCollinear = false
+			}
+		}
+		if isCollinear {
+			return OnlyInLine
+		}
+		return OnlyInPolygon
+	case p0InPolygon == OnlyInPolygon && p1InPolygon == OnlyInPolygon:
+		return OnlyInPolygon
+	case p0InPolygon == OnlyOutPolygon && p1InPolygon == OnlyOutPolygon:
+		if mark, _ := relate.IntersectionEdge(matrix.LineMatrix{l.P0, l.P1}, r); mark {
+			return BothPolygon
+		} else {
+			return OnlyOutPolygon
+		}
+	default:
+		return p0InPolygon + p1InPolygon - OnlyInLine
+	}
 }
 
 func calcInPolygon(old, new int) int {

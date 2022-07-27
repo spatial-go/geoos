@@ -34,7 +34,16 @@ const (
 	// DefaultTolerance10 ...
 	DefaultTolerance10 = 1.0e-10
 
-	AccuracyFloat = DefaultTolerance9
+	// DefaultTolerance12 ...
+	DefaultTolerance12 = 1.0e-12
+
+	// DefaultTolerance13 ...
+	DefaultTolerance13 = 1.0e-13
+
+	// DefaultTolerance15 ...
+	DefaultTolerance15 = 1.0e-15
+
+	AccuracyFloat = DefaultTolerance12
 
 	DefaultTolerance = AccuracyFloat
 )

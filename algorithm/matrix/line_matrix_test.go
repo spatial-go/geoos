@@ -225,7 +225,7 @@ func TestSteric_Proximity(t *testing.T) {
 		{"case 1", LineMatrix{{1, 1}, {2, 2}},
 			args{LineMatrix{{1, 1}, {2, 2}}}, true},
 		{"case 2", LineMatrix{{1, 1}, {2, 2}},
-			args{LineMatrix{{1, 1}, {2, 2.00000000001}}}, true},
+			args{LineMatrix{{1, 1}, {2, 2.0000000000001}}}, true},
 		{"case 3", PolygonMatrix{{{1, 1}, {2, 2}}},
 			args{LineMatrix{{1, 1}, {2, 2}}}, false},
 		{"case 4", Matrix{},

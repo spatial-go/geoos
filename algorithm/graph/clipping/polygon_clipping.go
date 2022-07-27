@@ -211,7 +211,7 @@ func (p *PolygonClipping) SymDifference() (matrix.Steric, error) {
 	if res, err := p.Difference(); err == nil && !res.IsEmpty() {
 		result = append(result, res)
 	}
-	if res, err := p.DifferenceReverse(); err == nil && !res.IsEmpty() {
+	if res, err := p.DifferenceReverse(); err == nil && res != nil && !res.IsEmpty() {
 		result = append(result, res)
 	}
 	switch len(result) {
