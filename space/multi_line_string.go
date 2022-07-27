@@ -262,6 +262,16 @@ func (mls MultiLineString) IsValid() bool {
 	return true
 }
 
+// IsCorrect returns true if the geometry struct is Correct.
+func (mls MultiLineString) IsCorrect() bool {
+	for _, v := range mls {
+		if !v.IsCorrect() {
+			return false
+		}
+	}
+	return true
+}
+
 // CoordinateSystem return Coordinate System.
 func (mls MultiLineString) CoordinateSystem() int {
 	return defaultCoordinateSystem()

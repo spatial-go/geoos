@@ -79,15 +79,32 @@ func UnmarshalFeatureCollection(data []byte) (*FeatureCollection, error) {
 				if !space.Ring(ring).IsClosed() {
 					poly[i] = append(ring, ring[0])
 				}
-
+			}
+		} else if mult, ok := v.Geometry.Geometry().(space.MultiPolygon); ok {
+			for _, poly := range mult {
+				for i, ring := range poly {
+					if !space.Ring(ring).IsClosed() {
+						poly[i] = append(ring, ring[0])
+					}
+				}
 			}
 		}
-		if !v.Geometry.Geometry().IsValid() {
-			if v.Geometry.Geometry().GeoJSONType() == space.TypePolygon {
-				v.Geometry.Coordinates = space.TransGeometry(
-					operation.CorrectPolygonMatrixSelfIntersect(
-						v.Geometry.Geometry().(space.Polygon).ToMatrix()))
+
+		if v.Geometry.Geometry().IsCorrect() {
+			if !v.Geometry.Geometry().IsValid() {
+				if v.Geometry.Geometry().GeoJSONType() == space.TypePolygon {
+					v.Geometry.Coordinates = space.TransGeometry(
+						operation.CorrectPolygonMatrixSelfIntersect(
+							v.Geometry.Geometry().(space.Polygon).ToMatrix()))
+				} else if v.Geometry.Geometry().GeoJSONType() == space.TypeMultiPolygon {
+					mult := v.Geometry.Geometry().(space.MultiPolygon)
+					for _, poly := range mult {
+						v.Geometry.Coordinates = space.TransGeometry(
+							operation.CorrectPolygonMatrixSelfIntersect(poly.ToMatrix()))
+					}
+				}
 			}
+		} else {
 			return nil, ErrInvalidGeometry
 		}
 	}

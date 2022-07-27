@@ -301,6 +301,19 @@ func (p Polygon) IsValid() bool {
 	return true
 }
 
+// IsCorrect returns true if the geometry struct is Correct.
+func (p Polygon) IsCorrect() bool {
+	if p.IsEmpty() {
+		return false
+	}
+	for _, v := range p {
+		if !Ring(v).IsCorrect() {
+			return false
+		}
+	}
+	return true
+}
+
 // CoordinateSystem return Coordinate System.
 func (p Polygon) CoordinateSystem() int {
 	return defaultCoordinateSystem()
