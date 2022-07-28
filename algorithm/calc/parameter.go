@@ -45,7 +45,7 @@ const (
 
 	AccuracyFloat = DefaultTolerance12
 
-	DefaultTolerance = AccuracyFloat
+	DefaultTolerance = DefaultTolerance10
 )
 
 // const  Defined constant variable overlay parameters.

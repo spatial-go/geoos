@@ -67,23 +67,25 @@ func lineInPolygon(m matrix.LineMatrix, poly matrix.PolygonMatrix) (int, int) {
 	pointInPolygon := DefaultInPolygon
 	entityInPolygon := DefaultInPolygon
 
-	for _, p := range m {
-		pInPolygon := OnlyOutPolygon
-		if inShell := pointInRing(matrix.Matrix(p), poly[0]); inShell == OnlyInPolygon {
-			pInPolygon = OnlyInPolygon
-			for i := 1; i < len(poly); i++ {
-				if inHoles := pointInRing(matrix.Matrix(p), poly[i]); inHoles == OnlyInPolygon {
-					pInPolygon = OnlyOutPolygon
-					break
-				} else if inHoles == OnlyInLine {
-					pInPolygon = OnlyInLine
-					break
+	for i, p := range m {
+		if i == 0 || i == len(m)-1 {
+			pInPolygon := OnlyOutPolygon
+			if inShell := pointInRing(matrix.Matrix(p), poly[0]); inShell == OnlyInPolygon {
+				pInPolygon = OnlyInPolygon
+				for i := 1; i < len(poly); i++ {
+					if inHoles := pointInRing(matrix.Matrix(p), poly[i]); inHoles == OnlyInPolygon {
+						pInPolygon = OnlyOutPolygon
+						break
+					} else if inHoles == OnlyInLine {
+						pInPolygon = OnlyInLine
+						break
+					}
 				}
+			} else if inShell == OnlyInLine {
+				pInPolygon = OnlyInLine
 			}
-		} else if inShell == OnlyInLine {
-			pInPolygon = OnlyInLine
+			pointInPolygon = calcInPolygon(pointInPolygon, pInPolygon)
 		}
-		pointInPolygon = calcInPolygon(pointInPolygon, pInPolygon)
 	}
 
 	for _, l := range m.ToLineArray() {

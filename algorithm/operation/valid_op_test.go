@@ -16,18 +16,18 @@ func TestValidOP_IsSimple(t *testing.T) {
 		fields fields
 		want   bool
 	}{
-		// {name: "Valid isSimple polygon", fields: fields{matrix.PolygonMatrix{
-		// 	{{1, 2}, {3, 4}, {5, 6}, {5, 3}, {1, 2}},
-		// }},
-		// 	want: true},
-		// {name: "Valid isSimple line", fields: fields{matrix.LineMatrix{
-		// 	{1, 1}, {2, 2}, {2, 3.5}, {1, 3}, {1, 2}, {2, 1},
-		// }},
-		// 	want: false},
-		// {name: "Valid isSimple ring", fields: fields{matrix.LineMatrix{
-		// 	{1, 2}, {3, 4}, {5, 6}, {5, 3}, {1, 2}},
-		// },
-		// 	want: true},
+		{name: "Valid isSimple polygon", fields: fields{matrix.PolygonMatrix{
+			{{1, 2}, {3, 4}, {5, 6}, {5, 3}, {1, 2}},
+		}},
+			want: true},
+		{name: "Valid isSimple line", fields: fields{matrix.LineMatrix{
+			{1, 1}, {2, 2}, {2, 3.5}, {1, 3}, {1, 2}, {2, 1},
+		}},
+			want: false},
+		{name: "Valid isSimple ring", fields: fields{matrix.LineMatrix{
+			{1, 2}, {3, 4}, {5, 6}, {5, 3}, {1, 2}},
+		},
+			want: true},
 
 		{name: "Valid isSimple ring1", fields: fields{matrix.LineMatrix{
 			{113.00084732367, 22.5083135499}, {113.00079141659, 22.50835737586},

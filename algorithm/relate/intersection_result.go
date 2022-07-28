@@ -33,10 +33,7 @@ func (ip *IntersectionPoint) Compare(other *IntersectionPoint, tes int) bool {
 	if tes > 0 {
 		if ip.X() == other.X() {
 			if ip.Y() == other.Y() {
-				if other.IsCollinear {
-					ip.IsCollinear = true
-				}
-				return false
+				return ip.IsCollinear
 			}
 			return ip.Y() < other.Y()
 		}
@@ -44,10 +41,7 @@ func (ip *IntersectionPoint) Compare(other *IntersectionPoint, tes int) bool {
 	}
 	if ip.X() == other.X() {
 		if ip.Y() == other.Y() {
-			if other.IsCollinear {
-				ip.IsCollinear = true
-			}
-			return false
+			return ip.IsCollinear
 		}
 		return ip.Y() > other.Y()
 	}

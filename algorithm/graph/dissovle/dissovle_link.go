@@ -30,7 +30,7 @@ func dissovleLink(gu graph.Graph, interLline matrix.LineMatrix) (results []matri
 				startPoint := matrix.Matrix(line[0])
 				lastPoint := matrix.Matrix(line[len(line)-1])
 
-				if matrix.Matrix(result[len(result)-1]).EqualsExact(startPoint, calc.DefaultTolerance*4) && beUsed[j] < 1 {
+				if matrix.Matrix(result[len(result)-1]).EqualsExact(startPoint, calc.DefaultTolerance) && beUsed[j] < 1 {
 					for i, point := range line {
 						if i == 0 {
 							continue
@@ -40,7 +40,7 @@ func dissovleLink(gu graph.Graph, interLline matrix.LineMatrix) (results []matri
 					beUsed[j] = 1
 					break
 				}
-				if matrix.Matrix(result[len(result)-1]).EqualsExact(lastPoint, calc.DefaultTolerance*4) && beUsed[j] < 1 {
+				if matrix.Matrix(result[len(result)-1]).EqualsExact(lastPoint, calc.DefaultTolerance) && beUsed[j] < 1 {
 					for i, point := range line.Reverse() {
 						if i == 0 {
 							continue

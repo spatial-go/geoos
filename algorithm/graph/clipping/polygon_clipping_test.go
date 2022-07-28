@@ -104,8 +104,8 @@ func TestPolygonClipping_Difference(t *testing.T) {
 func TestPolygonClipping_SymDifference(t *testing.T) {
 
 	for _, tt := range graphtests.TestsPolygonSymDifference {
-		if !geoos.GeoosTestTag &&
-			tt.Name != "poly poly" {
+		if //!geoos.GeoosTestTag &&
+		tt.Name != "poly poly0" {
 			continue
 		}
 		t.Run(tt.Name, func(t *testing.T) {
