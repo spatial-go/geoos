@@ -103,6 +103,7 @@ func UnmarshalFeatureCollection(data []byte) (*FeatureCollection, error) {
 							operation.CorrectPolygonMatrixSelfIntersect(poly.ToMatrix()))
 					}
 				}
+				// TODO check is closed
 			}
 		} else {
 			return nil, ErrInvalidGeometry
