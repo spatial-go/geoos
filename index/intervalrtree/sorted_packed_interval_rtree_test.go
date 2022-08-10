@@ -19,8 +19,8 @@ func TestMain(m *testing.M) {
 	fmt.Println("test start")
 	buildTree()
 	code := m.Run()
-	os.Exit(code)
 	fmt.Println("test end")
+	os.Exit(code)
 }
 func buildTree() *SortedPackedIntervalRTree {
 	indexTree = &SortedPackedIntervalRTree{}
