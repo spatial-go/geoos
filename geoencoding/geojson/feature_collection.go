@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/spatial-go/geoos/algorithm/operation"
 	"github.com/spatial-go/geoos/space"
 )
 
@@ -90,22 +89,7 @@ func UnmarshalFeatureCollection(data []byte) (*FeatureCollection, error) {
 			}
 		}
 
-		if v.Geometry.Geometry().IsCorrect() {
-			if !v.Geometry.Geometry().IsValid() {
-				if v.Geometry.Geometry().GeoJSONType() == space.TypePolygon {
-					v.Geometry.Coordinates = space.TransGeometry(
-						operation.CorrectPolygonMatrixSelfIntersect(
-							v.Geometry.Geometry().(space.Polygon).ToMatrix()))
-				} else if v.Geometry.Geometry().GeoJSONType() == space.TypeMultiPolygon {
-					mult := v.Geometry.Geometry().(space.MultiPolygon)
-					for _, poly := range mult {
-						v.Geometry.Coordinates = space.TransGeometry(
-							operation.CorrectPolygonMatrixSelfIntersect(poly.ToMatrix()))
-					}
-				}
-				// TODO check is closed
-			}
-		} else {
+		if !v.Geometry.Geometry().IsCorrect() {
 			return nil, ErrInvalidGeometry
 		}
 	}
