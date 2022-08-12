@@ -164,6 +164,8 @@ func TransGeometry(inputGeom matrix.Steric) Geometry {
 
 // BufferInMeter ...
 func BufferInMeter(geometry Geometry, width float64, quadsegs int) Geometry {
+	// TODO get the buffer polygon is error
+
 	centroid := geometry.Centroid()
 	width = measure.MercatorDistance(width, centroid.Lat())
 	transformer := coordtransform.NewTransformer(coordtransform.LLTOMERCATOR)
