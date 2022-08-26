@@ -22,6 +22,18 @@ func DefaultCurveParameters() *CurveParameters {
 	}
 }
 
+// DefaultCurveParametersMercator Creates a default set of parameters.
+func DefaultCurveParametersMercator() *CurveParameters {
+	return &CurveParameters{
+		calc.QuadrantSegments,
+		10,
+		5,
+		50,
+		1000000,
+		false,
+	}
+}
+
 // IsEmpty returns test Curve Parameters.
 func (c *CurveParameters) IsEmpty() bool {
 	return c.MitreLimit == 0.0

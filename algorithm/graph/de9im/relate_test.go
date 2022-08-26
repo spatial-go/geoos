@@ -9,10 +9,9 @@ import (
 )
 
 func TestRelate(t *testing.T) {
-
 	for _, tt := range graphtests.TestRelateData {
 		if !geoos.GeoosTestTag &&
-			tt.Name != "polyPoly f1" {
+			tt.Name != "issue 89" {
 			continue
 		}
 

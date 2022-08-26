@@ -306,7 +306,7 @@ func (c *Curve) addOutsideTurn(orientation int, addStartPoint bool) {
 	// where the two segments are almost parallel
 	// (which is hard to compute a robust intersection for).
 	offsetFactor := calc.OffsetSegmentSeparationFactor
-	offsetFactor = offsetFactor * math.Pow10(int(math.Log10(c.offset0.P1[1]))) / 10.0
+	//offsetFactor = offsetFactor * math.Pow10(int(math.Log10(c.offset0.P1[1]))) / 10.0
 	if measure.PlanarDistance(c.offset0.P1, c.offset1.P0) < c.distance*offsetFactor {
 		c.Add(c.offset0.P1)
 		return
