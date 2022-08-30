@@ -1,4 +1,11 @@
 # Change Log
+
+## [1.1.3] - 2022-08-30
+### Fixed
+- Fixed some buffer analysis method bugs
+## [1.1.2] - 2022-07-28
+### Added
+- Added a method to check the geometry struct is correct.
 ## [1.1.1.1] - 2022-07-22
 ### Added
 - Added a method to repair the self intersection of a polygon.
