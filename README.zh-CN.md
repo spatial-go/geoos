@@ -4,11 +4,13 @@
 
 ## 内容列表
 
-- [目录结构](#目录结构)
-- [使用说明](#使用说明)
-- [维护者](#维护者)
-- [如何贡献](#如何贡献)
-- [使用许可](#使用许可)
+- [Geoos](#geoos)
+  - [内容列表](#内容列表)
+  - [目录结构](#目录结构)
+  - [使用说明](#使用说明)
+  - [维护者](#维护者)
+  - [如何贡献](#如何贡献)
+  - [使用许可](#使用许可)
 
 
 
@@ -22,30 +24,34 @@
 package main
 
 import (
-  "encoding/json"
-  "fmt"
-  "github.com/spatial-go/geoos"
-  "github.com/spatial-go/geoos/encoding/wkt"
-  "github.com/spatial-go/geoos/geojson"
-  "github.com/spatial-go/geoos/planar"
+	"bytes"
+	"fmt"
+
+	"github.com/spatial-go/geoos/geoencoding"
+	"github.com/spatial-go/geoos/planar"
 )
 
 func main() {
-  // First, choose the default algorithm.
-  strategy := planar.NormalStrategy()
-  // Secondly, manufacturing test data and convert it to geometry
-  const polygon = `POLYGON((-1 -1, 1 -1, 1 1, -1 1, -1 -1))`
-  geometry, _ := wkt.UnmarshalString(polygon)
-  // Last， call the Area () method and get result.
-  area, e := strategy.Area(geometry)
-  if e != nil {
-    fmt.Printf(e.Error())
-  }
-  fmt.Printf("%f", area)
-}
+	// First, choose the default algorithm.
+	strategy := planar.NormalStrategy()
+	// Secondly, manufacturing test data and convert it to geometry
+	const polygon = `POLYGON((-1 -1, 1 -1, 1 1, -1 1, -1 -1))`
+	// geometry, _ := wkt.UnmarshalString(polygon)
 
+	buf0 := new(bytes.Buffer)
+	buf0.Write([]byte(polygon))
+	geometry, _ := geoencoding.Read(buf0, geoencoding.WKT)
+
+	// Last， call the Area () method and get result.
+	area, e := strategy.Area(geometry)
+	if e != nil {
+		fmt.Printf(e.Error())
+	}
+	fmt.Printf("%f", area)
+	// get result 4.0
+}
 ```
-Example: geoencoding 
+Example: geoencoding
 [example_encoding.go](https://github.com/spatial-go/geoos/example/example_encoding.go)
 
 ## 维护者
