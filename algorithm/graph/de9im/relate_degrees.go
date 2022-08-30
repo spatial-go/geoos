@@ -166,7 +166,8 @@ func (r *RelationshipByDegrees) lineIM(l matrix.LineMatrix, RelateType int) {
 			r.lineAndLineAnalyse(DefaultInPolygon, DefaultInPolygon)
 		case matrix.PolygonMatrix:
 			pointInPolygon, entityInPolygon := IsInPolygon(l, m)
-			r.lineAndPolygonAnalyse(pointInPolygon, entityInPolygon)
+			lrd := &LineRelationshipByDegrees{r, pointInPolygon, entityInPolygon}
+			produce(lrd)
 		}
 
 	}
@@ -201,7 +202,21 @@ func (r *RelationshipByDegrees) polygonIM(p matrix.PolygonMatrix, RelateType int
 			r.IM.SetString(RelateStrings[RAA1])
 		}
 	default:
-		pointInPolygon, entityInPolygon := IsInPolygon(p, r.Arg[1].(matrix.PolygonMatrix))
-		r.polygonTwoAnalyse(pointInPolygon, entityInPolygon)
+		_, entityInPolygon := IsInPolygon(p, r.Arg[1].(matrix.PolygonMatrix))
+		prd := &PolygonRelationshipByDegrees{r, entityInPolygon}
+		produce(prd)
+		// pointInPolygon, entityInPolygon := IsInPolygon(p, r.Arg[1].(matrix.PolygonMatrix))
+		// r.polygonTwoAnalyse(pointInPolygon, entityInPolygon)
 	}
+}
+
+type producingIM interface {
+	setInteriorIM()
+	setExteriorIM()
+	setBoundaryIM()
+	produce()
+}
+
+func produce(l producingIM) {
+	l.produce()
 }

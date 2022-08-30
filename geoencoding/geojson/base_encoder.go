@@ -82,6 +82,9 @@ func (e *BaseEncoder) ReadGeoJSON(r io.Reader) (*FeatureCollection, error) {
 
 func GeometryToFeatureCollection(geom space.Geometry) *FeatureCollection {
 	fc := NewFeatureCollection()
+	if geom == nil {
+		return fc
+	}
 	switch geom.GeoJSONType() {
 	case space.TypeCollection:
 		features := []*Feature{}

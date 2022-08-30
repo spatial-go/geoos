@@ -438,6 +438,15 @@ func (e *Envelope) Equals(other *Envelope) bool {
 		e.MinY == other.MinY
 }
 
+// Proximity ...
+func (e *Envelope) Proximity(other *Envelope) bool {
+	if e.IsNil() {
+		return other.IsNil()
+	}
+	return matrix.Matrix{e.MaxX, e.MaxY}.Proximity(matrix.Matrix{other.MaxX, other.MaxY}) &&
+		matrix.Matrix{e.MinX, e.MinY}.Proximity(matrix.Matrix{other.MinX, other.MinY})
+}
+
 // ToString ...
 func (e *Envelope) ToString() string {
 	return fmt.Sprintf("Env[%v : %v, %v : %v]", e.MinX, e.MaxX, e.MinY, e.MaxY)

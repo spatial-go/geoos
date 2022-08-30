@@ -33,10 +33,7 @@ func (ip *IntersectionPoint) Compare(other *IntersectionPoint, tes int) bool {
 	if tes > 0 {
 		if ip.X() == other.X() {
 			if ip.Y() == other.Y() {
-				if other.IsCollinear {
-					ip.IsCollinear = true
-				}
-				return false
+				return ip.IsCollinear
 			}
 			return ip.Y() < other.Y()
 		}
@@ -44,10 +41,7 @@ func (ip *IntersectionPoint) Compare(other *IntersectionPoint, tes int) bool {
 	}
 	if ip.X() == other.X() {
 		if ip.Y() == other.Y() {
-			if other.IsCollinear {
-				ip.IsCollinear = true
-			}
-			return false
+			return ip.IsCollinear
 		}
 		return ip.Y() > other.Y()
 	}
@@ -74,7 +68,13 @@ func (ips IntersectionPointLine) Len() int {
 
 // Less ...
 func (ips IntersectionPointLine) Less(i, j int) bool {
+	if ips[i].Matrix.Proximity(ips[j].Matrix) {
+		return ips[i].IsCollinear
+	}
 	if ips[i].Matrix[0] == ips[j].Matrix[0] {
+		if ips[i].Matrix[1] == ips[j].Matrix[1] {
+			return ips[i].IsCollinear
+		}
 		return ips[i].Matrix[1] < ips[j].Matrix[1]
 	}
 	return ips[i].Matrix[0] < ips[j].Matrix[0]
