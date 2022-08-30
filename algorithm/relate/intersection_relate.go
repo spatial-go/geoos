@@ -2,6 +2,7 @@ package relate
 
 import (
 	"math"
+	"sort"
 
 	"github.com/spatial-go/geoos/algorithm/calc"
 	"github.com/spatial-go/geoos/algorithm/filter"
@@ -22,13 +23,12 @@ func IntersectionLineSegment(l, o *matrix.LineSegment) (bool, IntersectionPointL
 
 // Intersection returns intersection of a and b.
 func Intersection(aStart, aEnd, bStart, bEnd matrix.Matrix) (mark bool, ips IntersectionPointLine) {
-
 	u := matrix.Matrix{aEnd[0] - aStart[0], aEnd[1] - aStart[1]}
 	v := matrix.Matrix{bEnd[0] - bStart[0], bEnd[1] - bStart[1]}
 
-	determinant := CrossProduct(u, v)
+	determinant := CrossProduct(aStart, aEnd, bStart, bEnd)
 
-	if determinant == 0 {
+	if math.Abs(determinant) < calc.AccuracyFloat {
 		isEnter := true
 		if (u[0] > 0 && v[0] > 0) || (u[1] > 0 && v[1] > 0) {
 			isEnter = false
@@ -102,23 +102,28 @@ func Intersection(aStart, aEnd, bStart, bEnd matrix.Matrix) (mark bool, ips Inte
 }
 
 // CrossProduct Returns cross product of a,b Matrix.
-func CrossProduct(a, b matrix.Matrix) float64 {
-	return calc.Determinant(a[0], a[1], b[0], b[1]).Value()
+func CrossProduct(aStart, aEnd, bStart, bEnd matrix.Matrix) float64 {
+	aa0 := calc.ValueOf(aEnd[0]).SelfSubtractPair(calc.ValueOf(aStart[0]))
+	aa1 := calc.ValueOf(aEnd[1]).SelfSubtractPair(calc.ValueOf(aStart[1]))
+	bb0 := calc.ValueOf(bEnd[0]).SelfSubtractPair(calc.ValueOf(bStart[0]))
+	bb1 := calc.ValueOf(bEnd[1]).SelfSubtractPair(calc.ValueOf(bStart[1]))
+	return calc.DeterminantPair(aa0, aa1, bb0, bb1).Value()
 }
 
 // InLine returns true if spot in ab,false else.
 func InLine(spot, a, b matrix.Matrix) (in bool, isVertex bool) {
 	// x := spot[0] <= math.Max(a[0], b[0]) && spot[0] >= math.Min(a[0], b[0])
 	// y := spot[1] <= math.Max(a[1], b[1]) && spot[1] >= math.Min(a[1], b[1])
+	accuracy := calc.DefaultTolerance10
 
-	if spot.EqualsExact(a, 2*calc.AccuracyFloat) || spot.EqualsExact(b, 2*calc.AccuracyFloat) {
+	if spot.EqualsExact(a, accuracy) || spot.EqualsExact(b, accuracy) {
 		return true, true
 	}
 	ax := (spot[0] - a[0]) * (a[1] - b[1])
 	bx := (a[0] - b[0]) * (spot[1] - a[1])
-	if math.Abs(ax-bx) < 2*calc.AccuracyFloat &&
-		(spot[0]+2*calc.AccuracyFloat >= math.Min(a[0], b[0]) && spot[0]-2*calc.AccuracyFloat <= math.Max(a[0], b[0])) &&
-		(spot[1]+2*calc.AccuracyFloat >= math.Min(a[1], b[1]) && spot[1]-2*calc.AccuracyFloat <= math.Max(a[1], b[1])) {
+	if math.Abs(ax-bx) < accuracy &&
+		(spot[0]+accuracy >= math.Min(a[0], b[0]) && spot[0]-accuracy <= math.Max(a[0], b[0])) &&
+		(spot[1]+accuracy >= math.Min(a[1], b[1]) && spot[1]-accuracy <= math.Max(a[1], b[1])) {
 		return true, false
 	}
 	return false, false
@@ -127,7 +132,7 @@ func InLine(spot, a, b matrix.Matrix) (in bool, isVertex bool) {
 // InLineVertex returns true if spot in LineVertex,false else..
 func InLineVertex(spot matrix.Matrix, matr matrix.LineMatrix) (bool, bool) {
 	for i, v := range matr {
-		if spot.EqualsExact(matrix.Matrix(v), 2*calc.AccuracyFloat) {
+		if spot.EqualsExact(matrix.Matrix(v), calc.DefaultTolerance) {
 			if i == 0 || i == len(matr)-1 {
 				return true, true
 			}
@@ -171,6 +176,7 @@ func IntersectionEdge(aLine, bLine matrix.LineMatrix) (mark bool, ps Intersectio
 			}
 		}
 	}
+	sort.Sort(ps)
 	filt := &UniqueIntersectionEdgeFilter{}
 	for _, v := range ps {
 		filt.Filter(v)
@@ -192,7 +198,7 @@ func (u *UniqueIntersectionEdgeFilter) Filter(ip interface{}) bool {
 func (u *UniqueIntersectionEdgeFilter) add(ip interface{}) bool {
 	hasMatrix := false
 	for _, v := range u.Ips {
-		if v.Matrix.Equals(ip.(IntersectionPoint).Matrix) {
+		if v.Matrix.Proximity(ip.(IntersectionPoint).Matrix) {
 			hasMatrix = true
 			break
 		}

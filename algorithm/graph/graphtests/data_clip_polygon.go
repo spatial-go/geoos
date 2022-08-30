@@ -272,8 +272,8 @@ var TestsPolygonSymDifference = []TestCase{
 		matrix.PolygonMatrix{{{5, 5}, {15, 5}, {15, 15}, {5, 15}, {5, 5}}},
 	},
 		matrix.Collection{
-			matrix.PolygonMatrix{{{5, 10}, {10, 10}, {10, 5}, {15, 5}, {15, 15}, {5, 15}, {5, 10}}},
 			matrix.PolygonMatrix{{{0, 0}, {0, 10}, {5, 10}, {5, 5}, {10, 5}, {10, 0}, {0, 0}}},
+			matrix.PolygonMatrix{{{5, 10}, {5, 15}, {15, 15}, {15, 5}, {10, 5}, {10, 10}, {5, 10}}},
 		}, false},
 	{"poly poly0", []matrix.Steric{
 		matrix.PolygonMatrix{{{100, 100}, {100, 101}, {101, 101}, {101, 100}, {100, 100}}},

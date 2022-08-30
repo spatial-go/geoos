@@ -2,6 +2,8 @@
 package buffer
 
 import (
+	"log"
+
 	"github.com/spatial-go/geoos/algorithm/calc"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
@@ -186,6 +188,7 @@ func (eb *ComputerBuffer) addRingSide(ring matrix.LineMatrix, offsetDistance flo
 			side = calc.SideLeft
 		}
 	}
+	log.Println("start ring curve")
 	eb.RingCurve(matrix.LineMatrix(ring), offsetDistance, side, leftLoc, rightLoc)
 
 }

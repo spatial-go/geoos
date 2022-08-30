@@ -220,7 +220,7 @@ func (m Matrix) EqualsExact(ms Steric, tolerance float64) bool {
 			return true
 		}
 
-		if m[0]-mm[0] > tolerance || m[1]-mm[1] > tolerance {
+		if math.Abs(m[0]-mm[0]) > tolerance || math.Abs(m[1]-mm[1]) > tolerance {
 			return false
 		}
 		return math.Hypot((m[0]-mm[0]), (m[1]-mm[1])) <= tolerance

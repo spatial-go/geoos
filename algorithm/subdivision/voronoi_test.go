@@ -36,8 +36,8 @@ func TestVoronoi_GetResult(t *testing.T) {
 			}
 			got := v.GetResult()
 			gotEnv := envelope.PolygonMatrixList(got)
-			if !tt.fields.env.Equals(gotEnv) {
-				t.Errorf("Get Voronoi Result Error")
+			if !tt.fields.env.Proximity(gotEnv) {
+				t.Errorf("Get Voronoi Result Error got=%v ,want=%v", gotEnv, tt.fields.env)
 			}
 			gotCollection := space.Collection{}
 			for _, pm := range got {

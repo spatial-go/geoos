@@ -260,13 +260,15 @@ func lineAndLineHandle(m1, m2 matrix.LineMatrix, g1, g2 Graph) error {
 func lineAndPolygonHandle(m1 matrix.LineMatrix, m2 matrix.PolygonMatrix, g1, g2 Graph) error {
 
 	corrNodes := IntersectLinePolygon(m1, m2)
+	isHandle := map[Graph]bool{}
 	for i, corrs := range corrNodes {
 		gNum := g1
 		if i > 0 {
 			gNum = g2
 		}
-		if len(corrs) > 0 {
+		if len(corrs) > 0 && !isHandle[gNum] {
 			gNum.Nodes()[0].Stat = false
+			isHandle[gNum] = true
 		}
 		startNode, endNode := &Node{}, &Node{}
 		startNodeLine, endNodeLine := &Node{}, &Node{}
