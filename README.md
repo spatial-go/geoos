@@ -7,8 +7,6 @@ All comments and suggestions are welcome!
 http://www.spatial-go.com
 
 ## Contents
-
-- [Geoos](#geoos)
   - [Guides](#guides)
   - [Contents](#contents)
   - [Structure](#structure)
