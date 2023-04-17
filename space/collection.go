@@ -290,6 +290,16 @@ func (c Collection) IsValid() bool {
 	return true
 }
 
+// IsCorrect returns true if the geometry struct is Correct.
+func (c Collection) IsCorrect() bool {
+	for _, v := range c {
+		if !v.IsCorrect() {
+			return false
+		}
+	}
+	return true
+}
+
 // CoordinateSystem return Coordinate System.
 func (c Collection) CoordinateSystem() int {
 	return defaultCoordinateSystem()

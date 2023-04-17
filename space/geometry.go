@@ -103,6 +103,9 @@ type Geometry interface {
 	// IsValid returns true if the  geometry is valid.
 	IsValid() bool
 
+	// IsCorrect returns true if the geometry struct is Correct.
+	IsCorrect() bool
+
 	// Length Returns the length of this geometry
 	Length() float64
 

@@ -1,10 +1,20 @@
 # Change Log
-## [1.1.1] - 2022-05-26
-### 新增
+
+## [1.1.3] - 2022-08-30
+### Fixed
+- Fixed some buffer analysis method bugs
+## [1.1.2] - 2022-07-28
+### Added
+- Added a method to check the geometry struct is correct.
+## [1.1.1.1] - 2022-07-22
+### Added
+- Added a method to repair the self intersection of a polygon.
+## [1.1.1] - 2022-07-20
+### Added
 - Optimize the performance of topological relation algorithm and geometric operation algorithm of geometry
 - It standardizes the encoding and decoding methods of geoencoding and improves the compatibility with geojson format
 ## [1.1.0] - 2022-05-26
-### 新增
+### Added
 - Optimize the topological relation algorithm and geometric operation algorithm of geometry
  and improve the performance of calculation
 - The encoding and decoding methods of geoencoding are standardized, and the encoder interface is realized
@@ -20,7 +30,7 @@
 - A correlation method to verify the validity of spatial geometry
 - WKB transforms Str correlation methods
 - Add circle geometry
-### Fix
+### Fixed
 - Fix buffer analysis bug
 - Fix overlay analysis bug
 
@@ -49,7 +59,7 @@
 - Add GeoCSV file read method
 
 ## [0.1.2.1] - 2021-02-10
-### Fix
+### Fixed
 - Fix memory leaks and null pointers
 
 

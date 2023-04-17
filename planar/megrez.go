@@ -18,6 +18,9 @@ func (g *megrezAlgorithm) Equals(geom1, geom2 space.Geometry) (bool, error) {
 // EqualsExact returns true if both geometries are Equal, as evaluated by their
 // points being within the given tolerance.
 func (g *megrezAlgorithm) EqualsExact(geom1, geom2 space.Geometry, tolerance float64) (bool, error) {
+	if geom1 == nil {
+		return geom2 == nil, nil
+	}
 	return geom1.EqualsExact(geom2, tolerance), nil
 }
 

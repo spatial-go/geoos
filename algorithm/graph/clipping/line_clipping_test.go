@@ -11,7 +11,7 @@ import (
 func TestLineClipping_Union(t *testing.T) {
 	for _, tt := range graphtests.TestsLineUnion {
 		if !geoos.GeoosTestTag &&
-			tt.Name != "line poly2" {
+			tt.Name != "line poly5" {
 			continue
 		}
 		t.Run(tt.Name, func(t *testing.T) {
@@ -33,7 +33,8 @@ func TestLineClipping_Union(t *testing.T) {
 func TestLineClipping_Intersection(t *testing.T) {
 
 	for _, tt := range graphtests.TestsLineIntersecation {
-		if !geoos.GeoosTestTag && tt.Name != "line poly5" {
+		if !geoos.GeoosTestTag &&
+			tt.Name != "line poly5" {
 			continue
 		}
 		t.Run(tt.Name, func(t *testing.T) {
@@ -46,7 +47,7 @@ func TestLineClipping_Intersection(t *testing.T) {
 				return
 			}
 			if !reflect.DeepEqual(got, tt.Want) {
-				t.Errorf("LineOverlay.Intersection() %v = %v, want %v", tt.Name, got, tt.Want)
+				t.Errorf("LineOverlay.Intersection() %v = \n%v, want \n%v", tt.Name, got, tt.Want)
 			}
 		})
 	}

@@ -254,6 +254,19 @@ func (ls LineString) IsValid() bool {
 	return true
 }
 
+// IsCorrect returns true if the geometry struct is Correct.
+func (ls LineString) IsCorrect() bool {
+	if ls.IsEmpty() {
+		return false
+	}
+	for _, v := range ls {
+		if !Point(v).IsCorrect() {
+			return false
+		}
+	}
+	return true
+}
+
 // CoordinateSystem return Coordinate System.
 func (ls LineString) CoordinateSystem() int {
 	return defaultCoordinateSystem()

@@ -244,6 +244,16 @@ func (mp MultiPolygon) IsValid() bool {
 	return true
 }
 
+// IsCorrect returns true if the geometry struct is Correct.
+func (mp MultiPolygon) IsCorrect() bool {
+	for _, v := range mp {
+		if !v.IsCorrect() {
+			return false
+		}
+	}
+	return true
+}
+
 // CoordinateSystem return Coordinate System.
 func (mp MultiPolygon) CoordinateSystem() int {
 	return defaultCoordinateSystem()

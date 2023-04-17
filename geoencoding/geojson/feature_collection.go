@@ -78,10 +78,18 @@ func UnmarshalFeatureCollection(data []byte) (*FeatureCollection, error) {
 				if !space.Ring(ring).IsClosed() {
 					poly[i] = append(ring, ring[0])
 				}
-
+			}
+		} else if mult, ok := v.Geometry.Geometry().(space.MultiPolygon); ok {
+			for _, poly := range mult {
+				for i, ring := range poly {
+					if !space.Ring(ring).IsClosed() {
+						poly[i] = append(ring, ring[0])
+					}
+				}
 			}
 		}
-		if !v.Geometry.Geometry().IsValid() {
+
+		if !v.Geometry.Geometry().IsCorrect() {
 			return nil, ErrInvalidGeometry
 		}
 	}

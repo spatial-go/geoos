@@ -2,6 +2,7 @@
 package subdivision
 
 import (
+	"github.com/spatial-go/geoos/algorithm/calc"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/matrix/envelope"
 	"github.com/spatial-go/geoos/algorithm/overlay"
@@ -9,7 +10,7 @@ import (
 )
 
 // DefaultTolerance ...
-const DefaultTolerance = 0.000000001
+const DefaultTolerance = calc.DefaultTolerance
 
 // Voronoi ...
 type Voronoi struct {

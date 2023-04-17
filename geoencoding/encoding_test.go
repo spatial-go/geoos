@@ -223,7 +223,7 @@ func TestReadGeoJSON(t *testing.T) {
 						"type": "MultiPolygon",
 						"coordinates": [
 							[
-								
+
 								[
 									113.25094290192146,
 									22.420572852340314
@@ -248,7 +248,7 @@ func TestReadGeoJSON(t *testing.T) {
 									113.25094290192146,
 									22.420572852340314
 								]
-								
+
 							]
 						]
 					}
@@ -259,6 +259,91 @@ func TestReadGeoJSON(t *testing.T) {
 			wantErr: true,
 		},
 		{name: "geojson string", args: args{
+			[]byte(`{
+				"type": "FeatureCollection",
+				"features": [
+				  {
+					"type": "Feature",
+					"geometry": {
+					  "type": "MultiPolygon",
+					  "coordinates": [
+						[
+						  [
+							[
+							  -47.900390625,
+							  -14.944784875088372
+							],
+							[
+							  -51.591796875,
+							  -19.91138351415555
+							],
+							[
+							  -41.11083984375,
+							  -21.309846141087192
+							],
+							[
+							  -43.39599609375,
+							  -15.390135715305204
+							]
+						  ]
+						]
+					  ]
+					},
+					"properties": {
+					  "prop0": "value0"
+					}
+				  }
+				]
+			  }`), GeoJSON},
+			want:    nil,
+			wantErr: false,
+		},
+		{name: "geojson string", args: args{
+			[]byte(`{
+				"type": "FeatureCollection",
+				"features": [
+					{
+						"_id": "pwBn4x",
+						"type": "Feature",
+						"geometry": {
+							"type": "MultiPolygon",
+							"coordinates": [
+								[
+									[
+										[
+											-48.368811019,
+											-23.906519878
+										],
+										[
+											-51.58525,
+											-19.90553
+										],
+										[
+											-41.1044,
+											-21.30375
+										],
+										[
+											-43.38951,
+											-15.38404
+										],
+										[
+											-48.368811019,
+											-23.906519878
+										]
+									]
+								]
+							]
+						},
+						"properties": {
+							"prop0": "value0"
+						}
+					}
+				]
+			}`), GeoJSON},
+			want:    nil,
+			wantErr: false,
+		},
+		{name: "geojson string", args: args{
 			[]byte(`{"type": "FeatureCollection",
 			"features": [
 				{
@@ -267,7 +352,7 @@ func TestReadGeoJSON(t *testing.T) {
 						"type": "Polygon",
 						"coordinates": [
 							[
-								
+
 								[
 									113.25094290192146,
 									22.420572852340314
@@ -288,7 +373,7 @@ func TestReadGeoJSON(t *testing.T) {
 									113.20524690238221,
 									22.46715598456933
 								]
-								
+
 							]
 						]
 					}
