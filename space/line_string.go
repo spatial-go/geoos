@@ -197,20 +197,13 @@ func (ls LineString) SimplifyP(tolerance float64) Geometry {
 // Buffer Returns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
 func (ls LineString) Buffer(width float64, quadsegs int) Geometry {
-	buff := buffer.Buffer(ls.ToMatrix(), width, quadsegs)
-	switch b := buff.(type) {
-	case matrix.LineMatrix:
-		return LineString(b)
-	case matrix.PolygonMatrix:
-		return Polygon(b)
-	}
-	return nil
+	return bufferInOriginal(ls, width, quadsegs)
 }
 
 // BufferInMeter Returns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
 func (ls LineString) BufferInMeter(width float64, quadsegs int) Geometry {
-	return BufferInMeter(ls, width, quadsegs)
+	return bufferInMeter(ls, width, quadsegs)
 }
 
 // Envelope returns the  minimum bounding box for the supplied geometry, as a geometry.

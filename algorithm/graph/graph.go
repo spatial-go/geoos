@@ -1,4 +1,4 @@
-// package graph the graph to describe the hierarchical relationship between geometric objects.
+// Package graph the graph to describe the hierarchical relationship between geometric objects.
 package graph
 
 import (

@@ -4,6 +4,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/spatial-go/geoos"
+	"github.com/spatial-go/geoos/debugtools"
 	"github.com/spatial-go/geoos/geoencoding/wkt"
 	"github.com/spatial-go/geoos/space"
 )
@@ -61,6 +63,9 @@ func TestAlgorithm_Buffer(t *testing.T) {
 	geometry, _ := wkt.UnmarshalString("POINT(100 90)")
 	expectGeometry, _ := wkt.UnmarshalString("POLYGON((150 90,146.193976625564 70.8658283817455,135.355339059327 54.6446609406727,119.134171618255 43.8060233744357,100 40,80.8658283817456 43.8060233744356,64.6446609406727 54.6446609406725,53.8060233744357 70.8658283817454,50 89.9999999999998,53.8060233744356 109.134171618254,64.6446609406725 125.355339059327,80.8658283817453 136.193976625564,99.9999999999998 140,119.134171618254 136.193976625564,135.355339059327 125.355339059328,146.193976625564 109.134171618255,150 90))")
 
+	line, _ := wkt.UnmarshalString("LINESTRING(2.073333263397217 48.81027603149414, 1.5225944519042969 48.45795440673828,1.361388921737671 48.705833435058594,2.073333263397217 48.81027603149414,2.0408332347869873 49.0966682434082)")
+	expectline, _ := wkt.UnmarshalString("POLYGON((264.6446609406726 335.3553390593274,280.8658283817456 346.19397662556435,300.00000000000006 350,319.1341716182545 346.19397662556435,335.3553390593274 335.3553390593274,346.19397662556435 319.1341716182545,350 300.00000000000006,346.19397662556435 280.8658283817456,335.3553390593274 264.6446609406726,135.35533905932738 64.64466094067262,119.13417161825444 53.80602337443564,99.99999999999997 50,80.8658283817455 53.80602337443566,64.64466094067262 64.64466094067262,53.806023374435675 80.86582838174549,50 99.99999999999994,53.80602337443563 119.13417161825441,64.64466094067262 135.35533905932738,264.6446609406726 335.3553390593274))")
+
 	type args struct {
 		g        space.Geometry
 		width    float64
@@ -72,6 +77,7 @@ func TestAlgorithm_Buffer(t *testing.T) {
 		want space.Geometry
 	}{
 		{name: "buffer", args: args{g: geometry, width: 50, quadsegs: 4}, want: expectGeometry},
+		{name: "line buffer", args: args{g: line, width: 0.01, quadsegs: 10}, want: expectline},
 		{name: "point buffer", args: args{
 			g:        space.Point{100, 90},
 			width:    50,
@@ -105,14 +111,21 @@ func TestAlgorithm_Buffer(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		if !geoos.GeoosTestTag && tt.name != "line buffer" {
+			continue
+		}
 		t.Run(tt.name, func(t *testing.T) {
 			G := NormalStrategy()
 			gotGeometry := G.Buffer(tt.args.g, tt.args.width, tt.args.quadsegs)
 			isEqual, _ := G.EqualsExact(gotGeometry, tt.want, 0.000001)
 			if !isEqual {
 				t.Errorf("GEOAlgorithm.Buffer() = %v\n, want %v", wkt.MarshalString(gotGeometry), wkt.MarshalString(tt.want))
+
+				// gotGeometry, _ = G.SimplifyP(gotGeometry, 0.9)
+
+				debugtools.WriteGeom("buffer_test.geojson", gotGeometry)
 			}
-			t.Log(wkt.MarshalString(gotGeometry))
+			// t.Log(wkt.MarshalString(gotGeometry))
 		})
 	}
 }

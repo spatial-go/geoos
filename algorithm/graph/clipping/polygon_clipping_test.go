@@ -8,7 +8,6 @@ import (
 	"github.com/spatial-go/geoos/algorithm/graph/graphtests"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
-	"github.com/spatial-go/geoos/space"
 )
 
 func TestPolygonClipping_Intersection(t *testing.T) {
@@ -141,9 +140,10 @@ func TestLargePolygonClipping_Union(t *testing.T) {
 		got, err = Union(m[0], m[13])
 		if (err != nil) != false {
 			t.Errorf("PolygonClipping.Union() error = %v, wantErr %v", err, false)
+			t.Log(got)
 		}
 	})
-	writeGeom(dir+"data_union.geojson", space.TransGeometry(got))
+	// debugtools.WriteGeom("data_union.geojson", space.TransGeometry(got))
 }
 
 func TestLargePolygonClipping_UnaryUnion(t *testing.T) {
@@ -163,10 +163,11 @@ func TestLargePolygonClipping_UnaryUnion(t *testing.T) {
 		got, err = UnaryUnion(m)
 		if (err != nil) != false {
 			t.Errorf("PolygonClipping.UnaryUnion() error = %v, wantErr %v", err, false)
+			t.Log(got)
 			return
 		}
 	})
-	writeGeom(dir+"data_unaryunion.geojson", space.TransGeometry(got))
+	// debugtools.WriteGeom("data_unaryunion.geojson", space.TransGeometry(got))
 }
 
 func BenchmarkUnaryUnion(b *testing.B) {
@@ -185,8 +186,9 @@ func BenchmarkUnaryUnion(b *testing.B) {
 		got, err = UnaryUnion(m)
 		if (err != nil) != false {
 			b.Errorf("PolygonClipping.UnaryUnion() error = %v, wantErr %v", err, false)
+			b.Log(got)
 			return
 		}
 	})
-	writeGeom(dir+"data_unaryunion.geojson", space.TransGeometry(got))
+	// debugtools.WriteGeom("data_unaryunion.geojson", space.TransGeometry(got))
 }

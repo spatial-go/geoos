@@ -162,8 +162,8 @@ func TransGeometry(inputGeom matrix.Steric) Geometry {
 	}
 }
 
-// BufferInMeter ...
-func BufferInMeter(geometry Geometry, width float64, quadsegs int) Geometry {
+// bufferInMeter ...
+func bufferInMeter(geometry Geometry, width float64, quadsegs int) Geometry {
 	centroid := geometry.Centroid()
 	width = measure.MercatorDistance(width, centroid.Lat())
 	transformer := coordtransform.NewTransformer(coordtransform.LLTOMERCATOR)
@@ -176,4 +176,24 @@ func BufferInMeter(geometry Geometry, width float64, quadsegs int) Geometry {
 		geometry = TransGeometry(geomMatrix)
 	}
 	return geometry
+}
+
+// bufferInOriginal ...
+func bufferInOriginal(geometry Geometry, width float64, quadsegs int) Geometry {
+	buff := buffer.Buffer(geometry.ToMatrix(), width, quadsegs)
+
+	// result := simplify.Simplify(buff, 0.0052)
+	// result, err := clipping.Intersection(buff, result)
+	// if err != nil {
+	// 	result = buff
+	// }
+
+	result := buff
+	switch b := result.(type) {
+	case matrix.LineMatrix:
+		return LineString(b)
+	case matrix.PolygonMatrix:
+		return Polygon(b)
+	}
+	return nil
 }

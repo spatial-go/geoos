@@ -184,20 +184,13 @@ func (mp MultiPolygon) SimplifyP(tolerance float64) Geometry {
 // Buffer Returns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
 func (mp MultiPolygon) Buffer(width float64, quadsegs int) Geometry {
-	buff := buffer.Buffer(mp.ToMatrix(), width, quadsegs)
-	switch b := buff.(type) {
-	case matrix.LineMatrix:
-		return LineString(b)
-	case matrix.PolygonMatrix:
-		return Polygon(b)
-	}
-	return nil
+	return bufferInOriginal(mp, width, quadsegs)
 }
 
 // BufferInMeter Returns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
 func (mp MultiPolygon) BufferInMeter(width float64, quadsegs int) Geometry {
-	return BufferInMeter(mp, width, quadsegs)
+	return bufferInMeter(mp, width, quadsegs)
 }
 
 // Envelope returns the  minimum bounding box for the supplied geometry, as a geometry.

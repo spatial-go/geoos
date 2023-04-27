@@ -78,7 +78,7 @@ func readPoint(r io.Reader, order byteOrder, buf []byte) (space.Point, error) {
 	return p, nil
 }
 
-func (e *Encoder) writePoint(p space.Point) error {
+func (e *Writer) writePoint(p space.Point) error {
 	e.order.PutUint32(e.buf, pointType)
 	_, err := e.w.Write(e.buf[:4])
 	if err != nil {
@@ -152,7 +152,7 @@ func readMultiPoint(r io.Reader, order byteOrder, buf []byte) (space.MultiPoint,
 	return result, nil
 }
 
-func (e *Encoder) writeMultiPoint(mp space.MultiPoint) error {
+func (e *Writer) writeMultiPoint(mp space.MultiPoint) error {
 	e.order.PutUint32(e.buf, multiPointType)
 	e.order.PutUint32(e.buf[4:], uint32(len(mp)))
 	_, err := e.w.Write(e.buf[:8])

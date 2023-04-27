@@ -1,4 +1,4 @@
-// package de9im the  criteria  for  judging  the  various
+// Package de9im the  criteria  for  judging  the  various
 // topological relations between points, line and surface entities in DE-9IM model are given.
 // the method of graph operation and geometric calculation to deduce
 // the specific topological relations among entities by analyzing the structure of points and line
@@ -86,7 +86,7 @@ func IMByClip(clip *graph.Clip) *matrix.IntersectionMatrix {
 	return im
 }
 
-// IM Gets the relate  for the spatial relationship
+// IMStructure Gets the relate  for the spatial relationship
 // between the input geometries.
 func IMStructure(m0, m1 matrix.Steric) *matrix.IntersectionMatrix {
 	return IMByRelationship(m0, m1, withStructure)

@@ -27,7 +27,7 @@ func TestDissovlePolygon(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotResult, err := DissovlePolygon(tt.args.poly, tt.args.diss)
+			gotResult, err := PolygonDissovle(tt.args.poly, tt.args.diss)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("DissovlePolygon() error = %v, wantErr %v", err, tt.wantErr)
 				return

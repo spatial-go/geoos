@@ -208,20 +208,13 @@ func (mls MultiLineString) SimplifyP(tolerance float64) Geometry {
 // Buffer Returns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
 func (mls MultiLineString) Buffer(width float64, quadsegs int) Geometry {
-	buff := buffer.Buffer(mls.ToMatrix(), width, quadsegs)
-	switch b := buff.(type) {
-	case matrix.LineMatrix:
-		return LineString(b)
-	case matrix.PolygonMatrix:
-		return Polygon(b)
-	}
-	return nil
+	return bufferInOriginal(mls, width, quadsegs)
 }
 
 // BufferInMeter Returns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
 func (mls MultiLineString) BufferInMeter(width float64, quadsegs int) Geometry {
-	return BufferInMeter(mls, width, quadsegs)
+	return bufferInMeter(mls, width, quadsegs)
 }
 
 // Envelope returns the  minimum bounding box for the supplied geometry, as a geometry.

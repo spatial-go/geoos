@@ -64,7 +64,7 @@ func TestBufferInMeter(t *testing.T) {
 		args args
 		want Geometry
 	}{
-		{"case1", args{Point{1, 1}, 1, 1},
+		{"case1", args{Point{2.073333263397217, 48.81027603149414}, 1000, 4},
 			Polygon{{{1.000008984521167, 0.9999999999999887},
 				{0.9999999999999999, 0.9999910168471858},
 				{0.9999910154788327, 0.9999999999999887},
@@ -74,7 +74,7 @@ func TestBufferInMeter(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := BufferInMeter(tt.args.geometry, tt.args.width, tt.args.quadsegs); !reflect.DeepEqual(got, tt.want) {
+			if got := bufferInMeter(tt.args.geometry, tt.args.width, tt.args.quadsegs); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("BufferInMeter() = %v, want %v", got, tt.want)
 			}
 		})

@@ -30,7 +30,7 @@ func readCollection(r io.Reader, order byteOrder, buf []byte) (space.Collection,
 	return result, nil
 }
 
-func (e *Encoder) writeCollection(c space.Collection) error {
+func (e *Writer) writeCollection(c space.Collection) error {
 	e.order.PutUint32(e.buf, geometryCollectionType)
 	e.order.PutUint32(e.buf[4:], uint32(len(c)))
 	_, err := e.w.Write(e.buf[:8])

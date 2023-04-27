@@ -1,17 +1,11 @@
 package clipping
 
 import (
-	"log"
-	"os"
-
 	"github.com/spatial-go/geoos"
 	"github.com/spatial-go/geoos/algorithm"
 	"github.com/spatial-go/geoos/algorithm/calc"
 	"github.com/spatial-go/geoos/algorithm/graph"
 	"github.com/spatial-go/geoos/algorithm/matrix"
-	"github.com/spatial-go/geoos/geoencoding"
-	"github.com/spatial-go/geoos/geoencoding/geojson"
-	"github.com/spatial-go/geoos/space"
 )
 
 // link returns edge by link nodes
@@ -120,14 +114,14 @@ func link(gu, gi graph.Graph) (results []matrix.LineMatrix, err error) {
 				continue
 			}
 			if !geoos.GeoosTestTag {
-				geom := space.Collection{}
-				for _, v := range guNodes {
-					geom = append(geom, space.TransGeometry(v.Value))
-				}
-				for _, v := range giNodes {
-					geom = append(geom, space.TransGeometry(v.Value))
-				}
-				writeGeom(dir+"data_link.geojson", geom)
+				// geom := space.Collection{}
+				// for _, v := range guNodes {
+				// 	geom = append(geom, space.TransGeometry(v.Value))
+				// }
+				// for _, v := range giNodes {
+				// 	geom = append(geom, space.TransGeometry(v.Value))
+				// }
+				// debugtools.WriteGeom("data_link.geojson", geom)
 			}
 			return nil, algorithm.ErrWrongLink
 		}
@@ -206,17 +200,4 @@ func linkmerge(gu graph.Graph) (results []matrix.LineMatrix, err error) {
 
 	}
 	return results, nil
-}
-
-func writeGeom(filename string, geom space.Geometry) {
-
-	if file, err := os.Create(filename); err != nil {
-		log.Println(err)
-	} else {
-		defer file.Close()
-
-		if err := geoencoding.WriteGeoJSON(file, geojson.GeometryToFeatureCollection(geom), geoencoding.GeoJSON); err != nil {
-			log.Println(err)
-		}
-	}
 }

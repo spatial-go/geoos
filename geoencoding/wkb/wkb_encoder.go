@@ -7,38 +7,39 @@ import (
 	"github.com/spatial-go/geoos/space"
 )
 
-type WKBEncoder struct {
+// Encoder defines wkb encoder.
+type Encoder struct {
 	geojson.BaseEncoder
 }
 
 // Encode Returns string of that encode geometry  by codeType.
-func (e *WKBEncoder) Encode(g space.Geometry) []byte {
+func (e *Encoder) Encode(g space.Geometry) []byte {
 	s, _ := GeomToWKBHexStr(g)
 	return []byte(s)
 }
 
 // Decode Returns geometry of that decode string by codeType.
-func (e *WKBEncoder) Decode(s []byte) (space.Geometry, error) {
+func (e *Encoder) Decode(s []byte) (space.Geometry, error) {
 	return GeomFromWKBHexStr(string(s))
 }
 
 // Read Returns geometry from reader.
-func (e *WKBEncoder) Read(r io.Reader) (space.Geometry, error) {
-	if b, err := e.ReadBytes(r); err != nil {
+func (e *Encoder) Read(r io.Reader) (space.Geometry, error) {
+	b, err := e.ReadBytes(r)
+	if err != nil {
 		return nil, err
-	} else {
-		return e.Decode(b)
 	}
+	return e.Decode(b)
 }
 
 // Write write geometry to reader.
-func (e *WKBEncoder) Write(w io.Writer, g space.Geometry) error {
+func (e *Encoder) Write(w io.Writer, g space.Geometry) error {
 	b := e.Encode(g)
 	return e.WriteBytes(w, b)
 }
 
 // WriteGeoJSON write geometry to writer.
-func (e *WKBEncoder) WriteGeoJSON(w io.Writer, g *geojson.FeatureCollection) error {
+func (e *Encoder) WriteGeoJSON(w io.Writer, g *geojson.FeatureCollection) error {
 	colls := space.Collection{}
 	for _, v := range g.Features {
 		colls = append(colls, v.Geometry.Geometry())
@@ -47,10 +48,10 @@ func (e *WKBEncoder) WriteGeoJSON(w io.Writer, g *geojson.FeatureCollection) err
 }
 
 // ReadGeoJSON Returns geometry from reader .
-func (e *WKBEncoder) ReadGeoJSON(r io.Reader) (*geojson.FeatureCollection, error) {
-	if geom, err := e.Read(r); err != nil {
+func (e *Encoder) ReadGeoJSON(r io.Reader) (*geojson.FeatureCollection, error) {
+	geom, err := e.Read(r)
+	if err != nil {
 		return nil, err
-	} else {
-		return geojson.GeometryToFeatureCollection(geom), nil
 	}
+	return geojson.GeometryToFeatureCollection(geom), nil
 }

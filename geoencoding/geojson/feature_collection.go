@@ -53,11 +53,11 @@ func (fc FeatureCollection) MarshalJSON() ([]byte, error) {
 
 // String returns string.
 func (fc *FeatureCollection) String() string {
-	if buf, err := fc.MarshalJSON(); err == nil {
+	buf, err := fc.MarshalJSON()
+	if err == nil {
 		return string(buf)
-	} else {
-		return err.Error()
 	}
+	return err.Error()
 }
 
 // UnmarshalFeatureCollection decodes the data into a GeoJSON feature collection.

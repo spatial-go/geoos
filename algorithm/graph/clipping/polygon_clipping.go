@@ -7,10 +7,7 @@ import (
 	"github.com/spatial-go/geoos/algorithm/graph/de9im"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
-	"github.com/spatial-go/geoos/space"
 )
-
-const dir = "../graphtests/"
 
 // PolygonClipping  Computes the overlay of two geometries.
 type PolygonClipping struct {
@@ -243,11 +240,11 @@ func (p *PolygonClipping) shellUnion(ps, pc matrix.PolygonMatrix) ([]matrix.Line
 	guNodes := gu.Nodes()
 
 	if !geoos.GeoosTestTag {
-		geom := space.Collection{}
-		for _, v := range gu.Nodes() {
-			geom = append(geom, space.TransGeometry(v.Value))
-		}
-		writeGeom(dir+"data_union_graph.geojson", geom)
+		// geom := space.Collection{}
+		// for _, v := range gu.Nodes() {
+		// 	geom = append(geom, space.TransGeometry(v.Value))
+		// }
+		// debugtools.WriteGeom("data_union_graph.geojson", geom)
 	}
 	for _, v := range guNodes {
 		if v.NodeType == graph.PNode {
@@ -276,11 +273,11 @@ func (p *PolygonClipping) shellUnion(ps, pc matrix.PolygonMatrix) ([]matrix.Line
 		}
 	}
 	if !geoos.GeoosTestTag {
-		geom := space.Collection{}
-		for _, v := range gu.Nodes() {
-			geom = append(geom, space.TransGeometry(v.Value))
-		}
-		writeGeom(dir+"data_link.geojson", geom)
+		// geom := space.Collection{}
+		// for _, v := range gu.Nodes() {
+		// 	geom = append(geom, space.TransGeometry(v.Value))
+		// }
+		// debugtools.WriteGeom("data_link.geojson", geom)
 	}
 	return link(gu, gi)
 }

@@ -49,7 +49,7 @@ func TestMustMarshal(t *testing.T) {
 }
 func BenchmarkEncode_Point(b *testing.B) {
 	g := space.Point{1, 2}
-	e := NewEncoder(ioutil.Discard)
+	e := NewWriter(ioutil.Discard)
 
 	b.ReportAllocs()
 	b.ResetTimer()
@@ -63,7 +63,7 @@ func BenchmarkEncode_LineString(b *testing.B) {
 		{1, 1}, {2, 2}, {3, 3}, {4, 4}, {5, 5},
 		{1, 1}, {2, 2}, {3, 3}, {4, 4}, {5, 5},
 	}
-	e := NewEncoder(ioutil.Discard)
+	e := NewWriter(ioutil.Discard)
 
 	b.ReportAllocs()
 	b.ResetTimer()

@@ -9,9 +9,10 @@ import (
 	"github.com/spatial-go/geoos/algorithm/matrix"
 )
 
-// DissovlePolygon returns a Geometry containing the dissovle.
+// PolygonDissovle returns a Geometry containing the dissovle.
+//
 //	or an empty atomic geometry, or an empty GEOMETRYCOLLECTION
-func DissovlePolygon(poly matrix.PolygonMatrix, diss matrix.Steric) (result matrix.Steric, err error) {
+func PolygonDissovle(poly matrix.PolygonMatrix, diss matrix.Steric) (result matrix.Steric, err error) {
 	switch d := diss.(type) {
 	case matrix.LineMatrix:
 		clip := graph.ClipHandle(d, poly)

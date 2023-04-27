@@ -6,6 +6,7 @@ import (
 	"github.com/spatial-go/geoos/space"
 )
 
+// BaseEncoder defines base encoder.
 type BaseEncoder struct {
 }
 
@@ -21,14 +22,14 @@ func (e *BaseEncoder) Decode(s []byte) (space.Geometry, error) {
 
 // Read Returns geometry from reader.
 func (e *BaseEncoder) Read(r io.Reader) (space.Geometry, error) {
-	if b, err := e.ReadBytes(r); err != nil {
+	b, err := e.ReadBytes(r)
+	if err != nil {
 		return nil, err
-	} else {
-		return e.Decode(b)
 	}
+	return e.Decode(b)
 }
 
-// Read Returns geometry from reader.
+// ReadBytes Returns geometry from reader.
 func (e *BaseEncoder) ReadBytes(r io.Reader) ([]byte, error) {
 	buf := []byte{}
 	b := make([]byte, 1)
@@ -51,7 +52,7 @@ func (e *BaseEncoder) Write(w io.Writer, g space.Geometry) error {
 	return e.WriteBytes(w, b)
 }
 
-// Write write geometry to writer.
+// WriteBytes write geometry to writer.
 func (e *BaseEncoder) WriteBytes(w io.Writer, buf []byte) error {
 	if _, err := w.Write(buf); err != nil {
 		return err
@@ -61,25 +62,26 @@ func (e *BaseEncoder) WriteBytes(w io.Writer, buf []byte) error {
 
 // WriteGeoJSON write geometry to writer .
 func (e *BaseEncoder) WriteGeoJSON(w io.Writer, g *FeatureCollection) error {
-	if buf, err := g.MarshalJSON(); err != nil {
+	buf, err := g.MarshalJSON()
+	if err != nil {
 		return err
-	} else {
-		if _, err := w.Write(buf); err != nil {
-			return err
-		}
+	}
+	if _, err := w.Write(buf); err != nil {
+		return err
 	}
 	return nil
 }
 
 // ReadGeoJSON Returns geometry from reader .
 func (e *BaseEncoder) ReadGeoJSON(r io.Reader) (*FeatureCollection, error) {
-	if b, err := e.ReadBytes(r); err != nil {
+	b, err := e.ReadBytes(r)
+	if err != nil {
 		return nil, err
-	} else {
-		return UnmarshalFeatureCollection(b)
 	}
+	return UnmarshalFeatureCollection(b)
 }
 
+// GeometryToFeatureCollection Returns feature collection from reader geometry .
 func GeometryToFeatureCollection(geom space.Geometry) *FeatureCollection {
 	fc := NewFeatureCollection()
 	if geom == nil {

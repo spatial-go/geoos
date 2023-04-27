@@ -1,5 +1,6 @@
 package de9im
 
+// LineRelationshipByDegrees ...
 type LineRelationshipByDegrees struct {
 	*RelationshipByDegrees
 	pointInPolygon, entityInPolygon int

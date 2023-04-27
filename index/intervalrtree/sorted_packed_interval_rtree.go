@@ -10,11 +10,12 @@ import (
 )
 
 // SortedPackedIntervalRTree  A static index on a set of 1-dimensional intervals,
-//  using an R-Tree packed based on the order of the interval midpoints.
-//  It supports range searching,
-//  where the range is an interval of the real line (which may be a single point).
-//  A common use is to index 1-dimensional intervals which
-//  are the projection of 2-D objects onto an axis of the coordinate system.
+//
+//	using an R-Tree packed based on the order of the interval midpoints.
+//	It supports range searching,
+//	where the range is an interval of the real line (which may be a single point).
+//	A common use is to index 1-dimensional intervals which
+//	are the projection of 2-D objects onto an axis of the coordinate system.
 type SortedPackedIntervalRTree struct {
 	leaves LeafNodes
 	root   Node
@@ -60,7 +61,7 @@ func (s *SortedPackedIntervalRTree) buildTree() Node {
 
 	// now group nodes into blocks of two and build tree up recursively
 	src := s.leaves
-	var dest LeafNodes = make(LeafNodes, 1)
+	var dest = make(LeafNodes, 1)
 	for {
 		s.buildLevel(src, dest)
 		if len(dest) == 1 {

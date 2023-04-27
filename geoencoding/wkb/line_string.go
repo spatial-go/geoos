@@ -45,7 +45,7 @@ func readLineString(r io.Reader, order byteOrder, buf []byte) (space.LineString,
 	return result, nil
 }
 
-func (e *Encoder) writeLineString(ls space.LineString) error {
+func (e *Writer) writeLineString(ls space.LineString) error {
 	e.order.PutUint32(e.buf, lineStringType)
 	e.order.PutUint32(e.buf[4:], uint32(len(ls)))
 	_, err := e.w.Write(e.buf[:8])
@@ -126,7 +126,7 @@ func readMultiLineString(r io.Reader, order byteOrder, buf []byte) (space.MultiL
 	return result, nil
 }
 
-func (e *Encoder) writeMultiLineString(mls space.MultiLineString) error {
+func (e *Writer) writeMultiLineString(mls space.MultiLineString) error {
 	e.order.PutUint32(e.buf, multiLineStringType)
 	e.order.PutUint32(e.buf[4:], uint32(len(mls)))
 	_, err := e.w.Write(e.buf[:8])

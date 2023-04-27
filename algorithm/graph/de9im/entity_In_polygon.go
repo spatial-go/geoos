@@ -165,9 +165,8 @@ func lineSegmentfInRing(l *matrix.LineSegment, r matrix.LineMatrix) int {
 	case p0InPolygon == OnlyOutPolygon && p1InPolygon == OnlyOutPolygon:
 		if mark, _ := relate.IntersectionEdge(matrix.LineMatrix{l.P0, l.P1}, r); mark {
 			return BothPolygon
-		} else {
-			return OnlyOutPolygon
 		}
+		return OnlyOutPolygon
 	default:
 		return p0InPolygon + p1InPolygon - OnlyInLine
 	}
