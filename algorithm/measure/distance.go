@@ -16,8 +16,8 @@ const (
 	E = 0.006694379990141317
 )
 
-// Distance is a func of measure distance.
-type Distance func(from, to matrix.Steric) float64
+// DistanceFunc is a func of measure distance.
+type DistanceFunc func(from, to matrix.Steric) float64
 
 // MercatorDistance scale factor is changed along the meridians as a function of latitude
 // https://gis.stackexchange.com/questions/110730/mercator-scale-factor-is-changed-along-the-meridians-as-a-function-of-latitude

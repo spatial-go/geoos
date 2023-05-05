@@ -2,8 +2,8 @@ package planar
 
 import (
 	"github.com/spatial-go/geoos/algorithm/buffer"
-	"github.com/spatial-go/geoos/algorithm/buffer/simplify"
 	"github.com/spatial-go/geoos/algorithm/overlay/snap"
+	"github.com/spatial-go/geoos/algorithm/simplify"
 	"github.com/spatial-go/geoos/space"
 )
 

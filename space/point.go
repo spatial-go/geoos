@@ -7,9 +7,9 @@ import (
 	"reflect"
 
 	"github.com/spatial-go/geoos/algorithm/buffer"
-	"github.com/spatial-go/geoos/algorithm/buffer/simplify"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
+	"github.com/spatial-go/geoos/algorithm/simplify"
 	"github.com/spatial-go/geoos/space/spaceerr"
 )
 

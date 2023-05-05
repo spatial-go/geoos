@@ -97,7 +97,7 @@ func Centroid(geom Geometry) Point {
 }
 
 // Distance returns distance Between the two Geometry.
-func Distance(from, to Geometry, f measure.Distance) (float64, error) {
+func Distance(from, to Geometry, f measure.DistanceFunc) (float64, error) {
 	if from == nil || from.IsEmpty() ||
 		to == nil || to.IsEmpty() {
 		return 0, nil

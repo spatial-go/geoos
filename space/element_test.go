@@ -29,7 +29,7 @@ func TestDistance(t *testing.T) {
 	type args struct {
 		from Geometry
 		to   Geometry
-		f    measure.Distance
+		f    measure.DistanceFunc
 	}
 	tests := []struct {
 		name    string
