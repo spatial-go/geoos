@@ -97,7 +97,7 @@ func Centroid(geom Geometry) Point {
 }
 
 // Distance returns distance Between the two Geometry.
-func Distance(from, to Geometry, f measure.Distance) (float64, error) {
+func Distance(from, to Geometry, f measure.DistanceFunc) (float64, error) {
 	if from == nil || from.IsEmpty() ||
 		to == nil || to.IsEmpty() {
 		return 0, nil
@@ -162,8 +162,8 @@ func TransGeometry(inputGeom matrix.Steric) Geometry {
 	}
 }
 
-// BufferInMeter ...
-func BufferInMeter(geometry Geometry, width float64, quadsegs int) Geometry {
+// bufferInMeter ...
+func bufferInMeter(geometry Geometry, width float64, quadsegs int) Geometry {
 	centroid := geometry.Centroid()
 	width = measure.MercatorDistance(width, centroid.Lat())
 	transformer := coordtransform.NewTransformer(coordtransform.LLTOMERCATOR)
@@ -176,4 +176,18 @@ func BufferInMeter(geometry Geometry, width float64, quadsegs int) Geometry {
 		geometry = TransGeometry(geomMatrix)
 	}
 	return geometry
+}
+
+// bufferInOriginal ...
+func bufferInOriginal(geometry Geometry, width float64, quadsegs int) Geometry {
+	buff := buffer.Buffer(geometry.ToMatrix(), width, quadsegs)
+
+	result := buff
+	switch b := result.(type) {
+	case matrix.LineMatrix:
+		return LineString(b)
+	case matrix.PolygonMatrix:
+		return Polygon(b)
+	}
+	return nil
 }

@@ -159,15 +159,18 @@ func lineSegmentfInRing(l *matrix.LineSegment, r matrix.LineMatrix) int {
 		if isCollinear {
 			return OnlyInLine
 		}
-		return OnlyInPolygon
+		if InPolygon(matrix.Matrix{(l.P0[0] + l.P1[0]) / 2.0, (l.P0[1] + l.P1[1]) / 2.0}, r) {
+			return OnlyInPolygon
+		}
+		return OnlyOutPolygon
+
 	case p0InPolygon == OnlyInPolygon && p1InPolygon == OnlyInPolygon:
 		return OnlyInPolygon
 	case p0InPolygon == OnlyOutPolygon && p1InPolygon == OnlyOutPolygon:
 		if mark, _ := relate.IntersectionEdge(matrix.LineMatrix{l.P0, l.P1}, r); mark {
 			return BothPolygon
-		} else {
-			return OnlyOutPolygon
 		}
+		return OnlyOutPolygon
 	default:
 		return p0InPolygon + p1InPolygon - OnlyInLine
 	}

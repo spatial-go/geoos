@@ -7,6 +7,7 @@ import (
 	"github.com/spatial-go/geoos"
 	"github.com/spatial-go/geoos/geoencoding/wkt"
 	"github.com/spatial-go/geoos/space"
+	"github.com/spatial-go/geoos/space/topograph"
 )
 
 type args struct {
@@ -493,6 +494,40 @@ func TestAlgorithm_Overlaps(t *testing.T) {
 			}
 			if got != tt.want {
 				t.Errorf("MegrezAlgorithm.Overlaps() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_megrezAlgorithm_Adjacency(t *testing.T) {
+	type fields struct {
+		topog topograph.Relationship
+	}
+	type args struct {
+		A space.Geometry
+		B space.Geometry
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    bool
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			g := &megrezAlgorithm{
+				topog: tt.fields.topog,
+			}
+			got, err := g.Adjacency(tt.args.A, tt.args.B)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("megrezAlgorithm.Adjacency() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("megrezAlgorithm.Adjacency() = %v, want %v", got, tt.want)
 			}
 		})
 	}

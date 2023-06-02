@@ -134,6 +134,8 @@ func TestIntersectionHandle(t *testing.T) {
 				t.Errorf("IntersectionHandle() %v\nreturn = %v, \n  want %v \nreturn = %v, \n  want %v",
 					tt.args.name, tt.graphs.g1, tt.wantGraphs.g1, tt.graphs.g2, tt.wantGraphs.g2)
 			}
+			// t.Errorf("IntersectionHandle() %v\nreturn = %v, \n  want %v \nreturn = %v, \n  want %v",
+			// 	tt.args.name, tt.graphs.g1, tt.wantGraphs.g1, tt.graphs.g2, tt.wantGraphs.g2)
 		})
 	}
 }

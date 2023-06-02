@@ -2,10 +2,11 @@ package space
 
 import (
 	"github.com/spatial-go/geoos/algorithm/buffer"
-	"github.com/spatial-go/geoos/algorithm/buffer/simplify"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
 	"github.com/spatial-go/geoos/algorithm/operation"
+	"github.com/spatial-go/geoos/algorithm/simplify"
+	"github.com/spatial-go/geoos/coordtransform"
 	"github.com/spatial-go/geoos/space/spaceerr"
 )
 
@@ -197,20 +198,31 @@ func (ls LineString) SimplifyP(tolerance float64) Geometry {
 // Buffer Returns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
 func (ls LineString) Buffer(width float64, quadsegs int) Geometry {
-	buff := buffer.Buffer(ls.ToMatrix(), width, quadsegs)
-	switch b := buff.(type) {
-	case matrix.LineMatrix:
-		return LineString(b)
-	case matrix.PolygonMatrix:
-		return Polygon(b)
-	}
-	return nil
+	return bufferInOriginal(ls, width, quadsegs)
 }
 
 // BufferInMeter Returns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
 func (ls LineString) BufferInMeter(width float64, quadsegs int) Geometry {
-	return BufferInMeter(ls, width, quadsegs)
+
+	distances := make([]float64, len(ls))
+
+	for i := range distances {
+		distances[i] = measure.MercatorDistance(width, Point(ls[i]).Lat())
+	}
+
+	transformer := coordtransform.NewTransformer(coordtransform.LLTOMERCATOR)
+	geomMatrix, _ := transformer.TransformGeometry(ls.ToMatrix())
+
+	lbuffer := &buffer.VariableLineBuffer{Line: geomMatrix.(matrix.LineMatrix), QuadrantSegments: quadsegs}
+	resultMatrix := lbuffer.DistancesBuffer(distances)
+	geometry := TransGeometry(resultMatrix)
+	if geometry != nil {
+		transformer.CoordType = coordtransform.MERCATORTOLL
+		geomMatrix, _ = transformer.TransformGeometry(geometry.ToMatrix())
+		geometry = TransGeometry(geomMatrix)
+	}
+	return geometry
 }
 
 // Envelope returns the  minimum bounding box for the supplied geometry, as a geometry.

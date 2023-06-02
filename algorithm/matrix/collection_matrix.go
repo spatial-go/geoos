@@ -11,6 +11,7 @@ import (
 // A Collection is a collection of sterices that is also a Steric.
 type Collection []Steric
 
+// CollectionFromMultiLineMatrix  Returns a Collection converted through MultiLineMatrix.
 func CollectionFromMultiLineMatrix(ml []LineMatrix) Collection {
 	coll := make(Collection, len(ml))
 	for i, v := range ml {
@@ -154,4 +155,14 @@ func (c Collection) Filter(f Filter) Steric {
 		_ = v.Filter(f)
 	}
 	return c
+}
+
+// String ...
+func (c Collection) String() string {
+	str := "{"
+	for _, m := range c {
+		str += m.String() + ",\n"
+	}
+	str += "}"
+	return str
 }

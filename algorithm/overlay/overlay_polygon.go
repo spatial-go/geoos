@@ -4,8 +4,8 @@ import (
 	"github.com/spatial-go/geoos/algorithm"
 	"github.com/spatial-go/geoos/algorithm/calc"
 	"github.com/spatial-go/geoos/algorithm/filter"
+	"github.com/spatial-go/geoos/algorithm/graph/de9im"
 	"github.com/spatial-go/geoos/algorithm/matrix"
-	"github.com/spatial-go/geoos/algorithm/matrix/envelope"
 	"github.com/spatial-go/geoos/algorithm/relate"
 )
 
@@ -26,8 +26,11 @@ func (p *PolygonOverlay) isPolyInHole(polyMatrix matrix.PolygonMatrix) (inHole b
 			continue
 		}
 		subjectMatrix := matrix.PolygonMatrix{subjectPoly[i]}
-		inter := envelope.Bound(polyMatrix.Bound()).IsIntersects(envelope.Bound(subjectMatrix.Bound()))
-		im := relate.IM(subjectMatrix, polyMatrix, inter)
+
+		im := de9im.IM(subjectMatrix, polyMatrix)
+
+		// inter := envelope.Bound(polyMatrix.Bound()).IsIntersects(envelope.Bound(subjectMatrix.Bound()))
+		// im := relate.IM(subjectMatrix, polyMatrix, inter)
 		if mark := im.IsContains(); mark {
 			inHole = true
 			break
@@ -45,8 +48,11 @@ func (p *PolygonOverlay) isPolyInHole(polyMatrix matrix.PolygonMatrix) (inHole b
 			continue
 		}
 		clippingMatrix := matrix.PolygonMatrix{clippingPoly[i]}
-		inter := envelope.Bound(polyMatrix.Bound()).IsIntersects(envelope.Bound(clippingMatrix.Bound()))
-		im := relate.IM(clippingMatrix, polyMatrix, inter)
+
+		im := de9im.IM(clippingMatrix, polyMatrix)
+
+		// inter := envelope.Bound(polyMatrix.Bound()).IsIntersects(envelope.Bound(clippingMatrix.Bound()))
+		// im := relate.IM(clippingMatrix, polyMatrix, inter)
 		if mark := im.IsContains(); mark {
 			inHole = true
 			break
@@ -62,8 +68,11 @@ func (p *PolygonOverlay) Union() (matrix.Steric, error) {
 	}
 	if ps, ok := p.Subject.(matrix.PolygonMatrix); ok {
 		if pc, ok := p.Clipping.(matrix.PolygonMatrix); ok {
-			inter := envelope.Bound(ps.Bound()).IsIntersects(envelope.Bound(pc.Bound()))
-			im := relate.IM(ps, pc, inter)
+
+			im := de9im.IM(ps, pc)
+
+			// inter := envelope.Bound(ps.Bound()).IsIntersects(envelope.Bound(pc.Bound()))
+			// im := relate.IM(ps, pc, inter)
 			if mark := im.IsCovers(); mark {
 				return ps, nil
 			}
@@ -103,8 +112,8 @@ func (p *PolygonOverlay) Intersection() (matrix.Steric, error) {
 	switch c := p.Clipping.(type) {
 	case matrix.Matrix:
 
-		inter := envelope.Bound(poly.Bound()).IsIntersects(envelope.Bound(c.Bound()))
-		if mark := relate.IM(poly, c, inter).IsContains(); mark {
+		im := de9im.IM(poly, c)
+		if mark := im.IsContains(); mark {
 			return c, nil
 		}
 		return nil, nil
@@ -117,8 +126,10 @@ func (p *PolygonOverlay) Intersection() (matrix.Steric, error) {
 		return LineMerge(result), nil
 	case matrix.PolygonMatrix:
 
-		inter := envelope.Bound(poly.Bound()).IsIntersects(envelope.Bound(c.Bound()))
-		im := relate.IM(poly, c, inter)
+		im := de9im.IM(poly, c)
+
+		// inter := envelope.Bound(poly.Bound()).IsIntersects(envelope.Bound(c.Bound()))
+		// im := relate.IM(poly, c, inter)
 		if mark := im.IsContains(); mark {
 			return c, nil
 		}
@@ -157,8 +168,10 @@ func (p *PolygonOverlay) Difference() (matrix.Steric, error) {
 	if poly, ok := p.Subject.(matrix.PolygonMatrix); ok {
 		if c, ok := p.Clipping.(matrix.PolygonMatrix); ok {
 
-			inter := envelope.Bound(poly.Bound()).IsIntersects(envelope.Bound(c.Bound()))
-			im := relate.IM(poly, c, inter)
+			im := de9im.IM(poly, c)
+
+			// inter := envelope.Bound(poly.Bound()).IsIntersects(envelope.Bound(c.Bound()))
+			// im := relate.IM(poly, c, inter)
 			if mark := im.IsCoveredBy(); mark {
 				return matrix.PolygonMatrix{}, nil
 

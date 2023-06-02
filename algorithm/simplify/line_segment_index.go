@@ -44,8 +44,7 @@ func (l *LineSegmentIndex) Query(querySeg *matrix.LineSegment) []*matrix.LineSeg
 	if err := l.index.QueryVisitor(env, visitor); err != nil {
 		log.Println(err)
 		return nil
-	} else {
-		itemsFound := visitor.Items()
-		return itemsFound.([]*matrix.LineSegment)
 	}
+	itemsFound := visitor.Items()
+	return itemsFound.([]*matrix.LineSegment)
 }

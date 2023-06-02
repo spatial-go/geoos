@@ -109,6 +109,9 @@ const (
 	// The default simplify factor
 	// Provides an accuracy of about 1%, which matches the accuracy of the default Quadrant Segments parameter.
 	SimplifyFactor = 0.01
+
+	// SnapTrigTol ...
+	SnapTrigTol = 1e-6
 )
 
 // const default DE-9IM  and Dimension parameters.

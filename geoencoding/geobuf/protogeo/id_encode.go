@@ -1,3 +1,4 @@
+// Package protogeo is a library for protogeo into Go structs using
 package protogeo
 
 import (

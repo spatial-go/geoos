@@ -63,6 +63,25 @@ func (l *LineSegment) PointAlongOffset(segmentLengthFraction, offsetDistance flo
 	return coord, nil
 }
 
+// Reflected Computes the reflection of a point in the line defined by this line segment.
+func (l *LineSegment) Reflected(p Matrix) Matrix {
+	// general line equation
+	A := l.P1[1] - l.P0[1]
+	B := l.P0[0] - l.P1[0]
+	C := l.P0[1]*(l.P1[0]-l.P0[0]) - l.P0[0]*(l.P1[1]-l.P0[1])
+
+	// compute reflected point
+	A2plusB2 := A*A + B*B
+	A2subB2 := A*A - B*B
+
+	x := p[0]
+	y := p[1]
+	rx := (-A2subB2*x - 2*A*B*y - 2*A*C) / A2plusB2
+	ry := (A2subB2*y - 2*A*B*x - 2*B*C) / A2plusB2
+
+	return Matrix{rx, ry}
+}
+
 // LineArray returns the LineArray
 func LineArray(l LineMatrix) (lines []*LineSegment) {
 	for i := 0; i < len(l)-1; i++ {

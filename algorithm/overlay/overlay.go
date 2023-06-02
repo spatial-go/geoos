@@ -3,8 +3,8 @@ package overlay
 
 import (
 	"github.com/spatial-go/geoos/algorithm"
+	"github.com/spatial-go/geoos/algorithm/graph/de9im"
 	"github.com/spatial-go/geoos/algorithm/matrix"
-	"github.com/spatial-go/geoos/algorithm/matrix/envelope"
 	"github.com/spatial-go/geoos/algorithm/relate"
 )
 
@@ -117,8 +117,9 @@ func (p *PointOverlay) Intersection() (matrix.Steric, error) {
 		}
 		return nil, nil
 	case matrix.PolygonMatrix:
-		inter := envelope.Bound(c.Bound()).IsIntersects(envelope.Bound(p.Subject.Bound()))
-		if mark := relate.IM(c, p.Subject.(matrix.Matrix), inter).IsCovers(); mark {
+		im := de9im.IM(c, p.Subject.(matrix.Matrix))
+
+		if mark := im.IsCovers(); mark {
 			return p.Subject.(matrix.Matrix), nil
 		}
 		return nil, nil

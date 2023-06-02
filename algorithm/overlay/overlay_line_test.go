@@ -26,7 +26,7 @@ func TestLineOverlay_Intersection(t *testing.T) {
 		{"line poly1", fields{&PointOverlay{matrix.LineMatrix{{100, 100}, {101, 101}},
 			matrix.PolygonMatrix{{{90, 90}, {90, 101}, {101, 101}, {101, 90}, {90, 90}}},
 		}},
-			matrix.Collection{matrix.LineMatrix{{100, 100}, {101, 101}}}, false},
+			matrix.LineMatrix{{100, 100}, {101, 101}}, false},
 		{"line poly2", fields{&PointOverlay{matrix.LineMatrix{{100, 100}, {100, 101}},
 			matrix.PolygonMatrix{{{100, 100}, {100, 101}, {101, 101}, {101, 100}, {100, 100}}},
 		}},

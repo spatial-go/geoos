@@ -10,12 +10,13 @@ import (
 )
 
 // Envelope Defines a rectangular region of the 2D coordinate plane.
-//  It is often used to represent the bounding box of a  Geometry,
-//  Envelopes support infinite or half-infinite regions, by using the values of
-//  Double.POSITIVE_INFINITY and Double.NEGATIVE_INFINITY.
-//  Envelope objects may have a null value.
-//  When Envelope objects are created or initialized,
-//  the supplies extent values are automatically sorted into the correct order.
+//
+//	It is often used to represent the bounding box of a  Geometry,
+//	Envelopes support infinite or half-infinite regions, by using the values of
+//	Double.POSITIVE_INFINITY and Double.NEGATIVE_INFINITY.
+//	Envelope objects may have a null value.
+//	When Envelope objects are created or initialized,
+//	the supplies extent values are automatically sorted into the correct order.
 type Envelope struct {
 	MaxX, MinX, MaxY, MinY float64
 }
@@ -168,7 +169,8 @@ func (e *Envelope) initEnvelope(env *Envelope) {
 }
 
 // SetToNil Makes this Envelope a "null" envelope, that is, the envelope
-//  of the empty geometry.
+//
+//	of the empty geometry.
 func (e *Envelope) SetToNil() {
 	e.MinX = 0
 	e.MaxX = -1
@@ -295,7 +297,8 @@ func (e *Envelope) ExpandToInclude(x, y float64) {
 }
 
 // ExpandToIncludeEnv  Enlarges this Envelope so that it contains  the other Envelope.
-//  Has no effect if other is wholly on or within the envelope.
+//
+//	Has no effect if other is wholly on or within the envelope.
 func (e *Envelope) ExpandToIncludeEnv(other *Envelope) {
 	if other.IsNil() {
 		return

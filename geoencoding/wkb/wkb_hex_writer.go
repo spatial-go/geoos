@@ -11,8 +11,8 @@ import (
 // BufferedWriter returns []Geometry from reader.
 func BufferedWriter(bufferedWriter io.Writer, geoms []space.Geometry) {
 	ewkb := &EWKBEncoder{
-		Encoder: NewEncoder(bufferedWriter),
-		Srid:    space.WGS84,
+		Writer: NewWriter(bufferedWriter),
+		Srid:   space.WGS84,
 	}
 	for _, v := range geoms {
 		_ = ewkb.Encode(v)
@@ -21,7 +21,7 @@ func BufferedWriter(bufferedWriter io.Writer, geoms []space.Geometry) {
 
 // EWKBEncoder Decoder can decoder EWKB geometry off of the stream.
 type EWKBEncoder struct {
-	*Encoder
+	*Writer
 	Srid uint32
 }
 

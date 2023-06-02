@@ -81,15 +81,15 @@ func getEncoder(codeType int) Encoder {
 	var encode Encoder
 	switch codeType {
 	case WKT:
-		encode = &wkt.WKTEncoder{}
+		encode = &wkt.Encoder{}
 	case WKB:
-		encode = &wkb.WKBEncoder{}
+		encode = &wkb.Encoder{}
 	case GeoJSON:
-		encode = &geojson.GeojsonEncoder{}
+		encode = &geojson.Encoder{}
 	case GeoCSV:
-		encode = &geocsv.GeocsvEncoder{}
+		encode = &geocsv.Encoder{}
 	case Geobuf:
-		encode = &geobuf.GeobufEncoder{}
+		encode = &geobuf.Encoder{}
 	default:
 		encode = &geojson.BaseEncoder{}
 	}

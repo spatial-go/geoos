@@ -70,9 +70,9 @@ func (b byteOrder) PutUint64(buf []byte, u uint64) {
 	}
 }
 
-// An Encoder will encode a geometry as WKB to the writer given at
+// An Writer will encode a geometry as WKB to the writer given at
 // creation time.
-type Encoder struct {
+type Writer struct {
 	buf []byte
 
 	w     io.Writer
@@ -94,7 +94,7 @@ func MustMarshal(geom space.Geometry, bo ...byteOrder) []byte {
 func Marshal(geom space.Geometry, bo ...byteOrder) ([]byte, error) {
 	buf := bytes.NewBuffer(make([]byte, 0, geomLength(geom)))
 
-	e := NewEncoder(buf)
+	e := NewWriter(buf)
 	if len(bo) > 0 {
 		e.order = bo[0]
 	}
@@ -111,16 +111,16 @@ func Marshal(geom space.Geometry, bo ...byteOrder) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-// NewEncoder creates a new Encoder for the given writer.
-func NewEncoder(w io.Writer) *Encoder {
-	return &Encoder{
+// NewWriter creates a new Encoder for the given writer.
+func NewWriter(w io.Writer) *Writer {
+	return &Writer{
 		w:     w,
 		order: 1,
 	}
 }
 
 // Encode will write the geometry encoded as WKB to the given writer.
-func (e *Encoder) Encode(geom space.Geometry) error {
+func (e *Writer) Encode(geom space.Geometry) error {
 	if geom == nil || geom.IsEmpty() {
 		return nil
 	}

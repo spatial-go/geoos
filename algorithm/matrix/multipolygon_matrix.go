@@ -2,6 +2,7 @@
 package matrix
 
 import (
+	"fmt"
 	"math"
 )
 
@@ -140,4 +141,21 @@ func (m MultiPolygonMatrix) Filter(f Filter) Steric {
 		_ = PolygonMatrix(v).Filter(f)
 	}
 	return m
+}
+
+// String ...
+func (m MultiPolygonMatrix) String() string {
+	str := "{"
+	for _, p := range m {
+		str += "{"
+		for _, l := range p {
+			str += "{"
+			for _, v := range l {
+				str += fmt.Sprintf("{%v,%v},\n", v[0], v[1])
+			}
+			str += "}"
+		}
+	}
+	str += "}"
+	return str
 }

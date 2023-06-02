@@ -29,7 +29,7 @@ func TestDistance(t *testing.T) {
 	type args struct {
 		from Geometry
 		to   Geometry
-		f    measure.Distance
+		f    measure.DistanceFunc
 	}
 	tests := []struct {
 		name    string
@@ -64,18 +64,32 @@ func TestBufferInMeter(t *testing.T) {
 		args args
 		want Geometry
 	}{
-		{"case1", args{Point{1, 1}, 1, 1},
-			Polygon{{{1.000008984521167, 0.9999999999999887},
-				{0.9999999999999999, 0.9999910168471858},
-				{0.9999910154788327, 0.9999999999999887},
-				{0.9999999999999999, 1.0000089831527534},
-				{1.000008984521167, 0.9999999999999887}}},
+		{"case1", args{Point{2.073333263397217, 48.81027603149414}, 100, 4},
+			Polygon{{{2.07469731736744, 48.81027603149415},
+				{2.0745934849415466, 48.80993226430165},
+				{2.0742977952094663, 48.809640830701994},
+				{2.0738552642524732, 48.8094461000523},
+				{2.073333263397217, 48.80937771956217},
+				{2.0728112625419604, 48.8094461000523},
+				{2.0723687315849677, 48.809640830701994},
+				{2.072073041852887, 48.80993226430165},
+				{2.0719692094269937, 48.81027603149415},
+				{2.072073041852887, 48.810619796329775},
+				{2.0723687315849677, 48.81091122423942},
+				{2.0728112625419604, 48.811105949199124},
+				{2.073333263397217, 48.81117432733234},
+				{2.0738552642524732, 48.811105949199124},
+				{2.0742977952094663, 48.81091122423942},
+				{2.0745934849415466, 48.810619796329775},
+				{2.07469731736744, 48.81027603149415},
+			},
+			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := BufferInMeter(tt.args.geometry, tt.args.width, tt.args.quadsegs); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("BufferInMeter() = %v, want %v", got, tt.want)
+			if got := bufferInMeter(tt.args.geometry, tt.args.width, tt.args.quadsegs); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("BufferInMeter() = %v, want %v", got.ToMatrix(), tt.want)
 			}
 		})
 	}

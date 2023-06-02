@@ -52,8 +52,15 @@ func TestPolygonOverlay_Intersection(t *testing.T) {
 			matrix.PolygonMatrix{{{111.50848388671875, 37.6359849542696}, {112.64007568359375, 37.6359849542696}, {112.64007568359375, 38.35027253825765},
 				{111.50848388671875, 38.35027253825765}, {111.50848388671875, 37.6359849542696}}},
 		}},
-			matrix.PolygonMatrix{{{112.34344482421875, 38.35027253825765}, {112.34344482421875, 38.11727165830543}, {111.50848388671875, 38.11727165830543},
-				{111.50848388671875, 38.35027253825765}, {112.34344482421875, 38.35027253825765}}}, false},
+			matrix.PolygonMatrix{{{111.50848388671875, 38.117271658305086},
+				{112.34344482421875, 38.11727165830543},
+				{112.34344482421875, 38.35027253825765},
+				{111.50848388671875, 38.35027253825765},
+				{111.50848388671875, 38.117271658305086},
+			},
+			},
+
+			false},
 
 		{"poly poly5", fields{PointOverlay: &PointOverlay{matrix.PolygonMatrix{{{0, 0}, {10, 0}, {10, 10}, {0, 10}, {0, 0}}, {{1, 1}, {9, 1}, {9, 9}, {1, 9}, {1, 1}}},
 			matrix.PolygonMatrix{{{5, 5}, {15, 5}, {15, 15}, {5, 15}, {5, 5}}},
@@ -139,7 +146,7 @@ func TestPolygonOverlay_Union(t *testing.T) {
 			},
 			}, want: []matrix.Steric{matrix.Collection{matrix.PolygonMatrix{{{1, 1}, {2, 1}, {2, 2}, {1, 2}, {1, 1}}},
 				matrix.PolygonMatrix{{{3, 1}, {5, 1}, {5, 2}, {3, 2}, {3, 1}}}},
-				matrix.Collection{matrix.PolygonMatrix{{{1, 1}, {2, 1}, {2, 2}, {1, 2}, {1, 1}}},
+				matrix.Collection{matrix.PolygonMatrix{{{1, 1}, {1, 2}, {2, 2}, {2, 1}, {1, 1}}},
 					matrix.PolygonMatrix{{{3, 1}, {5, 1}, {5, 2}, {3, 2}, {3, 1}}}},
 			},
 			wantErr: false},
@@ -250,7 +257,7 @@ func TestPolygonOverlay_Difference(t *testing.T) {
 			matrix.PolygonMatrix{{{1, 1}, {5, 1}, {5, 5}, {1, 5}, {1, 1}}},
 			matrix.PolygonMatrix{{{2, 2}, {3, 2}, {3, 3}, {2, 3}, {2, 2}}},
 		}},
-			matrix.PolygonMatrix{{{1, 1}, {5, 1}, {5, 5}, {1, 5}, {1, 1}}, {{2, 2}, {3, 2}, {3, 3}, {2, 3}, {2, 2}}}, false},
+			matrix.PolygonMatrix{{{1, 1}, {1, 5}, {5, 5}, {5, 1}, {1, 1}}, {{2, 2}, {3, 2}, {3, 3}, {2, 3}, {2, 2}}}, false},
 	}
 	for _, tt := range tests {
 		if !geoos.GeoosTestTag && tt.name != "poly poly2" {

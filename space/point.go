@@ -7,9 +7,9 @@ import (
 	"reflect"
 
 	"github.com/spatial-go/geoos/algorithm/buffer"
-	"github.com/spatial-go/geoos/algorithm/buffer/simplify"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
+	"github.com/spatial-go/geoos/algorithm/simplify"
 	"github.com/spatial-go/geoos/space/spaceerr"
 )
 
@@ -170,20 +170,13 @@ func (p Point) SimplifyP(tolerance float64) Geometry {
 // Buffer Returns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
 func (p Point) Buffer(width float64, quadsegs int) Geometry {
-	buff := buffer.Buffer(p.ToMatrix(), width, quadsegs)
-	switch b := buff.(type) {
-	case matrix.LineMatrix:
-		return LineString(b)
-	case matrix.PolygonMatrix:
-		return Polygon(b)
-	}
-	return nil
+	return bufferInOriginal(p, width, quadsegs)
 }
 
 // BufferInMeter Returns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
 func (p Point) BufferInMeter(width float64, quadsegs int) Geometry {
-	return BufferInMeter(p, width, quadsegs)
+	return bufferInMeter(p, width, quadsegs)
 }
 
 // Envelope returns the  minimum bounding box for the supplied geometry, as a geometry.

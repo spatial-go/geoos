@@ -65,7 +65,7 @@ func readPolygon(r io.Reader, order byteOrder, buf []byte) (space.Polygon, error
 	return result, nil
 }
 
-func (e *Encoder) writePolygon(p space.Polygon) error {
+func (e *Writer) writePolygon(p space.Polygon) error {
 	e.order.PutUint32(e.buf, polygonType)
 	e.order.PutUint32(e.buf[4:], uint32(len(p)))
 	_, err := e.w.Write(e.buf[:8])
@@ -156,7 +156,7 @@ func readMultiPolygon(r io.Reader, order byteOrder, buf []byte) (space.MultiPoly
 	return result, nil
 }
 
-func (e *Encoder) writeMultiPolygon(mp space.MultiPolygon) error {
+func (e *Writer) writeMultiPolygon(mp space.MultiPolygon) error {
 	e.order.PutUint32(e.buf, multiPolygonType)
 	e.order.PutUint32(e.buf[4:], uint32(len(mp)))
 	_, err := e.w.Write(e.buf[:8])

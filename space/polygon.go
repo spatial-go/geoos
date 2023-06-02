@@ -2,10 +2,10 @@ package space
 
 import (
 	"github.com/spatial-go/geoos/algorithm/buffer"
-	"github.com/spatial-go/geoos/algorithm/buffer/simplify"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
 	"github.com/spatial-go/geoos/algorithm/operation"
+	"github.com/spatial-go/geoos/algorithm/simplify"
 )
 
 // Polygon is a closed area. The first LineString is the outer ring.
@@ -238,20 +238,13 @@ func (p Polygon) SimplifyP(tolerance float64) Geometry {
 // Buffer Returns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
 func (p Polygon) Buffer(width float64, quadsegs int) Geometry {
-	buff := buffer.Buffer(p.ToMatrix(), width, quadsegs)
-	switch b := buff.(type) {
-	case matrix.LineMatrix:
-		return LineString(b)
-	case matrix.PolygonMatrix:
-		return Polygon(b)
-	}
-	return nil
+	return bufferInOriginal(p, width, quadsegs)
 }
 
 // BufferInMeter Returns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
 func (p Polygon) BufferInMeter(width float64, quadsegs int) Geometry {
-	return BufferInMeter(p, width, quadsegs)
+	return bufferInMeter(p, width, quadsegs)
 }
 
 // Envelope returns the  minimum bounding box for the supplied geometry, as a geometry.

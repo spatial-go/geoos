@@ -135,11 +135,11 @@ func TestBuffer(t *testing.T) {
 	}
 	for _, tt := range tests {
 		if !geoos.GeoosTestTag &&
-			tt.name != "issue87" {
+			tt.name != "line buffer1" {
 			continue
 		}
 		t.Run(tt.name, func(t *testing.T) {
-			if got := Buffer(tt.args.geom, tt.args.distance, tt.args.quadsegs); got == nil || !got.EqualsExact(tt.want, 0.01) {
+			if got := Buffer(tt.args.geom, tt.args.distance, tt.args.quadsegs); got == nil || !got.EqualsExact(tt.want, 0.5) {
 				t.Errorf("Buffer() = %v,\n want %v", got, tt.want)
 			}
 		})

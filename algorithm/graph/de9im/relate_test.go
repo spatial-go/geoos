@@ -11,7 +11,7 @@ import (
 func TestRelate(t *testing.T) {
 	for _, tt := range graphtests.TestRelateData {
 		if !geoos.GeoosTestTag &&
-			tt.Name != "issue 89" {
+			tt.Name != "test line Mercator2" {
 			continue
 		}
 
