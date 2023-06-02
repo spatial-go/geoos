@@ -4,8 +4,8 @@ import (
 	"sort"
 
 	"github.com/spatial-go/geoos/algorithm"
+	"github.com/spatial-go/geoos/algorithm/graph/de9im"
 	"github.com/spatial-go/geoos/algorithm/matrix"
-	"github.com/spatial-go/geoos/algorithm/matrix/envelope"
 	"github.com/spatial-go/geoos/algorithm/overlay/chain"
 	"github.com/spatial-go/geoos/algorithm/relate"
 )
@@ -35,8 +35,11 @@ func (p *LineOverlay) Union() (matrix.Steric, error) {
 			}
 			return append(ins.(matrix.Collection), sds.(matrix.Collection)...), nil
 		case matrix.PolygonMatrix:
-			inter := envelope.Bound(ps.Bound()).IsIntersects(envelope.Bound(pc.Bound()))
-			im := relate.IM(ps, pc, inter)
+
+			im := de9im.IM(ps, pc)
+
+			// inter := envelope.Bound(ps.Bound()).IsIntersects(envelope.Bound(pc.Bound()))
+			// im := relate.IM(ps, pc, inter)
 			if mark := im.IsDisjoint(); mark {
 				return matrix.Collection{ps, pc}, nil
 			}
@@ -46,9 +49,11 @@ func (p *LineOverlay) Union() (matrix.Steric, error) {
 			res, _ := p.Difference()
 			result := matrix.Collection{}
 			for _, v := range res.(matrix.Collection) {
-				inter := envelope.Bound(v.Bound()).IsIntersects(envelope.Bound(pc.Bound()))
-				im := relate.IM(pc, v, inter)
-				if !im.IsContains() {
+				im := de9im.IM(pc, v)
+
+				// inter := envelope.Bound(v.Bound()).IsIntersects(envelope.Bound(pc.Bound()))
+				// im := relate.IM(pc, v, inter)
+				if !im.IsCovers() {
 					result = append(result, v)
 				}
 			}
@@ -84,8 +89,10 @@ func (p *LineOverlay) Intersection() (matrix.Steric, error) {
 		result := intersectLine(line, c)
 		return LineMerge(result), nil
 	case matrix.PolygonMatrix:
-		inter := envelope.Bound(line.Bound()).IsIntersects(envelope.Bound(c.Bound()))
-		im := relate.IM(line, c, inter)
+
+		im := de9im.IM(line, c)
+
+		// im := relate.IM(line, c, inter)
 		if mark := im.IsDisjoint(); mark {
 			return matrix.Collection{}, nil
 		}
@@ -95,8 +102,9 @@ func (p *LineOverlay) Intersection() (matrix.Steric, error) {
 		res, _ := p.Difference()
 		result := matrix.Collection{}
 		for _, v := range res.(matrix.Collection) {
-			inter := envelope.Bound(v.Bound()).IsIntersects(envelope.Bound(c.Bound()))
-			im := relate.IM(c, v, inter)
+			im := de9im.IM(c, v)
+			//inter := envelope.Bound(v.Bound()).IsIntersects(envelope.Bound(c.Bound()))
+			//im := relate.IM(c, v, inter)
 			if im.IsCovers() {
 				result = append(result, v)
 			}

@@ -4,8 +4,8 @@ package debugtools
 import (
 	"log"
 	"os"
-	"strings"
 
+	"github.com/spatial-go/geoos"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/geoencoding"
 	"github.com/spatial-go/geoos/geoencoding/geojson"
@@ -16,10 +16,9 @@ const dir = "/debugtools/debug_data/"
 
 // WriteGeom Write the geom object to a file in geojson format.
 func WriteGeom(filename string, geom space.Geometry) {
-	env, _ := os.Getwd()
-	env = env[0 : strings.Index(env, "geoos")+6]
-
-	if file, err := os.Create(env + dir + filename); err != nil {
+	file, err := os.Create(geoos.EnvPath() + dir + filename)
+	defer file.Close()
+	if err != nil {
 		log.Println(err)
 	} else {
 		defer file.Close()
@@ -33,7 +32,9 @@ func WriteGeom(filename string, geom space.Geometry) {
 // WriteMatrix Write the matrix object to a file in geojson format.
 func WriteMatrix(filename string, m matrix.Steric) {
 
-	if file, err := os.Create(dir + filename); err != nil {
+	file, err := os.Create(geoos.EnvPath() + dir + filename)
+	defer file.Close()
+	if err != nil {
 		log.Println(err)
 	} else {
 		defer file.Close()

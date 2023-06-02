@@ -1,6 +1,8 @@
 // Package matrix Define spatial matrix base.
 package matrix
 
+import "fmt"
+
 // PolygonMatrix is a three-dimensional matrix.
 type PolygonMatrix [][][]float64
 
@@ -167,4 +169,18 @@ func (p PolygonMatrix) IsRectangle() bool {
 		}
 	}
 	return true
+}
+
+// String ...
+func (p PolygonMatrix) String() string {
+	str := "{"
+	for _, l := range p {
+		str += "{"
+		for _, v := range l {
+			str += fmt.Sprintf("{%v,%v},\n", v[0], v[1])
+		}
+		str += "},\n"
+	}
+	str += "}"
+	return str
 }

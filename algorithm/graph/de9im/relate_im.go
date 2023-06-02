@@ -75,6 +75,7 @@ func Relate(m0, m1 matrix.Steric) string {
 // IM Gets the relate  for the spatial relationship
 // between the input geometries.
 func IM(m0, m1 matrix.Steric) *matrix.IntersectionMatrix {
+
 	return IMByRelationship(m0, m1, withDegrees)
 }
 
@@ -105,4 +106,40 @@ func IMByRelationship(m0, m1 matrix.Steric, f RelateAlgorithm) *matrix.Intersect
 		im = im.Transpose()
 	}
 	return im
+}
+
+// AInB Returns isIntersect, isAInB, isSure.
+func AInB(A, B matrix.Steric) (isIntersect, isAInB, isSure bool) {
+
+	// optimization - lower dimension cannot contain areas
+	if A.Dimensions() == 2 && B.Dimensions() < 2 {
+		isIntersect, isAInB, isSure = false, false, true
+		return
+	}
+	// optimization - P cannot contain a non-zero-length L
+	// Note that a point can contain a zero-length lineal geometry,
+	// since the line has no boundary due to Mod-2 Boundary Rule
+	if A.Dimensions() == 1 && B.Dimensions() < 1 {
+		isIntersect, isAInB, isSure = false, false, true
+		return
+	}
+	// optimization - envelope test
+	if A.Bound().ContainsBound(B.Bound()) {
+		isIntersect, isAInB, isSure = false, false, true
+		return
+	}
+	//optimization for rectangle arguments
+	switch b := B.(type) {
+	case matrix.PolygonMatrix:
+		if b.IsRectangle() {
+			isIntersect, isAInB, isSure = false, B.Bound().ContainsBound(A.Bound()), true
+			return
+		}
+
+	}
+
+	isIntersect, isAInB, isSure = B.Bound().IntersectsBound(A.Bound()), false, false
+
+	return
+
 }

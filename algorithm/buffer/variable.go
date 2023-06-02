@@ -4,6 +4,7 @@ package buffer
 import (
 	"math"
 
+	"github.com/spatial-go/geoos"
 	"github.com/spatial-go/geoos/algorithm/calc"
 	"github.com/spatial-go/geoos/algorithm/calc/angle"
 	"github.com/spatial-go/geoos/algorithm/graph/clipping"
@@ -11,32 +12,39 @@ import (
 	"github.com/spatial-go/geoos/algorithm/measure"
 )
 
-// VariableInterpolatedBuffer Creates a buffer polygon along a line with the buffer distance interpolated
-// between a start distance and an end distance.
-func VariableInterpolatedBuffer(line matrix.Steric, startDistance, endDistance float64) matrix.Steric {
-	distance := interpolate(line.(matrix.LineMatrix),
-		startDistance, endDistance)
-	return VariableDistancesBuffer(line, distance)
+// VariableLineBuffer describes a line variable buffer
+type VariableLineBuffer struct {
+	Line             matrix.LineMatrix
+	QuadrantSegments int
 }
 
-// VariableDistancesBuffer Creates a buffer polygon along a line with the buffer distances.
-func VariableDistancesBuffer(line matrix.Steric, distances []float64) (buffer matrix.Steric) {
+// InterpolatedBuffer Creates a buffer polygon along a line with the buffer distance interpolated
+// between a start distance and an end distance.
+func (v *VariableLineBuffer) InterpolatedBuffer(startDistance, endDistance float64) matrix.Steric {
+	distance := interpolate(v.Line,
+		startDistance, endDistance)
+	return v.DistancesBuffer(distance)
+}
 
-	switch l := line.(type) {
-	case matrix.LineMatrix:
-		partsGeom := matrix.Collection{}
-		for i := 1; i < len(l); i++ {
-			dist0 := distances[i-1]
-			dist1 := distances[i]
+// DistancesBuffer Creates a buffer polygon along a line with the buffer distances.
+func (v *VariableLineBuffer) DistancesBuffer(distances []float64) (buffer matrix.Steric) {
 
-			if dist0 > 0 || dist1 > 0 {
-				poly := segmentBuffer(l[i-1], l[i], dist0, dist1)
-				if !poly.IsEmpty() {
-					partsGeom = append(partsGeom, poly)
-				}
+	partsGeom := matrix.Collection{}
+	for i := 1; i < len(v.Line); i++ {
+		dist0 := distances[i-1]
+		dist1 := distances[i]
+
+		if dist0 > 0 || dist1 > 0 {
+			poly := v.segmentBuffer(v.Line[i-1], v.Line[i], dist0, dist1)
+			if !poly.IsEmpty() {
+				partsGeom = append(partsGeom, poly)
 			}
 		}
-		buffer, _ = clipping.UnaryUnion(partsGeom)
+	}
+	buffer, _ = clipping.UnaryUnion(partsGeom)
+
+	if !geoos.GeoosTestTag {
+		matrix.WriteMatrix("collection", partsGeom)
 	}
 
 	return
@@ -67,13 +75,13 @@ func interpolate(line matrix.LineMatrix, startDistance, endDistance float64) []f
 
 // Computes a variable buffer polygon for a single segment,with the given endpoints and buffer distances.
 // The individual segment buffers are unioned to form the final buffer.
-func segmentBuffer(p0, p1 matrix.Matrix,
+func (v *VariableLineBuffer) segmentBuffer(p0, p1 matrix.Matrix,
 	dist0, dist1 float64) matrix.Steric {
 	/**
 	 * Compute for increasing distance only, so flip if needed
 	 */
 	if dist0 > dist1 {
-		return segmentBuffer(p1, p0, dist1, dist0)
+		return v.segmentBuffer(p1, p0, dist1, dist0)
 	}
 
 	// forward tangent line
@@ -89,7 +97,7 @@ func segmentBuffer(p0, p1 matrix.Matrix,
 			center = p1
 			dist = dist1
 		}
-		return Buffer(center, dist, 8)
+		return Buffer(center, dist, v.QuadrantSegments)
 	}
 	t0 := tangent.P0
 	t1 := tangent.P1
@@ -102,12 +110,11 @@ func segmentBuffer(p0, p1 matrix.Matrix,
 	coords := matrix.LineMatrix{t0, t1}
 
 	// end cap
-	addCap(p1, dist1, t1, tr1, coords)
+	coords = v.addCap(p1, dist1, t1, tr1, coords)
 
 	coords = append(coords, tr1, tr0)
-
 	// start cap
-	addCap(p0, dist0, tr0, t0, coords)
+	coords = v.addCap(p0, dist0, tr0, t0, coords)
 
 	// close
 	coords = append(coords, t0)
@@ -117,19 +124,19 @@ func segmentBuffer(p0, p1 matrix.Matrix,
 }
 
 // Adds a semi-circular cap CCW around the point p.
-func addCap(p matrix.Matrix, r float64, t1, t2 matrix.Matrix, coords matrix.LineMatrix) matrix.LineMatrix {
+func (v *VariableLineBuffer) addCap(p matrix.Matrix, r float64, t1, t2 matrix.Matrix, coords matrix.LineMatrix) matrix.LineMatrix {
 
 	angStart := angle.Angle(p, t1)
 	angEnd := angle.Angle(p, t2)
 	if angStart < angEnd {
 		angStart += 2 * math.Pi
 	}
-	indexStart := capAngleIndex(angStart)
-	indexEnd := capAngleIndex(angEnd)
+	indexStart := v.capAngleIndex(angStart)
+	indexEnd := v.capAngleIndex(angEnd)
 
 	for i := indexStart; i > indexEnd; i-- {
 		// use negative increment to create points CW
-		ang := capAngle(i)
+		ang := v.capAngle(i)
 		coords = append(coords, projectPolar(p, r, ang))
 	}
 	return coords
@@ -137,15 +144,15 @@ func addCap(p matrix.Matrix, r float64, t1, t2 matrix.Matrix, coords matrix.Line
 
 // Computes the canonical cap point index for a given angle.
 // The angle is rounded down to the next lower index.
-func capAngleIndex(ang float64) int {
-	capSegAng := math.Pi / 2 / calc.QuadrantSegments
-	index := (int)(ang / capSegAng)
+func (v *VariableLineBuffer) capAngleIndex(ang float64) int {
+	capSegAng := math.Pi / 2.0 / float64(v.QuadrantSegments)
+	index := int(ang / capSegAng)
 	return index
 }
 
 // Computes the angle for the given cap point index.
-func capAngle(index int) float64 {
-	capSegAng := math.Pi / 2 / calc.QuadrantSegments
+func (v *VariableLineBuffer) capAngle(index int) float64 {
+	capSegAng := math.Pi / 2.0 / float64(v.QuadrantSegments)
 	return capSegAng * float64(index)
 }
 

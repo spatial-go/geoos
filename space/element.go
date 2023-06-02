@@ -182,12 +182,6 @@ func bufferInMeter(geometry Geometry, width float64, quadsegs int) Geometry {
 func bufferInOriginal(geometry Geometry, width float64, quadsegs int) Geometry {
 	buff := buffer.Buffer(geometry.ToMatrix(), width, quadsegs)
 
-	// result := simplify.Simplify(buff, 0.0052)
-	// result, err := clipping.Intersection(buff, result)
-	// if err != nil {
-	// 	result = buff
-	// }
-
 	result := buff
 	switch b := result.(type) {
 	case matrix.LineMatrix:

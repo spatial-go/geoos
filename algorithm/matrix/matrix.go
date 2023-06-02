@@ -2,6 +2,7 @@
 package matrix
 
 import (
+	"fmt"
 	"math"
 
 	"github.com/spatial-go/geoos/algorithm"
@@ -40,6 +41,9 @@ type Steric interface {
 
 	// Filter Performs an operation with the provided .
 	Filter(f Filter) Steric
+
+	// String ...
+	String() string
 }
 
 // A Bound represents a closed box or rectangle.
@@ -231,6 +235,11 @@ func (m Matrix) EqualsExact(ms Steric, tolerance float64) bool {
 // Filter Performs an operation with the provided .
 func (m Matrix) Filter(f Filter) Steric {
 	return m
+}
+
+// String ...
+func (m Matrix) String() string {
+	return fmt.Sprintf("{%v,%v}", m[0], m[1])
 }
 
 // TransMatrixes trans steric to array matrixes.

@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/spatial-go/geoos"
+	"github.com/spatial-go/geoos/algorithm/calc"
 	"github.com/spatial-go/geoos/algorithm/graph/graphtests"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
@@ -47,7 +48,7 @@ func TestPolygonClipping_Union(t *testing.T) {
 
 	for _, tt := range graphtests.TestsPolygonUnion {
 		if !geoos.GeoosTestTag &&
-			tt.Name != "poly poly02" {
+			tt.Name != "poly mx3" {
 			continue
 		}
 		t.Run(tt.Name, func(t *testing.T) {
@@ -63,10 +64,9 @@ func TestPolygonClipping_Union(t *testing.T) {
 				t.Errorf("PolygonClipping.Union()%v = %v, \nwant %v", tt.Name, got, tt.Want)
 				return
 			}
-			isEqual := got.Proximity(tt.Want[0])
-			if len(tt.Want) > 1 {
-				isEqual1 := got.Proximity(tt.Want[1])
-				isEqual = isEqual || isEqual1
+			isEqual := false
+			for _, v := range tt.Want {
+				isEqual = isEqual || got.EqualsExact(v, calc.DefaultTolerance6)
 			}
 
 			if !isEqual {

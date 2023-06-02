@@ -156,3 +156,13 @@ func (c Collection) Filter(f Filter) Steric {
 	}
 	return c
 }
+
+// String ...
+func (c Collection) String() string {
+	str := "{"
+	for _, m := range c {
+		str += m.String() + ",\n"
+	}
+	str += "}"
+	return str
+}

@@ -2,6 +2,7 @@
 package matrix
 
 import (
+	"fmt"
 	"math"
 
 	"github.com/spatial-go/geoos/algorithm/calc"
@@ -179,4 +180,14 @@ func (l LineMatrix) Reverse() LineMatrix {
 		l[i], l[j] = l[j], l[i]
 	}
 	return l
+}
+
+// String ...
+func (l LineMatrix) String() string {
+	str := "{"
+	for _, v := range l {
+		str += fmt.Sprintf("{%v,%v},\n", v[0], v[1])
+	}
+	str += "}"
+	return str
 }
