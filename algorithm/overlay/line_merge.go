@@ -2,11 +2,13 @@ package overlay
 
 import (
 	"github.com/spatial-go/geoos/algorithm/matrix"
-	"github.com/spatial-go/geoos/algorithm/relate"
+	"github.com/spatial-go/geoos/algorithm/operation"
 )
 
 // LineMerge returns a Geometry containing the LineMerges.
+//
 //	or an empty atomic geometry, or an empty GEOMETRYCOLLECTION
+//
 // todo Rewrite with monotone chain
 func LineMerge(ml matrix.Collection) matrix.Collection {
 	for i := 0; i < len(ml)-1; i++ {
@@ -58,10 +60,10 @@ func MergeLine(ml matrix.Collection, i, j int) (matrix.Collection, bool) {
 		return ml, false
 	}
 
-	mark, ips := relate.IntersectionEdge(ml[i].(matrix.LineMatrix), ml[j].(matrix.LineMatrix))
+	mark, ips := operation.FindIntersectionLineMatrix(ml[i].(matrix.LineMatrix), ml[j].(matrix.LineMatrix))
 	if mark {
 		for _, v := range ips {
-			if _, inVer := relate.InLineVertex(v.Matrix, ml[i].(matrix.LineMatrix)); inVer {
+			if _, inVer := operation.IsLineMatrixVertex(v.Matrix, ml[i].(matrix.LineMatrix)); inVer {
 				r1 := mergeCheck(ml[i].(matrix.LineMatrix), ml[j].(matrix.LineMatrix))
 				if r1 != nil {
 					if i < j {
@@ -93,7 +95,7 @@ func MergeLine(ml matrix.Collection, i, j int) (matrix.Collection, bool) {
 					return result, true
 				}
 			}
-			if _, inVer := relate.InLineVertex(v.Matrix, ml[j].(matrix.LineMatrix)); inVer {
+			if _, inVer := operation.IsLineMatrixVertex(v.Matrix, ml[j].(matrix.LineMatrix)); inVer {
 				r1 := mergeCheck(ml[j].(matrix.LineMatrix), ml[i].(matrix.LineMatrix))
 				if r1 != nil {
 					if i < j {
@@ -142,7 +144,7 @@ func MergeMatrix(ml matrix.Collection, i, j int, result matrix.Collection) (matr
 			return ml, false
 		}
 		for _, v := range ml[j].(matrix.LineMatrix).ToLineArray() {
-			if in, _ := relate.InLine(m0, v.P0, v.P1); in {
+			if in, _ := operation.InLineSegment(m0, v.P0, v.P1); in {
 				result = append(result, ml[:i]...)
 				result = append(result, ml[i+1:]...)
 				return result, true

@@ -2,7 +2,7 @@ package sweepline
 
 import (
 	"github.com/spatial-go/geoos/algorithm/matrix"
-	"github.com/spatial-go/geoos/algorithm/relate"
+	"github.com/spatial-go/geoos/algorithm/operation"
 )
 
 // OverlapAction An action taken when a SweepLineIndex detects that two Interval.
@@ -22,7 +22,7 @@ type CoordinatesOverlapAction struct {
 
 // Overlap ...
 func (c *CoordinatesOverlapAction) Overlap(s0, s1 *Interval) bool {
-	mark, ips := relate.IntersectionLineSegment(s0.Item, s1.Item)
+	mark, ips := operation.FindIntersectionLineSegment(s0.Item, s1.Item)
 	if mark {
 		for _, ip := range ips {
 			if ip.IsIntersectionPoint {

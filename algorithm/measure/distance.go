@@ -4,7 +4,7 @@ import (
 	"math"
 
 	"github.com/spatial-go/geoos/algorithm/matrix"
-	"github.com/spatial-go/geoos/algorithm/relate"
+	"github.com/spatial-go/geoos/algorithm/operation"
 	"github.com/spatial-go/geoos/coordtransform"
 )
 
@@ -198,7 +198,7 @@ func distancePolygonToPoint(poly matrix.PolygonMatrix, pt matrix.Matrix, locMatr
 func distanceLineAndLine(from, to matrix.LineMatrix, locMatrix []matrix.Matrix) (dist float64) {
 	dist = math.MaxFloat64
 	loc := []matrix.Matrix{{0, 0}, {0, 0}}
-	if mark := relate.IsIntersectionEdge(from, to); mark {
+	if mark := operation.IsIntersectedLineMatrix(from, to); mark {
 		return 0
 	}
 	for _, v := range from {

@@ -6,12 +6,13 @@ import (
 
 	"github.com/spatial-go/geoos/algorithm/calc"
 	"github.com/spatial-go/geoos/algorithm/matrix"
-	"github.com/spatial-go/geoos/algorithm/relate"
+	"github.com/spatial-go/geoos/algorithm/operation"
 )
 
 // ConvexHullComputer Computes the convex hull of a Geometry.
 // The convex hull is the smallest convex Geometry that contains all the
-//  points in the input Geometry.
+//
+//	points in the input Geometry.
 type ConvexHullComputer struct {
 	inputPts []matrix.Matrix
 }
@@ -91,7 +92,7 @@ func (c *ConvexHullComputer) reduce() []matrix.Matrix {
 	}
 	reducedSet := list.New()
 	for _, v := range c.inputPts {
-		if !relate.InLineMatrix(v, ls) {
+		if !operation.InLineMatrix(v, ls) {
 			reducedSet.PushBack(v)
 		}
 	}

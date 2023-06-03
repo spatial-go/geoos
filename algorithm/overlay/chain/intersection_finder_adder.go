@@ -2,12 +2,12 @@ package chain
 
 import (
 	"github.com/spatial-go/geoos/algorithm/matrix"
-	"github.com/spatial-go/geoos/algorithm/relate"
+	"github.com/spatial-go/geoos/algorithm/operation"
 )
 
 // IntersectionFinderAdder Finds intersections between line segments , and adds them.
 type IntersectionFinderAdder struct {
-	Intersections relate.IntersectionPointLine
+	Intersections operation.IntersectionArray
 }
 
 // ProcessIntersections This method is called by clients  to process intersections for two segments being intersected.
@@ -25,7 +25,7 @@ func (ii *IntersectionFinderAdder) ProcessIntersections(
 		return
 	}
 
-	mark, ips := relate.Intersection(e0[segIndex0], e0[segIndex0+1], e1[segIndex1], e1[segIndex1+1])
+	mark, ips := operation.FindIntersection(e0[segIndex0], e0[segIndex0+1], e1[segIndex1], e1[segIndex1+1])
 
 	if mark {
 		ii.Intersections = append(ii.Intersections, ips...)

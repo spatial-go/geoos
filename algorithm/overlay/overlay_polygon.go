@@ -6,7 +6,7 @@ import (
 	"github.com/spatial-go/geoos/algorithm/filter"
 	"github.com/spatial-go/geoos/algorithm/graph/de9im"
 	"github.com/spatial-go/geoos/algorithm/matrix"
-	"github.com/spatial-go/geoos/algorithm/relate"
+	"github.com/spatial-go/geoos/algorithm/operation"
 )
 
 // PolygonOverlay  Computes the overlay of two geometries,either or both of which may be nil.
@@ -248,7 +248,7 @@ func (p *PolygonOverlay) Weiler() (enteringPoints, exitingPoints []Vertex) {
 		for _, vClip := range p.clippingPlane.Lines {
 
 			mark, ips :=
-				relate.Intersection(v.Start.Matrix, v.End.Matrix, vClip.Start.Matrix, vClip.End.Matrix)
+				operation.FindIntersection(v.Start.Matrix, v.End.Matrix, vClip.Start.Matrix, vClip.End.Matrix)
 			for _, ip := range ips {
 				//TODO
 				// if ip.IsCollinear {

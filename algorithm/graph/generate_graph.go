@@ -6,7 +6,7 @@ import (
 	"github.com/spatial-go/geoos/algorithm"
 	"github.com/spatial-go/geoos/algorithm/calc"
 	"github.com/spatial-go/geoos/algorithm/matrix"
-	"github.com/spatial-go/geoos/algorithm/relate"
+	"github.com/spatial-go/geoos/algorithm/operation"
 )
 
 // GenerateGraph create graph with matrix.
@@ -212,7 +212,7 @@ func matrixAndLineHandle(m1 matrix.Matrix, m2 matrix.LineMatrix, _, g2 Graph) er
 		} else if m1.Equals(ls.P1) {
 			continue
 		} else {
-			if inLine, _ = relate.InLine(m1, ls.P0, ls.P1); inLine {
+			if inLine, _ = operation.InLineSegment(m1, ls.P0, ls.P1); inLine {
 				line = append(line, m1)
 				node := &Node{Value: line, NodeType: LNode}
 				g2.AddNode(node)

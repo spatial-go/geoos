@@ -1,13 +1,11 @@
-// Package operation define valid func for geometries.
+// Package operation define Logical geometric func for geometries.
 package operation
 
 import (
 	"container/ring"
 
 	"github.com/spatial-go/geoos/algorithm/calc"
-	"github.com/spatial-go/geoos/algorithm/graph/de9im"
 	"github.com/spatial-go/geoos/algorithm/matrix"
-	"github.com/spatial-go/geoos/algorithm/relate"
 )
 
 // ValidOP describes a geographic Element Valid
@@ -54,7 +52,8 @@ func (el *ValidOP) isSimpleMultiSteric(matr matrix.Collection) bool {
 
 // isSimplePolygon Computes simplicity for polygonal geometries.
 // Polygonal geometries are simple if and only if
-//  all of their component rings are simple.
+//
+//	all of their component rings are simple.
 func (el *ValidOP) isSimplePolygon(matr matrix.PolygonMatrix) bool {
 	for _, ring := range matr {
 		elem := ValidOP{matrix.LineMatrix(ring)}
@@ -66,8 +65,9 @@ func (el *ValidOP) isSimplePolygon(matr matrix.PolygonMatrix) bool {
 }
 
 // isSimpleCollection Computes simplicity for collection geometries.
-//  geometries are simple if and only if
-//  all geometries are simple.
+//
+//	geometries are simple if and only if
+//	all geometries are simple.
 func (el *ValidOP) isSimpleCollection(matr matrix.Collection) bool {
 	el.isSimpleMultiSteric(matr)
 	for _, g := range matr {
@@ -90,7 +90,7 @@ func (el *ValidOP) isSimpleLine(matr matrix.LineMatrix) bool {
 			if i == j || j-i == 1 || i-j == 1 {
 				continue
 			}
-			if mark, ips := relate.IntersectionLineSegment(line1, line2); mark {
+			if mark, ips := FindIntersectionLineSegment(line1, line2); mark {
 				if (i == 0 && j == numLine-1) ||
 					(j == 0 && i == numLine-1) {
 					isIPoint := true
@@ -138,14 +138,18 @@ func CorrectPolygonMatrixSelfIntersect(ms matrix.Steric) matrix.Steric {
 		if mulitPoly.IsEmpty() {
 			return p
 		}
-		for _, s := range mulitPoly {
-			poly := s.(matrix.PolygonMatrix)
-			for i := 1; i < len(p); i++ {
-				if de9im.IM(poly, matrix.LineMatrix(p[i])).IsCovers() {
-					poly = append(poly, matrix.LineMatrix(p[i]))
-				}
-			}
-		}
+
+		//TODO optimize
+		// for _, s := range mulitPoly {
+		// 	poly := s.(matrix.PolygonMatrix)
+		// 	for i := 1; i < len(p); i++ {
+		// 		if de9im.IM(poly, matrix.LineMatrix(p[i])).IsCovers() {
+
+		//// append can Change address
+		// 			poly = append(poly, matrix.LineMatrix(p[i]))
+		// 		}
+		// 	}
+		// }
 		return mulitPoly
 	}
 	return ms
@@ -160,8 +164,8 @@ func CorrectRingSelfIntersect(shell matrix.LineMatrix) ([]matrix.LineMatrix, boo
 			if i == j || j-i == 1 || i-j == 1 {
 				continue
 			}
-			selfip := relate.IntersectionPoint{}
-			if ok, ips := relate.IntersectionLineSegment(&matrix.LineSegment{P0: shell[i], P1: shell[i+1]},
+			selfip := Intersection{}
+			if ok, ips := FindIntersectionLineSegment(&matrix.LineSegment{P0: shell[i], P1: shell[i+1]},
 				&matrix.LineSegment{P0: shell[j], P1: shell[j+1]}); ok {
 				if (i == 0 && j == numShell-2) ||
 					(j == 0 && i == numShell-2) {

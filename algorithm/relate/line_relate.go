@@ -2,6 +2,7 @@ package relate
 
 import (
 	"github.com/spatial-go/geoos/algorithm/matrix"
+	"github.com/spatial-go/geoos/algorithm/operation"
 )
 
 // LineRelate  be used during the relate computation.
@@ -30,7 +31,7 @@ func (p *LineRelate) IntersectionMatrix(im *matrix.IntersectionMatrix) *matrix.I
 func (p *LineRelate) computeLine(im *matrix.IntersectionMatrix) {
 
 	if p.other.(matrix.LineMatrix).IsClosed() {
-		mark, ips := IntersectionEdge(p.LineMatrix, p.other.(matrix.LineMatrix))
+		mark, ips := operation.FindIntersectionLineMatrix(p.LineMatrix, p.other.(matrix.LineMatrix))
 		if mark {
 			if ips.IsOriginal() {
 				im.SetAtLeastString("1FF00F102")
@@ -40,7 +41,7 @@ func (p *LineRelate) computeLine(im *matrix.IntersectionMatrix) {
 			return
 		}
 		for _, v := range p.LineMatrix {
-			if InPolygon(v, p.other.(matrix.LineMatrix)) {
+			if operation.IsPnPolygon(v, p.other.(matrix.LineMatrix)) {
 				im.SetAtLeastString("FF1FF01F2")
 				return
 			}
@@ -48,7 +49,7 @@ func (p *LineRelate) computeLine(im *matrix.IntersectionMatrix) {
 		im.SetAtLeastString("FF1FF01F2")
 		return
 	}
-	mark, ips := IntersectionEdge(p.LineMatrix, p.other.(matrix.LineMatrix))
+	mark, ips := operation.FindIntersectionLineMatrix(p.LineMatrix, p.other.(matrix.LineMatrix))
 	if mark {
 		if ips.IsOriginal() {
 			im.SetAtLeastString("1FF00F102")
@@ -65,7 +66,7 @@ func (p *LineRelate) computePolygon(im *matrix.IntersectionMatrix) {
 	interNum := 0
 
 	for i, v := range p.other.(matrix.PolygonMatrix) {
-		mark, ips := IntersectionEdge(p.LineMatrix, matrix.LineMatrix(v))
+		mark, ips := operation.FindIntersectionLineMatrix(p.LineMatrix, matrix.LineMatrix(v))
 		if ips.IsOriginal() {
 			interNum = 1
 		}
@@ -74,13 +75,13 @@ func (p *LineRelate) computePolygon(im *matrix.IntersectionMatrix) {
 			break
 		}
 		if i == 0 {
-			if InPolygon(p.LineMatrix[0], v) {
+			if operation.IsPnPolygon(p.LineMatrix[0], v) {
 				inRing = 0
 			} else {
 				inRing = 2
 			}
 		} else {
-			if InPolygon(p.LineMatrix[0], matrix.LineMatrix(v)) {
+			if operation.IsPnPolygon(p.LineMatrix[0], matrix.LineMatrix(v)) {
 				if inRing != 2 {
 					inRing = 2
 					break

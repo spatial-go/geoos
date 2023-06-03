@@ -2,9 +2,8 @@ package clipping
 
 import (
 	"github.com/spatial-go/geoos/algorithm"
-	"github.com/spatial-go/geoos/algorithm/graph/de9im"
 	"github.com/spatial-go/geoos/algorithm/matrix"
-	"github.com/spatial-go/geoos/algorithm/relate"
+	"github.com/spatial-go/geoos/algorithm/operation"
 )
 
 // PointClipping  Computes the overlay of two geometries.
@@ -26,23 +25,23 @@ func (p *PointClipping) Union() (matrix.Steric, error) {
 			return matrix.Collection{ps, pc}, nil
 		case matrix.LineMatrix:
 			if pc.IsClosed() {
-				if relate.InLineMatrix(ps, pc) {
+				if operation.InLineMatrix(ps, pc) {
 					return matrix.PolygonMatrix{pc}, nil
 				}
-				if relate.InPolygon(ps, pc) {
+				if operation.IsPnPolygon(ps, pc) {
 					return matrix.PolygonMatrix{pc}, nil
 				}
 			}
-			if relate.InLineMatrix(ps, pc) {
+			if operation.InLineMatrix(ps, pc) {
 				return pc, nil
 			}
 
 			return matrix.Collection{ps, pc}, nil
 		case matrix.PolygonMatrix:
-			switch pointInPolygon, _ := de9im.IsInPolygon(ps, pc); pointInPolygon {
-			case de9im.OnlyInLine, de9im.OnlyInPolygon:
+			switch pointInPolygon, _ := operation.InPolygon(ps, pc); pointInPolygon {
+			case operation.OnlyInLine, operation.OnlyInPolygon:
 				return pc, nil
-			case de9im.OnlyOutPolygon:
+			case operation.OnlyOutPolygon:
 				return matrix.Collection{ps, pc}, nil
 			}
 		case matrix.Collection:
@@ -76,16 +75,16 @@ func (p *PointClipping) Intersection() (matrix.Steric, error) {
 			}
 			return nil, nil
 		case matrix.LineMatrix:
-			if mark := relate.InLineMatrix(ps, pc); mark {
+			if mark := operation.InLineMatrix(ps, pc); mark {
 				return ps, nil
 			}
 			return nil, nil
 		case matrix.PolygonMatrix:
 
-			switch pointInPolygon, _ := de9im.IsInPolygon(ps, pc); pointInPolygon {
-			case de9im.OnlyInLine, de9im.OnlyInPolygon:
+			switch pointInPolygon, _ := operation.InPolygon(ps, pc); pointInPolygon {
+			case operation.OnlyInLine, operation.OnlyInPolygon:
 				return ps, nil
-			case de9im.OnlyOutPolygon:
+			case operation.OnlyOutPolygon:
 				return nil, nil
 			}
 		}

@@ -4,12 +4,12 @@ import (
 	"sort"
 
 	"github.com/spatial-go/geoos/algorithm/matrix"
-	"github.com/spatial-go/geoos/algorithm/relate"
+	"github.com/spatial-go/geoos/algorithm/operation"
 )
 
 // IntersectionCollinear Finds intersections between line segments , and adds them.
 type IntersectionCollinear struct {
-	Intersections relate.IntersectionPointLine
+	Intersections operation.IntersectionArray
 	Edge          matrix.LineMatrix
 
 	result matrix.Collection
@@ -31,7 +31,7 @@ func (ii *IntersectionCollinear) ProcessIntersections(
 	if segIndex0 > len(e0)-1 || segIndex1 > len(e1)-1 {
 		return
 	}
-	mark, ips := relate.Intersection(e0[segIndex0], e0[segIndex0+1], e1[segIndex1], e1[segIndex1+1])
+	mark, ips := operation.FindIntersection(e0[segIndex0], e0[segIndex0+1], e1[segIndex1], e1[segIndex1+1])
 
 	if mark {
 		if tes, _ := (matrix.Matrix(e0[segIndex0])).Compare(matrix.Matrix(e0[segIndex0+1])); tes > 0 {

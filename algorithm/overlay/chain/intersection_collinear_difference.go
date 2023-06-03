@@ -4,7 +4,7 @@ import (
 	"sort"
 
 	"github.com/spatial-go/geoos/algorithm/matrix"
-	"github.com/spatial-go/geoos/algorithm/relate"
+	"github.com/spatial-go/geoos/algorithm/operation"
 )
 
 // IntersectionCollinearDifference Finds interior intersections between line segments , and adds them.
@@ -27,7 +27,7 @@ func (ii *IntersectionCollinearDifference) ProcessIntersections(
 	if segIndex0 > len(e0)-1 || segIndex1 > len(e1)-1 {
 		return
 	}
-	mark, ips := relate.Intersection(e0[segIndex0], e0[segIndex0+1], e1[segIndex1], e1[segIndex1+1])
+	mark, ips := operation.FindIntersection(e0[segIndex0], e0[segIndex0+1], e1[segIndex1], e1[segIndex1+1])
 	if mark {
 		var monos = []*MonotoneChain{}
 		var mono *MonotoneChain
@@ -44,7 +44,7 @@ func (ii *IntersectionCollinearDifference) ProcessIntersections(
 		}
 		if monoNum > 1 {
 			for _, v := range monos {
-				if markInter := relate.IsIntersectionEdge(v.Edge, matrix.LineMatrix{e1[segIndex1], e1[segIndex1+1]}); markInter {
+				if markInter := operation.IsIntersectedLineMatrix(v.Edge, matrix.LineMatrix{e1[segIndex1], e1[segIndex1+1]}); markInter {
 					mono = v
 					edge = mono.Edge
 					mono.Context = false

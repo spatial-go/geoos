@@ -6,7 +6,7 @@ import (
 
 	"github.com/spatial-go/geoos/algorithm/calc"
 	"github.com/spatial-go/geoos/algorithm/matrix"
-	"github.com/spatial-go/geoos/algorithm/relate"
+	"github.com/spatial-go/geoos/algorithm/operation"
 )
 
 // IntersectionCorrelation Finds intersections between line segments , and adds them.
@@ -36,23 +36,23 @@ func (ii *IntersectionCorrelation) ProcessIntersections(
 			if e0.IsClosed() {
 				return
 			}
-			inr0 := &IntersectionNodeResult{0, 1, relate.IntersectionPoint{Matrix: matrix.Matrix(ii.Edge[0]), IsCollinear: true},
+			inr0 := &IntersectionNodeResult{0, 1, operation.Intersection{Matrix: matrix.Matrix(ii.Edge[0]), IsCollinear: true},
 				matrix.LineSegment{P0: ii.Edge[0], P1: ii.Edge[1]}, matrix.LineSegment{P0: ii.Edge[0], P1: ii.Edge[1]}, ii.Edge1}
 			ii.result0 = append(ii.result0, inr0)
 			ii.result0 = append(ii.result0, inr0)
 			if !matrix.Matrix(ii.Edge[len(ii.Edge)-1]).Equals(matrix.Matrix(ii.Edge[0])) {
-				inr0 = &IntersectionNodeResult{len(ii.Edge) - 2, len(ii.Edge) - 1, relate.IntersectionPoint{Matrix: matrix.Matrix(ii.Edge[len(ii.Edge)-1]), IsCollinear: true},
+				inr0 = &IntersectionNodeResult{len(ii.Edge) - 2, len(ii.Edge) - 1, operation.Intersection{Matrix: matrix.Matrix(ii.Edge[len(ii.Edge)-1]), IsCollinear: true},
 					matrix.LineSegment{P0: ii.Edge[0], P1: ii.Edge[len(ii.Edge)-1]}, matrix.LineSegment{P0: ii.Edge[0], P1: ii.Edge[len(ii.Edge)-1]}, ii.Edge1}
 				ii.result0 = append(ii.result0, inr0)
 				ii.result0 = append(ii.result0, inr0)
 			}
 
-			inr0 = &IntersectionNodeResult{0, 1, relate.IntersectionPoint{Matrix: matrix.Matrix(ii.Edge1[0]), IsCollinear: true},
+			inr0 = &IntersectionNodeResult{0, 1, operation.Intersection{Matrix: matrix.Matrix(ii.Edge1[0]), IsCollinear: true},
 				matrix.LineSegment{P0: ii.Edge1[0], P1: ii.Edge1[1]}, matrix.LineSegment{P0: ii.Edge1[0], P1: ii.Edge1[1]}, ii.Edge}
 			ii.result1 = append(ii.result1, inr0)
 			ii.result1 = append(ii.result1, inr0)
 			if !matrix.Matrix(ii.Edge[len(ii.Edge)-1]).Equals(matrix.Matrix(ii.Edge[0])) {
-				inr0 = &IntersectionNodeResult{len(ii.Edge1) - 2, len(ii.Edge1) - 1, relate.IntersectionPoint{Matrix: matrix.Matrix(ii.Edge1[len(ii.Edge1)-1]), IsCollinear: true},
+				inr0 = &IntersectionNodeResult{len(ii.Edge1) - 2, len(ii.Edge1) - 1, operation.Intersection{Matrix: matrix.Matrix(ii.Edge1[len(ii.Edge1)-1]), IsCollinear: true},
 					matrix.LineSegment{P0: ii.Edge1[0], P1: ii.Edge1[len(ii.Edge1)-1]}, matrix.LineSegment{P0: ii.Edge1[0], P1: ii.Edge1[len(ii.Edge1)-1]}, ii.Edge}
 				ii.result1 = append(ii.result1, inr0)
 				ii.result1 = append(ii.result1, inr0)
@@ -66,7 +66,7 @@ func (ii *IntersectionCorrelation) ProcessIntersections(
 		return
 	}
 
-	mark, ips := relate.Intersection(e0[segIndex0], e0[segIndex0+1], e1[segIndex1], e1[segIndex1+1])
+	mark, ips := operation.FindIntersection(e0[segIndex0], e0[segIndex0+1], e1[segIndex1], e1[segIndex1+1])
 
 	if mark {
 		if tes, _ := (matrix.Matrix(e0[segIndex0])).Compare(matrix.Matrix(e0[segIndex0+1])); tes > 0 {
@@ -125,7 +125,7 @@ func (ic *IntersectionCorrelationNode) String() string {
 type IntersectionNodeResult struct {
 	Pos       int
 	End       int
-	InterNode relate.IntersectionPoint
+	InterNode operation.Intersection
 	Line      matrix.LineSegment
 	OtherLine matrix.LineSegment
 	OtherEdge matrix.LineMatrix
