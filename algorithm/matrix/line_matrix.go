@@ -6,6 +6,7 @@ import (
 	"math"
 
 	"github.com/spatial-go/geoos/algorithm/calc"
+	"github.com/spatial-go/geoos/algorithm/filter"
 	"github.com/spatial-go/geoos/space/spaceerr"
 )
 
@@ -162,11 +163,11 @@ func (l LineMatrix) EqualsExact(ms Steric, tolerance float64) bool {
 }
 
 // Filter Performs an operation with the provided .
-func (l LineMatrix) Filter(f Filter) Steric {
-	f.FilterMatrixes(TransMatrixes(l))
+func (l LineMatrix) Filter(f filter.Filter[Matrix]) Steric {
+	f.FilterEntities(TransMatrixes(l))
 	if f.IsChanged() {
 		l = l[:0]
-		for _, v := range f.Matrixes() {
+		for _, v := range f.Entities() {
 			l = append(l, v)
 		}
 		return l

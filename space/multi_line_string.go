@@ -2,6 +2,7 @@ package space
 
 import (
 	"github.com/spatial-go/geoos/algorithm/buffer"
+	"github.com/spatial-go/geoos/algorithm/filter"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
 	"github.com/spatial-go/geoos/algorithm/operation"
@@ -118,12 +119,14 @@ func (mls MultiLineString) IsEmpty() bool {
 
 // Distance returns distance Between the two Geometry.
 func (mls MultiLineString) Distance(g Geometry) (float64, error) {
-	return Distance(mls, g, measure.PlanarDistance)
+	pg := PlanarGeom[MultiLineString]{mls}
+	return pg.Distance(g, measure.PlanarDistance)
 }
 
 // SpheroidDistance returns  spheroid distance Between the two Geometry.
 func (mls MultiLineString) SpheroidDistance(g Geometry) (float64, error) {
-	return Distance(mls, g, measure.SpheroidDistance)
+	pg := PlanarGeom[MultiLineString]{mls}
+	return pg.Distance(g, measure.SpheroidDistance)
 }
 
 // Boundary returns the closure of the combinatorial boundary of this space.Geometry.
@@ -178,7 +181,8 @@ func (mls MultiLineString) IsSimple() bool {
 
 // Centroid Computes the centroid point of a geometry.
 func (mls MultiLineString) Centroid() Point {
-	return Centroid(mls)
+	pg := PlanarGeom[MultiLineString]{mls}
+	return pg.Centroid()
 }
 
 // UniquePoints return all distinct vertices of input geometry as a MultiPoint.
@@ -208,13 +212,15 @@ func (mls MultiLineString) SimplifyP(tolerance float64) Geometry {
 // Buffer Returns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
 func (mls MultiLineString) Buffer(width float64, quadsegs int) Geometry {
-	return bufferInOriginal(mls, width, quadsegs)
+	pg := PlanarGeom[MultiLineString]{mls}
+	return pg.bufferInOriginal(width, quadsegs)
 }
 
 // BufferInMeter Returns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
 func (mls MultiLineString) BufferInMeter(width float64, quadsegs int) Geometry {
-	return bufferInMeter(mls, width, quadsegs)
+	pg := PlanarGeom[MultiLineString]{mls}
+	return pg.bufferInMeter(width, quadsegs)
 }
 
 // Envelope returns the  minimum bounding box for the supplied geometry, as a geometry.
@@ -271,7 +277,7 @@ func (mls MultiLineString) CoordinateSystem() int {
 }
 
 // Filter Performs an operation with the provided .
-func (mls MultiLineString) Filter(f matrix.Filter) Geometry {
+func (mls MultiLineString) Filter(f filter.Filter[matrix.Matrix]) Geometry {
 	if f.IsChanged() {
 		ml := mls[:0]
 		for _, v := range mls {

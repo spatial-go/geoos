@@ -3,6 +3,7 @@ package measure
 import (
 	"fmt"
 
+	"github.com/spatial-go/geoos/algorithm/filter"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 )
 
@@ -141,60 +142,61 @@ func ProjectionFactor(p, a, b matrix.Matrix) float64 {
 }
 
 // MaxPointDistanceFilter ...
-type MaxPointDistanceFilter struct {
+type MaxPointDistanceFilter[T matrix.Matrix] struct {
 	MaxPtDist, MinPtDist *PointPairDistance
 	euclideanDist        *DistanceToPoint
 	geom                 matrix.Steric
 }
 
 // IsChanged  Returns the true when need change.
-func (m *MaxPointDistanceFilter) IsChanged() bool {
+func (m *MaxPointDistanceFilter[T]) IsChanged() bool {
 	return false
 }
 
 // Filter  Performs an operation with the provided .
-func (m *MaxPointDistanceFilter) Filter(pt matrix.Matrix) {
+func (m *MaxPointDistanceFilter[T]) Filter(pt matrix.Matrix) bool {
 	m.MinPtDist.IsNil = true
 	(&DistanceToPoint{}).computeDistance(m.geom, pt, m.MinPtDist)
 	m.MaxPtDist.setMaximum(m.MinPtDist)
+	return true
 }
 
 // FilterMatrixes  Performs an operation with the provided .
-func (m *MaxPointDistanceFilter) FilterMatrixes(pts []matrix.Matrix) {
+func (m *MaxPointDistanceFilter[T]) FilterEntities(pts []matrix.Matrix) {
 	for i := 0; i < len(pts); i++ {
 		m.Filter(pts[i])
 	}
 }
 
 // Matrixes  Returns the gathered Matrixes.
-func (m *MaxPointDistanceFilter) Matrixes() []matrix.Matrix {
+func (m *MaxPointDistanceFilter[T]) Entities() []matrix.Matrix {
 	return matrix.TransMatrixes(m.geom)
 }
 
 // Clear  clear Matrixes.
-func (m *MaxPointDistanceFilter) Clear() {
+func (m *MaxPointDistanceFilter[T]) Clear() {
 
 }
 
 // MaxDensifiedByFractionDistanceFilter ...
-type MaxDensifiedByFractionDistanceFilter struct {
+type MaxDensifiedByFractionDistanceFilter[T matrix.Matrix] struct {
 	MaxPtDist, MinPtDist *PointPairDistance
 	geom                 matrix.Steric
 	numSubSegs           int
 }
 
 // IsChanged  Returns the true when need change.
-func (m *MaxDensifiedByFractionDistanceFilter) IsChanged() bool {
+func (m *MaxDensifiedByFractionDistanceFilter[T]) IsChanged() bool {
 	return false
 }
 
 // Matrixes  Returns the gathered Matrixes.
-func (m *MaxDensifiedByFractionDistanceFilter) Matrixes() []matrix.Matrix {
+func (m *MaxDensifiedByFractionDistanceFilter[T]) Entities() []matrix.Matrix {
 	return matrix.TransMatrixes(m.geom)
 }
 
 // FilterMatrixes  Performs an operation with the provided .
-func (m *MaxDensifiedByFractionDistanceFilter) FilterMatrixes(pts []matrix.Matrix) {
+func (m *MaxDensifiedByFractionDistanceFilter[T]) FilterEntities(pts []matrix.Matrix) {
 
 	if len(pts) == 0 {
 		return
@@ -205,7 +207,7 @@ func (m *MaxDensifiedByFractionDistanceFilter) FilterMatrixes(pts []matrix.Matri
 }
 
 // filterTwo  Performs an operation with the provided .
-func (m *MaxDensifiedByFractionDistanceFilter) filterTwo(pts []matrix.Matrix, index int) {
+func (m *MaxDensifiedByFractionDistanceFilter[T]) filterTwo(pts []matrix.Matrix, index int) {
 	//This logic also handles skipping Point geometries
 	if index == 0 {
 		return
@@ -229,16 +231,17 @@ func (m *MaxDensifiedByFractionDistanceFilter) filterTwo(pts []matrix.Matrix, in
 }
 
 // Clear  clear Matrixes.
-func (m *MaxDensifiedByFractionDistanceFilter) Clear() {
+func (m *MaxDensifiedByFractionDistanceFilter[T]) Clear() {
 
 }
 
 // Filter  Performs an operation with the provided .
-func (m *MaxDensifiedByFractionDistanceFilter) Filter(pt matrix.Matrix) {
+func (m *MaxDensifiedByFractionDistanceFilter[T]) Filter(pt matrix.Matrix) bool {
+	return true
 }
 
 // compile time checks
 var (
-	_ matrix.Filter = &MaxDensifiedByFractionDistanceFilter{}
-	_ matrix.Filter = &MaxPointDistanceFilter{}
+	_ filter.Filter[matrix.Matrix] = &MaxDensifiedByFractionDistanceFilter[matrix.Matrix]{}
+	_ filter.Filter[matrix.Matrix] = &MaxPointDistanceFilter[matrix.Matrix]{}
 )

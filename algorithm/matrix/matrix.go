@@ -7,6 +7,7 @@ import (
 
 	"github.com/spatial-go/geoos/algorithm"
 	"github.com/spatial-go/geoos/algorithm/calc"
+	"github.com/spatial-go/geoos/algorithm/filter"
 )
 
 // Steric is the interface implemented by other Steric objects
@@ -40,7 +41,7 @@ type Steric interface {
 	Bound() Bound
 
 	// Filter Performs an operation with the provided .
-	Filter(f Filter) Steric
+	Filter(f filter.Filter[Matrix]) Steric
 
 	// String ...
 	String() string
@@ -233,7 +234,7 @@ func (m Matrix) EqualsExact(ms Steric, tolerance float64) bool {
 }
 
 // Filter Performs an operation with the provided .
-func (m Matrix) Filter(f Filter) Steric {
+func (m Matrix) Filter(f filter.Filter[Matrix]) Steric {
 	return m
 }
 

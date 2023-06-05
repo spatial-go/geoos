@@ -6,6 +6,7 @@ import (
 
 	"github.com/spatial-go/geoos/algorithm"
 	"github.com/spatial-go/geoos/algorithm/calc"
+	"github.com/spatial-go/geoos/algorithm/filter"
 )
 
 // A Collection is a collection of sterices that is also a Steric.
@@ -142,7 +143,7 @@ func (c Collection) EqualsExact(ms Steric, tolerance float64) bool {
 }
 
 // Filter Performs an operation with the provided .
-func (c Collection) Filter(f Filter) Steric {
+func (c Collection) Filter(f filter.Filter[Matrix]) Steric {
 	if f.IsChanged() {
 		mc := c[:0]
 		for _, v := range c {

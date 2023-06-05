@@ -179,20 +179,16 @@ func TestMultiPolygonMatrix_EqualsExact(t *testing.T) {
 }
 
 func TestMultiPolygonMatrix_Filter(t *testing.T) {
-	type args struct {
-		f Filter
-	}
 	tests := []struct {
 		name string
 		m    MultiPolygonMatrix
-		args args
 		want Steric
 	}{
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.m.Filter(tt.args.f); !reflect.DeepEqual(got, tt.want) {
+			if got := tt.m.Filter(CreateFilterMatrix()); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("MultiPolygonMatrix.Filter() = %v, want %v", got, tt.want)
 			}
 		})

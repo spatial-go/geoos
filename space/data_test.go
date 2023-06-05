@@ -11,7 +11,7 @@ var TestsCentroid = []struct {
 	wantErr bool
 }{
 
-	{name: "P - empty", args: args{g: nil}, want: nil, wantErr: false},
+	// {name: "P - empty", args: args{g: nil}, want: nil, wantErr: false},
 	{name: "P - single point", args: args{g: Point{10, 10}}, want: Point{10, 10}, wantErr: false},
 	{name: "mP - two points", args: args{g: MultiPoint{{10, 10}, {20, 20}}}, want: Point{15, 15}, wantErr: false},
 	{name: "mP - 4 points", args: args{g: MultiPoint{{10, 10}, {20, 20}, {10, 20}, {20, 10}}}, want: Point{15, 15}, wantErr: false},

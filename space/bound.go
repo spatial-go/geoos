@@ -3,6 +3,7 @@ package space
 import (
 	"math"
 
+	"github.com/spatial-go/geoos/algorithm/filter"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/space/spaceerr"
 )
@@ -222,7 +223,7 @@ func (b Bound) IsSimple() bool {
 
 // Centroid Computes the centroid point of a geometry.
 func (b Bound) Centroid() Point {
-	return Centroid(b.ToRing())
+	return b.ToRing().Centroid()
 }
 
 // UniquePoints return all distinct vertices of input geometry as a MultiPoint.
@@ -314,7 +315,7 @@ func (b Bound) CoordinateSystem() int {
 }
 
 // Filter Performs an operation with the provided .
-func (b Bound) Filter(f matrix.Filter) Geometry {
+func (b Bound) Filter(f filter.Filter[matrix.Matrix]) Geometry {
 	return b
 }
 

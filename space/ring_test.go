@@ -3,12 +3,13 @@ package space
 import (
 	"testing"
 
+	"github.com/spatial-go/geoos/algorithm/filter"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 )
 
 func TestRing_Filter(t *testing.T) {
 
-	var f matrix.Filter = &matrix.UniqueArrayFilter{}
+	var f filter.Filter[matrix.Matrix] = matrix.CreateFilterMatrix()
 	tests := []struct {
 		name string
 		r    Ring

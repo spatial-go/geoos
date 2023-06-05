@@ -1,73 +1,31 @@
 package matrix
 
-// Filter  An interface  which use the values of the matrix in a  Steric.
-//  matrix filters can be used to implement centroid and
-//  envelope computation, and many other functions.
-type Filter interface {
-	// IsChanged  Returns the true when need change.
-	IsChanged() bool
+import "github.com/spatial-go/geoos/algorithm/filter"
 
-	// FilterMatrixes  Performs an operation with the provided .
-	FilterMatrixes(matrixes []Matrix)
-
-	// Filter  Performs an operation with the provided .
-	Filter(matrix Matrix)
-
-	// Matrixes Returns matrixes.
-	Matrixes() []Matrix
-
-	// Clear  clear matrixes.
-	Clear()
-}
-
-// UniqueArrayFilter  A Filter that extracts a unique array.
-type UniqueArrayFilter struct {
-	matrixes    []Matrix
-	IsNotChange bool
-}
-
-// IsChanged  Returns the true when need change.
-func (u *UniqueArrayFilter) IsChanged() bool {
-	return !u.IsNotChange
-}
-
-// Matrixes  Returns the gathered Matrixes.
-func (u *UniqueArrayFilter) Matrixes() []Matrix {
-	return u.matrixes
-}
-
-// Clear  Returns the gathered Matrixes.
-func (u *UniqueArrayFilter) Clear() {
-	u.matrixes = []Matrix{}
-}
-
-// Filter Performs an operation with the provided .
-func (u *UniqueArrayFilter) Filter(matrix Matrix) {
-	u.add(matrix)
-}
-
-// FilterMatrixes Performs an operation with the provided .
-func (u *UniqueArrayFilter) FilterMatrixes(matrixes []Matrix) {
-	for _, v := range matrixes {
-		u.Filter(v)
-	}
-
-}
-
-func (u *UniqueArrayFilter) add(matrix Matrix) {
-	hasMatrix := false
-	for _, v := range u.matrixes {
-		if v.Equals(matrix) {
-			hasMatrix = true
-			break
+func CreateFilterMatrix() filter.Filter[Matrix] {
+	f := &filter.UniqueArrayFilter[Matrix]{FilterFunc: func(param1, param2 any) bool {
+		if v1, ok := param1.(Matrix); ok {
+			if v2, ok := param2.(Matrix); ok {
+				if v1.Equals(v2) {
+					return true
+				}
+			}
 		}
-	}
-	if !hasMatrix {
-		u.matrixes = append(u.matrixes, matrix)
-	}
+		return false
+	}}
+	return f
 }
+func CreateFilterMatrixNotChanged() filter.Filter[Matrix] {
+	f := &filter.UniqueArrayFilter[Matrix]{IsNotChange: true, FilterFunc: func(param1, param2 any) bool {
+		if v1, ok := param1.(Matrix); ok {
+			if v2, ok := param2.(Matrix); ok {
+				if v1.Equals(v2) {
+					return true
+				}
+			}
+		}
+		return false
 
-// compile time checks
-var (
-	_ Filter = &UniqueArrayFilter{}
-)
+	}}
+	return f
+}

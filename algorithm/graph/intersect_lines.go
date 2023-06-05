@@ -39,12 +39,21 @@ func IntersectmultiLines(m1 matrix.LineMatrix, m2 []matrix.LineMatrix) chain.Cor
 
 func sortIntersectionNode(ins chain.IntersectionNodeOfLine) chain.IntersectionNodeOfLine {
 	sort.Sort(ins)
-	filter := IntersectionNodeUniqueArrayFilter{}
+	filter := filter.UniqueArrayFilter[*chain.IntersectionNodeResult]{FilterFunc: func(p1, p2 any) bool {
+		if v1, ok := p1.(*chain.IntersectionNodeResult); ok {
+			if v2, ok := p2.(*chain.IntersectionNodeResult); ok {
+				if v1.InterNode.Matrix.Equals(v2.InterNode.Matrix) {
+					return true
+				}
+			}
+		}
+		return false
+	}}
 	for _, v := range ins {
 		filter.Filter(v)
 	}
 	result := filter.Entities()
-	return result.(chain.IntersectionNodeOfLine)
+	return chain.IntersectionNodeOfLine(result)
 }
 
 // IntersectLinePolygon returns a Collection  that represents that part of geometry A intersect with geometry B.
@@ -98,37 +107,40 @@ func IntersectPolygons(poly1, poly2 matrix.PolygonMatrix) []chain.CorrelationNod
 	return result
 }
 
-// IntersectionNodeUniqueArrayFilter  A Filter that extracts a unique array.
-type IntersectionNodeUniqueArrayFilter struct {
-	entities chain.IntersectionNodeOfLine
-}
-
-// Entities  Returns the gathered Matrixes.
-func (u *IntersectionNodeUniqueArrayFilter) Entities() interface{} {
-	return u.entities
-}
-
-// Filter Performs an operation with the provided .
-func (u *IntersectionNodeUniqueArrayFilter) Filter(entity interface{}) bool {
-	return u.add(entity)
-}
-
-func (u *IntersectionNodeUniqueArrayFilter) add(entity interface{}) bool {
-	hasMatrix := false
-	for _, v := range u.entities {
-		if v.InterNode.Matrix.Equals(entity.(*chain.IntersectionNodeResult).InterNode.Matrix) {
-			hasMatrix = true
-			break
-		}
-	}
-	if !hasMatrix {
-		u.entities = append(u.entities, entity.(*chain.IntersectionNodeResult))
-		return true
-	}
-	return false
-}
-
-// compile time checks
-var (
-	_ filter.Filter = &IntersectionNodeUniqueArrayFilter{}
-)
+// // IntersectionNodeUniqueArrayFilter  A Filter that extracts a unique array.
+// type IntersectionNodeUniqueArrayFilter struct {
+// 	entities chain.IntersectionNodeOfLine
+// }
+//
+// // Entities  Returns the gathered Matrixes.
+// func (u *IntersectionNodeUniqueArrayFilter) Entities() interface{} {
+// 	return u.entities
+// }
+//
+// // Filter Performs an operation with the provided .
+// func (u *IntersectionNodeUniqueArrayFilter) Filter(entity interface{}) bool {
+// 	return u.add(entity)
+// }
+//
+// func (u *IntersectionNodeUniqueArrayFilter) add(entity interface{}) bool {
+// 	hasMatrix := false
+// 	for _, v := range u.entities {
+// 		if v.InterNode.Matrix.Equals(entity.(*chain.IntersectionNodeResult).InterNode.Matrix) {
+// 			hasMatrix = true
+// 			break
+// 		}
+// 	}
+// 	if !hasMatrix {
+// 		u.entities = append(u.entities, entity.(*chain.IntersectionNodeResult))
+// 		return true
+// 	}
+// 	return false
+// }
+//
+// // compile time checks
+// var (
+// 	_ filter.Filter = &IntersectionNodeUniqueArrayFilter{}
+// )
+//
+//
+// []*IntersectionNodeResult

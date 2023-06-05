@@ -2,11 +2,11 @@ package space
 
 import (
 	"github.com/spatial-go/geoos/algorithm/buffer"
+	"github.com/spatial-go/geoos/algorithm/filter"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
 	"github.com/spatial-go/geoos/algorithm/operation"
 	"github.com/spatial-go/geoos/algorithm/simplify"
-	"github.com/spatial-go/geoos/coordtransform"
 	"github.com/spatial-go/geoos/space/spaceerr"
 )
 
@@ -128,12 +128,14 @@ func (ls LineString) IsEmpty() bool {
 
 // Distance returns distance Between the two Geometry.
 func (ls LineString) Distance(g Geometry) (float64, error) {
-	return Distance(ls, g, measure.PlanarDistance)
+	pg := PlanarGeom[LineString]{ls}
+	return pg.Distance(g, measure.PlanarDistance)
 }
 
 // SpheroidDistance returns  spheroid distance Between the two Geometry.
 func (ls LineString) SpheroidDistance(g Geometry) (float64, error) {
-	return Distance(ls, g, measure.SpheroidDistance)
+	pg := PlanarGeom[LineString]{ls}
+	return pg.Distance(g, measure.SpheroidDistance)
 }
 
 // Boundary returns the closure of the combinatorial boundary of this space.Geometry.
@@ -168,7 +170,8 @@ func (ls LineString) IsSimple() bool {
 
 // Centroid Computes the centroid point of a geometry.
 func (ls LineString) Centroid() Point {
-	return Centroid(ls)
+	pg := PlanarGeom[LineString]{ls}
+	return pg.Centroid()
 }
 
 // UniquePoints return all distinct vertices of input geometry as a MultiPoint.
@@ -198,31 +201,15 @@ func (ls LineString) SimplifyP(tolerance float64) Geometry {
 // Buffer Returns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
 func (ls LineString) Buffer(width float64, quadsegs int) Geometry {
-	return bufferInOriginal(ls, width, quadsegs)
+	pg := PlanarGeom[LineString]{ls}
+	return pg.bufferInOriginal(width, quadsegs)
 }
 
 // BufferInMeter Returns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
 func (ls LineString) BufferInMeter(width float64, quadsegs int) Geometry {
-
-	distances := make([]float64, len(ls))
-
-	for i := range distances {
-		distances[i] = measure.MercatorDistance(width, Point(ls[i]).Lat())
-	}
-
-	transformer := coordtransform.NewTransformer(coordtransform.LLTOMERCATOR)
-	geomMatrix, _ := transformer.TransformGeometry(ls.ToMatrix())
-
-	lbuffer := &buffer.VariableLineBuffer{Line: geomMatrix.(matrix.LineMatrix), QuadrantSegments: quadsegs}
-	resultMatrix := lbuffer.DistancesBuffer(distances)
-	geometry := TransGeometry(resultMatrix)
-	if geometry != nil {
-		transformer.CoordType = coordtransform.MERCATORTOLL
-		geomMatrix, _ = transformer.TransformGeometry(geometry.ToMatrix())
-		geometry = TransGeometry(geomMatrix)
-	}
-	return geometry
+	pg := PlanarGeom[LineString]{ls}
+	return pg.bufferInMeter(width, quadsegs)
 }
 
 // Envelope returns the  minimum bounding box for the supplied geometry, as a geometry.
@@ -285,11 +272,11 @@ func (ls LineString) CoordinateSystem() int {
 }
 
 // Filter Performs an operation with the provided .
-func (ls LineString) Filter(f matrix.Filter) Geometry {
-	f.FilterMatrixes(matrix.TransMatrixes(ls.ToMatrix()))
+func (ls LineString) Filter(f filter.Filter[matrix.Matrix]) Geometry {
+	f.FilterEntities(matrix.TransMatrixes(ls.ToMatrix()))
 	if f.IsChanged() {
 		ls = ls[:0]
-		for _, v := range f.Matrixes() {
+		for _, v := range f.Entities() {
 			ls = append(ls, v)
 		}
 		return ls

@@ -2,6 +2,7 @@ package space
 
 import (
 	"github.com/spatial-go/geoos/algorithm/buffer"
+	"github.com/spatial-go/geoos/algorithm/filter"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
 	"github.com/spatial-go/geoos/algorithm/operation"
@@ -111,12 +112,14 @@ func (mp MultiPolygon) IsEmpty() bool {
 
 // Distance returns distance Between the two Geometry.
 func (mp MultiPolygon) Distance(g Geometry) (float64, error) {
-	return Distance(mp, g, measure.PlanarDistance)
+	pg := PlanarGeom[MultiPolygon]{mp}
+	return pg.Distance(g, measure.PlanarDistance)
 }
 
 // SpheroidDistance returns  spheroid distance Between the two Geometry.
 func (mp MultiPolygon) SpheroidDistance(g Geometry) (float64, error) {
-	return Distance(mp, g, measure.SpheroidDistance)
+	pg := PlanarGeom[MultiPolygon]{mp}
+	return pg.Distance(g, measure.SpheroidDistance)
 }
 
 // Boundary returns the closure of the combinatorial boundary of this space.Geometry.
@@ -154,7 +157,8 @@ func (mp MultiPolygon) IsSimple() bool {
 
 // Centroid Computes the centroid point of a geometry.
 func (mp MultiPolygon) Centroid() Point {
-	return Centroid(mp)
+	pg := PlanarGeom[MultiPolygon]{mp}
+	return pg.Centroid()
 }
 
 // UniquePoints return all distinct vertices of input geometry as a MultiPoint.
@@ -184,13 +188,15 @@ func (mp MultiPolygon) SimplifyP(tolerance float64) Geometry {
 // Buffer Returns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
 func (mp MultiPolygon) Buffer(width float64, quadsegs int) Geometry {
-	return bufferInOriginal(mp, width, quadsegs)
+	pg := PlanarGeom[MultiPolygon]{mp}
+	return pg.bufferInOriginal(width, quadsegs)
 }
 
 // BufferInMeter Returns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
 func (mp MultiPolygon) BufferInMeter(width float64, quadsegs int) Geometry {
-	return bufferInMeter(mp, width, quadsegs)
+	pg := PlanarGeom[MultiPolygon]{mp}
+	return pg.bufferInMeter(width, quadsegs)
 }
 
 // Envelope returns the  minimum bounding box for the supplied geometry, as a geometry.
@@ -253,7 +259,7 @@ func (mp MultiPolygon) CoordinateSystem() int {
 }
 
 // Filter Performs an operation with the provided .
-func (mp MultiPolygon) Filter(f matrix.Filter) Geometry {
+func (mp MultiPolygon) Filter(f filter.Filter[matrix.Matrix]) Geometry {
 	if f.IsChanged() {
 		mPoly := mp[:0]
 		for _, v := range mp {

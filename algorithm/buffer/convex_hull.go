@@ -33,9 +33,9 @@ func ConvexHullWithGeom(geom matrix.Steric) *ConvexHullComputer {
 }
 
 func extractMatrixes(geom matrix.Steric) []matrix.Matrix {
-	filter := matrix.UniqueArrayFilter{IsNotChange: true}
-	_ = geom.Filter(&filter)
-	return filter.Matrixes()
+	filter := matrix.CreateFilterMatrixNotChanged()
+	_ = geom.Filter(filter)
+	return filter.Entities()
 }
 
 // ConvexHull Returns a geometry that represents the convex hull of the input geometry.

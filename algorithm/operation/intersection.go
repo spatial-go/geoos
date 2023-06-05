@@ -5,6 +5,7 @@ import (
 	"sort"
 
 	"github.com/spatial-go/geoos/algorithm/calc"
+	"github.com/spatial-go/geoos/algorithm/filter"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 )
 
@@ -145,10 +146,19 @@ func FindIntersectionLineMatrix(aLine, bLine matrix.LineMatrix) (mark bool, ps I
 		}
 	}
 	sort.Sort(ps)
-	filt := &UniqueIntersectionArrayFilter{}
+	filt := &filter.UniqueArrayFilter[Intersection]{FilterFunc: func(p1, p2 any) bool {
+		if v1, ok := p1.(Intersection); ok {
+			if v2, ok := p2.(Intersection); ok {
+				if v1.Matrix.Proximity(v2.Matrix) {
+					return true
+				}
+			}
+		}
+		return false
+	}}
 	for _, v := range ps {
 		filt.Filter(v)
 	}
-	ps = filt.Ips
+	ps = filt.Entities()
 	return
 }

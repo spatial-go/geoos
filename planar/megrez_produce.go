@@ -36,7 +36,7 @@ func (g *megrezAlgorithm) Centroid(geom space.Geometry) (space.Geometry, error) 
 	if geom == nil || geom.IsEmpty() {
 		return nil, nil
 	}
-	return space.Centroid(geom), nil
+	return geom.Centroid(), nil
 }
 
 // ConvexHull computes the convex hull of a geometry. The convex hull is the smallest convex geometry

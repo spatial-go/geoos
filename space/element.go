@@ -1,10 +1,7 @@
 package space
 
 import (
-	"github.com/spatial-go/geoos/algorithm/buffer"
 	"github.com/spatial-go/geoos/algorithm/matrix"
-	"github.com/spatial-go/geoos/algorithm/measure"
-	"github.com/spatial-go/geoos/coordtransform"
 	"github.com/spatial-go/geoos/space/spaceerr"
 )
 
@@ -53,7 +50,7 @@ func CreateElementValid(geom Geometry) (*GeometryValid, error) {
 
 // CreateElementValidWithCoordSys Returns valid geom element. returns nil if geom is invalid.
 func CreateElementValidWithCoordSys(geom Geometry, coordSys int) (*GeometryValid, error) {
-	geom = geom.Filter(&matrix.UniqueArrayFilter{})
+	geom = geom.Filter(matrix.CreateFilterMatrix())
 	if geom.IsValid() {
 		return &GeometryValid{geom, coordSys}, nil
 	}
@@ -82,30 +79,6 @@ func (g *GeometryValid) Geom() Geometry {
 
 func defaultCoordinateSystem() int {
 	return GCJ02
-}
-
-// Centroid Computes the centroid point of a geometry.
-func Centroid(geom Geometry) Point {
-	cent := &buffer.CentroidComputer{}
-
-	if geom == nil || geom.IsEmpty() {
-		return nil
-	}
-	cent.Add(geom.ToMatrix())
-	m := cent.GetCentroid()
-	return Point(m)
-}
-
-// Distance returns distance Between the two Geometry.
-func Distance(from, to Geometry, f measure.DistanceFunc) (float64, error) {
-	if from == nil || from.IsEmpty() ||
-		to == nil || to.IsEmpty() {
-		return 0, nil
-	}
-	if from.IsEmpty() != to.IsEmpty() {
-		return 0, spaceerr.ErrNilGeometry
-	}
-	return f(from.ToMatrix(), to.ToMatrix()), nil
 }
 
 // TransGeometry trans steric to geometry.
@@ -160,34 +133,4 @@ func TransGeometry(inputGeom matrix.Steric) Geometry {
 	default:
 		return nil
 	}
-}
-
-// bufferInMeter ...
-func bufferInMeter(geometry Geometry, width float64, quadsegs int) Geometry {
-	centroid := geometry.Centroid()
-	width = measure.MercatorDistance(width, centroid.Lat())
-	transformer := coordtransform.NewTransformer(coordtransform.LLTOMERCATOR)
-	geomMatrix, _ := transformer.TransformGeometry(geometry.ToMatrix())
-	geometry = TransGeometry(geomMatrix)
-	geometry = geometry.Buffer(width, quadsegs)
-	if geometry != nil {
-		transformer.CoordType = coordtransform.MERCATORTOLL
-		geomMatrix, _ = transformer.TransformGeometry(geometry.ToMatrix())
-		geometry = TransGeometry(geomMatrix)
-	}
-	return geometry
-}
-
-// bufferInOriginal ...
-func bufferInOriginal(geometry Geometry, width float64, quadsegs int) Geometry {
-	buff := buffer.Buffer(geometry.ToMatrix(), width, quadsegs)
-
-	result := buff
-	switch b := result.(type) {
-	case matrix.LineMatrix:
-		return LineString(b)
-	case matrix.PolygonMatrix:
-		return Polygon(b)
-	}
-	return nil
 }
