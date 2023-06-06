@@ -122,21 +122,16 @@ func (p PolygonMatrix) EqualsExact(ms Steric, tolerance float64) bool {
 
 // Filter Performs an operation with the provided .
 func (p PolygonMatrix) Filter(f filter.Filter[Matrix]) Steric {
-	if f.IsChanged() {
-		poly := PolygonMatrix{}
-		for _, v := range p {
-			r := LineMatrix(v).Filter(f).(LineMatrix)
-			if !Matrix(r[len(r)-1]).Equals(Matrix(r[0])) {
-				r = append(r, r[0])
-			}
-			poly = append(poly, r)
-		}
-		return poly
-	}
+	poly := PolygonMatrix{}
 	for _, v := range p {
-		_ = LineMatrix(v).Filter(f)
+		r := LineMatrix(v).Filter(f).(LineMatrix)
+		if !Matrix(r[len(r)-1]).Equals(Matrix(r[0])) {
+			r = append(r, r[0])
+		}
+		poly = append(poly, r)
+		f.Clear()
 	}
-	return p
+	return poly
 }
 
 // IsRectangle returns true if  the polygon is rectangle.

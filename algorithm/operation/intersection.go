@@ -146,7 +146,7 @@ func FindIntersectionLineMatrix(aLine, bLine matrix.LineMatrix) (mark bool, ps I
 		}
 	}
 	sort.Sort(ps)
-	filt := &filter.UniqueArrayFilter[Intersection]{FilterFunc: func(p1, p2 any) bool {
+	filt := &filter.UniqueArrayFilter[Intersection]{ShieldFunc: func(p1, p2 any) bool {
 		if v1, ok := p1.(Intersection); ok {
 			if v2, ok := p2.(Intersection); ok {
 				if v1.Matrix.Proximity(v2.Matrix) {

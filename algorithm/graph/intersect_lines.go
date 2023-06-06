@@ -39,7 +39,7 @@ func IntersectmultiLines(m1 matrix.LineMatrix, m2 []matrix.LineMatrix) chain.Cor
 
 func sortIntersectionNode(ins chain.IntersectionNodeOfLine) chain.IntersectionNodeOfLine {
 	sort.Sort(ins)
-	filter := filter.UniqueArrayFilter[*chain.IntersectionNodeResult]{FilterFunc: func(p1, p2 any) bool {
+	filter := filter.UniqueArrayFilter[*chain.IntersectionNodeResult]{ShieldFunc: func(p1, p2 any) bool {
 		if v1, ok := p1.(*chain.IntersectionNodeResult); ok {
 			if v2, ok := p2.(*chain.IntersectionNodeResult); ok {
 				if v1.InterNode.Matrix.Equals(v2.InterNode.Matrix) {

@@ -164,13 +164,11 @@ func (l LineMatrix) EqualsExact(ms Steric, tolerance float64) bool {
 
 // Filter Performs an operation with the provided .
 func (l LineMatrix) Filter(f filter.Filter[Matrix]) Steric {
+
 	f.FilterEntities(TransMatrixes(l))
-	if f.IsChanged() {
-		l = l[:0]
-		for _, v := range f.Entities() {
-			l = append(l, v)
-		}
-		return l
+	l = l[:0]
+	for _, v := range f.Entities() {
+		l = append(l, v)
 	}
 	return l
 }

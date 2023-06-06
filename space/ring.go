@@ -196,10 +196,8 @@ func (r Ring) CoordinateSystem() int {
 // Filter Performs an operation with the provided .
 func (r Ring) Filter(f filter.Filter[matrix.Matrix]) Geometry {
 	line := LineString(r).Filter(f)
-	if f.IsChanged() {
-		return append(Ring(line.(LineString)), line.(LineString)[0])
-	}
-	return r
+	return append(Ring(line.(LineString)), line.(LineString)[0])
+
 }
 
 // Geom return Geometry without Coordinate System.

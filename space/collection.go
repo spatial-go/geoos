@@ -304,19 +304,13 @@ func (c Collection) CoordinateSystem() int {
 
 // Filter Performs an operation with the provided .
 func (c Collection) Filter(f filter.Filter[matrix.Matrix]) Geometry {
-	if f.IsChanged() {
-		mc := c[:0]
-		for _, v := range c {
-			f.Clear()
-			g := v.Filter(f)
-			mc = append(mc, g)
-		}
-		return mc
-	}
+	mc := c[:0]
 	for _, v := range c {
-		_ = v.Filter(f)
+		f.Clear()
+		g := v.Filter(f)
+		mc = append(mc, g)
 	}
-	return c
+	return mc
 }
 
 // Geom return Geometry without Coordinate System.

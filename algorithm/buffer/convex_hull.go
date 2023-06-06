@@ -33,8 +33,8 @@ func ConvexHullWithGeom(geom matrix.Steric) *ConvexHullComputer {
 }
 
 func extractMatrixes(geom matrix.Steric) []matrix.Matrix {
-	filter := matrix.CreateFilterMatrixNotChanged()
-	_ = geom.Filter(filter)
+	filter := matrix.CreateFilterMatrix()
+	geom = geom.Filter(filter)
 	return filter.Entities()
 }
 

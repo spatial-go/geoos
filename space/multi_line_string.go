@@ -278,19 +278,14 @@ func (mls MultiLineString) CoordinateSystem() int {
 
 // Filter Performs an operation with the provided .
 func (mls MultiLineString) Filter(f filter.Filter[matrix.Matrix]) Geometry {
-	if f.IsChanged() {
-		ml := mls[:0]
-		for _, v := range mls {
-			f.Clear()
-			l := LineString(v).Filter(f)
-			ml = append(ml, l.(LineString))
-		}
-		return ml
-	}
+
+	ml := mls[:0]
 	for _, v := range mls {
-		_ = LineString(v).Filter(f)
+		f.Clear()
+		l := LineString(v).Filter(f)
+		ml = append(ml, l.(LineString))
 	}
-	return mls
+	return ml
 }
 
 // Geom return Geometry without Coordinate System.

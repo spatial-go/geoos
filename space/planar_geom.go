@@ -8,12 +8,9 @@ import (
 	"github.com/spatial-go/geoos/space/spaceerr"
 )
 
+// PlanarGeom Define a planar geometry generic object.
 type PlanarGeom[T Geometry] struct {
 	geom T
-}
-
-func (p *PlanarGeom[T]) Dimensions() int {
-	return p.geom.Dimensions()
 }
 
 // Centroid Computes the centroid point of a geometry.

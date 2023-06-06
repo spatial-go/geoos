@@ -144,18 +144,13 @@ func (c Collection) EqualsExact(ms Steric, tolerance float64) bool {
 
 // Filter Performs an operation with the provided .
 func (c Collection) Filter(f filter.Filter[Matrix]) Steric {
-	if f.IsChanged() {
-		mc := c[:0]
-		for _, v := range c {
-			g := v.Filter(f)
-			mc = append(mc, g)
-		}
-		return mc
-	}
+	mc := c[:0]
 	for _, v := range c {
-		_ = v.Filter(f)
+		g := v.Filter(f)
+		mc = append(mc, g)
+		f.Clear()
 	}
-	return c
+	return mc
 }
 
 // String ...

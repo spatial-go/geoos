@@ -1,13 +1,11 @@
 // Package filter Define  data filter function.
 package filter
 
-type FilterFunc func(param1, param2 any) bool
+// ShieldFunc Define a filter function.
+type ShieldFunc func(param1, param2 any) bool
 
 // Filter  An interface  which use the values of the entity in a  entities.
 type Filter[T any] interface {
-
-	// IsChanged  Returns the true when need change.
-	IsChanged() bool
 
 	// Filter  Performs an operation with the provided .
 	Filter(entity T) bool
@@ -25,13 +23,7 @@ type Filter[T any] interface {
 // UniqueArrayFilter  A Filter that extracts a unique array.
 type UniqueArrayFilter[T any] struct {
 	entities []T
-	FilterFunc
-	IsNotChange bool
-}
-
-// IsChanged  Returns the true when need change.
-func (u *UniqueArrayFilter[T]) IsChanged() bool {
-	return !u.IsNotChange
+	ShieldFunc
 }
 
 // Entities  Returns the gathered Matrixes.
@@ -44,7 +36,7 @@ func (u *UniqueArrayFilter[T]) Filter(entity T) bool {
 	return u.add(entity)
 }
 
-// FilterMatrixes Performs an operation with the provided .
+// FilterEntities Performs an operation with the provided .
 func (u *UniqueArrayFilter[T]) FilterEntities(es []T) {
 	for _, v := range es {
 		u.Filter(v)
@@ -60,7 +52,7 @@ func (u *UniqueArrayFilter[T]) Clear() {
 func (u *UniqueArrayFilter[T]) add(entity T) bool {
 	hasMatrix := false
 	for _, v := range u.entities {
-		if u.FilterFunc(v, entity) {
+		if u.ShieldFunc(v, entity) {
 			hasMatrix = true
 			break
 		}

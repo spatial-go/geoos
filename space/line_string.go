@@ -274,12 +274,9 @@ func (ls LineString) CoordinateSystem() int {
 // Filter Performs an operation with the provided .
 func (ls LineString) Filter(f filter.Filter[matrix.Matrix]) Geometry {
 	f.FilterEntities(matrix.TransMatrixes(ls.ToMatrix()))
-	if f.IsChanged() {
-		ls = ls[:0]
-		for _, v := range f.Entities() {
-			ls = append(ls, v)
-		}
-		return ls
+	ls = ls[:0]
+	for _, v := range f.Entities() {
+		ls = append(ls, v)
 	}
 	return ls
 }

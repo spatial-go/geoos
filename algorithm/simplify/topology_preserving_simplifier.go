@@ -70,12 +70,12 @@ func (l *LineStringMapBuilderFilter[T]) IsChanged() bool {
 	return false
 }
 
-// Matrixes  Returns the gathered Matrixes.
+// Entities  Returns the gathered Matrixes.
 func (l *LineStringMapBuilderFilter[T]) Entities() []T {
 	return nil
 }
 
-// FilterMatrixes Performs an operation with the provided .
+// FilterEntities Performs an operation with the provided .
 func (l *LineStringMapBuilderFilter[T]) FilterEntities(matrixes []T) {
 	if line, ok := l.tps.InputGeom.(matrix.LineMatrix); ok {
 		// skip empty geometries

@@ -242,12 +242,9 @@ func (mp MultiPoint) CoordinateSystem() int {
 // Filter Performs an operation with the provided .
 func (mp MultiPoint) Filter(f filter.Filter[matrix.Matrix]) Geometry {
 	f.FilterEntities(matrix.TransMatrixes(mp.ToMatrix()))
-	if f.IsChanged() {
-		mp = mp[:0]
-		for _, v := range f.Entities() {
-			mp = append(mp, Point(v))
-		}
-		return mp
+	mp = mp[:0]
+	for _, v := range f.Entities() {
+		mp = append(mp, Point(v))
 	}
 	return mp
 }

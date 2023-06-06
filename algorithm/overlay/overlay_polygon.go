@@ -242,8 +242,8 @@ func (p *PolygonOverlay) prepare() {
 func (p *PolygonOverlay) Weiler() (enteringPoints, exitingPoints []Vertex) {
 
 	// TODO overlay ...
-	filtEntering := &filter.UniqueArrayFilter[Vertex]{FilterFunc: equalsVertex}
-	filtExiting := &filter.UniqueArrayFilter[Vertex]{FilterFunc: equalsVertex}
+	filtEntering := &filter.UniqueArrayFilter[Vertex]{ShieldFunc: equalsVertex}
+	filtExiting := &filter.UniqueArrayFilter[Vertex]{ShieldFunc: equalsVertex}
 	for _, v := range p.subjectPlane.Lines {
 		for _, vClip := range p.clippingPlane.Lines {
 

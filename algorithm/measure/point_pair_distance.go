@@ -161,14 +161,14 @@ func (m *MaxPointDistanceFilter[T]) Filter(pt matrix.Matrix) bool {
 	return true
 }
 
-// FilterMatrixes  Performs an operation with the provided .
+// FilterEntities  Performs an operation with the provided .
 func (m *MaxPointDistanceFilter[T]) FilterEntities(pts []matrix.Matrix) {
 	for i := 0; i < len(pts); i++ {
 		m.Filter(pts[i])
 	}
 }
 
-// Matrixes  Returns the gathered Matrixes.
+// Entities  Returns the gathered Matrixes.
 func (m *MaxPointDistanceFilter[T]) Entities() []matrix.Matrix {
 	return matrix.TransMatrixes(m.geom)
 }
@@ -190,12 +190,12 @@ func (m *MaxDensifiedByFractionDistanceFilter[T]) IsChanged() bool {
 	return false
 }
 
-// Matrixes  Returns the gathered Matrixes.
+// Entities  Returns the gathered Matrixes.
 func (m *MaxDensifiedByFractionDistanceFilter[T]) Entities() []matrix.Matrix {
 	return matrix.TransMatrixes(m.geom)
 }
 
-// FilterMatrixes  Performs an operation with the provided .
+// FilterEntities  Performs an operation with the provided .
 func (m *MaxDensifiedByFractionDistanceFilter[T]) FilterEntities(pts []matrix.Matrix) {
 
 	if len(pts) == 0 {

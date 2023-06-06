@@ -260,18 +260,13 @@ func (mp MultiPolygon) CoordinateSystem() int {
 
 // Filter Performs an operation with the provided .
 func (mp MultiPolygon) Filter(f filter.Filter[matrix.Matrix]) Geometry {
-	if f.IsChanged() {
-		mPoly := mp[:0]
-		for _, v := range mp {
-			p := Polygon(v).Filter(f)
-			mPoly = append(mPoly, p.(Polygon))
-		}
-		return mPoly
-	}
+
+	mPoly := mp[:0]
 	for _, v := range mp {
-		_ = Polygon(v).Filter(f)
+		p := Polygon(v).Filter(f)
+		mPoly = append(mPoly, p.(Polygon))
 	}
-	return mp
+	return mPoly
 }
 
 // Geom return Geometry without Coordinate System.

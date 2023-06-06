@@ -320,19 +320,13 @@ func (p Polygon) CoordinateSystem() int {
 
 // Filter Performs an operation with the provided .
 func (p Polygon) Filter(f filter.Filter[matrix.Matrix]) Geometry {
-	if f.IsChanged() {
-		poly := Polygon{}
-		for _, v := range p {
-			f.Clear()
-			r := Ring(v).Filter(f)
-			poly = append(poly, r.(Ring))
-		}
-		return poly
-	}
+	poly := Polygon{}
 	for _, v := range p {
-		_ = Ring(v).Filter(f)
+		f.Clear()
+		r := Ring(v).Filter(f)
+		poly = append(poly, r.(Ring))
 	}
-	return p
+	return poly
 }
 
 // Geom return Geometry without Coordinate System.
