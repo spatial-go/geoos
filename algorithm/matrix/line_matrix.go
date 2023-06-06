@@ -166,7 +166,9 @@ func (l LineMatrix) EqualsExact(ms Steric, tolerance float64) bool {
 func (l LineMatrix) Filter(f filter.Filter[Matrix]) Steric {
 
 	f.FilterEntities(TransMatrixes(l))
-	l = l[:0]
+	l = LineMatrix{}
+	// TODO How to improve efficiency
+	//l = l[:0]
 	for _, v := range f.Entities() {
 		l = append(l, v)
 	}

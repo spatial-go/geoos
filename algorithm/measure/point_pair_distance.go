@@ -148,11 +148,6 @@ type MaxPointDistanceFilter[T matrix.Matrix] struct {
 	geom                 matrix.Steric
 }
 
-// IsChanged  Returns the true when need change.
-func (m *MaxPointDistanceFilter[T]) IsChanged() bool {
-	return false
-}
-
 // Filter  Performs an operation with the provided .
 func (m *MaxPointDistanceFilter[T]) Filter(pt matrix.Matrix) bool {
 	m.MinPtDist.IsNil = true
@@ -183,11 +178,6 @@ type MaxDensifiedByFractionDistanceFilter[T matrix.Matrix] struct {
 	MaxPtDist, MinPtDist *PointPairDistance
 	geom                 matrix.Steric
 	numSubSegs           int
-}
-
-// IsChanged  Returns the true when need change.
-func (m *MaxDensifiedByFractionDistanceFilter[T]) IsChanged() bool {
-	return false
 }
 
 // Entities  Returns the gathered Matrixes.
