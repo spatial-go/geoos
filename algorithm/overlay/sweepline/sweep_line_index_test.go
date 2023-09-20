@@ -1,4 +1,4 @@
-//Package sweepline Contains struct which implement a sweepline algorithm for scanning geometric data structures.
+// Package sweepline Contains struct which implement a sweepline algorithm for scanning geometric data structures.
 package sweepline
 
 import (
@@ -16,8 +16,8 @@ func TestMain(m *testing.M) {
 	fmt.Println("test start")
 	buildTree()
 	code := m.Run()
-	os.Exit(code)
 	fmt.Println("test end")
+	os.Exit(code)
 }
 func buildTree() *Index {
 	var ms matrix.LineMatrix = matrix.LineMatrix{{1, 1}, {1.5, 1}, {2, 1}, {2, 2}, {2, 3}, {3, 3}}

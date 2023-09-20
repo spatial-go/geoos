@@ -22,8 +22,8 @@ func TestMain(m *testing.M) {
 	}
 	fmt.Println("test start")
 	code := m.Run()
-	os.Exit(code)
 	fmt.Println("test end")
+	os.Exit(code)
 }
 func TestQuadtree_Insert(t *testing.T) {
 	line := matrix.LineMatrix{{5, 5}, {10, 8}}
