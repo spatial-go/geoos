@@ -20,12 +20,12 @@ func (r Ring) Dimensions() int {
 	return 2
 }
 
-// Nums num of linstrings
+// Nums num of linestrings
 func (r Ring) Nums() int {
 	return 1
 }
 
-// IsCollection returns true if the Geometry is  collection.
+// IsCollection returns true if the Geometry is collection.
 func (r Ring) IsCollection() bool {
 	return false
 }
