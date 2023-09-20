@@ -10,6 +10,16 @@ import (
 	"github.com/spatial-go/geoos/space"
 )
 
+func TestFeaturecollectionDecode(t *testing.T) {
+	fc := `{"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[122.993197,41.117725],[122.999399,41.115696],[122.99573,41.109516],[122.987146,41.106994],[122.984775,41.107699],[122.990687,41.117878],[122.993197,41.117725]]]},"properties":{}}]}`
+	encoder := Encoder{}
+	geom, err := encoder.Decode([]byte(fc))
+	if err != nil {
+		t.Fatalf("should unmarshal feature collection without issue, err %v", err)
+	}
+	println(geom)
+}
+
 func TestNewFeatureCollection(t *testing.T) {
 	fc := NewFeatureCollection()
 

@@ -22,7 +22,7 @@ func (e *Encoder) Encode(g space.Geometry) []byte {
 
 // Decode Returns geometry of that decode string by codeType.
 func (e *Encoder) Decode(s []byte) (space.Geometry, error) {
-	if strings.Contains(string(s[9:20]), "FeatureCollection") {
+	if strings.Contains(string(s), "\"type\":\"FeatureCollection\"") {
 		colls, err := UnmarshalFeatureCollection(s)
 		if err != nil {
 			log.Println(err)
@@ -33,7 +33,7 @@ func (e *Encoder) Decode(s []byte) (space.Geometry, error) {
 			geom = append(geom, v.Geometry.Geometry())
 		}
 		return geom, nil
-	} else if strings.Contains(string(s[9:20]), "Feature") {
+		} else if strings.Contains(string(s), "\"type\":\"Feature\"") {
 		feat, err := UnmarshalFeature(s)
 		if err != nil {
 			log.Println(err)
