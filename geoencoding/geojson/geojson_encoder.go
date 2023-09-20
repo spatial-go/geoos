@@ -43,6 +43,9 @@ func (e *Encoder) Decode(s []byte) (space.Geometry, error) {
 		return geom, nil
 	}
 	geom, err := UnmarshalGeometry(s)
+	if err != nil {
+		return nil, err
+	}
 	return geom.Geometry(), err
 }
 
