@@ -32,16 +32,16 @@ func (e *BaseEncoder) Read(r io.Reader) (space.Geometry, error) {
 // ReadBytes Returns geometry from reader.
 func (e *BaseEncoder) ReadBytes(r io.Reader) ([]byte, error) {
 	buf := []byte{}
-	b := make([]byte, 1)
+	b := make([]byte, 4096)
 	for {
-		if _, err := r.Read(b); err == io.EOF {
-			//buf = append(buf, b[0:n]...)
-			break
-		} else if err != nil {
-			return nil, err
-		} else {
-			buf = append(buf, b...)
-		}
+		n, err := r.Read(b) 
+        if err != nil && err != io.EOF {
+            return nil,err
+        }
+        buf = append(buf, b[:n]...)
+        if err == io.EOF {
+            break
+        }
 	}
 	return buf, nil
 }
