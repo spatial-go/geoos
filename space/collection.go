@@ -2,6 +2,7 @@ package space
 
 import (
 	"github.com/spatial-go/geoos/algorithm/buffer"
+	"github.com/spatial-go/geoos/algorithm/filter"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/simplify"
 	"github.com/spatial-go/geoos/space/spaceerr"
@@ -200,7 +201,8 @@ func (c Collection) IsSimple() bool {
 
 // Centroid Computes the centroid point of a geometry.
 func (c Collection) Centroid() Point {
-	return Centroid(c)
+	pg := PlanarGeom[Collection]{c}
+	return pg.Centroid()
 }
 
 // UniquePoints return all distinct vertices of input geometry as a MultiPoint.
@@ -230,13 +232,15 @@ func (c Collection) SimplifyP(tolerance float64) Geometry {
 // Buffer Returns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
 func (c Collection) Buffer(width float64, quadsegs int) Geometry {
-	return bufferInOriginal(c, width, quadsegs)
+	pg := PlanarGeom[Collection]{c}
+	return pg.bufferInOriginal(width, quadsegs)
 }
 
 // BufferInMeter Returns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
 func (c Collection) BufferInMeter(width float64, quadsegs int) Geometry {
-	return bufferInMeter(c, width, quadsegs)
+	pg := PlanarGeom[Collection]{c}
+	return pg.bufferInMeter(width, quadsegs)
 }
 
 // Envelope returns the  minimum bounding box for the supplied geometry, as a geometry.
@@ -299,20 +303,14 @@ func (c Collection) CoordinateSystem() int {
 }
 
 // Filter Performs an operation with the provided .
-func (c Collection) Filter(f matrix.Filter) Geometry {
-	if f.IsChanged() {
-		mc := c[:0]
-		for _, v := range c {
-			f.Clear()
-			g := v.Filter(f)
-			mc = append(mc, g)
-		}
-		return mc
-	}
+func (c Collection) Filter(f filter.Filter[matrix.Matrix]) Geometry {
+	mc := c[:0]
 	for _, v := range c {
-		_ = v.Filter(f)
+		f.Clear()
+		g := v.Filter(f)
+		mc = append(mc, g)
 	}
-	return c
+	return mc
 }
 
 // Geom return Geometry without Coordinate System.

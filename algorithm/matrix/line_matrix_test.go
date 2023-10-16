@@ -271,33 +271,31 @@ func TestSteric_EqualsExact(t *testing.T) {
 }
 
 func TestSteric_Filter(t *testing.T) {
-	type args struct {
-		f Filter
-	}
+
 	tests := []struct {
 		name string
 		l    Steric
-		args args
 		want Steric
 	}{
 		{"case 1", LineMatrix{{1, 1}, {2, 2}},
-			args{&UniqueArrayFilter{}}, LineMatrix{{1, 1}, {2, 2}}},
+			LineMatrix{{1, 1}, {2, 2}}},
 		{"case 2", LineMatrix{{1, 1}, {2, 2}, {2, 2}},
-			args{&UniqueArrayFilter{}}, LineMatrix{{1, 1}, {2, 2}}},
+			LineMatrix{{1, 1}, {2, 2}}},
 		{"case 3", PolygonMatrix{{{1, 1}, {2, 2}}},
-			args{&UniqueArrayFilter{}}, PolygonMatrix{{{1, 1}, {2, 2}, {1, 1}}}},
+			PolygonMatrix{{{1, 1}, {2, 2}, {1, 1}}}},
 		{"case 4", Matrix{},
-			args{&UniqueArrayFilter{}}, Matrix{}},
+			Matrix{}},
 
 		{"poly ", PolygonMatrix{{
 			{0, 0}, {0, 5}, {5, 5}, {5, 5}, {5, 0}, {0, 0},
-		}}, args{&UniqueArrayFilter{}},
+		}},
 			PolygonMatrix{{{0, 0}, {0, 5}, {5, 5}, {5, 0}, {0, 0}}},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.l.Filter(tt.args.f); !reflect.DeepEqual(got, tt.want) {
+			f := CreateFilterMatrix()
+			if got := tt.l.Filter(f); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Steric.Filter() = %v, want %v", got, tt.want)
 			}
 		})

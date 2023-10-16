@@ -2,6 +2,7 @@ package relate
 
 import (
 	"github.com/spatial-go/geoos/algorithm/matrix"
+	"github.com/spatial-go/geoos/algorithm/operation"
 )
 
 // PointRelate  be used during the relate computation.
@@ -33,7 +34,7 @@ func (p *PointRelate) computePoint(im *matrix.IntersectionMatrix) {
 
 func (p *PointRelate) computeLine(im *matrix.IntersectionMatrix) {
 	if p.other.(matrix.LineMatrix).IsClosed() {
-		if inLine, inVer := InLineVertex(p.Matrix, p.other.(matrix.LineMatrix)); inLine {
+		if inLine, inVer := operation.IsLineMatrixVertex(p.Matrix, p.other.(matrix.LineMatrix)); inLine {
 			if inVer {
 				im.SetAtLeastString("F0FFFF102")
 				return
@@ -41,14 +42,14 @@ func (p *PointRelate) computeLine(im *matrix.IntersectionMatrix) {
 			im.SetAtLeastString("0FFFFF102")
 			return
 		}
-		if InLineMatrix(p.Matrix, p.other.(matrix.LineMatrix)) {
+		if operation.InLineMatrix(p.Matrix, p.other.(matrix.LineMatrix)) {
 			im.SetAtLeastString("0FFFFF1F2")
 			return
 		}
 		im.SetAtLeastString("FF0FFF1F2")
 		return
 	}
-	if inLine, inVer := InLineVertex(p.Matrix, p.other.(matrix.LineMatrix)); inLine {
+	if inLine, inVer := operation.IsLineMatrixVertex(p.Matrix, p.other.(matrix.LineMatrix)); inLine {
 		if inVer {
 			im.SetAtLeastString("F0FFFF102")
 			return
@@ -56,7 +57,7 @@ func (p *PointRelate) computeLine(im *matrix.IntersectionMatrix) {
 		im.SetAtLeastString("0FFFFF102")
 		return
 	}
-	if InLineMatrix(p.Matrix, p.other.(matrix.LineMatrix)) {
+	if operation.InLineMatrix(p.Matrix, p.other.(matrix.LineMatrix)) {
 		im.SetAtLeastString("0FFFFF102")
 		return
 	}
@@ -68,18 +69,18 @@ func (p *PointRelate) computePolygon(im *matrix.IntersectionMatrix) {
 	inHoles := 0
 	for i, v := range p.other.(matrix.PolygonMatrix) {
 		if i == 0 {
-			if InLineMatrix(p.Matrix, matrix.LineMatrix(v)) {
+			if operation.InLineMatrix(p.Matrix, matrix.LineMatrix(v)) {
 				inRing = 1
-			} else if InPolygon(p.Matrix, matrix.LineMatrix(v)) {
+			} else if operation.IsPnPolygon(p.Matrix, matrix.LineMatrix(v)) {
 				inRing = 0
 			} else {
 				inRing = 2
 			}
 		} else {
-			if InLineMatrix(p.Matrix, matrix.LineMatrix(v)) {
+			if operation.InLineMatrix(p.Matrix, matrix.LineMatrix(v)) {
 				inRing = 1
 				break
-			} else if InPolygon(p.Matrix, matrix.LineMatrix(v)) {
+			} else if operation.IsPnPolygon(p.Matrix, matrix.LineMatrix(v)) {
 				if inRing != 2 {
 					inRing = 2
 					inHoles = 1

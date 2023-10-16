@@ -2,6 +2,7 @@ package de9im
 
 import (
 	"github.com/spatial-go/geoos/algorithm/matrix"
+	"github.com/spatial-go/geoos/algorithm/operation"
 )
 
 func (r *RelationshipByStructure) lineAnalyse(pointInPolygon, entityInPolygon int) {
@@ -88,22 +89,22 @@ func (r *RelationshipByStructure) lineAnalyse(pointInPolygon, entityInPolygon in
 		}
 	case matrix.PolygonMatrix:
 		switch {
-		case r.nPoint == 2 && r.nLine >= 1 && r.maxDlLine == 6 && pointInPolygon == OnlyOutPolygon:
+		case r.nPoint == 2 && r.nLine >= 1 && r.maxDlLine == 6 && pointInPolygon == operation.OnlyOutPolygon:
 			r.relationshipSymbol = RLA4
-		case r.nPoint == 2 && r.nLine >= 1 && r.maxDlLine == 6 && pointInPolygon == OnlyInPolygon:
+		case r.nPoint == 2 && r.nLine >= 1 && r.maxDlLine == 6 && pointInPolygon == operation.OnlyInPolygon:
 			r.relationshipSymbol = RLA6
-		case r.nPoint == 2 && r.nLine >= 1 && r.maxDlLine == 6 && pointInPolygon == BothPolygon:
+		case r.nPoint == 2 && r.nLine >= 1 && r.maxDlLine == 6 && pointInPolygon == operation.BothPolygon:
 			r.relationshipSymbol = RLA12
 		case r.nPoint == 2 && r.nLine >= 1 && r.maxDlLine == 4:
 			r.relationshipSymbol = RLA24
-		case r.nPoint == 2 && r.nLine >= 1 && r.maxDlLine == 5 && entityInPolygon == OnlyOutPolygon:
+		case r.nPoint == 2 && r.nLine >= 1 && r.maxDlLine == 5 && entityInPolygon == operation.OnlyOutPolygon:
 			r.relationshipSymbol = RLA26
-		case r.nPoint == 2 && r.nLine >= 1 && r.maxDlLine == 5 && pointInPolygon == OnlyInPolygon:
+		case r.nPoint == 2 && r.nLine >= 1 && r.maxDlLine == 5 && pointInPolygon == operation.OnlyInPolygon:
 			r.relationshipSymbol = RLA30
 
-		case r.nPoint == 3 && r.nLine >= 1 && r.maxDlLine == 6 && r.maxDlPoint == 4 && pointInPolygon == OnlyOutPolygon:
+		case r.nPoint == 3 && r.nLine >= 1 && r.maxDlLine == 6 && r.maxDlPoint == 4 && pointInPolygon == operation.OnlyOutPolygon:
 			r.relationshipSymbol = RLA10
-		case r.nPoint == 3 && r.nLine >= 1 && r.maxDlLine == 6 && r.maxDlPoint == 4 && pointInPolygon == OnlyInPolygon:
+		case r.nPoint == 3 && r.nLine >= 1 && r.maxDlLine == 6 && r.maxDlPoint == 4 && pointInPolygon == operation.OnlyInPolygon:
 			r.relationshipSymbol = RLA11
 		case r.nPoint == 3 && r.nLine >= 1 && r.maxDlLine == 6 && r.maxDlPoint == 3:
 			r.relationshipSymbol = RLA18
@@ -111,9 +112,9 @@ func (r *RelationshipByStructure) lineAnalyse(pointInPolygon, entityInPolygon in
 			r.relationshipSymbol = RLA25
 		case r.nPoint == 3 && r.nLine >= 1 && r.maxDlLine == 5 && r.maxDlPoint == 3:
 			r.relationshipSymbol = RLA27
-		case r.nPoint == 3 && r.nLine >= 1 && r.maxDlLine == 5 && r.maxDlPoint == 4 && pointInPolygon == OnlyOutPolygon:
+		case r.nPoint == 3 && r.nLine >= 1 && r.maxDlLine == 5 && r.maxDlPoint == 4 && pointInPolygon == operation.OnlyOutPolygon:
 			r.relationshipSymbol = RLA29
-		case r.nPoint == 3 && r.nLine >= 1 && r.maxDlLine == 5 && r.maxDlPoint == 4 && pointInPolygon == OnlyInPolygon:
+		case r.nPoint == 3 && r.nLine >= 1 && r.maxDlLine == 5 && r.maxDlPoint == 4 && pointInPolygon == operation.OnlyInPolygon:
 			r.relationshipSymbol = RLA31
 
 		case r.nPoint >= 4 && r.nLine >= 1 && r.maxDlLine == 6:
@@ -121,35 +122,35 @@ func (r *RelationshipByStructure) lineAnalyse(pointInPolygon, entityInPolygon in
 		case r.nPoint >= 4 && r.nLine >= 1 && r.maxDlLine == 5:
 			r.relationshipSymbol = RLA28
 
-		case r.nPoint == 1 && r.nLine == 0 && r.maxDlPoint == 3 && pointInPolygon == OnlyOutPolygon:
+		case r.nPoint == 1 && r.nLine == 0 && r.maxDlPoint == 3 && pointInPolygon == operation.OnlyOutPolygon:
 			r.relationshipSymbol = RLA3
-		case r.nPoint == 1 && r.nLine == 0 && r.maxDlPoint == 3 && pointInPolygon == OnlyInPolygon:
+		case r.nPoint == 1 && r.nLine == 0 && r.maxDlPoint == 3 && pointInPolygon == operation.OnlyInPolygon:
 			r.relationshipSymbol = RLA5
-		case r.nPoint == 1 && r.nLine == 0 && r.maxDlPoint == 3 && pointInPolygon == BothPolygon:
+		case r.nPoint == 1 && r.nLine == 0 && r.maxDlPoint == 3 && pointInPolygon == operation.BothPolygon:
 			r.relationshipSymbol = RLA8
-		case r.nPoint == 1 && r.nLine == 0 && r.maxDlPoint == 2 && entityInPolygon == OnlyOutPolygon:
+		case r.nPoint == 1 && r.nLine == 0 && r.maxDlPoint == 2 && entityInPolygon == operation.OnlyOutPolygon:
 			r.relationshipSymbol = RLA14
-		case r.nPoint == 1 && r.nLine == 0 && r.maxDlPoint == 2 && entityInPolygon == OnlyInPolygon:
+		case r.nPoint == 1 && r.nLine == 0 && r.maxDlPoint == 2 && entityInPolygon == operation.OnlyInPolygon:
 			r.relationshipSymbol = RLA15
 
 			//TODO
 
-		case r.nPoint == 2 && r.nLine == 0 && r.maxDlPoint == 4 && pointInPolygon == OnlyOutPolygon:
+		case r.nPoint == 2 && r.nLine == 0 && r.maxDlPoint == 4 && pointInPolygon == operation.OnlyOutPolygon:
 			r.relationshipSymbol = RLA7
-		case r.nPoint == 2 && r.nLine == 0 && r.maxDlPoint == 4 && pointInPolygon == OnlyInPolygon:
+		case r.nPoint == 2 && r.nLine == 0 && r.maxDlPoint == 4 && pointInPolygon == operation.OnlyInPolygon:
 			r.relationshipSymbol = RLA9
-		case r.nPoint == 2 && r.nLine == 0 && r.maxDlPoint == 4 && entityInPolygon == OnlyInPolygon:
+		case r.nPoint == 2 && r.nLine == 0 && r.maxDlPoint == 4 && entityInPolygon == operation.OnlyInPolygon:
 			r.relationshipSymbol = RLA22
-		case r.nPoint == 2 && r.nLine == 0 && r.maxDlPoint == 4 && entityInPolygon == OnlyOutPolygon:
+		case r.nPoint == 2 && r.nLine == 0 && r.maxDlPoint == 4 && entityInPolygon == operation.OnlyOutPolygon:
 			r.relationshipSymbol = RLA23
-		case r.nPoint == 2 && r.nLine == 0 && r.maxDlPoint == 3 && entityInPolygon == OnlyOutPolygon:
+		case r.nPoint == 2 && r.nLine == 0 && r.maxDlPoint == 3 && entityInPolygon == operation.OnlyOutPolygon:
 			r.relationshipSymbol = RLA13
-		case r.nPoint == 2 && r.nLine == 0 && r.maxDlPoint == 3 && entityInPolygon == OnlyInPolygon:
+		case r.nPoint == 2 && r.nLine == 0 && r.maxDlPoint == 3 && entityInPolygon == operation.OnlyInPolygon:
 			r.relationshipSymbol = RLA16
 
-		case r.nPoint >= 3 && r.nLine == 0 && r.maxDlPoint == 4 && entityInPolygon == OnlyInPolygon:
+		case r.nPoint >= 3 && r.nLine == 0 && r.maxDlPoint == 4 && entityInPolygon == operation.OnlyInPolygon:
 			r.relationshipSymbol = RLA19
-		case r.nPoint >= 3 && r.nLine == 0 && r.maxDlPoint == 4 && entityInPolygon == OnlyOutPolygon:
+		case r.nPoint >= 3 && r.nLine == 0 && r.maxDlPoint == 4 && entityInPolygon == operation.OnlyOutPolygon:
 			r.relationshipSymbol = RLA20
 
 		}
@@ -163,16 +164,16 @@ func (r *RelationshipByStructure) polygonAnalyse(pointInPolygon, entityInPolygon
 		switch {
 		case r.nPoint == 0 && r.nLine >= 1:
 			r.relationshipSymbol = RAA9
-		case r.nPoint >= 2 && r.nLine >= 1 && entityInPolygon == OnlyOutPolygon:
+		case r.nPoint >= 2 && r.nLine >= 1 && entityInPolygon == operation.OnlyOutPolygon:
 			r.relationshipSymbol = RAA3
-		case r.nPoint >= 2 && r.nLine >= 1 && entityInPolygon == OnlyInPolygon:
+		case r.nPoint >= 2 && r.nLine >= 1 && entityInPolygon == operation.OnlyInPolygon:
 			r.relationshipSymbol = RAA10
 		case r.nPoint >= 2 && r.nLine >= 1:
 			r.relationshipSymbol = RAA11
 
-		case r.nPoint == 1 && r.nLine == 0 && entityInPolygon == OnlyOutPolygon:
+		case r.nPoint == 1 && r.nLine == 0 && entityInPolygon == operation.OnlyOutPolygon:
 			r.relationshipSymbol = RAA2
-		case r.nPoint == 1 && r.nLine == 0 && entityInPolygon == OnlyInPolygon:
+		case r.nPoint == 1 && r.nLine == 0 && entityInPolygon == operation.OnlyInPolygon:
 			r.relationshipSymbol = RAA8
 		case r.nPoint == 1 && r.nLine == 0:
 			r.relationshipSymbol = RAA7
@@ -180,7 +181,7 @@ func (r *RelationshipByStructure) polygonAnalyse(pointInPolygon, entityInPolygon
 		case r.nPoint == 2 && r.nLine == 0 && r.maxDlPoint == 4:
 			r.relationshipSymbol = RAA4
 
-		case r.nPoint == 0 && r.nLine == 0 && entityInPolygon == OnlyInPolygon:
+		case r.nPoint == 0 && r.nLine == 0 && entityInPolygon == operation.OnlyInPolygon:
 			r.relationshipSymbol = RAA6
 		case r.nPoint == 0 && r.nLine == 0:
 			r.relationshipSymbol = RAA5

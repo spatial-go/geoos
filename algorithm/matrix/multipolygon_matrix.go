@@ -4,6 +4,8 @@ package matrix
 import (
 	"fmt"
 	"math"
+
+	"github.com/spatial-go/geoos/algorithm/filter"
 )
 
 // MultiPolygonMatrix is a four-dimensional matrix.
@@ -128,19 +130,13 @@ func (m MultiPolygonMatrix) EqualsExact(ms Steric, tolerance float64) bool {
 }
 
 // Filter Performs an operation with the provided .
-func (m MultiPolygonMatrix) Filter(f Filter) Steric {
-	if f.IsChanged() {
-		mPoly := m[:0]
-		for _, v := range m {
-			p := PolygonMatrix(v).Filter(f)
-			mPoly = append(mPoly, p.(PolygonMatrix))
-		}
-		return mPoly
-	}
+func (m MultiPolygonMatrix) Filter(f filter.Filter[Matrix]) Steric {
+	mPoly := m[:0]
 	for _, v := range m {
-		_ = PolygonMatrix(v).Filter(f)
+		p := PolygonMatrix(v).Filter(f)
+		mPoly = append(mPoly, p.(PolygonMatrix))
 	}
-	return m
+	return mPoly
 }
 
 // String ...

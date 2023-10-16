@@ -1,6 +1,7 @@
 package space
 
 import (
+	"github.com/spatial-go/geoos/algorithm/filter"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
 	"github.com/spatial-go/geoos/algorithm/simplify"
@@ -103,7 +104,7 @@ func (r Ring) IsSimple() bool {
 
 // Centroid Computes the centroid point of a geometry.
 func (r Ring) Centroid() Point {
-	return Centroid(LineString(r))
+	return LineString(r).Centroid()
 }
 
 // UniquePoints return all distinct vertices of input geometry as a MultiPoint.
@@ -193,12 +194,10 @@ func (r Ring) CoordinateSystem() int {
 }
 
 // Filter Performs an operation with the provided .
-func (r Ring) Filter(f matrix.Filter) Geometry {
+func (r Ring) Filter(f filter.Filter[matrix.Matrix]) Geometry {
 	line := LineString(r).Filter(f)
-	if f.IsChanged() {
-		return append(Ring(line.(LineString)), line.(LineString)[0])
-	}
-	return r
+	return append(Ring(line.(LineString)), line.(LineString)[0])
+
 }
 
 // Geom return Geometry without Coordinate System.

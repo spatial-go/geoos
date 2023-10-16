@@ -1,7 +1,11 @@
 // Package matrix Define spatial matrix base.
 package matrix
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/spatial-go/geoos/algorithm/filter"
+)
 
 // PolygonMatrix is a three-dimensional matrix.
 type PolygonMatrix [][][]float64
@@ -117,22 +121,17 @@ func (p PolygonMatrix) EqualsExact(ms Steric, tolerance float64) bool {
 }
 
 // Filter Performs an operation with the provided .
-func (p PolygonMatrix) Filter(f Filter) Steric {
-	if f.IsChanged() {
-		poly := PolygonMatrix{}
-		for _, v := range p {
-			r := LineMatrix(v).Filter(f).(LineMatrix)
-			if !Matrix(r[len(r)-1]).Equals(Matrix(r[0])) {
-				r = append(r, r[0])
-			}
-			poly = append(poly, r)
-		}
-		return poly
-	}
+func (p PolygonMatrix) Filter(f filter.Filter[Matrix]) Steric {
+	poly := PolygonMatrix{}
 	for _, v := range p {
-		_ = LineMatrix(v).Filter(f)
+		r := LineMatrix(v).Filter(f).(LineMatrix)
+		if !Matrix(r[len(r)-1]).Equals(Matrix(r[0])) {
+			r = append(r, r[0])
+		}
+		poly = append(poly, r)
+		f.Clear()
 	}
-	return p
+	return poly
 }
 
 // IsRectangle returns true if  the polygon is rectangle.

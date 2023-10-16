@@ -2,7 +2,7 @@ package kdtree
 
 import "github.com/spatial-go/geoos/algorithm/matrix"
 
-//  KdNode A node of a KdTree, which represents one or more points in the same location.
+// KdNode A node of a KdTree, which represents one or more points in the same location.
 type KdNode struct {
 	matrix.Matrix
 	Data interface{}

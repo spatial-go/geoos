@@ -3,11 +3,12 @@ package simplify
 import (
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
-	"github.com/spatial-go/geoos/algorithm/relate"
+	"github.com/spatial-go/geoos/algorithm/operation"
 )
 
 // TaggedLineStringSimplifier Simplifies a TaggedLineString, preserving topology
-//  (in the sense that no new intersections are introduced). Uses the recursive Douglas-Peucker algorithm.
+//
+//	(in the sense that no new intersections are introduced). Uses the recursive Douglas-Peucker algorithm.
 type TaggedLineStringSimplifier struct {
 	inputIndex, outputIndex *LineSegmentIndex
 	line                    *TaggedLineString
@@ -150,7 +151,7 @@ func IsInLineSection(
 
 // HasInteriorIntersection ..
 func HasInteriorIntersection(seg0, seg1 *matrix.LineSegment) bool {
-	return relate.IsIntersectionLineSegment(seg0, seg1)
+	return operation.IsIntersectedLineSegment(seg0, seg1)
 }
 
 // Remove Remove the segs in the section of the line
@@ -166,7 +167,8 @@ func (t *TaggedLineStringSimplifier) Remove(line *TaggedLineString,
 }
 
 // TaggedLinesSimplifier Simplifies a collection of TaggedLineStrings, preserving topology
-//  (in the sense that no new intersections are introduced).
+//
+//	(in the sense that no new intersections are introduced).
 type TaggedLinesSimplifier struct {
 	inputIndex, outputIndex *LineSegmentIndex
 	distanceTolerance       float64

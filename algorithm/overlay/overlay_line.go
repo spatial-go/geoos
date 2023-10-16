@@ -6,8 +6,8 @@ import (
 	"github.com/spatial-go/geoos/algorithm"
 	"github.com/spatial-go/geoos/algorithm/graph/de9im"
 	"github.com/spatial-go/geoos/algorithm/matrix"
+	"github.com/spatial-go/geoos/algorithm/operation"
 	"github.com/spatial-go/geoos/algorithm/overlay/chain"
-	"github.com/spatial-go/geoos/algorithm/relate"
 )
 
 // LineOverlay  Computes the overlay of two geometries,either or both of which may be nil.
@@ -81,7 +81,7 @@ func (p *LineOverlay) Intersection() (matrix.Steric, error) {
 	}
 	switch c := p.Clipping.(type) {
 	case matrix.Matrix:
-		if mark := relate.InLineMatrix(c, line); mark {
+		if mark := operation.InLineMatrix(c, line); mark {
 			return c, nil
 		}
 		return nil, nil
@@ -177,17 +177,17 @@ func intersectLine(m, m1 matrix.LineMatrix) matrix.Collection {
 }
 
 // IntersectLine returns a array  that represents that part of geometry A intersect with geometry B.
-func IntersectLine(m, m1 matrix.LineMatrix) []relate.IntersectionResult {
+func IntersectLine(m, m1 matrix.LineMatrix) []operation.Crossroads {
 
-	mark, ips := relate.IntersectionEdge(m, m1)
+	mark, ips := operation.FindIntersectionLineMatrix(m, m1)
 	if !mark || len(ips) < 1 {
 		return nil
 	}
-	ils := []relate.IntersectionResult{}
-	il := relate.IntersectionResult{Ips: relate.IntersectionPointLine{}}
+	ils := []operation.Crossroads{}
+	il := operation.Crossroads{Ips: operation.IntersectionArray{}}
 	for i, line := range m.ToLineArray() {
 		for _, ip := range ips {
-			if in, _ := relate.InLine(ip.Matrix, line.P0, line.P1); in {
+			if in, _ := operation.InLineSegment(ip.Matrix, line.P0, line.P1); in {
 				il.Pos = i
 				il.Line = *line
 				il.Start = i
@@ -203,7 +203,7 @@ func IntersectLine(m, m1 matrix.LineMatrix) []relate.IntersectionResult {
 		if len(il.Ips) > 0 {
 			ils = append(ils, il)
 		}
-		il = relate.IntersectionResult{Ips: relate.IntersectionPointLine{}}
+		il = operation.Crossroads{Ips: operation.IntersectionArray{}}
 	}
 
 	return ils

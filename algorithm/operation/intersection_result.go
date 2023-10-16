@@ -1,35 +1,35 @@
-package relate
+package operation
 
 import (
 	"github.com/spatial-go/geoos/algorithm/matrix"
 )
 
-// IntersectionResult ...
-type IntersectionResult struct {
+// Crossroads ...
+type Crossroads struct {
 	Pos        int
 	Start, End int
 	Line       matrix.LineSegment
-	Ips        IntersectionPointLine
+	Ips        IntersectionArray
 }
 
-// IntersectionPoint overlay point.
-type IntersectionPoint struct {
+// Intersection overlay point.
+type Intersection struct {
 	matrix.Matrix
 	IsIntersectionPoint, IsEntering, IsOriginal, IsCollinear bool
 }
 
 // X Returns x  .
-func (ip *IntersectionPoint) X() float64 {
+func (ip *Intersection) X() float64 {
 	return ip.Matrix[0]
 }
 
 // Y Returns y  .
-func (ip *IntersectionPoint) Y() float64 {
+func (ip *Intersection) Y() float64 {
 	return ip.Matrix[1]
 }
 
 // Compare Returns Compare of  IntersectionPoint.
-func (ip *IntersectionPoint) Compare(other *IntersectionPoint, tes int) bool {
+func (ip *Intersection) Compare(other *Intersection, tes int) bool {
 	if tes > 0 {
 		if ip.X() == other.X() {
 			if ip.Y() == other.Y() {
@@ -48,11 +48,11 @@ func (ip *IntersectionPoint) Compare(other *IntersectionPoint, tes int) bool {
 	return ip.X() > other.X()
 }
 
-// IntersectionPointLine overlay point array.
-type IntersectionPointLine []IntersectionPoint
+// IntersectionArray overlay point array.
+type IntersectionArray []Intersection
 
 // IsOriginal returns line overlays.
-func (ips IntersectionPointLine) IsOriginal() bool {
+func (ips IntersectionArray) IsOriginal() bool {
 	for _, v := range ips {
 		if v.IsOriginal {
 			return true
@@ -62,12 +62,12 @@ func (ips IntersectionPointLine) IsOriginal() bool {
 }
 
 // Len ...
-func (ips IntersectionPointLine) Len() int {
+func (ips IntersectionArray) Len() int {
 	return len(ips)
 }
 
 // Less ...
-func (ips IntersectionPointLine) Less(i, j int) bool {
+func (ips IntersectionArray) Less(i, j int) bool {
 	if ips[i].Matrix.Proximity(ips[j].Matrix) {
 		return ips[i].IsCollinear
 	}
@@ -81,6 +81,6 @@ func (ips IntersectionPointLine) Less(i, j int) bool {
 }
 
 // Swap ...
-func (ips IntersectionPointLine) Swap(i, j int) {
+func (ips IntersectionArray) Swap(i, j int) {
 	ips[i], ips[j] = ips[j], ips[i]
 }

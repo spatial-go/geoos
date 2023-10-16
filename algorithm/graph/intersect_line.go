@@ -75,7 +75,7 @@ func writeIntersectionCorrelationNode(ips chain.IntersectionNodeOfLine, lines []
 			i < len(ips)-1 {
 			if ips[i+1].Pos == ips[i].End && ips[i+1].InterNode.IsCollinear {
 				lines[i+1] = append(lines[i], lines[i+1]...)
-				lines[i+1] = lines[i+1].Filter(&matrix.UniqueArrayFilter{}).(matrix.LineMatrix)
+				lines[i+1] = lines[i+1].Filter(matrix.CreateFilterMatrix()).(matrix.LineMatrix)
 				if i > 0 && ip.InterNode.Matrix == nil {
 					ip = ips[i-1]
 				}

@@ -4,7 +4,7 @@ import (
 	"github.com/spatial-go/geoos/algorithm/calc"
 	"github.com/spatial-go/geoos/algorithm/graph"
 	"github.com/spatial-go/geoos/algorithm/matrix"
-	"github.com/spatial-go/geoos/algorithm/relate"
+	"github.com/spatial-go/geoos/algorithm/operation"
 )
 
 // RelationshipByDegrees  be used during the relate computation.
@@ -114,8 +114,8 @@ func (r *RelationshipByDegrees) matrixIM(p matrix.Matrix, RelateType int) {
 			}
 			r.IM.SetString(RelateStrings[RPL1])
 		case matrix.PolygonMatrix:
-			pointInPolygon, _ := IsInPolygon(p, m)
-			if pointInPolygon == OnlyInPolygon {
+			pointInPolygon, _ := operation.InPolygon(p, m)
+			if pointInPolygon == operation.OnlyInPolygon {
 				r.IM.SetString(RelateStrings[RPA2])
 			} else {
 				r.IM.SetString(RelateStrings[RPA1])
@@ -150,8 +150,8 @@ func (r *RelationshipByDegrees) lineIM(l matrix.LineMatrix, RelateType int) {
 			}
 			r.IM.SetString(RelateStrings[RLL1])
 		case matrix.PolygonMatrix:
-			pointInPolygon, _ := IsInPolygon(l, m)
-			if pointInPolygon == OnlyInPolygon {
+			pointInPolygon, _ := operation.InPolygon(l, m)
+			if pointInPolygon == operation.OnlyInPolygon {
 				r.IM.SetString(RelateStrings[RLA2])
 			} else {
 				r.IM.SetString(RelateStrings[RLA1])
@@ -163,9 +163,9 @@ func (r *RelationshipByDegrees) lineIM(l matrix.LineMatrix, RelateType int) {
 			if m.IsClosed() {
 				r.IsClosed[1] = true
 			}
-			r.lineAndLineAnalyse(DefaultInPolygon, DefaultInPolygon)
+			r.lineAndLineAnalyse(operation.DefaultInPolygon, operation.DefaultInPolygon)
 		case matrix.PolygonMatrix:
-			pointInPolygon, entityInPolygon := IsInPolygon(l, m)
+			pointInPolygon, entityInPolygon := operation.InPolygon(l, m)
 			lrd := &LineRelationshipByDegrees{r, pointInPolygon, entityInPolygon}
 			produce(lrd)
 		}
@@ -181,19 +181,19 @@ func (r *RelationshipByDegrees) polygonIM(p matrix.PolygonMatrix, RelateType int
 		switch r.Arg[1].(type) {
 		case matrix.PolygonMatrix:
 			poly := r.Arg[1].(matrix.PolygonMatrix)
-			if relate.InPolygon(p[0][0], poly[0]) {
+			if operation.IsPnPolygon(p[0][0], poly[0]) {
 				r.IM.SetString(RelateStrings[RAA6])
 				for i := 1; i < len(poly); i++ {
-					if relate.InPolygon(p[0][0], poly[i]) {
+					if operation.IsPnPolygon(p[0][0], poly[i]) {
 						r.IM.SetString(RelateStrings[RAA1])
 					}
 				}
 				return
 			}
-			if relate.InPolygon(poly[0][0], p[0]) {
+			if operation.IsPnPolygon(poly[0][0], p[0]) {
 				r.IM.SetString(RelateStrings[RAA5])
 				for i := 1; i < len(p); i++ {
-					if relate.InPolygon(poly[0][0], p[i]) {
+					if operation.IsPnPolygon(poly[0][0], p[i]) {
 						r.IM.SetString(RelateStrings[RAA1])
 					}
 				}
@@ -202,7 +202,7 @@ func (r *RelationshipByDegrees) polygonIM(p matrix.PolygonMatrix, RelateType int
 			r.IM.SetString(RelateStrings[RAA1])
 		}
 	default:
-		_, entityInPolygon := IsInPolygon(p, r.Arg[1].(matrix.PolygonMatrix))
+		_, entityInPolygon := operation.InPolygon(p, r.Arg[1].(matrix.PolygonMatrix))
 		prd := &PolygonRelationshipByDegrees{r, entityInPolygon}
 		produce(prd)
 		// pointInPolygon, entityInPolygon := IsInPolygon(p, r.Arg[1].(matrix.PolygonMatrix))

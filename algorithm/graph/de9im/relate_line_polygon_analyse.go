@@ -1,5 +1,7 @@
 package de9im
 
+import "github.com/spatial-go/geoos/algorithm/operation"
+
 // LineRelationshipByDegrees ...
 type LineRelationshipByDegrees struct {
 	*RelationshipByDegrees
@@ -58,15 +60,15 @@ func (l *LineRelationshipByDegrees) produce() {
 
 func (l *LineRelationshipByDegrees) relatePolygon(inPolygon int) (
 	isInterior, isBoundary, isExterior int) {
-	if inPolygon == OnlyInPolygon || inPolygon == BothPolygon || inPolygon == PartInPolygon || inPolygon == IncludePolygon {
+	if inPolygon == operation.OnlyInPolygon || inPolygon == operation.BothPolygon || inPolygon == operation.PartInPolygon || inPolygon == operation.IncludePolygon {
 		isInterior = 1
 	}
 
-	if inPolygon == OnlyOutPolygon || inPolygon == BothPolygon || inPolygon == PartOutPolygon {
+	if inPolygon == operation.OnlyOutPolygon || inPolygon == operation.BothPolygon || inPolygon == operation.PartOutPolygon {
 		isExterior = 1
 	}
 
-	if inPolygon == OnlyInLine || inPolygon == PartInPolygon || inPolygon == PartOutPolygon {
+	if inPolygon == operation.OnlyInLine || inPolygon == operation.PartInPolygon || inPolygon == operation.PartOutPolygon {
 		isBoundary = 1
 	}
 	return

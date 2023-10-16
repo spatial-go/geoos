@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.2.0] - 2023-06-02
+### 新增
+-Added dynamic buffer algorithm, which can support buffer algorithms with different widths for lines.
+-Optimized the union algorithm and realized union support for non convex polygon.
+-Solved the Issue issue.
+
 ## [1.1.3] - 2022-08-30
 ### Fixed
 - Fixed some buffer analysis method bugs

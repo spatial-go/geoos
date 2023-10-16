@@ -13,8 +13,16 @@
 
 
 ## 目录结构
-1. `algorithm` 是对外暴露的空间运算方法定义。
-2. `strategy.go` 定义了空间运算底层算法的选择实现。
+1.algorithm 定义了计算几何的算法.
+2.clusters 定义了空间计算的算法.
+3.coordtransform 定义了坐标转换的算法.
+4.example 代码示例.
+5.geoencoding 定义了各种编码解码的方法.
+6.grid 用于生成网格数据.
+7.index 定义空间索引算法.
+8.planar 封装平面空间运算和几何算法的实现.
+9.space 封装空间线性矢量几何.
+10.utils 实用程序的函数.
 
 ## 使用说明
 以计算面积`Area`为例。

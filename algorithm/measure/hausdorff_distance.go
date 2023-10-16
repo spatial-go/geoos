@@ -46,11 +46,11 @@ func (h *HausdorffDistance) compute() {
 }
 
 func (h *HausdorffDistance) computeOrientedDistance(g0, g1 matrix.Steric, ptDist *PointPairDistance) {
-	distFilter := &MaxPointDistanceFilter{geom: g1, MaxPtDist: ptDist, MinPtDist: &PointPairDistance{}, euclideanDist: &DistanceToPoint{}}
+	distFilter := &MaxPointDistanceFilter[matrix.Matrix]{geom: g1, MaxPtDist: ptDist, MinPtDist: &PointPairDistance{}, euclideanDist: &DistanceToPoint{}}
 	g0.Filter(distFilter)
 
 	if h.densifyFrac > 0 {
-		fracFilter := &MaxDensifiedByFractionDistanceFilter{geom: g1, MaxPtDist: ptDist, MinPtDist: &PointPairDistance{}, numSubSegs: int((1.0 / h.densifyFrac))}
+		fracFilter := &MaxDensifiedByFractionDistanceFilter[matrix.Matrix]{geom: g1, MaxPtDist: ptDist, MinPtDist: &PointPairDistance{}, numSubSegs: int((1.0 / h.densifyFrac))}
 		g0.Filter(fracFilter)
 
 	}

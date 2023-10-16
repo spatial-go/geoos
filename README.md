@@ -18,8 +18,26 @@ http://www.spatial-go.com
 
 
 ## Structure
-1. `Algorithm` is the definition of spatial operation, which is outside exposing.
-2. `strategy.go` defines the implementation of the spatial computing based algorithm.
+1.algorithm
+Package algorithm defines Specifies Computational Geometric and algorithm err.
+2.clusters
+Package clusters is a spatial clustering algorithm.
+3.coordtransform
+Package coordtransform is for transform coord.
+4.example
+Example This is an example .
+5.geoencoding
+Package geoencoding is a library for encoding and decoding into Go structs using the geometries.
+6.grid
+Package grid is used to generate grid data.
+7.index
+Package index define spatial index interface.
+8.planar
+Package planar provides support for the implementation of spatial operations and geometric algorithms.
+9.space
+Package space A representation of a linear vector geometry.
+10.utils
+Package utils A functions of utils.
 
 ## Documentation
 How to use `Geoos`:

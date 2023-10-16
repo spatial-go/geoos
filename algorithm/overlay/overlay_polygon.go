@@ -6,7 +6,7 @@ import (
 	"github.com/spatial-go/geoos/algorithm/filter"
 	"github.com/spatial-go/geoos/algorithm/graph/de9im"
 	"github.com/spatial-go/geoos/algorithm/matrix"
-	"github.com/spatial-go/geoos/algorithm/relate"
+	"github.com/spatial-go/geoos/algorithm/operation"
 )
 
 // PolygonOverlay  Computes the overlay of two geometries,either or both of which may be nil.
@@ -242,13 +242,13 @@ func (p *PolygonOverlay) prepare() {
 func (p *PolygonOverlay) Weiler() (enteringPoints, exitingPoints []Vertex) {
 
 	// TODO overlay ...
-	filtEntering := &UniqueVertexFilter{}
-	filtExiting := &UniqueVertexFilter{}
+	filtEntering := &filter.UniqueArrayFilter[Vertex]{ShieldFunc: equalsVertex}
+	filtExiting := &filter.UniqueArrayFilter[Vertex]{ShieldFunc: equalsVertex}
 	for _, v := range p.subjectPlane.Lines {
 		for _, vClip := range p.clippingPlane.Lines {
 
 			mark, ips :=
-				relate.Intersection(v.Start.Matrix, v.End.Matrix, vClip.Start.Matrix, vClip.End.Matrix)
+				operation.FindIntersection(v.Start.Matrix, v.End.Matrix, vClip.Start.Matrix, vClip.End.Matrix)
 			for _, ip := range ips {
 				//TODO
 				// if ip.IsCollinear {
@@ -286,40 +286,16 @@ func (p *PolygonOverlay) Weiler() (enteringPoints, exitingPoints []Vertex) {
 	return
 }
 
-// UniqueVertexFilter  A Filter that extracts a unique array.
-type UniqueVertexFilter struct {
-	Ips []Vertex
-}
-
-// Filter Performs an operation with the provided .
-func (u *UniqueVertexFilter) Filter(ip interface{}) bool {
-	return u.add(ip)
-}
-
-// Entities  Returns the gathered Matrixes.
-func (u *UniqueVertexFilter) Entities() interface{} {
-	return u.Ips
-}
-
-func (u *UniqueVertexFilter) add(ip interface{}) bool {
-	hasMatrix := false
-	for _, v := range u.Ips {
-		if v.Matrix.Equals(ip.(Vertex).Matrix) {
-			hasMatrix = true
-			break
+func equalsVertex(p1, p2 any) bool {
+	if v1, ok := p1.(Vertex); ok {
+		if v2, ok := p2.(Vertex); ok {
+			if v1.Matrix.Equals(v2.Matrix) {
+				return true
+			}
 		}
-	}
-	if !hasMatrix {
-		u.Ips = append(u.Ips, ip.(Vertex))
-		return true
 	}
 	return false
 }
-
-// compile time checks
-var (
-	_ filter.Filter = &UniqueVertexFilter{}
-)
 
 // ComputePolygon compute overlay.
 func (p *PolygonOverlay) ComputePolygon(exitingPoints []Vertex, cpo ComputePolyOverlay) *Plane {

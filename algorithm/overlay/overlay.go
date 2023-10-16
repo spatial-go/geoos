@@ -5,7 +5,7 @@ import (
 	"github.com/spatial-go/geoos/algorithm"
 	"github.com/spatial-go/geoos/algorithm/graph/de9im"
 	"github.com/spatial-go/geoos/algorithm/matrix"
-	"github.com/spatial-go/geoos/algorithm/relate"
+	"github.com/spatial-go/geoos/algorithm/operation"
 )
 
 // Overlay  Computes the overlay of two geometries,either or both of which may be nil.
@@ -48,14 +48,14 @@ func (p *PointOverlay) Union() (matrix.Steric, error) {
 			return matrix.Collection{ps, pc}, nil
 		case matrix.LineMatrix:
 			if pc.IsClosed() {
-				if relate.InLineMatrix(ps, pc) {
+				if operation.InLineMatrix(ps, pc) {
 					return matrix.PolygonMatrix{pc}, nil
 				}
-				if relate.InPolygon(ps, pc) {
+				if operation.IsPnPolygon(ps, pc) {
 					return matrix.PolygonMatrix{pc}, nil
 				}
 			}
-			if relate.InLineMatrix(ps, pc) {
+			if operation.InLineMatrix(ps, pc) {
 				return pc, nil
 			}
 
@@ -64,14 +64,14 @@ func (p *PointOverlay) Union() (matrix.Steric, error) {
 			inPoly := false
 			for i, v := range pc {
 				if i == 0 {
-					if relate.InLineMatrix(ps, v) {
+					if operation.InLineMatrix(ps, v) {
 						inPoly = true
 					}
-					if relate.InPolygon(ps, v) {
+					if operation.IsPnPolygon(ps, v) {
 						inPoly = true
 					}
 				} else {
-					if relate.InPolygon(ps, v) {
+					if operation.IsPnPolygon(ps, v) {
 						inPoly = false
 					}
 				}
@@ -112,7 +112,7 @@ func (p *PointOverlay) Intersection() (matrix.Steric, error) {
 		}
 		return nil, nil
 	case matrix.LineMatrix:
-		if mark := relate.InLineMatrix(p.Subject.(matrix.Matrix), c); mark {
+		if mark := operation.InLineMatrix(p.Subject.(matrix.Matrix), c); mark {
 			return p.Subject.(matrix.Matrix), nil
 		}
 		return nil, nil

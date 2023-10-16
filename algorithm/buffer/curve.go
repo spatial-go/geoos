@@ -7,7 +7,7 @@ import (
 	"github.com/spatial-go/geoos/algorithm/calc/angle"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
-	"github.com/spatial-go/geoos/algorithm/relate"
+	"github.com/spatial-go/geoos/algorithm/operation"
 )
 
 // Curve A dynamic list of the vertices in a constructed offset curve.
@@ -249,7 +249,7 @@ func (c *Curve) addNextSegment(p matrix.Matrix, addStartPoint bool) {
 
 func (c *Curve) addCollinear(addStartPoint bool) {
 
-	mark, ips := relate.Intersection(c.s0, c.s1, c.s1, c.s2)
+	mark, ips := operation.FindIntersection(c.s0, c.s1, c.s1, c.s2)
 
 	// if numInt is < 2, the lines are parallel and in the same direction. In
 	// this case the point can be ignored, since the offset lines will also be
@@ -332,7 +332,7 @@ func (c *Curve) addOutsideTurn(orientation int, addStartPoint bool) {
 func (c *Curve) addInsideTurn(orientation int, addStartPoint bool) {
 
 	// add intersection point of offset segments (if any)
-	mark, ips := relate.Intersection(c.offset0.P0, c.offset0.P1, c.offset1.P0, c.offset1.P1)
+	mark, ips := operation.FindIntersection(c.offset0.P0, c.offset0.P1, c.offset1.P0, c.offset1.P1)
 
 	if mark {
 		c.Add(ips[0].Matrix)
@@ -405,7 +405,7 @@ func (c *Curve) addMitreJoin(p matrix.Matrix,
 	// This computation is unstable if the offset segments are nearly collinear.
 	// However, this situation should have been eliminated earlier by the check
 	// for whether the offset segment endpoints are almost coincident
-	_, intPt := relate.Intersection(c.offset0.P0, c.offset0.P1, offset1.P0, offset1.P1)
+	_, intPt := operation.FindIntersection(c.offset0.P0, c.offset0.P1, offset1.P0, offset1.P1)
 	if intPt != nil {
 		mitreRatio := 1.0
 		if distance > 0.0 {

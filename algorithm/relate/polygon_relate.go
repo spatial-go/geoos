@@ -2,6 +2,7 @@ package relate
 
 import (
 	"github.com/spatial-go/geoos/algorithm/matrix"
+	"github.com/spatial-go/geoos/algorithm/operation"
 )
 
 // PolygonRelate  be used during the relate computation.
@@ -32,16 +33,16 @@ func (p *PolygonRelate) computePolygon(im *matrix.IntersectionMatrix) {
 	ipNum := 0
 	for i, v := range p.other.(matrix.PolygonMatrix) {
 		l := p.PolygonMatrix[0]
-		if mark, ips := IntersectionEdge(l, v); mark {
+		if mark, ips := operation.FindIntersectionLineMatrix(l, v); mark {
 			inRing = 1
 			ipNum = len(ips)
 		}
 		if i == 0 {
 			if inRing != 1 {
-				if InPolygon(l[0], v) {
+				if operation.IsPnPolygon(l[0], v) {
 					inRing = 0
 				} else {
-					if InPolygon(v[0], l) {
+					if operation.IsPnPolygon(v[0], l) {
 						inRing = 20
 					} else {
 						inRing = 2
@@ -52,20 +53,20 @@ func (p *PolygonRelate) computePolygon(im *matrix.IntersectionMatrix) {
 				lInRingOther := 0
 				lOutRing := 0
 				for _, m := range l {
-					if InLineMatrix(m, v) {
+					if operation.InLineMatrix(m, v) {
 						continue
 					}
-					if InPolygon(m, v) {
+					if operation.IsPnPolygon(m, v) {
 						lInRing++
 					} else {
 						lOutRing++
 					}
 				}
 				for _, m := range v {
-					if InLineMatrix(m, l) {
+					if operation.InLineMatrix(m, l) {
 						continue
 					}
-					if InPolygon(m, l) {
+					if operation.IsPnPolygon(m, l) {
 						lInRingOther++
 					}
 				}
@@ -95,7 +96,7 @@ func (p *PolygonRelate) computePolygon(im *matrix.IntersectionMatrix) {
 			}
 		} else {
 			if inRing != 1 {
-				if InPolygon(l[0], v) {
+				if operation.IsPnPolygon(l[0], v) {
 					if inRing != 2 {
 						inRing = 2
 						break
@@ -105,10 +106,10 @@ func (p *PolygonRelate) computePolygon(im *matrix.IntersectionMatrix) {
 				lInRing := 0
 				lOutRing := 0
 				for _, m := range l {
-					if InLineMatrix(m, v) {
+					if operation.InLineMatrix(m, v) {
 						continue
 					}
-					if InPolygon(m, v) {
+					if operation.IsPnPolygon(m, v) {
 						lInRing++
 					} else {
 						lOutRing++

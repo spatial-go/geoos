@@ -22,9 +22,9 @@ func TestUniqueArrayFilter_FilterSteric(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			u := &UniqueArrayFilter{}
-			u.FilterMatrixes(TransMatrixes(tt.args.matr))
-			if got := u.Matrixes(); !reflect.DeepEqual(got, tt.want) {
+			u := CreateFilterMatrix()
+			u.FilterEntities(TransMatrixes(tt.args.matr))
+			if got := u.Entities(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("unique array filter = %v, want %v", got, tt.want)
 			}
 		})

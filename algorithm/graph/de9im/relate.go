@@ -3,7 +3,7 @@ package de9im
 import (
 	"github.com/spatial-go/geoos/algorithm/graph"
 	"github.com/spatial-go/geoos/algorithm/matrix"
-	"github.com/spatial-go/geoos/algorithm/relate"
+	"github.com/spatial-go/geoos/algorithm/operation"
 )
 
 // relation Symbol
@@ -173,8 +173,8 @@ func (r *RelationshipByStructure) matrixIM(p matrix.Matrix, RelateType int) {
 			}
 			r.relationshipSymbol = RPL1
 		case matrix.PolygonMatrix:
-			pointInPolygon, _ := IsInPolygon(p, m)
-			if pointInPolygon == OnlyInPolygon {
+			pointInPolygon, _ := operation.InPolygon(p, m)
+			if pointInPolygon == operation.OnlyInPolygon {
 				r.relationshipSymbol = RPA2
 			} else {
 				r.relationshipSymbol = RPA1
@@ -209,8 +209,8 @@ func (r *RelationshipByStructure) lineIM(l matrix.LineMatrix, RelateType int) {
 			}
 			r.relationshipSymbol = RLL1
 		case matrix.PolygonMatrix:
-			pointInPolygon, _ := IsInPolygon(l, m)
-			if pointInPolygon == OnlyInPolygon {
+			pointInPolygon, _ := operation.InPolygon(l, m)
+			if pointInPolygon == operation.OnlyInPolygon {
 				r.relationshipSymbol = RLA2
 			} else {
 				r.relationshipSymbol = RLA1
@@ -222,9 +222,9 @@ func (r *RelationshipByStructure) lineIM(l matrix.LineMatrix, RelateType int) {
 			if m.IsClosed() {
 				r.IsClosed[1] = true
 			}
-			r.lineAnalyse(DefaultInPolygon, DefaultInPolygon)
+			r.lineAnalyse(operation.DefaultInPolygon, operation.DefaultInPolygon)
 		case matrix.PolygonMatrix:
-			pointInPolygon, entityInPolygon := IsInPolygon(l, m)
+			pointInPolygon, entityInPolygon := operation.InPolygon(l, m)
 			r.lineAnalyse(pointInPolygon, entityInPolygon)
 		}
 
@@ -239,19 +239,19 @@ func (r *RelationshipByStructure) polygonIM(p matrix.PolygonMatrix, RelateType i
 		switch r.Arg[1].(type) {
 		case matrix.PolygonMatrix:
 			poly := r.Arg[1].(matrix.PolygonMatrix)
-			if relate.InPolygon(p[0][0], poly[0]) {
+			if operation.IsPnPolygon(p[0][0], poly[0]) {
 				r.relationshipSymbol = RAA6
 				for i := 1; i < len(poly); i++ {
-					if relate.InPolygon(p[0][0], poly[i]) {
+					if operation.IsPnPolygon(p[0][0], poly[i]) {
 						r.relationshipSymbol = RAA1
 					}
 				}
 				return
 			}
-			if relate.InPolygon(poly[0][0], p[0]) {
+			if operation.IsPnPolygon(poly[0][0], p[0]) {
 				r.relationshipSymbol = RAA5
 				for i := 1; i < len(p); i++ {
-					if relate.InPolygon(poly[0][0], p[i]) {
+					if operation.IsPnPolygon(poly[0][0], p[i]) {
 						r.relationshipSymbol = RAA1
 					}
 				}
@@ -260,7 +260,7 @@ func (r *RelationshipByStructure) polygonIM(p matrix.PolygonMatrix, RelateType i
 			r.relationshipSymbol = RAA1
 		}
 	default:
-		pointInPolygon, entityInPolygon := IsInPolygon(p, r.Arg[1].(matrix.PolygonMatrix))
+		pointInPolygon, entityInPolygon := operation.InPolygon(p, r.Arg[1].(matrix.PolygonMatrix))
 		r.polygonAnalyse(pointInPolygon, entityInPolygon)
 	}
 }

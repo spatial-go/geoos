@@ -2,6 +2,7 @@ package space
 
 import (
 	"github.com/spatial-go/geoos/algorithm/buffer"
+	"github.com/spatial-go/geoos/algorithm/filter"
 	"github.com/spatial-go/geoos/algorithm/matrix"
 	"github.com/spatial-go/geoos/algorithm/measure"
 	"github.com/spatial-go/geoos/algorithm/operation"
@@ -109,12 +110,14 @@ func (mp MultiPoint) IsEmpty() bool {
 
 // Distance returns distance Between the two Geometry.
 func (mp MultiPoint) Distance(g Geometry) (float64, error) {
-	return Distance(mp, g, measure.PlanarDistance)
+	pg := PlanarGeom[MultiPoint]{mp}
+	return pg.Distance(g, measure.PlanarDistance)
 }
 
 // SpheroidDistance returns  spheroid distance Between the two Geometry.
 func (mp MultiPoint) SpheroidDistance(g Geometry) (float64, error) {
-	return Distance(mp, g, measure.SpheroidDistance)
+	pg := PlanarGeom[MultiPoint]{mp}
+	return pg.Distance(g, measure.SpheroidDistance)
 }
 
 // Boundary returns the closure of the combinatorial boundary of this space.Geometry.
@@ -139,7 +142,8 @@ func (mp MultiPoint) IsSimple() bool {
 
 // Centroid Computes the centroid point of a geometry.
 func (mp MultiPoint) Centroid() Point {
-	return Centroid(mp)
+	pg := PlanarGeom[MultiPoint]{mp}
+	return pg.Centroid()
 }
 
 // UniquePoints return all distinct vertices of input geometry as a MultiPoint.
@@ -165,13 +169,15 @@ func (mp MultiPoint) SimplifyP(tolerance float64) Geometry {
 // Buffer Returns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
 func (mp MultiPoint) Buffer(width float64, quadsegs int) Geometry {
-	return bufferInOriginal(mp, width, quadsegs)
+	pg := PlanarGeom[MultiPoint]{mp}
+	return pg.bufferInOriginal(width, quadsegs)
 }
 
 // BufferInMeter Returns a geometry that represents all points whose distance
 // from this space.Geometry is less than or equal to distance.
 func (mp MultiPoint) BufferInMeter(width float64, quadsegs int) Geometry {
-	return bufferInMeter(mp, width, quadsegs)
+	pg := PlanarGeom[MultiPoint]{mp}
+	return pg.bufferInMeter(width, quadsegs)
 }
 
 // Envelope returns the  minimum bounding box for the supplied geometry, as a geometry.
@@ -234,14 +240,11 @@ func (mp MultiPoint) CoordinateSystem() int {
 }
 
 // Filter Performs an operation with the provided .
-func (mp MultiPoint) Filter(f matrix.Filter) Geometry {
-	f.FilterMatrixes(matrix.TransMatrixes(mp.ToMatrix()))
-	if f.IsChanged() {
-		mp = mp[:0]
-		for _, v := range f.Matrixes() {
-			mp = append(mp, Point(v))
-		}
-		return mp
+func (mp MultiPoint) Filter(f filter.Filter[matrix.Matrix]) Geometry {
+	f.FilterEntities(matrix.TransMatrixes(mp.ToMatrix()))
+	mp = mp[:0]
+	for _, v := range f.Entities() {
+		mp = append(mp, Point(v))
 	}
 	return mp
 }
