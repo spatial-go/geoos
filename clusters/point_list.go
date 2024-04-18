@@ -2,7 +2,7 @@ package clusters
 
 import (
 	"fmt"
-	"slices"
+	"sort"
 
 	"github.com/spatial-go/geoos/planar"
 	"github.com/spatial-go/geoos/space"
@@ -62,14 +62,8 @@ func (points PointList) ConvexHull() PointList {
 	}
 
 	// sort points by x coordinates (ties stay in original order)
-	slices.SortStableFunc(points, func(a, b space.Point) int {
-		if a.X() < b.X() || (a.X() == b.X() && a.Y() < b.Y()) {
-			return -1
-		}
-		if a.X() > b.X() || (a.X() == b.X() && a.Y() > b.Y()) {
-			return 1
-		}
-		return 0
+	sort.SliceStable(points, func(i, j int) bool {
+		return points[i].X() < points[j].X() || (points[i].X() == points[j].X() && points[i].Y() < points[j].Y())
 	})
 
 	// build lower hull
@@ -84,8 +78,9 @@ func (points PointList) ConvexHull() PointList {
 	}
 	// build upper hull
 	upperHull := PointList{}
-	slices.Reverse(points)
-	for _, p := range points {
+	// iterate in reverse order
+	for i := len(points) - 1; i >= 0; i-- {
+		p := points[i]
 		for len(upperHull) >= 2 && cross(upperHull[len(upperHull)-2], upperHull[len(upperHull)-1], p) <= 0 {
 			// pop last point
 			upperHull = upperHull[:len(upperHull)-1]
