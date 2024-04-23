@@ -73,6 +73,7 @@ func TestRangeQueryKDTree(t *testing.T) {
 }
 
 func TestDBScan(t *testing.T) {
+	setup()
 	clusterArray, noise := DBScan(s.points, 0.8, 10)
 
 	goodClusters := []clusters.Cluster{
@@ -155,6 +156,38 @@ func TestDBScan(t *testing.T) {
 		if b != true {
 			t.Errorf("allPoints want %v,but get %v", true, b)
 			return
+		}
+	}
+
+	// Verify cluster.PointList contains the correct points
+	for _, cluster := range clusterArray {
+		if len(cluster.Points) != len(cluster.PointList) {
+			t.Errorf("Cluster #%d cluster.Points contains %d points, while cluster.Pointlist contains %d points. Must be the same!", cluster.C, len(cluster.Points), len(cluster.PointList))
+			return
+		}
+		// cluster.Points has been sorted, but cluster.PointList has not so we have to loop cluster.PointList for each cluster.Point to find the match
+		// multiple matches are allowed as a cluster can contain multiple points with the same coordinates
+		matchedPoints := make(map[int]bool, len(cluster.Points))
+		for _, pointIdx := range cluster.Points {
+			for _, point := range cluster.PointList {
+				if reflect.DeepEqual(s.points[pointIdx], point) {
+					matchedPoints[pointIdx] = true
+				}
+			}
+		}
+		// every index in cluster.Points must have a match in cluster.PointList
+		for _, pointIdx := range cluster.Points {
+			if !matchedPoints[pointIdx] {
+				t.Errorf("Cluster #%d pointIdx %d (%v) has no match in cluster.PointList", cluster.C, pointIdx, s.points[pointIdx])
+				return
+			}
+		}
+	}
+
+	// Verify cluster.Center is filled
+	for _, cluster := range clusterArray {
+		if cluster.Center == nil || len(cluster.Center) == 0 {
+			t.Errorf("cluster.Center should not be empty")
 		}
 	}
 }

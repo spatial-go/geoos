@@ -37,7 +37,8 @@ func DBScan(points clusters.PointList, eps float64, minPoints int) (clusterArray
 		if len(neighborPts) < minPoints {
 			noise = append(noise, i)
 		} else {
-			cluster := clusters.Cluster{C: C, Points: []int{i}}
+			// init cluster with center point
+			cluster := clusters.Cluster{C: C, Points: []int{i}, PointList: []space.Point{points[i]}}
 			members[i] = true
 			C++
 			// expandCluster goes here inline
@@ -63,9 +64,11 @@ func DBScan(points clusters.PointList, eps float64, minPoints int) (clusterArray
 
 				if !members[k] {
 					cluster.Points = append(cluster.Points, k)
+					cluster.PointList = append(cluster.PointList, points[k])
 					members[k] = true
 				}
 			}
+			cluster.Recenter()
 			clusterArray = append(clusterArray, cluster)
 		}
 	}
