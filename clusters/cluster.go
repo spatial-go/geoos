@@ -46,6 +46,11 @@ func (c *Cluster) Append(point space.Point) {
 	c.PointList = append(c.PointList, point)
 }
 
+// ConvexHull returns the convex hull of the clusters PointList
+func (c *Cluster) ConvexHull() PointList {
+	return c.PointList.ConvexHull()
+}
+
 // Nearest returns the index of the cluster nearest to point
 func (c Clusters) Nearest(point space.Point) int {
 	var ci int
