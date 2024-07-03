@@ -31,7 +31,7 @@ func (ii *IntersectionInterior) ProcessIntersections(
 			if ip.IsCollinear {
 				continue
 			}
-			ii.Intersections = append(ii.Intersections, ips...)
+			ii.Intersections = append(ii.Intersections, ip)
 		}
 	}
 }
