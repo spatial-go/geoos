@@ -253,6 +253,23 @@ func (p Polygon) BufferInMeter(width float64, quadsegs int) Geometry {
 	return pg.bufferInMeter(width, quadsegs)
 }
 
+func (p Polygon) BufferInMeterDistributed(width float64, quadsegs int, workers int) Geometry {
+    if workers <= 1 || len(p) == 0 {
+        return p.BufferInMeter(width, quadsegs) // Fallback to single-threaded
+    }
+
+    pool := NewWorkerPool(workers)
+    for _, ring := range p {
+        ringCopy := Ring(ring) // Capture in closure
+        pool.AddTask(func() Geometry {
+            return ringCopy.BufferInMeter(width, quadsegs)
+        })
+    }
+
+    return pool.Wait()
+}
+
+
 // Envelope returns the  minimum bounding box for the supplied geometry, as a geometry.
 // The polygon is defined by the corner points of the bounding box
 // ((MINX, MINY), (MINX, MAXY), (MAXX, MAXY), (MAXX, MINY), (MINX, MINY)).

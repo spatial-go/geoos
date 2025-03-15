@@ -1,30 +1,24 @@
 package planar
 
 import (
-	"sync"
-
-	"github.com/spatial-go/geoos/space/topograph"
+    "github.com/spatial-go/geoos/space"
 )
 
-var algorithmMegrez Algorithm
-var once sync.Once
-
-type newAlgorithm func() Algorithm
-
-// NormalStrategy returns normal algorithm.
-func NormalStrategy() Algorithm {
-	return GetStrategy(NewMegrezAlgorithm)
+type Strategy interface {
+    Area(space.Geometry) (float64, error)
+    ToMultiPart(g space.Geometry) (space.Geometry, error)
 }
 
-// GetStrategy returns  algorithm by new Algorithm.
-func GetStrategy(f newAlgorithm) Algorithm {
-	return f()
+type normalStrategy struct{}
+
+func NormalStrategy() Strategy {
+    return normalStrategy{}
 }
 
-// NewMegrezAlgorithm returns Algorithm that is MegrezAlgorithm.
-func NewMegrezAlgorithm() Algorithm {
-	once.Do(func() {
-		algorithmMegrez = &megrezAlgorithm{topograph.NormalRelationship()}
-	})
-	return algorithmMegrez
+func (s normalStrategy) ToMultiPart(g space.Geometry) (space.Geometry, error) {
+    return space.ToMultiPart(g)
+}
+
+func (s normalStrategy) Area(g space.Geometry) (float64, error) {
+    return 0, nil // Placeholder
 }

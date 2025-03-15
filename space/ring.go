@@ -146,6 +146,29 @@ func (r Ring) BufferInMeter(width float64, quadsegs int) Geometry {
 	return LineString(r).BufferInMeter(width, quadsegs)
 }
 
+// BufferInMeterDistributed buffers the Ring using distributed computing.
+func (r Ring) BufferInMeterDistributed(width float64, quadsegs int, workers int) Geometry {
+    if workers <= 1 || len(r) < 2 {
+        return r.BufferInMeter(width, quadsegs) // Fallback to single-threaded
+    }
+
+    pool := NewWorkerPool(workers)
+    chunkSize := (len(r) + workers - 1) / workers // Divide points into chunks
+
+    for i := 0; i < len(r)-1; i += chunkSize {
+        end := i + chunkSize
+        if end > len(r) {
+            end = len(r)
+        }
+        segment := r[i:end]
+        pool.AddTask(func() Geometry {
+            return LineString(segment).BufferInMeter(width, quadsegs)
+        })
+    }
+
+    return pool.Wait()
+}
+
 // Envelope returns the  minimum bounding box for the supplied geometry, as a geometry.
 // The polygon is defined by the corner points of the bounding box
 // ((MINX, MINY), (MINX, MAXY), (MAXX, MAXY), (MAXX, MINY), (MINX, MINY)).
