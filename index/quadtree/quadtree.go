@@ -1,5 +1,6 @@
 // Package quadtree A Quadtree is a spatial index structure for efficient range querying
-//  of items bounded by 2D rectangles.
+//
+//	of items bounded by 2D rectangles.
 package quadtree
 
 import (
@@ -11,17 +12,19 @@ import (
 )
 
 // Quadtree A Quadtree is a spatial index structure for efficient range querying
-//  of items bounded by 2D rectangles.
-//  Geometries can be indexed by using their Envelopes.
-//  Any type of Object can also be indexed as
-//  long as it has an extent that can be represented by an  Envelope.
+//
+//	of items bounded by 2D rectangles.
+//	Geometries can be indexed by using their Envelopes.
+//	Any type of Object can also be indexed as
+//	long as it has an extent that can be represented by an  Envelope.
 type Quadtree struct {
 	Root      *Root
 	MinExtent float64
 }
 
 // EnsureExtent Ensure that the envelope for the inserted item has non-zero extents.
-//  Use the current minExtent to pad the envelope, if necessary
+//
+//	Use the current minExtent to pad the envelope, if necessary
 func EnsureExtent(itemEnv *envelope.Envelope, minExtent float64) *envelope.Envelope {
 
 	minx := itemEnv.MinX

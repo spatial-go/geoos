@@ -7,10 +7,11 @@ import (
 
 // SpatialIndex The basic operations supported
 // implementing spatial index algorithms.
-//  A spatial index typically provides a primary filter for range rectangle queries.
-//  A secondary filter is required to test for exact intersection.
-//  The secondary filter may consist of other kinds of tests,
-//  such as testing other spatial relationships.
+//
+//	A spatial index typically provides a primary filter for range rectangle queries.
+//	A secondary filter is required to test for exact intersection.
+//	The secondary filter may consist of other kinds of tests,
+//	such as testing other spatial relationships.
 type SpatialIndex interface {
 	// Insert Adds a spatial item with an extent specified by the given Envelope to the index
 	Insert(itemEnv *envelope.Envelope, item interface{}) error

@@ -206,3 +206,29 @@ func isSortedOnDim(dim int, nodes []int, pts pointSlice) bool {
 	}
 	return true
 }
+
+func TestNearestNeighbor(t *testing.T) {
+	// Sabit bir nokta kümesi
+	pts := clusters.PointList{
+		space.Point{0, 0},
+		space.Point{1, 1},
+		space.Point{2, 2},
+		space.Point{5, 5},
+	}
+	tree := NewKDTree(pts)
+	tests := []struct {
+		query    space.Point
+		expected int
+	}{
+		{space.Point{0.1, 0.1}, 0},
+		{space.Point{1.2, 1.1}, 1},
+		{space.Point{2.1, 2.2}, 2},
+		{space.Point{4.9, 5.1}, 3},
+	}
+	for _, tc := range tests {
+		idx, _ := tree.NearestNeighbor(tc.query)
+		if idx != tc.expected {
+			t.Errorf("NearestNeighbor(%v) = %d, want %d", tc.query, idx, tc.expected)
+		}
+	}
+}
