@@ -34,7 +34,8 @@ func (r *Root) Insert(itemEnv *envelope.Envelope, item interface{}) {
 }
 
 // InsertContained insert an item which is known to be contained in the tree rooted at
-//  the given QuadNode root.  Lower levels of the tree will be created if necessary to hold the item.
+//
+//	the given QuadNode root.  Lower levels of the tree will be created if necessary to hold the item.
 func (r *Root) InsertContained(tree *Node, itemEnv *envelope.Envelope, item interface{}) {
 	isZeroX := IsZeroWidth(itemEnv.MinX, itemEnv.MaxX)
 	isZeroY := IsZeroWidth(itemEnv.MinY, itemEnv.MaxY)

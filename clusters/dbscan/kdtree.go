@@ -253,3 +253,39 @@ func (n *nodeSorter) Less(i, j int) bool {
 	}
 	return a < b
 }
+
+// NearestNeighbor returns the index and distance of the closest point in the KDTree to the given point.
+func (tree *KDTree) NearestNeighbor(pt space.Point) (nearestIdx int, minDist float64) {
+	nearestIdx = -1
+	minDist = 1e20 // sufficiently large
+	var search func(t *T)
+	search = func(t *T) {
+		if t == nil {
+			return
+		}
+		dist := DistanceSphericalFast(tree.Points[t.PointID], pt)
+		if dist < minDist {
+			nearestIdx = t.PointID
+			minDist = dist
+		}
+		// Check equal points
+		for _, eqID := range t.EqualIDs {
+			eqDist := DistanceSphericalFast(tree.Points[eqID], pt)
+			if eqDist < minDist {
+				nearestIdx = eqID
+				minDist = eqDist
+			}
+		}
+		diff := pt[t.split] - tree.Points[t.PointID][t.split]
+		first, second := t.left, t.right
+		if diff > 0 {
+			first, second = t.right, t.left
+		}
+		search(first)
+		if diff*diff < minDist*minDist {
+			search(second)
+		}
+	}
+	search(tree.Root)
+	return
+}
